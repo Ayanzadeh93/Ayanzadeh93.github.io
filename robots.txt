@@ -1,0 +1,23 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://ayanzadeh93.github.io/sitemap.xml
+
+# Crawl-delay for respectful crawling
+Crawl-delay: 1
+
+# Disallow crawling of certain file types that are not useful for SEO
+Disallow: *.pdf$
+Disallow: *.doc$
+Disallow: *.docx$
+
+# Allow CSS and JS files for proper rendering
+Allow: /css/
+Allow: /js/
+Allow: /images/
+
+# High-priority pages
+# Main portfolio page
+# Blog page
+# Contact information 
