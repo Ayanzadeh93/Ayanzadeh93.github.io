@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - Aydin Ayanzadeh</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/blog.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Top Navigation -->
+    <nav class="top-navbar">
+        <div class="top-nav-container">
+            <div class="nav-brand">
+                <h2><a href="index.html">Aydin Ayanzadeh</a></h2>
+            </div>
+            <ul class="top-nav-menu">
+                <li><a href="blog.html" class="top-nav-link active"><i class="fas fa-blog"></i> Blog</a></li>
+                <li><a href="index.html#contact" class="top-nav-link"><i class="fas fa-envelope"></i> Contact</a></li>
+            </ul>
+            <div class="sidebar-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Vertical Sidebar Navigation -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-close">
+                <i class="fas fa-times"></i>
+            </div>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="index.html#home" class="sidebar-link"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="index.html#about" class="sidebar-link"><i class="fas fa-user"></i> About</a></li>
+            <li><a href="index.html#education" class="sidebar-link"><i class="fas fa-graduation-cap"></i> Education</a></li>
+            <li><a href="index.html#experience" class="sidebar-link"><i class="fas fa-briefcase"></i> Experience</a></li>
+            <li><a href="index.html#publications" class="sidebar-link"><i class="fas fa-book"></i> Publications</a></li>
+            <li><a href="index.html#skills" class="sidebar-link"><i class="fas fa-code"></i> Skills</a></li>
+            <li><a href="index.html#awards" class="sidebar-link"><i class="fas fa-trophy"></i> Awards</a></li>
+        </ul>
+    </nav>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Blog Header -->
+        <section class="blog-header">
+            <div class="container">
+                <h1 class="blog-title">Research Blog</h1>
+                <p class="blog-subtitle">Insights, discoveries, and thoughts on Computer Vision, Medical Image Analysis, and AI</p>
+            </div>
+        </section>
+
+        <!-- Blog Posts -->
+        <section class="blog-posts">
+            <div class="container">
+                <div class="blog-grid">
+                    <!-- Featured Post -->
+                    <article class="blog-post featured">
+                        <div class="post-image">
+                            <img src="images/blog/multi-task-learning.jpg" alt="Multi-Task Learning" onerror="this.style.display='none'">
+                            <div class="post-category">Featured</div>
+                        </div>
+                        <div class="post-content">
+                            <div class="post-meta">
+                                <span class="post-date"><i class="fas fa-calendar"></i> December 15, 2024</span>
+                                <span class="post-read-time"><i class="fas fa-clock"></i> 8 min read</span>
+                            </div>
+                            <h2 class="post-title">Multi-Task Learning in Medical Image Analysis: A Deep Dive</h2>
+                            <p class="post-excerpt">
+                                Exploring how multi-task learning architectures can significantly improve performance on medical image segmentation and classification tasks, particularly when dealing with imbalanced datasets.
+                            </p>
+                            <div class="post-tags">
+                                <span class="tag">Computer Vision</span>
+                                <span class="tag">Medical AI</span>
+                                <span class="tag">Deep Learning</span>
+                            </div>
+                            <a href="#" class="read-more-btn">Read More <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </article>
+
+                    <!-- Regular Posts -->
+                    <article class="blog-post">
+                        <div class="post-image">
+                            <img src="images/blog/graph-autoencoders.jpg" alt="Graph Autoencoders" onerror="this.style.display='none'">
+                        </div>
+                        <div class="post-content">
+                            <div class="post-meta">
+                                <span class="post-date"><i class="fas fa-calendar"></i> November 28, 2024</span>
+                                <span class="post-read-time"><i class="fas fa-clock"></i> 6 min read</span>
+                            </div>
+                            <h3 class="post-title">Res-VGAE: Enhancing Graph Autoencoders with Residual Connections</h3>
+                            <p class="post-excerpt">
+                                A technical overview of our work on variational graph autoencoders with residual connections and their applications in social network analysis.
+                            </p>
+                            <div class="post-tags">
+                                <span class="tag">Graph Neural Networks</span>
+                                <span class="tag">Social Networks</span>
+                            </div>
+                            <a href="#" class="read-more-btn">Read More <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </article>
+
+                    <article class="blog-post">
+                        <div class="post-image">
+                            <img src="images/blog/cell-tracking.jpg" alt="Cell Tracking" onerror="this.style.display='none'">
+                        </div>
+                        <div class="post-content">
+                            <div class="post-meta">
+                                <span class="post-date"><i class="fas fa-calendar"></i> November 10, 2024</span>
+                                <span class="post-read-time"><i class="fas fa-clock"></i> 7 min read</span>
+                            </div>
+                            <h3 class="post-title">Advanced Cell Tracking in Phase-Contrast Microscopy</h3>
+                            <p class="post-excerpt">
+                                How we improved cell tracking efficiency using novel autoencoder architectures for time-series analysis in label-free optical microscopy.
+                            </p>
+                            <div class="post-tags">
+                                <span class="tag">Microscopy</span>
+                                <span class="tag">Cell Biology</span>
+                                <span class="tag">Time Series</span>
+                            </div>
+                            <a href="#" class="read-more-btn">Read More <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </article>
+
+                    <article class="blog-post">
+                        <div class="post-image">
+                            <img src="images/blog/edge-computing.jpg" alt="Edge Computing" onerror="this.style.display='none'">
+                        </div>
+                        <div class="post-content">
+                            <div class="post-meta">
+                                <span class="post-date"><i class="fas fa-calendar"></i> October 22, 2024</span>
+                                <span class="post-read-time"><i class="fas fa-clock"></i> 5 min read</span>
+                            </div>
+                            <h3 class="post-title">Optimizing Deep Learning Models for Edge Devices</h3>
+                            <p class="post-excerpt">
+                                Practical insights into model compression and quantization techniques that can accelerate inference from 2 fps to 18 fps on surveillance systems.
+                            </p>
+                            <div class="post-tags">
+                                <span class="tag">Edge Computing</span>
+                                <span class="tag">Model Compression</span>
+                                <span class="tag">Optimization</span>
+                            </div>
+                            <a href="#" class="read-more-btn">Read More <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </article>
+
+                    <article class="blog-post">
+                        <div class="post-image">
+                            <img src="images/blog/knowledge-distillation.jpg" alt="Knowledge Distillation" onerror="this.style.display='none'">
+                        </div>
+                        <div class="post-content">
+                            <div class="post-meta">
+                                <span class="post-date"><i class="fas fa-calendar"></i> October 5, 2024</span>
+                                <span class="post-read-time"><i class="fas fa-clock"></i> 9 min read</span>
+                            </div>
+                            <h3 class="post-title">PURSUhInT: Finding Informative Hint Points in Knowledge Distillation</h3>
+                            <p class="post-excerpt">
+                                Deep dive into our layer clustering approach for identifying the most informative hint points in knowledge distillation networks.
+                            </p>
+                            <div class="post-tags">
+                                <span class="tag">Knowledge Distillation</span>
+                                <span class="tag">Model Compression</span>
+                                <span class="tag">Transfer Learning</span>
+                            </div>
+                            <a href="#" class="read-more-btn">Read More <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </article>
+
+                    <article class="blog-post">
+                        <div class="post-image">
+                            <img src="images/blog/research-journey.jpg" alt="Research Journey" onerror="this.style.display='none'">
+                        </div>
+                        <div class="post-content">
+                            <div class="post-meta">
+                                <span class="post-date"><i class="fas fa-calendar"></i> September 18, 2024</span>
+                                <span class="post-read-time"><i class="fas fa-clock"></i> 4 min read</span>
+                            </div>
+                            <h3 class="post-title">My Journey from Industry to Academia</h3>
+                            <p class="post-excerpt">
+                                Reflections on transitioning from industry research roles at Vodafone and Arcelik to pursuing a PhD in Computer Science at UMBC.
+                            </p>
+                            <div class="post-tags">
+                                <span class="tag">Career</span>
+                                <span class="tag">Academia</span>
+                                <span class="tag">Research</span>
+                            </div>
+                            <a href="#" class="read-more-btn">Read More <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </article>
+                </div>
+
+                <!-- Load More Button -->
+                <div class="load-more-section">
+                    <button class="btn btn-primary load-more-btn">
+                        <i class="fas fa-plus"></i> Load More Posts
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Newsletter Signup -->
+        <section class="newsletter">
+            <div class="container">
+                <div class="newsletter-content">
+                    <h2>Stay Updated</h2>
+                    <p>Subscribe to get notified about new blog posts and research updates</p>
+                    <form class="newsletter-form">
+                        <input type="email" placeholder="Enter your email address" required>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> Subscribe
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-content">
+            <div class="footer-social">
+                <a href="mailto:aydina1@umbc.edu" title="Email"><i class="fas fa-envelope"></i></a>
+                <a href="https://linkedin.com/in/ayanzadeh93" target="_blank" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/Ayanzadeh93" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+            </div>
+            <div class="footer-copyright">
+                &copy; 2024 Aydin Ayanzadeh. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/blog.js"></script>
+</body>
+</html> 
