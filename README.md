@@ -40,7 +40,7 @@ This is the personal website of Aydin Ayanzadeh, Ph.D. candidate in Computer Sci
 ## Setup
 
 1. Clone the repository
-2. **Add your profile photo**: Save your professional photo as `images/profile-photo.jpg` (the image should be square and high quality for best results)
+2. **Add your profile photo**: Save your professional photo as `images/profile-compressed.jpg` (the image should be square and high quality for best results)
 3. Open `index.html` in a web browser
 4. No build process required - it's a static website
 
