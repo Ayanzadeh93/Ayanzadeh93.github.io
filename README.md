@@ -1,6 +1,6 @@
 # Aydin Ayanzadeh - Personal Website
 
-This is the personal website of Aydin Ayanzadeh, Ph.D. candidate in Computer Science at the University of Maryland, Baltimore County.
+This is the personal website of Aydin Ayanzadeh, Ph.D. Student in Computer Science at the University of Maryland, Baltimore County.
 
 ## Features
 
