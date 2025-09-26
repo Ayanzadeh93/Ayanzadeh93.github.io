@@ -667,4 +667,95 @@ function fallbackCopyTextToClipboard(text) {
     }
     
     document.body.removeChild(textArea);
-} 
+}
+
+// Privacy and Accessibility Info Functions
+window.showPrivacyInfo = function() {
+    const message = `
+Privacy Notice:
+• This website uses no tracking cookies
+• Contact form data is processed securely via Formspree
+• No personal data is stored on this website
+• Email addresses are only used to respond to inquiries
+• All external links use proper security attributes
+    `;
+    showCustomModal('Privacy Information', message);
+};
+
+window.showAccessibilityInfo = function() {
+    const message = `
+Accessibility Features:
+• Fully keyboard navigable
+• Screen reader compatible with ARIA labels
+• High contrast mode support
+• Reduced motion support for users who prefer it
+• Semantic HTML structure
+• Proper heading hierarchy
+• Alt text for all images
+• Focus indicators on all interactive elements
+
+If you encounter any accessibility issues, please contact me at aydina1@umbc.edu
+    `;
+    showCustomModal('Accessibility Information', message);
+};
+
+function showCustomModal(title, content) {
+    // Remove existing modal if any
+    const existingModal = document.getElementById('customModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // Create modal
+    const modal = document.createElement('div');
+    modal.id = 'customModal';
+    modal.className = 'custom-modal';
+    modal.innerHTML = `
+        <div class="modal-backdrop" onclick="closeCustomModal()"></div>
+        <div class="modal-content" role="dialog" aria-labelledby="modalTitle" aria-describedby="modalContent">
+            <div class="modal-header">
+                <h3 id="modalTitle">${title}</h3>
+                <button class="modal-close" onclick="closeCustomModal()" aria-label="Close modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <pre id="modalContent">${content}</pre>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeCustomModal()">Close</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Focus trap
+    const modalContent = modal.querySelector('.modal-content');
+    const focusableElements = modalContent.querySelectorAll('button, [tabindex]:not([tabindex="-1"])');
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+    
+    firstElement.focus();
+    
+    modal.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeCustomModal();
+        } else if (e.key === 'Tab') {
+            if (e.shiftKey && document.activeElement === firstElement) {
+                e.preventDefault();
+                lastElement.focus();
+            } else if (!e.shiftKey && document.activeElement === lastElement) {
+                e.preventDefault();
+                firstElement.focus();
+            }
+        }
+    });
+}
+
+window.closeCustomModal = function() {
+    const modal = document.getElementById('customModal');
+    if (modal) {
+        modal.remove();
+    }
+}; 
