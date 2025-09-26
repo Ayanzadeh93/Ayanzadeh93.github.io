@@ -403,20 +403,64 @@ function updateScrollPosition() {
 function submitForm(form) {
     showLoadingSpinner();
     
-    // Simulate form submission
-    setTimeout(() => {
+    // Disable submit button to prevent double submission
+    const submitButton = form.querySelector('button[type="submit"]');
+    const originalText = submitButton.innerHTML;
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Sending...';
+    
+    // Prepare form data
+    const formData = new FormData(form);
+    
+    // Submit to Formspree
+    fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => {
         hideLoadingSpinner();
-        showSuccessMessage('Thank you for your message! I will get back to you soon.');
-        form.reset();
+        submitButton.disabled = false;
+        submitButton.innerHTML = originalText;
         
-        // Remove validation states
-        form.querySelectorAll('.error').forEach(field => {
-            field.classList.remove('error');
-        });
-        form.querySelectorAll('.field-error').forEach(error => {
-            error.remove();
-        });
-    }, 2000);
+        if (response.ok) {
+            showSuccessMessage('Thank you for your message! I will get back to you soon.');
+            form.reset();
+            
+            // Remove validation states
+            form.querySelectorAll('.error').forEach(field => {
+                field.classList.remove('error');
+            });
+            form.querySelectorAll('.field-error').forEach(error => {
+                error.remove();
+            });
+            
+            // Announce success to screen readers
+            if (window.announceToScreenReader) {
+                window.announceToScreenReader('Message sent successfully!');
+            }
+        } else {
+            response.json().then(data => {
+                if (data.errors) {
+                    const errorMessages = data.errors.map(error => error.message).join(', ');
+                    showErrorMessage(`Error: ${errorMessages}`);
+                } else {
+                    showErrorMessage('There was a problem sending your message. Please try again.');
+                }
+            }).catch(() => {
+                showErrorMessage('There was a problem sending your message. Please try again.');
+            });
+        }
+    })
+    .catch(error => {
+        hideLoadingSpinner();
+        submitButton.disabled = false;
+        submitButton.innerHTML = originalText;
+        console.error('Form submission error:', error);
+        showErrorMessage('There was a problem sending your message. Please check your connection and try again.');
+    });
 }
 
 function showErrorMessage(message) {
@@ -579,4 +623,48 @@ function updateLayoutForScreenSize() {
 }
 
 // Initialize responsive behavior
-initResponsiveBehavior(); 
+initResponsiveBehavior();
+
+// Copy to clipboard functionality
+window.copyToClipboard = function(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+        // Use the modern Clipboard API
+        navigator.clipboard.writeText(text).then(() => {
+            showSuccessMessage('Citation copied to clipboard!');
+        }).catch(err => {
+            console.error('Failed to copy: ', err);
+            fallbackCopyTextToClipboard(text);
+        });
+    } else {
+        // Fallback for older browsers
+        fallbackCopyTextToClipboard(text);
+    }
+};
+
+function fallbackCopyTextToClipboard(text) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    
+    // Avoid scrolling to bottom
+    textArea.style.top = '0';
+    textArea.style.left = '0';
+    textArea.style.position = 'fixed';
+    
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+            showSuccessMessage('Citation copied to clipboard!');
+        } else {
+            showErrorMessage('Unable to copy citation. Please copy manually.');
+        }
+    } catch (err) {
+        console.error('Fallback: Could not copy text: ', err);
+        showErrorMessage('Unable to copy citation. Please copy manually.');
+    }
+    
+    document.body.removeChild(textArea);
+} 
