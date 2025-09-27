@@ -2093,7 +2093,7 @@ body {
     box-shadow: 0 4px 15px rgba(26, 115, 232, 0.3);
     transition: all 0.3s ease;
     z-index: 10003;
-    display: flex;
+    display: none; /* Hidden by default */
     align-items: center;
     justify-content: center;
 }
@@ -2103,6 +2103,12 @@ body {
     background: #1557b0;
     transform: scale(1.1);
     box-shadow: 0 6px 20px rgba(26, 115, 232, 0.4);
+}
+
+/* Show accessibility toggle when needed */
+.accessibility-toggle.show,
+body.accessibility-active .accessibility-toggle {
+    display: flex;
 }
 
 /* Accessibility Menu */

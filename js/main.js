@@ -1141,4 +1141,31 @@ function resetAccessibilitySettings() {
 document.addEventListener('DOMContentLoaded', function() {
     // Add to existing initialization
     initializeAccessibilityFeatures();
+    
+    // Add keyboard shortcut to toggle accessibility menu (Alt + A)
+    document.addEventListener('keydown', function(e) {
+        if (e.altKey && e.key.toLowerCase() === 'a') {
+            e.preventDefault();
+            const toggle = document.getElementById('accessibility-menu-toggle');
+            const menu = document.getElementById('accessibility-menu');
+            
+            if (toggle && menu) {
+                const isActive = document.body.classList.contains('accessibility-active');
+                
+                if (isActive) {
+                    // Hide accessibility features
+                    toggle.classList.remove('show');
+                    document.body.classList.remove('accessibility-active');
+                    closeAccessibilityMenu();
+                    announceToScreenReader('Accessibility menu hidden.');
+                } else {
+                    // Show accessibility features
+                    toggle.classList.add('show');
+                    document.body.classList.add('accessibility-active');
+                    openAccessibilityMenu();
+                    announceToScreenReader('Accessibility menu activated. Press Alt+A again to hide.');
+                }
+            }
+        }
+    });
 }); 
