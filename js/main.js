@@ -758,4 +758,387 @@ window.closeCustomModal = function() {
     if (modal) {
         modal.remove();
     }
-}; 
+};
+
+// Advanced Accessibility Features
+function initializeAccessibilityFeatures() {
+    initializeSkipLinks();
+    initializeAccessibilityMenu();
+    initializeKeyboardEnhancements();
+    initializeScreenReaderSupport();
+    initializeReadingGuide();
+    loadAccessibilityPreferences();
+}
+
+// Skip Links
+function initializeSkipLinks() {
+    const skipToContent = document.getElementById('skip-to-content');
+    const skipToNav = document.getElementById('skip-to-nav');
+    
+    if (skipToContent) {
+        skipToContent.addEventListener('click', function(e) {
+            e.preventDefault();
+            const mainContent = document.getElementById('main-content');
+            if (mainContent) {
+                mainContent.scrollIntoView({ behavior: 'smooth' });
+                mainContent.focus();
+                announceToScreenReader('Skipped to main content');
+            }
+        });
+    }
+    
+    if (skipToNav) {
+        skipToNav.addEventListener('click', function(e) {
+            e.preventDefault();
+            const navigation = document.getElementById('main-navigation');
+            if (navigation) {
+                navigation.scrollIntoView({ behavior: 'smooth' });
+                const firstNavLink = navigation.querySelector('.top-nav-link');
+                if (firstNavLink) {
+                    firstNavLink.focus();
+                    announceToScreenReader('Skipped to navigation');
+                }
+            }
+        });
+    }
+}
+
+// Accessibility Menu
+function initializeAccessibilityMenu() {
+    const toggle = document.getElementById('accessibility-menu-toggle');
+    const menu = document.getElementById('accessibility-menu');
+    const closeBtn = menu?.querySelector('.accessibility-close');
+    const resetBtn = menu?.querySelector('.accessibility-reset');
+    
+    if (toggle && menu) {
+        toggle.addEventListener('click', function() {
+            const isOpen = menu.classList.contains('active');
+            if (isOpen) {
+                closeAccessibilityMenu();
+            } else {
+                openAccessibilityMenu();
+            }
+        });
+        
+        // Close button
+        if (closeBtn) {
+            closeBtn.addEventListener('click', closeAccessibilityMenu);
+        }
+        
+        // Reset button
+        if (resetBtn) {
+            resetBtn.addEventListener('click', resetAccessibilitySettings);
+        }
+        
+        // Close on escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && menu.classList.contains('active')) {
+                closeAccessibilityMenu();
+            }
+        });
+        
+        // Close on backdrop click
+        menu.addEventListener('click', function(e) {
+            if (e.target === menu) {
+                closeAccessibilityMenu();
+            }
+        });
+        
+        // Initialize toggle states
+        initializeAccessibilityToggles();
+    }
+}
+
+function openAccessibilityMenu() {
+    const menu = document.getElementById('accessibility-menu');
+    const toggle = document.getElementById('accessibility-menu-toggle');
+    
+    if (menu && toggle) {
+        menu.classList.add('active');
+        menu.setAttribute('aria-hidden', 'false');
+        toggle.setAttribute('aria-expanded', 'true');
+        
+        // Focus first option
+        const firstOption = menu.querySelector('input[type="checkbox"]');
+        if (firstOption) {
+            firstOption.focus();
+        }
+        
+        announceToScreenReader('Accessibility menu opened');
+    }
+}
+
+function closeAccessibilityMenu() {
+    const menu = document.getElementById('accessibility-menu');
+    const toggle = document.getElementById('accessibility-menu-toggle');
+    
+    if (menu && toggle) {
+        menu.classList.remove('active');
+        menu.setAttribute('aria-hidden', 'true');
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.focus();
+        
+        announceToScreenReader('Accessibility menu closed');
+    }
+}
+
+// Accessibility Toggle Functions
+function initializeAccessibilityToggles() {
+    const toggles = {
+        'high-contrast-toggle': toggleHighContrast,
+        'large-text-toggle': toggleLargeText,
+        'focus-highlight-toggle': toggleEnhancedFocus,
+        'reduce-motion-toggle': toggleReducedMotion,
+        'keyboard-nav-toggle': toggleEnhancedKeyboard,
+        'nav-announcements-toggle': toggleNavigationAnnouncements,
+        'reading-guide-toggle': toggleReadingGuide,
+        'dyslexia-font-toggle': toggleDyslexiaFont
+    };
+    
+    Object.entries(toggles).forEach(([id, handler]) => {
+        const toggle = document.getElementById(id);
+        if (toggle) {
+            toggle.addEventListener('change', handler);
+        }
+    });
+}
+
+// Individual Toggle Functions
+function toggleHighContrast() {
+    const isEnabled = document.getElementById('high-contrast-toggle').checked;
+    document.body.classList.toggle('high-contrast', isEnabled);
+    saveAccessibilityPreference('highContrast', isEnabled);
+    announceToScreenReader(`High contrast mode ${isEnabled ? 'enabled' : 'disabled'}`);
+}
+
+function toggleLargeText() {
+    const isEnabled = document.getElementById('large-text-toggle').checked;
+    document.body.classList.toggle('large-text', isEnabled);
+    saveAccessibilityPreference('largeText', isEnabled);
+    announceToScreenReader(`Large text mode ${isEnabled ? 'enabled' : 'disabled'}`);
+}
+
+function toggleEnhancedFocus() {
+    const isEnabled = document.getElementById('focus-highlight-toggle').checked;
+    document.body.classList.toggle('enhanced-focus', isEnabled);
+    saveAccessibilityPreference('enhancedFocus', isEnabled);
+    announceToScreenReader(`Enhanced focus indicators ${isEnabled ? 'enabled' : 'disabled'}`);
+}
+
+function toggleReducedMotion() {
+    const isEnabled = document.getElementById('reduce-motion-toggle').checked;
+    document.body.classList.toggle('reduce-motion', isEnabled);
+    saveAccessibilityPreference('reducedMotion', isEnabled);
+    announceToScreenReader(`Reduced motion ${isEnabled ? 'enabled' : 'disabled'}`);
+}
+
+function toggleEnhancedKeyboard() {
+    const isEnabled = document.getElementById('keyboard-nav-toggle').checked;
+    document.body.classList.toggle('enhanced-keyboard', isEnabled);
+    saveAccessibilityPreference('enhancedKeyboard', isEnabled);
+    announceToScreenReader(`Enhanced keyboard navigation ${isEnabled ? 'enabled' : 'disabled'}`);
+}
+
+function toggleNavigationAnnouncements() {
+    const isEnabled = document.getElementById('nav-announcements-toggle').checked;
+    window.navigationAnnouncementsEnabled = isEnabled;
+    saveAccessibilityPreference('navigationAnnouncements', isEnabled);
+    announceToScreenReader(`Navigation announcements ${isEnabled ? 'enabled' : 'disabled'}`);
+}
+
+function toggleReadingGuide() {
+    const isEnabled = document.getElementById('reading-guide-toggle').checked;
+    const guide = document.getElementById('reading-guide');
+    
+    if (guide) {
+        guide.classList.toggle('active', isEnabled);
+        guide.setAttribute('aria-hidden', !isEnabled);
+    }
+    
+    if (isEnabled) {
+        initializeReadingGuideTracking();
+    } else {
+        removeReadingGuideTracking();
+    }
+    
+    saveAccessibilityPreference('readingGuide', isEnabled);
+    announceToScreenReader(`Reading guide ${isEnabled ? 'enabled' : 'disabled'}`);
+}
+
+function toggleDyslexiaFont() {
+    const isEnabled = document.getElementById('dyslexia-font-toggle').checked;
+    document.body.classList.toggle('dyslexia-font', isEnabled);
+    saveAccessibilityPreference('dyslexiaFont', isEnabled);
+    announceToScreenReader(`Dyslexia-friendly font ${isEnabled ? 'enabled' : 'disabled'}`);
+}
+
+// Reading Guide Functionality
+function initializeReadingGuide() {
+    const guide = document.getElementById('reading-guide');
+    if (guide) {
+        guide.style.top = '0px';
+    }
+}
+
+function initializeReadingGuideTracking() {
+    document.addEventListener('mousemove', updateReadingGuide);
+}
+
+function removeReadingGuideTracking() {
+    document.removeEventListener('mousemove', updateReadingGuide);
+}
+
+function updateReadingGuide(e) {
+    const guide = document.getElementById('reading-guide');
+    if (guide && guide.classList.contains('active')) {
+        guide.style.top = (e.clientY - 1) + 'px';
+    }
+}
+
+// Enhanced Keyboard Navigation
+function initializeKeyboardEnhancements() {
+    // Enhanced arrow key navigation for menu
+    const navLinks = document.querySelectorAll('.top-nav-link');
+    
+    navLinks.forEach((link, index) => {
+        link.addEventListener('keydown', function(e) {
+            if (!document.body.classList.contains('enhanced-keyboard')) return;
+            
+            let targetIndex;
+            
+            switch(e.key) {
+                case 'ArrowRight':
+                case 'ArrowDown':
+                    e.preventDefault();
+                    targetIndex = (index + 1) % navLinks.length;
+                    navLinks[targetIndex].focus();
+                    break;
+                case 'ArrowLeft':
+                case 'ArrowUp':
+                    e.preventDefault();
+                    targetIndex = (index - 1 + navLinks.length) % navLinks.length;
+                    navLinks[targetIndex].focus();
+                    break;
+                case 'Home':
+                    e.preventDefault();
+                    navLinks[0].focus();
+                    break;
+                case 'End':
+                    e.preventDefault();
+                    navLinks[navLinks.length - 1].focus();
+                    break;
+            }
+        });
+        
+        link.addEventListener('focus', function() {
+            if (window.navigationAnnouncementsEnabled) {
+                announceToScreenReader(`Focused on ${this.textContent.trim()}`);
+            }
+        });
+    });
+    
+    // Enhanced form navigation
+    const formInputs = document.querySelectorAll('input, textarea, select, button');
+    formInputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.classList.add('focus-glow');
+            setTimeout(() => {
+                this.classList.remove('focus-glow');
+            }, 600);
+        });
+    });
+}
+
+// Screen Reader Support
+function initializeScreenReaderSupport() {
+    // Announce page sections when they come into view
+    const sections = document.querySelectorAll('section[id]');
+    
+    const sectionObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting && window.navigationAnnouncementsEnabled) {
+                const sectionName = entry.target.querySelector('h1, h2, h3')?.textContent || 
+                                  entry.target.getAttribute('aria-label') || 
+                                  entry.target.id.replace('-', ' ');
+                announceToScreenReader(`Entering ${sectionName} section`);
+            }
+        });
+    }, { threshold: 0.5 });
+    
+    sections.forEach(section => {
+        sectionObserver.observe(section);
+    });
+}
+
+function announceToScreenReader(message, priority = 'polite') {
+    const announcer = document.getElementById(priority === 'assertive' ? 'sr-alerts' : 'sr-status');
+    if (announcer) {
+        // Clear previous message
+        announcer.textContent = '';
+        
+        // Add new message after a brief delay to ensure it's announced
+        setTimeout(() => {
+            announcer.textContent = message;
+        }, 100);
+        
+        // Clear message after it's been announced
+        setTimeout(() => {
+            announcer.textContent = '';
+        }, 3000);
+    }
+}
+
+// Accessibility Preferences
+function saveAccessibilityPreference(key, value) {
+    try {
+        const preferences = JSON.parse(localStorage.getItem('accessibilityPreferences') || '{}');
+        preferences[key] = value;
+        localStorage.setItem('accessibilityPreferences', JSON.stringify(preferences));
+    } catch (e) {
+        console.warn('Could not save accessibility preference:', e);
+    }
+}
+
+function loadAccessibilityPreferences() {
+    try {
+        const preferences = JSON.parse(localStorage.getItem('accessibilityPreferences') || '{}');
+        
+        // Apply saved preferences
+        Object.entries(preferences).forEach(([key, value]) => {
+            const toggleId = key.replace(/([A-Z])/g, '-$1').toLowerCase() + '-toggle';
+            const toggle = document.getElementById(toggleId);
+            
+            if (toggle) {
+                toggle.checked = value;
+                // Trigger the change event to apply the setting
+                toggle.dispatchEvent(new Event('change'));
+            }
+        });
+    } catch (e) {
+        console.warn('Could not load accessibility preferences:', e);
+    }
+}
+
+function resetAccessibilitySettings() {
+    // Reset all toggles
+    const toggles = document.querySelectorAll('#accessibility-menu input[type="checkbox"]');
+    toggles.forEach(toggle => {
+        toggle.checked = false;
+        toggle.dispatchEvent(new Event('change'));
+    });
+    
+    // Clear localStorage
+    try {
+        localStorage.removeItem('accessibilityPreferences');
+    } catch (e) {
+        console.warn('Could not clear accessibility preferences:', e);
+    }
+    
+    announceToScreenReader('All accessibility settings have been reset');
+}
+
+// Initialize accessibility features when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Add to existing initialization
+    initializeAccessibilityFeatures();
+}); 

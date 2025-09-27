@@ -193,8 +193,80 @@
     <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml">
 </head>
 <body>
-    <!-- Skip to content for accessibility -->
-    <a href="#main-content" class="skip-to-content">Skip to main content</a>
+    <!-- Accessibility Features -->
+    <div class="accessibility-controls" role="region" aria-label="Accessibility Controls">
+        <button id="skip-to-content" class="skip-link">Skip to main content</button>
+        <button id="skip-to-nav" class="skip-link">Skip to navigation</button>
+        <button id="accessibility-menu-toggle" class="accessibility-toggle" aria-label="Open accessibility menu" aria-expanded="false">
+            <i class="fas fa-universal-access" aria-hidden="true"></i>
+            <span class="sr-only">Accessibility Options</span>
+        </button>
+    </div>
+
+    <!-- Accessibility Menu -->
+    <div id="accessibility-menu" class="accessibility-menu" role="dialog" aria-labelledby="accessibility-title" aria-hidden="true">
+        <div class="accessibility-content">
+            <h2 id="accessibility-title">Accessibility Settings</h2>
+            <button class="accessibility-close" aria-label="Close accessibility menu">
+                <i class="fas fa-times" aria-hidden="true"></i>
+            </button>
+            
+            <div class="accessibility-options">
+                <div class="accessibility-group">
+                    <h3>Visual Accessibility</h3>
+                    <label class="accessibility-option">
+                        <input type="checkbox" id="high-contrast-toggle">
+                        <span>High Contrast Mode</span>
+                    </label>
+                    <label class="accessibility-option">
+                        <input type="checkbox" id="large-text-toggle">
+                        <span>Large Text</span>
+                    </label>
+                    <label class="accessibility-option">
+                        <input type="checkbox" id="focus-highlight-toggle">
+                        <span>Enhanced Focus Indicators</span>
+                    </label>
+                    <label class="accessibility-option">
+                        <input type="checkbox" id="reduce-motion-toggle">
+                        <span>Reduce Motion</span>
+                    </label>
+                </div>
+                
+                <div class="accessibility-group">
+                    <h3>Navigation</h3>
+                    <label class="accessibility-option">
+                        <input type="checkbox" id="keyboard-nav-toggle">
+                        <span>Enhanced Keyboard Navigation</span>
+                    </label>
+                    <label class="accessibility-option">
+                        <input type="checkbox" id="nav-announcements-toggle">
+                        <span>Navigation Announcements</span>
+                    </label>
+                </div>
+                
+                <div class="accessibility-group">
+                    <h3>Reading</h3>
+                    <label class="accessibility-option">
+                        <input type="checkbox" id="reading-guide-toggle">
+                        <span>Reading Guide</span>
+                    </label>
+                    <label class="accessibility-option">
+                        <input type="checkbox" id="dyslexia-font-toggle">
+                        <span>Dyslexia-Friendly Font</span>
+                    </label>
+                </div>
+            </div>
+            
+            <button class="accessibility-reset">Reset All Settings</button>
+        </div>
+    </div>
+    
+    <!-- Reading Guide -->
+    <div id="reading-guide" class="reading-guide" aria-hidden="true"></div>
+    
+    <!-- Screen Reader Status Updates -->
+    <div id="sr-status" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+    <div id="sr-alerts" class="sr-only" aria-live="assertive" aria-atomic="true"></div>
     
     <!-- Loading overlay -->
     <div class="loading-overlay" id="loadingOverlay">
@@ -204,38 +276,39 @@
     </div>
 
     <!-- Enhanced Top Navigation -->
-    <nav class="top-navbar" role="navigation" aria-label="Main navigation">
+    <nav class="top-navbar" role="navigation" aria-label="Main navigation" id="main-navigation">
         <div class="top-nav-container">
             <div class="nav-brand">
-                <a href="#home" class="brand-link">
-                    <div class="ai-logo">
+                <a href="#home" class="brand-link" aria-label="Aydin Ayanzadeh - Go to home section">
+                    <div class="ai-logo" role="img" aria-label="AI-themed logo with neural network design">
                         <div class="neural-network-icon">
-                            <div class="node"></div>
-                            <div class="node"></div>
-                            <div class="node"></div>
-                            <div class="connection"></div>
-                            <div class="connection"></div>
+                            <div class="node" aria-hidden="true"></div>
+                            <div class="node" aria-hidden="true"></div>
+                            <div class="node" aria-hidden="true"></div>
+                            <div class="connection" aria-hidden="true"></div>
+                            <div class="connection" aria-hidden="true"></div>
                         </div>
                     </div>
                     <span class="brand-text">Aydin Ayanzadeh</span>
                 </a>
             </div>
-            <ul class="top-nav-menu">
-                <li><a href="#home" class="top-nav-link" aria-label="Go to home section"><i class="fas fa-home" aria-hidden="true"></i> Home</a></li>
-                <li><a href="#about" class="top-nav-link" aria-label="Go to about section"><i class="fas fa-user" aria-hidden="true"></i> About</a></li>
-                <li><a href="#education" class="top-nav-link" aria-label="Go to education section"><i class="fas fa-graduation-cap" aria-hidden="true"></i> Education</a></li>
-                <li><a href="#experience" class="top-nav-link" aria-label="Go to experience section"><i class="fas fa-briefcase" aria-hidden="true"></i> Experience</a></li>
-                <li><a href="#teaching" class="top-nav-link" aria-label="Go to teaching section"><i class="fas fa-chalkboard-teacher" aria-hidden="true"></i> Teaching</a></li>
-                <li><a href="#publications" class="top-nav-link" aria-label="Go to publications section"><i class="fas fa-book" aria-hidden="true"></i> Publications</a></li>
-                <li><a href="#research-projects" class="top-nav-link" aria-label="Go to research projects section"><i class="fas fa-flask" aria-hidden="true"></i> Research</a></li>
-                <li><a href="#skills" class="top-nav-link" aria-label="Go to skills section"><i class="fas fa-code" aria-hidden="true"></i> Skills</a></li>
-                <li><a href="#awards" class="top-nav-link" aria-label="Go to awards section"><i class="fas fa-trophy" aria-hidden="true"></i> Awards</a></li>
-                <li><a href="#contact" class="top-nav-link" aria-label="Go to contact section"><i class="fas fa-envelope" aria-hidden="true"></i> Contact</a></li>
+            <ul class="top-nav-menu" role="menubar" aria-label="Main navigation menu">
+                <li role="none"><a href="#home" class="top-nav-link" role="menuitem" aria-label="Navigate to home section" tabindex="0"><i class="fas fa-home" aria-hidden="true"></i> <span>Home</span></a></li>
+                <li role="none"><a href="#about" class="top-nav-link" role="menuitem" aria-label="Navigate to about section" tabindex="-1"><i class="fas fa-user" aria-hidden="true"></i> <span>About</span></a></li>
+                <li role="none"><a href="#education" class="top-nav-link" role="menuitem" aria-label="Navigate to education section" tabindex="-1"><i class="fas fa-graduation-cap" aria-hidden="true"></i> <span>Education</span></a></li>
+                <li role="none"><a href="#experience" class="top-nav-link" role="menuitem" aria-label="Navigate to experience section" tabindex="-1"><i class="fas fa-briefcase" aria-hidden="true"></i> <span>Experience</span></a></li>
+                <li role="none"><a href="#teaching" class="top-nav-link" role="menuitem" aria-label="Navigate to teaching section" tabindex="-1"><i class="fas fa-chalkboard-teacher" aria-hidden="true"></i> <span>Teaching</span></a></li>
+                <li role="none"><a href="#publications" class="top-nav-link" role="menuitem" aria-label="Navigate to publications section" tabindex="-1"><i class="fas fa-book" aria-hidden="true"></i> <span>Publications</span></a></li>
+                <li role="none"><a href="#research-projects" class="top-nav-link" role="menuitem" aria-label="Navigate to research projects section" tabindex="-1"><i class="fas fa-flask" aria-hidden="true"></i> <span>Research</span></a></li>
+                <li role="none"><a href="#skills" class="top-nav-link" role="menuitem" aria-label="Navigate to skills section" tabindex="-1"><i class="fas fa-code" aria-hidden="true"></i> <span>Skills</span></a></li>
+                <li role="none"><a href="#awards" class="top-nav-link" role="menuitem" aria-label="Navigate to awards section" tabindex="-1"><i class="fas fa-trophy" aria-hidden="true"></i> <span>Awards</span></a></li>
+                <li role="none"><a href="#contact" class="top-nav-link" role="menuitem" aria-label="Navigate to contact section" tabindex="-1"><i class="fas fa-envelope" aria-hidden="true"></i> <span>Contact</span></a></li>
             </ul>
-            <button class="mobile-menu-toggle" aria-label="Toggle mobile menu" aria-expanded="false">
-                <span></span>
-                <span></span>
-                <span></span>
+            <button class="mobile-menu-toggle" aria-label="Toggle mobile navigation menu" aria-expanded="false" aria-controls="top-nav-menu">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span class="sr-only">Menu</span>
             </button>
         </div>
     </nav>

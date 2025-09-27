@@ -2031,6 +2031,342 @@ body {
     }
 }
 
+/* Advanced Accessibility Features */
+
+/* Screen Reader Only Content */
+.sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+    clip-path: inset(50%) !important;
+}
+
+/* Skip Links */
+.accessibility-controls {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10001;
+    display: flex;
+    gap: 5px;
+}
+
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 6px;
+    background: var(--primary-color);
+    color: white;
+    padding: 8px 16px;
+    text-decoration: none;
+    border: none;
+    border-radius: 4px;
+    font-weight: 500;
+    transition: top 0.3s ease;
+    z-index: 10002;
+    cursor: pointer;
+}
+
+.skip-link:focus {
+    top: 6px;
+}
+
+/* Accessibility Toggle Button */
+.accessibility-toggle {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(26, 115, 232, 0.3);
+    transition: all 0.3s ease;
+    z-index: 10003;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.accessibility-toggle:hover,
+.accessibility-toggle:focus {
+    background: #1557b0;
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(26, 115, 232, 0.4);
+}
+
+/* Accessibility Menu */
+.accessibility-menu {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 350px;
+    height: 100vh;
+    background: white;
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    z-index: 10004;
+    overflow-y: auto;
+}
+
+.accessibility-menu.active {
+    transform: translateX(0);
+}
+
+.accessibility-content {
+    padding: 20px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.accessibility-content h2 {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--primary-color);
+}
+
+.accessibility-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-light);
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.accessibility-close:hover,
+.accessibility-close:focus {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+}
+
+.accessibility-options {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.accessibility-group {
+    margin-bottom: 25px;
+    padding: 15px;
+    background: var(--background-light);
+    border-radius: 8px;
+}
+
+.accessibility-group h3 {
+    color: var(--text-dark);
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.accessibility-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.accessibility-option:hover {
+    background: rgba(26, 115, 232, 0.05);
+}
+
+.accessibility-option input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary-color);
+}
+
+.accessibility-option span {
+    color: var(--text-dark);
+    font-weight: 500;
+}
+
+.accessibility-reset {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: auto;
+}
+
+.accessibility-reset:hover,
+.accessibility-reset:focus {
+    background: #c82333;
+}
+
+/* Reading Guide */
+.reading-guide {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent 0%, var(--primary-color) 50%, transparent 100%);
+    pointer-events: none;
+    z-index: 9999;
+    transform: translateY(-100%);
+    transition: transform 0.3s ease;
+}
+
+.reading-guide.active {
+    transform: translateY(0);
+}
+
+/* High Contrast Mode */
+body.high-contrast {
+    --primary-color: #0066cc;
+    --secondary-color: #000000;
+    --text-dark: #000000;
+    --text-light: #333333;
+    --background-light: #ffffff;
+    --background-white: #ffffff;
+    --border-color: #000000;
+}
+
+body.high-contrast .hero {
+    background: #000000 !important;
+    color: #ffffff !important;
+}
+
+body.high-contrast .footer {
+    background: #000000 !important;
+    color: #ffffff !important;
+}
+
+body.high-contrast .btn {
+    border: 2px solid #000000 !important;
+}
+
+/* Large Text Mode */
+body.large-text {
+    font-size: 120% !important;
+}
+
+body.large-text h1,
+body.large-text h2,
+body.large-text h3,
+body.large-text h4,
+body.large-text h5,
+body.large-text h6 {
+    line-height: 1.4 !important;
+}
+
+/* Enhanced Focus Indicators */
+body.enhanced-focus *:focus {
+    outline: 3px solid var(--primary-color) !important;
+    outline-offset: 2px !important;
+    box-shadow: 0 0 0 6px rgba(26, 115, 232, 0.2) !important;
+}
+
+/* Reduced Motion */
+body.reduce-motion *,
+body.reduce-motion *::before,
+body.reduce-motion *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+}
+
+/* Dyslexia-Friendly Font */
+body.dyslexia-font {
+    font-family: 'Comic Sans MS', 'Trebuchet MS', Verdana, sans-serif !important;
+}
+
+body.dyslexia-font .hero-title,
+body.dyslexia-font .section-title {
+    font-family: 'Comic Sans MS', 'Trebuchet MS', Verdana, sans-serif !important;
+}
+
+/* Keyboard Navigation Enhancement */
+body.enhanced-keyboard .top-nav-link:focus {
+    background: var(--primary-color) !important;
+    color: white !important;
+    transform: scale(1.05) !important;
+}
+
+/* Form Error States */
+.field-error {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    display: block;
+}
+
+.error {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1) !important;
+}
+
+/* Mobile Accessibility */
+@media (max-width: 768px) {
+    .accessibility-menu {
+        width: 100%;
+    }
+    
+    .accessibility-toggle {
+        top: 5px;
+        right: 5px;
+        width: 45px;
+        height: 45px;
+        font-size: 1.1rem;
+    }
+    
+    .skip-link {
+        left: 3px;
+        padding: 6px 12px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Print Accessibility */
+@media print {
+    .accessibility-controls,
+    .accessibility-menu,
+    .accessibility-toggle,
+    .reading-guide {
+        display: none !important;
+    }
+}
+
+/* Animation for Focus Management */
+@keyframes focusGlow {
+    0% { box-shadow: 0 0 0 0 rgba(26, 115, 232, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(26, 115, 232, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(26, 115, 232, 0); }
+}
+
+.focus-glow {
+    animation: focusGlow 0.6s ease-out;
+}
+
 /* Enhanced Mobile Navigation */
 @media (max-width: 768px) {
     .top-nav-menu {
