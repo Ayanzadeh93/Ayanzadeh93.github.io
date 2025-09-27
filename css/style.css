@@ -1068,6 +1068,12 @@ body {
     border-left-color: #ff9800;
 }
 
+.publication-item.book-chapter {
+    background: linear-gradient(135deg, #f3e5f5 0%, #ffffff 100%);
+    border-left-color: #9c27b0;
+    border: 1px solid rgba(156, 39, 176, 0.2);
+}
+
 .publication-badge {
     position: absolute;
     top: 15px;
@@ -1086,6 +1092,11 @@ body {
 .preprint-badge {
     background: linear-gradient(135deg, #ff9800, #f57c00);
     box-shadow: 0 2px 10px rgba(255, 152, 0, 0.3);
+}
+
+.book-badge {
+    background: linear-gradient(135deg, #9c27b0, #7b1fa2);
+    box-shadow: 0 2px 10px rgba(156, 39, 176, 0.3);
 }
 
 .publication-item h4 {
