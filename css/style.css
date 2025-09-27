@@ -2047,35 +2047,6 @@ body {
     clip-path: inset(50%) !important;
 }
 
-/* Skip Links */
-.accessibility-controls {
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 10001;
-    display: flex;
-    gap: 5px;
-}
-
-.skip-link {
-    position: absolute;
-    top: -40px;
-    left: 6px;
-    background: var(--primary-color);
-    color: white;
-    padding: 8px 16px;
-    text-decoration: none;
-    border: none;
-    border-radius: 4px;
-    font-weight: 500;
-    transition: top 0.3s ease;
-    z-index: 10002;
-    cursor: pointer;
-}
-
-.skip-link:focus {
-    top: 6px;
-}
 
 /* Accessibility Toggle Button */
 .accessibility-toggle {
@@ -2344,17 +2315,10 @@ body.enhanced-keyboard .top-nav-link:focus {
         height: 45px;
         font-size: 1.1rem;
     }
-    
-    .skip-link {
-        left: 3px;
-        padding: 6px 12px;
-        font-size: 0.9rem;
-    }
 }
 
 /* Print Accessibility */
 @media print {
-    .accessibility-controls,
     .accessibility-menu,
     .accessibility-toggle,
     .reading-guide {

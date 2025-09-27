@@ -762,7 +762,6 @@ window.closeCustomModal = function() {
 
 // Advanced Accessibility Features
 function initializeAccessibilityFeatures() {
-    initializeSkipLinks();
     initializeAccessibilityMenu();
     initializeKeyboardEnhancements();
     initializeScreenReaderSupport();
@@ -770,38 +769,6 @@ function initializeAccessibilityFeatures() {
     loadAccessibilityPreferences();
 }
 
-// Skip Links
-function initializeSkipLinks() {
-    const skipToContent = document.getElementById('skip-to-content');
-    const skipToNav = document.getElementById('skip-to-nav');
-    
-    if (skipToContent) {
-        skipToContent.addEventListener('click', function(e) {
-            e.preventDefault();
-            const mainContent = document.getElementById('main-content');
-            if (mainContent) {
-                mainContent.scrollIntoView({ behavior: 'smooth' });
-                mainContent.focus();
-                announceToScreenReader('Skipped to main content');
-            }
-        });
-    }
-    
-    if (skipToNav) {
-        skipToNav.addEventListener('click', function(e) {
-            e.preventDefault();
-            const navigation = document.getElementById('main-navigation');
-            if (navigation) {
-                navigation.scrollIntoView({ behavior: 'smooth' });
-                const firstNavLink = navigation.querySelector('.top-nav-link');
-                if (firstNavLink) {
-                    firstNavLink.focus();
-                    announceToScreenReader('Skipped to navigation');
-                }
-            }
-        });
-    }
-}
 
 // Accessibility Menu
 function initializeAccessibilityMenu() {

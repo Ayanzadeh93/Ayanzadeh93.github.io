@@ -193,15 +193,11 @@
     <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml">
 </head>
 <body>
-    <!-- Accessibility Features -->
-    <div class="accessibility-controls" role="region" aria-label="Accessibility Controls">
-        <button id="skip-to-content" class="skip-link">Skip to main content</button>
-        <button id="skip-to-nav" class="skip-link">Skip to navigation</button>
-        <button id="accessibility-menu-toggle" class="accessibility-toggle" aria-label="Open accessibility menu" aria-expanded="false">
-            <i class="fas fa-universal-access" aria-hidden="true"></i>
-            <span class="sr-only">Accessibility Options</span>
-        </button>
-    </div>
+    <!-- Accessibility Toggle (Hidden by default) -->
+    <button id="accessibility-menu-toggle" class="accessibility-toggle" aria-label="Open accessibility menu" aria-expanded="false">
+        <i class="fas fa-universal-access" aria-hidden="true"></i>
+        <span class="sr-only">Accessibility Options</span>
+    </button>
 
     <!-- Accessibility Menu -->
     <div id="accessibility-menu" class="accessibility-menu" role="dialog" aria-labelledby="accessibility-title" aria-hidden="true">
