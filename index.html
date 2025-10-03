@@ -1364,116 +1364,98 @@
         </section>
 
         <!-- Contact Section -->
-        <section id="contact" class="section contact-section" aria-label="Contact information">
+        <section id="contact" class="section contact-section">
             <div class="container">
-                <div class="contact-header">
-                    <h2 class="section-title">Let's Connect</h2>
-                    <p class="contact-subtitle">Have a question or want to collaborate? I'd love to hear from you!</p>
+                <div class="contact-header-modern">
+                    <h2 class="section-title">Get In Touch</h2>
+                    <p class="section-subtitle-modern">Let's discuss research opportunities, collaborations, or innovative ideas</p>
                 </div>
-                
-                <div class="contact-wrapper">
-                    <!-- Contact Info Cards -->
-                    <div class="contact-info-grid">
-                        <div class="info-card">
-                            <div class="info-icon-wrapper email-icon">
-                                <i class="fas fa-envelope"></i>
-                            </div>
-                            <h3>Email</h3>
-                            <a href="mailto:aydina1@umbc.edu">aydina1@umbc.edu</a>
-                            <p class="info-description">Best way to reach me</p>
-                        </div>
-                        
-                        <div class="info-card">
-                            <div class="info-icon-wrapper location-icon">
-                                <i class="fas fa-map-marker-alt"></i>
-                            </div>
-                            <h3>Location</h3>
-                            <p>Baltimore, MD</p>
-                            <p class="info-description">United States</p>
-                        </div>
-                        
-                        <div class="info-card">
-                            <div class="info-icon-wrapper university-icon">
-                                <i class="fas fa-university"></i>
-                            </div>
-                            <h3>Institution</h3>
-                            <p>UMBC</p>
-                            <p class="info-description">Computer Science Department</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Contact Form -->
-                    <div class="contact-form-container">
-                        <div class="form-card">
-                            <div class="form-header">
-                                <i class="fas fa-paper-plane"></i>
-                                <h3>Send Me a Message</h3>
-                                <p>Fill out the form below and I'll get back to you as soon as possible</p>
+
+                <div class="contact-content-wrapper">
+                    <!-- Main Contact Form -->
+                    <div class="contact-main-form">
+                        <form action="https://formspree.io/f/xpwaqjqr" method="POST" id="contactForm" class="elegant-form" novalidate>
+                            <div class="form-grid">
+                                <div class="form-field">
+                                    <label for="name">Name</label>
+                                    <input type="text" id="name" name="name" required placeholder="Your full name" autocomplete="name">
+                                </div>
+                                
+                                <div class="form-field">
+                                    <label for="email">Email</label>
+                                    <input type="email" id="email" name="email" required placeholder="your.email@example.com" autocomplete="email">
+                                </div>
                             </div>
                             
-                            <form action="https://formspree.io/f/xpwaqjqr" method="POST" id="contactForm" class="modern-form" novalidate>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="name">
-                                            <i class="fas fa-user"></i>
-                                            Full Name *
-                                        </label>
-                                        <input type="text" id="name" name="name" required placeholder="John Doe" autocomplete="name">
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <label for="email">
-                                            <i class="fas fa-envelope"></i>
-                                            Email Address *
-                                        </label>
-                                        <input type="email" id="email" name="email" required placeholder="john@example.com" autocomplete="email">
-                                    </div>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="subject">
-                                        <i class="fas fa-tag"></i>
-                                        Subject *
-                                    </label>
-                                    <input type="text" id="subject" name="subject" required placeholder="Research Collaboration">
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="message">
-                                        <i class="fas fa-comment-dots"></i>
-                                        Your Message *
-                                    </label>
-                                    <textarea id="message" name="message" rows="6" required placeholder="Tell me about your research interests, collaboration ideas, or questions..."></textarea>
-                                </div>
-                                
-                                <button type="submit" class="submit-btn">
-                                    <span>Send Message</span>
-                                    <i class="fas fa-arrow-right"></i>
-                                </button>
-                                
-                                <div id="form-status" class="form-status" role="status" aria-live="polite"></div>
-                            </form>
-                        </div>
-                        
-                        <!-- Social Links -->
-                        <div class="social-connect">
-                            <h4>Connect with me</h4>
-                            <div class="social-links-grid">
-                                <a href="mailto:aydina1@umbc.edu" class="social-link email-link" title="Email">
+                            <div class="form-field">
+                                <label for="subject">Subject</label>
+                                <input type="text" id="subject" name="subject" required placeholder="What would you like to discuss?">
+                            </div>
+                            
+                            <div class="form-field">
+                                <label for="message">Message</label>
+                                <textarea id="message" name="message" rows="5" required placeholder="Share your thoughts, questions, or collaboration ideas..."></textarea>
+                            </div>
+                            
+                            <button type="submit" class="elegant-submit-btn">
+                                Send Message
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                            
+                            <div id="form-status" class="form-status" role="status" aria-live="polite"></div>
+                        </form>
+                    </div>
+
+                    <!-- Contact Info Sidebar -->
+                    <div class="contact-sidebar">
+                        <div class="sidebar-card">
+                            <h3>Contact Information</h3>
+                            
+                            <div class="contact-detail-item">
+                                <div class="detail-icon">
                                     <i class="fas fa-envelope"></i>
-                                    <span>Email</span>
+                                </div>
+                                <div class="detail-content">
+                                    <span class="detail-label">Email</span>
+                                    <a href="mailto:aydina1@umbc.edu">aydina1@umbc.edu</a>
+                                </div>
+                            </div>
+                            
+                            <div class="contact-detail-item">
+                                <div class="detail-icon">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div class="detail-content">
+                                    <span class="detail-label">Location</span>
+                                    <span>Baltimore, MD, USA</span>
+                                </div>
+                            </div>
+                            
+                            <div class="contact-detail-item">
+                                <div class="detail-icon">
+                                    <i class="fas fa-university"></i>
+                                </div>
+                                <div class="detail-content">
+                                    <span class="detail-label">Institution</span>
+                                    <span>UMBC - Computer Science</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="sidebar-card social-card">
+                            <h3>Follow Me</h3>
+                            <div class="social-buttons">
+                                <a href="https://linkedin.com/in/ayanzadeh93" target="_blank" class="social-btn linkedin">
+                                    <i class="fab fa-linkedin-in"></i>
                                 </a>
-                                <a href="https://linkedin.com/in/ayanzadeh93" target="_blank" class="social-link linkedin-link" title="LinkedIn">
-                                    <i class="fab fa-linkedin"></i>
-                                    <span>LinkedIn</span>
-                                </a>
-                                <a href="https://github.com/Ayanzadeh93" target="_blank" class="social-link github-link" title="GitHub">
+                                <a href="https://github.com/Ayanzadeh93" target="_blank" class="social-btn github">
                                     <i class="fab fa-github"></i>
-                                    <span>GitHub</span>
                                 </a>
-                                <a href="https://scholar.google.com/citations?user=YOUR_ID" target="_blank" class="social-link scholar-link" title="Google Scholar">
+                                <a href="https://scholar.google.com/citations?user=YOUR_ID" target="_blank" class="social-btn scholar">
                                     <i class="fas fa-graduation-cap"></i>
-                                    <span>Scholar</span>
+                                </a>
+                                <a href="mailto:aydina1@umbc.edu" class="social-btn email">
+                                    <i class="fas fa-envelope"></i>
                                 </a>
                             </div>
                         </div>
