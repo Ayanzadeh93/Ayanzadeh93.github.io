@@ -1717,42 +1717,59 @@ body {
 
 /* Social Card */
 .social-card {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    background: white;
+    color: inherit;
 }
 
 .social-card h3 {
-    color: white;
-    border-bottom-color: rgba(255, 255, 255, 0.15);
+    color: var(--text-dark);
+    border-bottom-color: #f1f5f9;
 }
 
 .social-buttons {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
 }
 
 .social-btn {
-    width: 100%;
-    aspect-ratio: 1;
-    background: rgba(255, 255, 255, 0.12);
-    border: 1.5px solid rgba(255, 255, 255, 0.25);
-    border-radius: 12px;
+    width: 50px;
+    height: 50px;
+    background: #f8fafc;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
-    font-size: 1.3rem;
+    color: #64748b;
+    font-size: 1.2rem;
     text-decoration: none;
     transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
 }
 
-.social-btn:hover {
-    background: rgba(255, 255, 255, 0.22);
-    border-color: rgba(255, 255, 255, 0.4);
-    transform: translateY(-3px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+.social-btn.linkedin:hover {
+    background: #0077b5;
+    border-color: #0077b5;
+    color: white;
+}
+
+.social-btn.github:hover {
+    background: #24292e;
+    border-color: #24292e;
+    color: white;
+}
+
+.social-btn.scholar:hover {
+    background: #4285f4;
+    border-color: #4285f4;
+    color: white;
+}
+
+.social-btn.email:hover {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
 }
 
 /* Form Status */
@@ -1823,10 +1840,6 @@ body {
     .section-subtitle-modern {
         font-size: 1rem;
         padding: 0 20px;
-    }
-    
-    .social-buttons {
-        grid-template-columns: repeat(4, 1fr);
     }
 }
 
