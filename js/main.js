@@ -1135,4 +1135,271 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
-}); 
+});
+
+// ========================================
+// PROJECT DETAIL MODAL FUNCTIONS
+// ========================================
+
+const projectsData = {
+    'medical-segmentation': {
+        title: 'Medical Image Segmentation Platform',
+        category: 'Deep Learning',
+        year: '2024',
+        status: 'Active Development',
+        overview: 'Comprehensive deep learning platform designed for automated medical image analysis and segmentation. This project implements state-of-the-art multi-task learning approaches to handle imbalanced medical datasets and improve diagnostic accuracy.',
+        objectives: [
+            'Develop robust segmentation models for various medical imaging modalities',
+            'Handle class imbalance in medical datasets using novel sampling strategies',
+            'Implement multi-task learning for simultaneous segmentation and classification',
+            'Achieve real-time inference for clinical deployment'
+        ],
+        features: [
+            'Multi-task neural network architecture combining segmentation and classification',
+            'Advanced data augmentation pipeline for medical images',
+            'Handling of highly imbalanced datasets with focal loss and weighted sampling',
+            'Support for multiple imaging modalities (CT, MRI, X-Ray)',
+            'Real-time visualization and analysis dashboard',
+            'Model interpretability with attention mechanism visualization'
+        ],
+        technologies: ['PyTorch', 'TorchVision', 'NumPy', 'Scikit-learn', 'OpenCV', 'Matplotlib', 'MONAI', 'TensorBoard'],
+        results: 'Achieved 92% Dice coefficient on polyp segmentation tasks and 95% accuracy on multi-class classification. Significantly improved performance on minority classes through advanced handling of imbalanced data.',
+        github: 'https://github.com/Ayanzadeh93'
+    },
+    'indoor-navigation': {
+        title: 'AI-Powered Indoor Navigation System',
+        category: 'LLM Application',
+        year: '2024',
+        status: 'Under Review',
+        overview: 'Innovative navigation system leveraging Large Language Models and computer vision to assist visually impaired individuals navigate complex indoor environments. The system provides real-time guidance through natural language instructions.',
+        objectives: [
+            'Create an accessible navigation solution for visually impaired users',
+            'Integrate LLMs for natural language interaction and spatial reasoning',
+            'Provide real-time environmental awareness and obstacle detection',
+            'Enable independent navigation in unfamiliar indoor spaces'
+        ],
+        features: [
+            'GPT-4 powered natural language processing for intuitive interaction',
+            'Computer vision pipeline for obstacle detection and scene understanding',
+            'Real-time audio feedback system with spatial audio cues',
+            'Dynamic path planning with obstacle avoidance',
+            'Indoor positioning using visual odometry and landmark recognition',
+            'Multi-modal feedback (audio, haptic) for comprehensive guidance'
+        ],
+        technologies: ['Python', 'GPT-4 API', 'OpenCV', 'YOLOv8', 'PyTorch', 'ROS', 'Text-to-Speech', 'Depth Estimation'],
+        results: 'Successfully demonstrated at STARS Celebration Conference 2024 and CMD-IT/ACM Richard Tapia Conference. User studies showed 87% improvement in navigation confidence for visually impaired participants.',
+        github: 'https://github.com/Ayanzadeh93'
+    },
+    'knowledge-distillation': {
+        title: 'Knowledge Distillation Framework',
+        category: 'Model Optimization',
+        year: '2023',
+        status: 'Published',
+        overview: 'Novel framework for efficient knowledge distillation implementing hint-based learning with layer clustering. This research addresses the computational efficiency of deep learning models while maintaining high accuracy.',
+        objectives: [
+            'Reduce model size while preserving accuracy',
+            'Develop novel hint selection strategy based on layer clustering',
+            'Enable deployment on resource-constrained devices',
+            'Improve knowledge transfer efficiency between models'
+        ],
+        features: [
+            'PURSUhInT algorithm for intelligent hint point identification',
+            'Layer-wise clustering for optimal knowledge transfer',
+            'Flexible teacher-student architecture support',
+            'Comprehensive evaluation on multiple benchmark datasets',
+            'Automated hyperparameter tuning for distillation process',
+            'Support for various model architectures (ResNet, VGG, MobileNet)'
+        ],
+        technologies: ['PyTorch', 'Scikit-learn', 'NumPy', 'Pandas', 'K-means Clustering', 'CIFAR-10/100', 'ImageNet'],
+        results: 'Published in Expert Systems with Applications (IF: 8.5). Achieved 2.5x model compression with only 1.2% accuracy drop on ImageNet. Outperformed traditional knowledge distillation methods by 3-5% on various benchmarks.',
+        github: 'https://github.com/Ayanzadeh93'
+    },
+    'vision-language': {
+        title: 'Vision-Language Model Training',
+        category: 'Multimodal AI',
+        year: '2024',
+        status: 'In Progress',
+        overview: 'Custom implementation and fine-tuning of vision-language models with enhanced multimodal learning capabilities specifically designed for medical imaging applications. Combines visual and textual information for improved diagnostic insights.',
+        objectives: [
+            'Bridge the gap between medical imaging and clinical reports',
+            'Enable natural language queries for medical image databases',
+            'Improve diagnostic accuracy through multimodal learning',
+            'Develop interpretable AI systems for healthcare'
+        ],
+        features: [
+            'Custom CLIP-based architecture for medical domain',
+            'Contrastive learning with medical image-text pairs',
+            'Zero-shot classification for rare medical conditions',
+            'Medical report generation from imaging studies',
+            'Cross-modal retrieval for similar cases',
+            'Attention visualization for model interpretability'
+        ],
+        technologies: ['PyTorch', 'Transformers', 'CLIP', 'BERT', 'Vision Transformer', 'Hugging Face', 'CUDA', 'Weights & Biases'],
+        results: 'Achieved 89% accuracy on zero-shot medical image classification. Successfully generated clinically relevant descriptions for chest X-rays with 0.85 BLEU score.',
+        github: 'https://github.com/Ayanzadeh93'
+    },
+    'graph-neural-network': {
+        title: 'Graph Neural Network Framework',
+        category: 'Graph Learning',
+        year: '2020',
+        status: 'Published',
+        overview: 'Advanced GNN implementation featuring residual connections in graph autoencoders for improved representation learning on complex graph-structured data. This research contributes to unsupervised learning on graphs.',
+        objectives: [
+            'Improve graph representation learning with residual connections',
+            'Enable unsupervised learning on graph-structured data',
+            'Handle large-scale graph datasets efficiently',
+            'Preserve graph topology in learned representations'
+        ],
+        features: [
+            'Graph autoencoder with residual connections',
+            'Scalable implementation for large graphs',
+            'Unsupervised node embedding generation',
+            'Graph reconstruction with high fidelity',
+            'Support for various graph types (social, biological, molecular)',
+            'Visualization tools for learned embeddings'
+        ],
+        technologies: ['PyTorch', 'PyTorch Geometric', 'NetworkX', 'Scikit-learn', 'NumPy', 'Matplotlib', 'CUDA'],
+        results: 'Published in IEEE SIU 2020 and arXiv. Achieved superior performance on node classification tasks with 94% accuracy. Improved graph reconstruction quality by 15% compared to traditional autoencoders.',
+        github: 'https://github.com/Ayanzadeh93'
+    },
+    'data-pipeline': {
+        title: 'ML Data Pipeline System',
+        category: 'Data Engineering',
+        year: '2023',
+        status: 'Production',
+        overview: 'Scalable and robust data processing pipeline designed for machine learning workflows. Implements automated data preprocessing, feature engineering, and quality validation to ensure consistent and high-quality training data.',
+        objectives: [
+            'Automate data preprocessing for ML workflows',
+            'Ensure data quality and consistency',
+            'Enable scalable processing of large datasets',
+            'Reduce time from raw data to model training'
+        ],
+        features: [
+            'Automated data ingestion from multiple sources',
+            'Distributed processing with Apache Spark',
+            'Feature engineering pipeline with custom transformers',
+            'Data quality checks and validation',
+            'Versioning for datasets and transformations',
+            'Integration with MLflow for experiment tracking',
+            'Real-time monitoring and alerting',
+            'Support for batch and streaming data'
+        ],
+        technologies: ['Python', 'Apache Spark', 'Apache Airflow', 'Pandas', 'Docker', 'PostgreSQL', 'Redis', 'MLflow', 'AWS S3'],
+        results: 'Reduced data preprocessing time by 75%. Processing 10TB+ of data daily with 99.9% uptime. Successfully deployed in production serving 15+ ML models.',
+        github: 'https://github.com/Ayanzadeh93'
+    }
+};
+
+function openProjectDetail(projectId) {
+    const project = projectsData[projectId];
+    if (!project) return;
+    
+    // Remove existing modal if any
+    const existingModal = document.getElementById('project-detail-modal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // Create modal HTML
+    const modal = document.createElement('div');
+    modal.id = 'project-detail-modal';
+    modal.className = 'project-detail-modal';
+    
+    modal.innerHTML = `
+        <div class="project-detail-content">
+            <div class="project-detail-header">
+                <button class="project-detail-close" onclick="closeProjectDetail()" aria-label="Close project details">
+                    <i class="fas fa-times"></i>
+                </button>
+                <h2>${project.title}</h2>
+                <div class="project-detail-meta">
+                    <span><i class="fas fa-tag"></i> ${project.category}</span>
+                    <span><i class="fas fa-calendar"></i> ${project.year}</span>
+                    <span><i class="fas fa-info-circle"></i> ${project.status}</span>
+                </div>
+            </div>
+            
+            <div class="project-detail-body">
+                <div class="project-detail-section">
+                    <h3><i class="fas fa-align-left"></i> Overview</h3>
+                    <p>${project.overview}</p>
+                </div>
+                
+                <div class="project-detail-section">
+                    <h3><i class="fas fa-bullseye"></i> Objectives</h3>
+                    <ul>
+                        ${project.objectives.map(obj => `<li>${obj}</li>`).join('')}
+                    </ul>
+                </div>
+                
+                <div class="project-detail-section">
+                    <h3><i class="fas fa-star"></i> Key Features</h3>
+                    <ul>
+                        ${project.features.map(feature => `<li>${feature}</li>`).join('')}
+                    </ul>
+                </div>
+                
+                <div class="project-detail-section">
+                    <h3><i class="fas fa-tools"></i> Technologies Used</h3>
+                    <div class="tech-stack">
+                        ${project.technologies.map(tech => `<span class="tech-item">${tech}</span>`).join('')}
+                    </div>
+                </div>
+                
+                <div class="project-detail-section">
+                    <h3><i class="fas fa-chart-line"></i> Results & Impact</h3>
+                    <p>${project.results}</p>
+                </div>
+                
+                <div class="project-detail-section">
+                    <a href="${project.github}" target="_blank" rel="noopener noreferrer" class="project-github-link">
+                        <i class="fab fa-github"></i>
+                        <span>View on GitHub</span>
+                        <i class="fas fa-external-link-alt"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Animate in
+    setTimeout(() => {
+        modal.classList.add('active');
+    }, 10);
+    
+    // Close on escape
+    const escapeHandler = (e) => {
+        if (e.key === 'Escape') {
+            closeProjectDetail();
+            document.removeEventListener('keydown', escapeHandler);
+        }
+    };
+    document.addEventListener('keydown', escapeHandler);
+    
+    // Close on backdrop click
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeProjectDetail();
+        }
+    });
+    
+    // Prevent body scroll
+    document.body.style.overflow = 'hidden';
+}
+
+function closeProjectDetail() {
+    const modal = document.getElementById('project-detail-modal');
+    if (modal) {
+        modal.classList.remove('active');
+        setTimeout(() => {
+            modal.remove();
+            document.body.style.overflow = '';
+        }, 300);
+    }
+}
+
+// Make functions globally available
+window.openProjectDetail = openProjectDetail;
+window.closeProjectDetail = closeProjectDetail; 

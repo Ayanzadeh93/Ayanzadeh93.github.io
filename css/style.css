@@ -2337,6 +2337,397 @@ body.enhanced-keyboard .top-nav-link:focus {
     animation: focusGlow 0.6s ease-out;
 }
 
+/* ========================================
+   PROJECTS SECTION STYLES
+   ======================================== */
+
+.section-subtitle {
+    text-align: center;
+    color: var(--text-light);
+    font-size: 1.1rem;
+    margin-top: -20px;
+    margin-bottom: 40px;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.projects-showcase {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.project-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.project-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 35px rgba(26, 115, 232, 0.15);
+}
+
+.project-thumbnail {
+    position: relative;
+    width: 100%;
+    height: 220px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.project-thumb-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    color: rgba(255, 255, 255, 0.9);
+    transition: transform 0.3s ease;
+}
+
+.project-card:hover .project-thumb-placeholder {
+    transform: scale(1.1);
+}
+
+/* Unique gradient backgrounds for different project types */
+.medical-ai {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.navigation-ai {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.knowledge-distill {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.vision-language {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+}
+
+.graph-nn {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+}
+
+.data-pipeline {
+    background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+}
+
+.project-overlay {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+}
+
+.project-category-badge {
+    background: rgba(255, 255, 255, 0.95);
+    color: #333;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.project-card-content {
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.project-card-content h3 {
+    font-size: 1.4rem;
+    color: var(--text-dark);
+    margin-bottom: 12px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.project-card-description {
+    color: var(--text-light);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    flex: 1;
+}
+
+.project-card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.project-card-tags .tag {
+    background: linear-gradient(135deg, rgba(26, 115, 232, 0.1), rgba(26, 115, 232, 0.05));
+    color: var(--primary-color);
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid rgba(26, 115, 232, 0.2);
+    transition: all 0.2s ease;
+}
+
+.project-card-tags .tag:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.project-read-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    align-self: flex-start;
+}
+
+.project-read-more:hover {
+    background: #1557b0;
+    transform: translateX(5px);
+    box-shadow: 0 4px 15px rgba(26, 115, 232, 0.3);
+}
+
+.project-read-more i {
+    transition: transform 0.3s ease;
+}
+
+.project-read-more:hover i {
+    transform: translateX(5px);
+}
+
+/* Project Detail Modal */
+.project-detail-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 10005;
+    overflow-y: auto;
+    animation: fadeIn 0.3s ease;
+}
+
+.project-detail-modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.project-detail-content {
+    background: white;
+    max-width: 900px;
+    width: 100%;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.4s ease;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.project-detail-header {
+    position: relative;
+    padding: 40px;
+    background: linear-gradient(135deg, var(--primary-color), #4a90e2);
+    color: white;
+}
+
+.project-detail-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.project-detail-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+.project-detail-header h2 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.project-detail-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.project-detail-meta span {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+}
+
+.project-detail-body {
+    padding: 40px;
+}
+
+.project-detail-section {
+    margin-bottom: 35px;
+}
+
+.project-detail-section h3 {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.project-detail-section h3 i {
+    font-size: 1.3rem;
+}
+
+.project-detail-section p,
+.project-detail-section ul {
+    color: var(--text-light);
+    font-size: 1rem;
+    line-height: 1.8;
+}
+
+.project-detail-section ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.project-detail-section ul li {
+    padding-left: 25px;
+    position: relative;
+    margin-bottom: 10px;
+}
+
+.project-detail-section ul li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+.tech-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.tech-stack .tech-item {
+    background: linear-gradient(135deg, rgba(26, 115, 232, 0.1), rgba(26, 115, 232, 0.05));
+    color: var(--primary-color);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    border: 1px solid rgba(26, 115, 232, 0.2);
+}
+
+.project-github-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #24292e;
+    color: white;
+    padding: 15px 30px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.05rem;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+}
+
+.project-github-link:hover {
+    background: #000;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+}
+
+.project-github-link i {
+    font-size: 1.3rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .projects-showcase {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+    
+    .project-thumbnail {
+        height: 180px;
+    }
+    
+    .project-thumb-placeholder {
+        font-size: 3rem;
+    }
+    
+    .project-detail-content {
+        margin: 20px;
+        max-height: 85vh;
+    }
+    
+    .project-detail-header,
+    .project-detail-body {
+        padding: 25px;
+    }
+    
+    .project-detail-header h2 {
+        font-size: 1.5rem;
+    }
+}
+
 /* Enhanced Mobile Navigation */
 @media (max-width: 768px) {
     .top-nav-menu {

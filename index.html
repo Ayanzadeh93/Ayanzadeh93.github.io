@@ -296,6 +296,7 @@
                 <li role="none"><a href="#teaching" class="top-nav-link" role="menuitem" aria-label="Navigate to teaching section" tabindex="-1"><i class="fas fa-chalkboard-teacher" aria-hidden="true"></i> <span>Teaching</span></a></li>
                 <li role="none"><a href="#publications" class="top-nav-link" role="menuitem" aria-label="Navigate to publications section" tabindex="-1"><i class="fas fa-book" aria-hidden="true"></i> <span>Publications</span></a></li>
                 <li role="none"><a href="#research-projects" class="top-nav-link" role="menuitem" aria-label="Navigate to research projects section" tabindex="-1"><i class="fas fa-flask" aria-hidden="true"></i> <span>Research</span></a></li>
+                <li role="none"><a href="#projects" class="top-nav-link" role="menuitem" aria-label="Navigate to projects section" tabindex="-1"><i class="fas fa-rocket" aria-hidden="true"></i> <span>Projects</span></a></li>
                 <li role="none"><a href="#skills" class="top-nav-link" role="menuitem" aria-label="Navigate to skills section" tabindex="-1"><i class="fas fa-code" aria-hidden="true"></i> <span>Skills</span></a></li>
                 <li role="none"><a href="#awards" class="top-nav-link" role="menuitem" aria-label="Navigate to awards section" tabindex="-1"><i class="fas fa-trophy" aria-hidden="true"></i> <span>Awards</span></a></li>
                 <li role="none"><a href="#contact" class="top-nav-link" role="menuitem" aria-label="Navigate to contact section" tabindex="-1"><i class="fas fa-envelope" aria-hidden="true"></i> <span>Contact</span></a></li>
@@ -1125,6 +1126,178 @@
                                     <strong>Published in:</strong> arXiv preprint, IEEE SIU 2020
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section id="projects" class="section">
+            <div class="container">
+                <h2 class="section-title"><i class="fas fa-rocket"></i> Projects</h2>
+                <p class="section-subtitle">Explore my software development projects, applications, and technical implementations</p>
+                
+                <div class="projects-showcase">
+                    <!-- Project Card 1 -->
+                    <div class="project-card">
+                        <div class="project-thumbnail">
+                            <div class="project-thumb-placeholder medical-ai">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <div class="project-overlay">
+                                <span class="project-category-badge">Deep Learning</span>
+                            </div>
+                        </div>
+                        <div class="project-card-content">
+                            <h3>Medical Image Segmentation Platform</h3>
+                            <p class="project-card-description">
+                                Advanced deep learning platform for automated medical image analysis and segmentation using multi-task learning approaches.
+                            </p>
+                            <div class="project-card-tags">
+                                <span class="tag">PyTorch</span>
+                                <span class="tag">Computer Vision</span>
+                                <span class="tag">Medical AI</span>
+                            </div>
+                            <button class="project-read-more" onclick="openProjectDetail('medical-segmentation')">
+                                <span>Read More</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Project Card 2 -->
+                    <div class="project-card">
+                        <div class="project-thumbnail">
+                            <div class="project-thumb-placeholder navigation-ai">
+                                <i class="fas fa-route"></i>
+                            </div>
+                            <div class="project-overlay">
+                                <span class="project-category-badge">LLM Application</span>
+                            </div>
+                        </div>
+                        <div class="project-card-content">
+                            <h3>AI-Powered Indoor Navigation</h3>
+                            <p class="project-card-description">
+                                Intelligent navigation system leveraging LLMs and computer vision to assist visually impaired individuals in indoor environments.
+                            </p>
+                            <div class="project-card-tags">
+                                <span class="tag">GPT-4</span>
+                                <span class="tag">CV</span>
+                                <span class="tag">Accessibility</span>
+                            </div>
+                            <button class="project-read-more" onclick="openProjectDetail('indoor-navigation')">
+                                <span>Read More</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Project Card 3 -->
+                    <div class="project-card">
+                        <div class="project-thumbnail">
+                            <div class="project-thumb-placeholder knowledge-distill">
+                                <i class="fas fa-compress-arrows-alt"></i>
+                            </div>
+                            <div class="project-overlay">
+                                <span class="project-category-badge">Model Optimization</span>
+                            </div>
+                        </div>
+                        <div class="project-card-content">
+                            <h3>Knowledge Distillation Framework</h3>
+                            <p class="project-card-description">
+                                Efficient deep learning framework implementing novel hint-based knowledge distillation for model compression.
+                            </p>
+                            <div class="project-card-tags">
+                                <span class="tag">PyTorch</span>
+                                <span class="tag">Model Compression</span>
+                                <span class="tag">Clustering</span>
+                            </div>
+                            <button class="project-read-more" onclick="openProjectDetail('knowledge-distillation')">
+                                <span>Read More</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Project Card 4 -->
+                    <div class="project-card">
+                        <div class="project-thumbnail">
+                            <div class="project-thumb-placeholder vision-language">
+                                <i class="fas fa-eye"></i>
+                            </div>
+                            <div class="project-overlay">
+                                <span class="project-category-badge">Multimodal AI</span>
+                            </div>
+                        </div>
+                        <div class="project-card-content">
+                            <h3>Vision-Language Model Training</h3>
+                            <p class="project-card-description">
+                                Custom implementation of vision-language models with enhanced multimodal learning capabilities for medical imaging.
+                            </p>
+                            <div class="project-card-tags">
+                                <span class="tag">Transformers</span>
+                                <span class="tag">CLIP</span>
+                                <span class="tag">Multimodal</span>
+                            </div>
+                            <button class="project-read-more" onclick="openProjectDetail('vision-language')">
+                                <span>Read More</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Project Card 5 -->
+                    <div class="project-card">
+                        <div class="project-thumbnail">
+                            <div class="project-thumb-placeholder graph-nn">
+                                <i class="fas fa-project-diagram"></i>
+                            </div>
+                            <div class="project-overlay">
+                                <span class="project-category-badge">Graph Learning</span>
+                            </div>
+                        </div>
+                        <div class="project-card-content">
+                            <h3>Graph Neural Network Framework</h3>
+                            <p class="project-card-description">
+                                Advanced GNN implementation with residual connections for improved representation learning on complex graph structures.
+                            </p>
+                            <div class="project-card-tags">
+                                <span class="tag">GNN</span>
+                                <span class="tag">PyTorch Geometric</span>
+                                <span class="tag">Graphs</span>
+                            </div>
+                            <button class="project-read-more" onclick="openProjectDetail('graph-neural-network')">
+                                <span>Read More</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Project Card 6 -->
+                    <div class="project-card">
+                        <div class="project-thumbnail">
+                            <div class="project-thumb-placeholder data-pipeline">
+                                <i class="fas fa-database"></i>
+                            </div>
+                            <div class="project-overlay">
+                                <span class="project-category-badge">Data Engineering</span>
+                            </div>
+                        </div>
+                        <div class="project-card-content">
+                            <h3>ML Data Pipeline System</h3>
+                            <p class="project-card-description">
+                                Scalable data processing pipeline for machine learning workflows with automated preprocessing and feature engineering.
+                            </p>
+                            <div class="project-card-tags">
+                                <span class="tag">Python</span>
+                                <span class="tag">Apache Spark</span>
+                                <span class="tag">MLOps</span>
+                            </div>
+                            <button class="project-read-more" onclick="openProjectDetail('data-pipeline')">
+                                <span>Read More</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
