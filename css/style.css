@@ -18,10 +18,6 @@
     box-sizing: border-box;
 }
 
-html {
-    overflow-x: hidden;
-}
-
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     font-size: clamp(14px, 2.5vw, 16px);
@@ -31,21 +27,12 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
-    overflow-x: hidden;
 }
 
 .container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
-}
-
-.section {
-    overflow-x: hidden;
-}
-
-.main-content {
-    overflow-x: hidden;
 }
 
 /* Enhanced Top Navigation */
@@ -2351,67 +2338,68 @@ body.enhanced-keyboard .top-nav-link:focus {
 }
 
 /* ========================================
-   PROJECTS SECTION STYLES
+   PROJECTS SECTION
    ======================================== */
 
-.section-subtitle {
+.section-description {
     text-align: center;
     color: var(--text-light);
     font-size: 1.1rem;
-    margin-top: -20px;
-    margin-bottom: 40px;
-    max-width: 700px;
+    margin-top: -15px;
+    margin-bottom: 50px;
+    max-width: 650px;
     margin-left: auto;
     margin-right: auto;
 }
 
-.projects-showcase {
+.projects-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(350px, 100%), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     gap: 30px;
-    margin-top: 40px;
+    max-width: 100%;
 }
 
 .project-card {
     background: white;
-    border-radius: 12px;
+    border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid rgba(0, 0, 0, 0.06);
     display: flex;
     flex-direction: column;
-    border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .project-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 35px rgba(26, 115, 232, 0.15);
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(26, 115, 232, 0.2);
 }
 
 .project-thumbnail {
     position: relative;
-    width: 100%;
-    height: 220px;
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     overflow: hidden;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
-.project-thumb-placeholder {
+.project-icon {
     width: 100%;
     height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 4rem;
-    color: rgba(255, 255, 255, 0.9);
-    transition: transform 0.3s ease;
+    color: white;
+    transition: transform 0.4s ease;
 }
 
-.project-card:hover .project-thumb-placeholder {
-    transform: scale(1.1);
+.project-card:hover .project-icon {
+    transform: scale(1.15) rotate(5deg);
 }
 
-/* Unique gradient backgrounds for different project types */
+/* Icon Background Gradients */
 .medical-ai {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
@@ -2420,56 +2408,53 @@ body.enhanced-keyboard .top-nav-link:focus {
     background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
 }
 
-.knowledge-distill {
+.optimization {
     background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
 }
 
-.vision-language {
+.multimodal {
     background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
 }
 
-.graph-nn {
+.graph-learning {
     background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
 }
 
-.data-pipeline {
+.data-engineering {
     background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
 }
 
-.project-overlay {
+.project-badge {
     position: absolute;
     top: 15px;
     right: 15px;
-}
-
-.project-category-badge {
     background: rgba(255, 255, 255, 0.95);
-    color: #333;
     padding: 6px 14px;
     border-radius: 20px;
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: 700;
+    color: #333;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
 }
 
-.project-card-content {
+.project-card-body {
     padding: 25px;
     display: flex;
     flex-direction: column;
     flex: 1;
 }
 
-.project-card-content h3 {
-    font-size: 1.4rem;
+.project-card-body h3 {
+    font-size: 1.35rem;
     color: var(--text-dark);
     margin-bottom: 12px;
     font-weight: 700;
     line-height: 1.3;
 }
 
-.project-card-description {
+.project-card-body > p {
     color: var(--text-light);
     font-size: 0.95rem;
     line-height: 1.6;
@@ -2477,14 +2462,14 @@ body.enhanced-keyboard .top-nav-link:focus {
     flex: 1;
 }
 
-.project-card-tags {
+.project-tags {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
     margin-bottom: 20px;
 }
 
-.project-card-tags .tag {
+.project-tags span {
     background: linear-gradient(135deg, rgba(26, 115, 232, 0.1), rgba(26, 115, 232, 0.05));
     color: var(--primary-color);
     padding: 5px 12px;
@@ -2492,18 +2477,19 @@ body.enhanced-keyboard .top-nav-link:focus {
     font-size: 0.8rem;
     font-weight: 600;
     border: 1px solid rgba(26, 115, 232, 0.2);
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
 }
 
-.project-card-tags .tag:hover {
+.project-tags span:hover {
     background: var(--primary-color);
     color: white;
     transform: translateY(-2px);
 }
 
-.project-read-more {
+.btn-read-more {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
     background: var(--primary-color);
     color: white;
@@ -2517,80 +2503,80 @@ body.enhanced-keyboard .top-nav-link:focus {
     align-self: flex-start;
 }
 
-.project-read-more:hover {
+.btn-read-more:hover {
     background: #1557b0;
     transform: translateX(5px);
-    box-shadow: 0 4px 15px rgba(26, 115, 232, 0.3);
+    box-shadow: 0 5px 20px rgba(26, 115, 232, 0.3);
 }
 
-.project-read-more i {
+.btn-read-more i {
     transition: transform 0.3s ease;
 }
 
-.project-read-more:hover i {
+.btn-read-more:hover i {
     transform: translateX(5px);
 }
 
-/* Project Detail Modal */
-.project-detail-modal {
+/* Project Modal */
+.project-modal {
     display: none;
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.85);
     z-index: 10005;
-    overflow-y: auto;
-    animation: fadeIn 0.3s ease;
-}
-
-.project-detail-modal.active {
-    display: flex;
     align-items: center;
     justify-content: center;
-    padding: 40px 20px;
+    padding: 20px;
+    overflow-y: auto;
 }
 
-.project-detail-content {
+.project-modal.active {
+    display: flex;
+}
+
+.modal-container {
     background: white;
     max-width: 900px;
-    width: calc(100% - 40px);
-    border-radius: 16px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    animation: slideUp 0.4s ease;
+    width: 100%;
+    border-radius: 20px;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+    animation: modalSlideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     max-height: 90vh;
     overflow-y: auto;
-    overflow-x: hidden;
+    position: relative;
 }
 
-@keyframes slideUp {
+@keyframes modalSlideIn {
     from {
         opacity: 0;
-        transform: translateY(50px);
+        transform: scale(0.9) translateY(30px);
     }
     to {
         opacity: 1;
-        transform: translateY(0);
+        transform: scale(1) translateY(0);
     }
 }
 
-.project-detail-header {
+.modal-header {
     position: relative;
     padding: 40px;
     background: linear-gradient(135deg, var(--primary-color), #4a90e2);
     color: white;
+    border-radius: 20px 20px 0 0;
 }
 
-.project-detail-close {
+.modal-close {
     position: absolute;
     top: 20px;
     right: 20px;
     background: rgba(255, 255, 255, 0.2);
     border: none;
     color: white;
-    width: 40px;
-    height: 40px;
+    width: 45px;
+    height: 45px;
     border-radius: 50%;
     font-size: 1.5rem;
     cursor: pointer;
@@ -2600,39 +2586,42 @@ body.enhanced-keyboard .top-nav-link:focus {
     justify-content: center;
 }
 
-.project-detail-close:hover {
+.modal-close:hover {
     background: rgba(255, 255, 255, 0.3);
     transform: rotate(90deg);
 }
 
-.project-detail-header h2 {
+.modal-header h2 {
     font-size: 2rem;
     margin-bottom: 10px;
 }
 
-.project-detail-meta {
+.modal-meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 15px;
+    gap: 12px;
     margin-top: 15px;
 }
 
-.project-detail-meta span {
+.modal-meta span {
     background: rgba(255, 255, 255, 0.2);
     padding: 6px 14px;
-    border-radius: 20px;
+    border-radius: 18px;
     font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
-.project-detail-body {
+.modal-body {
     padding: 40px;
 }
 
-.project-detail-section {
+.modal-section {
     margin-bottom: 35px;
 }
 
-.project-detail-section h3 {
+.modal-section h3 {
     color: var(--primary-color);
     font-size: 1.5rem;
     margin-bottom: 15px;
@@ -2641,60 +2630,58 @@ body.enhanced-keyboard .top-nav-link:focus {
     gap: 10px;
 }
 
-.project-detail-section h3 i {
-    font-size: 1.3rem;
-}
-
-.project-detail-section p,
-.project-detail-section ul {
+.modal-section p,
+.modal-section ul {
     color: var(--text-light);
     font-size: 1rem;
     line-height: 1.8;
 }
 
-.project-detail-section ul {
+.modal-section ul {
     list-style: none;
     padding-left: 0;
 }
 
-.project-detail-section ul li {
-    padding-left: 25px;
+.modal-section ul li {
+    padding-left: 30px;
     position: relative;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
 }
 
-.project-detail-section ul li::before {
+.modal-section ul li::before {
     content: '▸';
     position: absolute;
     left: 0;
     color: var(--primary-color);
     font-weight: bold;
+    font-size: 1.2rem;
 }
 
-.tech-stack {
+.tech-stack-grid {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
     margin-top: 15px;
 }
 
-.tech-stack .tech-item {
+.tech-item {
     background: linear-gradient(135deg, rgba(26, 115, 232, 0.1), rgba(26, 115, 232, 0.05));
     color: var(--primary-color);
     padding: 8px 16px;
     border-radius: 20px;
     font-weight: 600;
     border: 1px solid rgba(26, 115, 232, 0.2);
+    font-size: 0.9rem;
 }
 
-.project-github-link {
+.github-link {
     display: inline-flex;
     align-items: center;
     gap: 10px;
     background: #24292e;
     color: white;
     padding: 15px 30px;
-    border-radius: 8px;
+    border-radius: 10px;
     text-decoration: none;
     font-weight: 600;
     font-size: 1.05rem;
@@ -2702,42 +2689,42 @@ body.enhanced-keyboard .top-nav-link:focus {
     margin-top: 20px;
 }
 
-.project-github-link:hover {
+.github-link:hover {
     background: #000;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }
 
-.project-github-link i {
-    font-size: 1.3rem;
+.github-link i {
+    font-size: 1.4rem;
 }
 
-/* Responsive Design */
+/* Responsive Projects */
 @media (max-width: 768px) {
-    .projects-showcase {
+    .projects-grid {
         grid-template-columns: 1fr;
         gap: 25px;
     }
     
     .project-thumbnail {
-        height: 180px;
+        height: 160px;
     }
     
-    .project-thumb-placeholder {
+    .project-icon {
         font-size: 3rem;
     }
     
-    .project-detail-content {
-        margin: 20px;
-        max-height: 85vh;
+    .modal-container {
+        max-height: 95vh;
+        margin: 10px;
     }
     
-    .project-detail-header,
-    .project-detail-body {
+    .modal-header,
+    .modal-body {
         padding: 25px;
     }
     
-    .project-detail-header h2 {
+    .modal-header h2 {
         font-size: 1.5rem;
     }
 }
