@@ -1364,72 +1364,118 @@
         </section>
 
         <!-- Contact Section -->
-        <section id="contact" class="section section-alt" aria-label="Contact information">
+        <section id="contact" class="section contact-section" aria-label="Contact information">
             <div class="container">
-                <h2 class="section-title">Contact Me</h2>
-                <div class="contact-container">
-                    <div class="contact-info">
-                        <div class="contact-card">
-                            <h3>Get in Touch</h3>
-                            <p>I'm always interested in discussing research opportunities, collaborations, or new ideas in computer vision and AI.</p>
-                            
-                            <div class="contact-item">
-                                <i class="fas fa-envelope" aria-hidden="true"></i>
-                                <div class="contact-details">
-                                    <h4>Email</h4>
-                                    <a href="mailto:aydina1@umbc.edu" aria-label="Send email to Aydin">aydina1@umbc.edu</a>
-                                </div>
+                <div class="contact-header">
+                    <h2 class="section-title">Let's Connect</h2>
+                    <p class="contact-subtitle">Have a question or want to collaborate? I'd love to hear from you!</p>
+                </div>
+                
+                <div class="contact-wrapper">
+                    <!-- Contact Info Cards -->
+                    <div class="contact-info-grid">
+                        <div class="info-card">
+                            <div class="info-icon-wrapper email-icon">
+                                <i class="fas fa-envelope"></i>
                             </div>
-                            
-                            <div class="contact-item">
-                                <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
-                                <div class="contact-details">
-                                    <h4>Location</h4>
-                                    <p>Baltimore, MD, USA</p>
-                                </div>
+                            <h3>Email</h3>
+                            <a href="mailto:aydina1@umbc.edu">aydina1@umbc.edu</a>
+                            <p class="info-description">Best way to reach me</p>
+                        </div>
+                        
+                        <div class="info-card">
+                            <div class="info-icon-wrapper location-icon">
+                                <i class="fas fa-map-marker-alt"></i>
                             </div>
-                            
-                            <div class="contact-item">
-                                <i class="fas fa-graduation-cap" aria-hidden="true"></i>
-                                <div class="contact-details">
-                                    <h4>Institution</h4>
-                                    <p>University of Maryland, Baltimore County</p>
-                                </div>
+                            <h3>Location</h3>
+                            <p>Baltimore, MD</p>
+                            <p class="info-description">United States</p>
+                        </div>
+                        
+                        <div class="info-card">
+                            <div class="info-icon-wrapper university-icon">
+                                <i class="fas fa-university"></i>
                             </div>
+                            <h3>Institution</h3>
+                            <p>UMBC</p>
+                            <p class="info-description">Computer Science Department</p>
                         </div>
                     </div>
                     
-                    <div class="contact-form-section">
-                        <div class="contact-card">
-                            <h3>Send a Message</h3>
-                            <form action="https://formspree.io/f/xpwaqjqr" method="POST" id="contactForm" class="contact-form" novalidate aria-label="Contact form">
-                                <div class="form-group">
-                                    <label for="name">Name *</label>
-                                    <input type="text" id="name" name="name" required aria-required="true" aria-describedby="name-error" autocomplete="name">
+                    <!-- Contact Form -->
+                    <div class="contact-form-container">
+                        <div class="form-card">
+                            <div class="form-header">
+                                <i class="fas fa-paper-plane"></i>
+                                <h3>Send Me a Message</h3>
+                                <p>Fill out the form below and I'll get back to you as soon as possible</p>
+                            </div>
+                            
+                            <form action="https://formspree.io/f/xpwaqjqr" method="POST" id="contactForm" class="modern-form" novalidate>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="name">
+                                            <i class="fas fa-user"></i>
+                                            Full Name *
+                                        </label>
+                                        <input type="text" id="name" name="name" required placeholder="John Doe" autocomplete="name">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="email">
+                                            <i class="fas fa-envelope"></i>
+                                            Email Address *
+                                        </label>
+                                        <input type="email" id="email" name="email" required placeholder="john@example.com" autocomplete="email">
+                                    </div>
                                 </div>
                                 
                                 <div class="form-group">
-                                    <label for="email">Email *</label>
-                                    <input type="email" id="email" name="email" required aria-required="true" aria-describedby="email-error" autocomplete="email">
+                                    <label for="subject">
+                                        <i class="fas fa-tag"></i>
+                                        Subject *
+                                    </label>
+                                    <input type="text" id="subject" name="subject" required placeholder="Research Collaboration">
                                 </div>
                                 
                                 <div class="form-group">
-                                    <label for="subject">Subject</label>
-                                    <input type="text" id="subject" name="subject" aria-describedby="subject-help">
-                                    <small id="subject-help">Optional: Brief description of your inquiry</small>
+                                    <label for="message">
+                                        <i class="fas fa-comment-dots"></i>
+                                        Your Message *
+                                    </label>
+                                    <textarea id="message" name="message" rows="6" required placeholder="Tell me about your research interests, collaboration ideas, or questions..."></textarea>
                                 </div>
                                 
-                                <div class="form-group">
-                                    <label for="message">Message *</label>
-                                    <textarea id="message" name="message" rows="5" required aria-required="true" aria-describedby="message-error" placeholder="Tell me about your research interests, collaboration ideas, or questions..."></textarea>
-                                </div>
-                                
-                                <button type="submit" class="btn btn-primary form-submit" aria-describedby="form-status">
-                                    <i class="fas fa-paper-plane" aria-hidden="true"></i> Send Message
+                                <button type="submit" class="submit-btn">
+                                    <span>Send Message</span>
+                                    <i class="fas fa-arrow-right"></i>
                                 </button>
                                 
                                 <div id="form-status" class="form-status" role="status" aria-live="polite"></div>
                             </form>
+                        </div>
+                        
+                        <!-- Social Links -->
+                        <div class="social-connect">
+                            <h4>Connect with me</h4>
+                            <div class="social-links-grid">
+                                <a href="mailto:aydina1@umbc.edu" class="social-link email-link" title="Email">
+                                    <i class="fas fa-envelope"></i>
+                                    <span>Email</span>
+                                </a>
+                                <a href="https://linkedin.com/in/ayanzadeh93" target="_blank" class="social-link linkedin-link" title="LinkedIn">
+                                    <i class="fab fa-linkedin"></i>
+                                    <span>LinkedIn</span>
+                                </a>
+                                <a href="https://github.com/Ayanzadeh93" target="_blank" class="social-link github-link" title="GitHub">
+                                    <i class="fab fa-github"></i>
+                                    <span>GitHub</span>
+                                </a>
+                                <a href="https://scholar.google.com/citations?user=YOUR_ID" target="_blank" class="social-link scholar-link" title="Google Scholar">
+                                    <i class="fas fa-graduation-cap"></i>
+                                    <span>Scholar</span>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
