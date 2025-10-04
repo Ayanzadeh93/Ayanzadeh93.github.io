@@ -1,23 +1,46 @@
+# robots.txt for Aydin Ayanzadeh Research Portfolio
+# https://ayanzadeh93.github.io/
+
 User-agent: *
 Allow: /
-
-# Sitemap
-Sitemap: https://ayanzadeh93.github.io/sitemap.xml
-
-# Crawl-delay for respectful crawling
 Crawl-delay: 1
 
-# Disallow crawling of certain file types that are not useful for SEO
-Disallow: *.pdf$
-Disallow: *.doc$
-Disallow: *.docx$
+# Sitemaps
+Sitemap: https://ayanzadeh93.github.io/sitemap.xml
 
-# Allow CSS and JS files for proper rendering
+# Allow important resources for proper rendering
 Allow: /css/
 Allow: /js/
 Allow: /images/
+Allow: /index.html
+Allow: /favicon.svg
+Allow: /manifest.json
 
-# High-priority pages
-# Main portfolio page
-# Blog page
-# Contact information 
+# Allow PDF CV for academic purposes
+Allow: /Aydin_Ayanzadeh_CV__final.pdf
+
+# Disallow unnecessary files
+Disallow: /*.json$
+Disallow: /browserconfig.xml
+Disallow: /.git
+
+# Specific crawlers
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /images/
+
+User-agent: bingbot
+Allow: /
+
+# Academic/Research specific crawlers
+User-agent: AcademicBot
+Allow: /
+
+# Block bad bots
+User-agent: AhrefsBot
+Crawl-delay: 10
+
+User-agent: SemrushBot
+Crawl-delay: 10 

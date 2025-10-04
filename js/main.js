@@ -1108,8 +1108,6 @@ function resetAccessibilitySettings() {
 document.addEventListener('DOMContentLoaded', function() {
     // Add to existing initialization
     initializeAccessibilityFeatures();
-    initializeScrollProgress();
-    initializeBackToTop();
     
     // Add keyboard shortcut to toggle accessibility menu (Alt + A)
     document.addEventListener('keydown', function(e) {
@@ -1138,60 +1136,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
-
-// ========================================
-// SCROLL PROGRESS BAR
-// ========================================
-
-function initializeScrollProgress() {
-    const progressBar = document.getElementById('scrollProgress');
-    
-    if (!progressBar) return;
-    
-    function updateScrollProgress() {
-        const windowHeight = window.innerHeight;
-        const documentHeight = document.documentElement.scrollHeight;
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        
-        const scrollPercentage = (scrollTop / (documentHeight - windowHeight)) * 100;
-        progressBar.style.width = scrollPercentage + '%';
-    }
-    
-    window.addEventListener('scroll', updateScrollProgress);
-    updateScrollProgress(); // Initial call
-}
-
-// ========================================
-// BACK TO TOP BUTTON
-// ========================================
-
-function initializeBackToTop() {
-    const backToTopBtn = document.getElementById('backToTop');
-    
-    if (!backToTopBtn) return;
-    
-    // Show/hide button based on scroll position
-    function toggleBackToTop() {
-        if (window.pageYOffset > 300) {
-            backToTopBtn.classList.add('show');
-        } else {
-            backToTopBtn.classList.remove('show');
-        }
-    }
-    
-    window.addEventListener('scroll', toggleBackToTop);
-    
-    // Scroll to top on click
-    backToTopBtn.addEventListener('click', function() {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
-    });
-    
-    // Initial check
-    toggleBackToTop();
-}
 
 // ========================================
 // PROJECT MODAL SYSTEM
