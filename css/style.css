@@ -18,6 +18,10 @@
     box-sizing: border-box;
 }
 
+html {
+    overflow-x: hidden;
+}
+
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     font-size: clamp(14px, 2.5vw, 16px);
@@ -27,12 +31,27 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
 }
 
 .container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
+    width: 100%;
+    overflow-x: hidden;
+}
+
+main {
+    overflow-x: hidden;
+    width: 100%;
+}
+
+section {
+    overflow-x: hidden;
+    width: 100%;
 }
 
 /* Enhanced Top Navigation */
@@ -40,18 +59,21 @@ body {
     position: fixed;
     top: 0;
     width: 100%;
+    max-width: 100vw;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 251, 0.95) 100%);
     backdrop-filter: blur(10px);
     box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
     z-index: 1001;
     transition: var(--transition);
     border-bottom: 1px solid rgba(26, 115, 232, 0.1);
+    overflow-x: hidden;
 }
 
 .top-nav-container {
     max-width: 1400px;
     margin: 0 auto;
     padding: 0 20px;
+    overflow-x: hidden;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -2025,6 +2047,8 @@ body {
     border-top: 3px solid var(--primary-color);
     margin-top: 60px;
     position: relative;
+    width: 100%;
+    overflow-x: hidden;
 }
 
 .footer-content {
