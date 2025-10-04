@@ -1187,6 +1187,79 @@ function initializeCommitmentBanner() {
 }
 
 // ========================================
+// CITATION COPY FUNCTION
+// ========================================
+
+function copyToClipboard(text) {
+    // Try using the modern Clipboard API first
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(function() {
+            showCitationNotification('Citation copied to clipboard!');
+        }).catch(function(err) {
+            fallbackCopyTextToClipboard(text);
+        });
+    } else {
+        // Fallback for older browsers or non-HTTPS
+        fallbackCopyTextToClipboard(text);
+    }
+}
+
+function fallbackCopyTextToClipboard(text) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.position = "fixed";
+    textArea.style.top = "-9999px";
+    textArea.style.left = "-9999px";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+            showCitationNotification('Citation copied to clipboard!');
+        } else {
+            showCitationNotification('Failed to copy citation', 'error');
+        }
+    } catch (err) {
+        showCitationNotification('Failed to copy citation', 'error');
+    }
+    
+    document.body.removeChild(textArea);
+}
+
+function showCitationNotification(message, type = 'success') {
+    // Remove any existing notifications
+    const existingNotif = document.querySelector('.citation-notification');
+    if (existingNotif) {
+        existingNotif.remove();
+    }
+    
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `citation-notification ${type}`;
+    notification.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+        <span>${message}</span>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Show notification
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 10);
+    
+    // Hide and remove notification after 3 seconds
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+            notification.remove();
+        }, 300);
+    }, 3000);
+}
+
+// ========================================
 // PROJECT MODAL SYSTEM
 // ========================================
 
