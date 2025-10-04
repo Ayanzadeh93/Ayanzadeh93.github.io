@@ -1108,6 +1108,8 @@ function resetAccessibilitySettings() {
 document.addEventListener('DOMContentLoaded', function() {
     // Add to existing initialization
     initializeAccessibilityFeatures();
+    initializeAccessibilityBadge();
+    initializeCommitmentBanner();
     
     // Add keyboard shortcut to toggle accessibility menu (Alt + A)
     document.addEventListener('keydown', function(e) {
@@ -1136,6 +1138,53 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+// Accessibility Badge Functions
+function initializeAccessibilityBadge() {
+    const badge = document.querySelector('.badge-trigger');
+    if (badge) {
+        badge.addEventListener('click', function() {
+            const toggle = document.getElementById('accessibility-menu-toggle');
+            const menu = document.getElementById('accessibility-menu');
+            
+            if (toggle && menu) {
+                toggle.classList.add('show');
+                document.body.classList.add('accessibility-active');
+                openAccessibilityMenu();
+                announceToScreenReader('Accessibility menu opened');
+            }
+        });
+    }
+}
+
+// Commitment Banner Functions
+function initializeCommitmentBanner() {
+    const banner = document.querySelector('.a11y-commitment-banner');
+    const closeBtn = document.querySelector('.close-banner');
+    
+    // Check if banner was previously closed
+    const bannerClosed = localStorage.getItem('a11y-banner-closed');
+    
+    if (bannerClosed) {
+        banner.classList.add('hidden');
+    } else {
+        // Auto-hide after 10 seconds
+        setTimeout(() => {
+            if (banner && !banner.classList.contains('hidden')) {
+                banner.classList.add('hidden');
+            }
+        }, 10000);
+    }
+    
+    // Close button handler
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function() {
+            banner.classList.add('hidden');
+            localStorage.setItem('a11y-banner-closed', 'true');
+            announceToScreenReader('Accessibility banner closed');
+        });
+    }
+}
 
 // ========================================
 // PROJECT MODAL SYSTEM
