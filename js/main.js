@@ -11,8 +11,36 @@ document.addEventListener('DOMContentLoaded', function() {
     initPerformanceOptimizations();
     initAccessibilityFeatures();
     initAIAnimations();
+    initNavbarScroll();
     hideLoadingOverlay();
 });
+
+// Navbar scroll effect
+function initNavbarScroll() {
+    const navbar = document.querySelector('.top-navbar');
+    if (!navbar) return;
+    
+    let lastScrollY = window.scrollY;
+    
+    function handleScroll() {
+        const currentScrollY = window.scrollY;
+        
+        // Add scrolled class when scrolled down
+        if (currentScrollY > 50) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
+        }
+        
+        lastScrollY = currentScrollY;
+    }
+    
+    // Use passive listener for better scroll performance
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    // Initial check
+    handleScroll();
+}
 
 // Mobile menu functionality
 function initMobileMenu() {
