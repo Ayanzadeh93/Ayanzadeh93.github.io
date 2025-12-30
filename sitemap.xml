@@ -2,62 +2,104 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
         <loc>https://ayanzadeh93.github.io/</loc>
-        <lastmod>2024-01-15</lastmod>
+        <lastmod>2025-01-01</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
     </url>
     <url>
         <loc>https://ayanzadeh93.github.io/blog.html</loc>
-        <lastmod>2024-01-15</lastmod>
+        <lastmod>2025-01-01</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
         <loc>https://ayanzadeh93.github.io/blog-post.html</loc>
-        <lastmod>2024-12-15</lastmod>
+        <lastmod>2025-01-01</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
     <url>
+        <loc>https://ayanzadeh93.github.io/projects/indoor-navigation.html</loc>
+        <lastmod>2025-01-01</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>https://ayanzadeh93.github.io/projects/medical-segmentation.html</loc>
+        <lastmod>2025-01-01</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://ayanzadeh93.github.io/projects/knowledge-distillation.html</loc>
+        <lastmod>2025-01-01</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://ayanzadeh93.github.io/projects/vision-language-medical.html</loc>
+        <lastmod>2025-01-01</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://ayanzadeh93.github.io/projects/graph-autoencoder.html</loc>
+        <lastmod>2025-01-01</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://ayanzadeh93.github.io/projects/ml-data-pipeline.html</loc>
+        <lastmod>2025-01-01</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
         <loc>https://ayanzadeh93.github.io/#about</loc>
-        <lastmod>2024-01-15</lastmod>
+        <lastmod>2025-01-01</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
         <loc>https://ayanzadeh93.github.io/#education</loc>
-        <lastmod>2024-01-15</lastmod>
+        <lastmod>2025-01-01</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
     <url>
         <loc>https://ayanzadeh93.github.io/#experience</loc>
-        <lastmod>2024-01-15</lastmod>
+        <lastmod>2025-01-01</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
     <url>
+        <loc>https://ayanzadeh93.github.io/#featured-research</loc>
+        <lastmod>2025-01-01</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
         <loc>https://ayanzadeh93.github.io/#publications</loc>
-        <lastmod>2024-01-15</lastmod>
+        <lastmod>2025-01-01</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.9</priority>
     </url>
     <url>
         <loc>https://ayanzadeh93.github.io/#skills</loc>
-        <lastmod>2024-01-15</lastmod>
+        <lastmod>2025-01-01</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
     </url>
     <url>
         <loc>https://ayanzadeh93.github.io/#awards</loc>
-        <lastmod>2024-01-15</lastmod>
+        <lastmod>2025-01-01</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
     </url>
     <url>
         <loc>https://ayanzadeh93.github.io/#contact</loc>
-        <lastmod>2024-01-15</lastmod>
+        <lastmod>2025-01-01</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
-</urlset> 
+</urlset>

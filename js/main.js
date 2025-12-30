@@ -454,16 +454,16 @@ function submitForm(form) {
         submitButton.innerHTML = originalText;
         
         if (response.ok) {
-            showSuccessMessage('Thank you for your message! I will get back to you soon.');
-            form.reset();
-            
-            // Remove validation states
-            form.querySelectorAll('.error').forEach(field => {
-                field.classList.remove('error');
-            });
-            form.querySelectorAll('.field-error').forEach(error => {
-                error.remove();
-            });
+        showSuccessMessage('Thank you for your message! I will get back to you soon.');
+        form.reset();
+        
+        // Remove validation states
+        form.querySelectorAll('.error').forEach(field => {
+            field.classList.remove('error');
+        });
+        form.querySelectorAll('.field-error').forEach(error => {
+            error.remove();
+        });
             
             // Announce success to screen readers
             if (window.announceToScreenReader) {
@@ -651,7 +651,7 @@ function updateLayoutForScreenSize() {
 }
 
 // Initialize responsive behavior
-initResponsiveBehavior();
+initResponsiveBehavior(); 
 
 // Copy to clipboard functionality
 window.copyToClipboard = function(text) {
