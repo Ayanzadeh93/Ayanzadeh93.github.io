@@ -1531,46 +1531,4 @@ function handleEscapeKey(e) {
 }
 
 window.openProjectModal = openProjectModal;
-window.closeProjectModal = closeProjectModal;
-
-// News Ribbon Carousel
-function initNewsCarousel() {
-    const newsRibbon = document.getElementById('newsRibbon');
-    const prevBtn = document.getElementById('newsPrev');
-    const nextBtn = document.getElementById('newsNext');
-    
-    if (!newsRibbon || !prevBtn || !nextBtn) return;
-    
-    const scrollAmount = 320; // Width of item + gap
-    
-    prevBtn.addEventListener('click', () => {
-        newsRibbon.scrollBy({
-            left: -scrollAmount,
-            behavior: 'smooth'
-        });
-    });
-    
-    nextBtn.addEventListener('click', () => {
-        newsRibbon.scrollBy({
-            left: scrollAmount,
-            behavior: 'smooth'
-        });
-    });
-    
-    // Update button visibility based on scroll position
-    function updateButtons() {
-        const maxScroll = newsRibbon.scrollWidth - newsRibbon.clientWidth;
-        prevBtn.style.opacity = newsRibbon.scrollLeft > 0 ? '1' : '0.5';
-        nextBtn.style.opacity = newsRibbon.scrollLeft < maxScroll - 10 ? '1' : '0.5';
-    }
-    
-    newsRibbon.addEventListener('scroll', updateButtons);
-    updateButtons();
-}
-
-// Initialize on DOM load
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initNewsCarousel);
-} else {
-    initNewsCarousel();
-} 
+window.closeProjectModal = closeProjectModal; 
