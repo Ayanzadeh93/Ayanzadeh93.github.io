@@ -340,6 +340,7 @@
     height: auto;
     object-fit: contain;
     border-radius: 8px;
+    display: block;
 }
 
 .diagram-fallback {

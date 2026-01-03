@@ -142,10 +142,10 @@
                         <div class="diagram-container">
                             <h3>System Architecture</h3>
                             <div class="diagram-wrapper">
-                                <!-- PDF Embed (preferred) -->
-                                <embed src="images/floorVLM_diag.pdf" type="application/pdf" class="project-diagram pdf-embed" />
-                                <!-- Image fallback (if PDF doesn't load, use image) -->
-                                <img src="images/floorVLM_diag.png" alt="FloorPlan2Guide System Architecture Diagram" class="project-diagram image-diagram" style="display: none;" />
+                                <!-- PNG Image (preferred - faster loading) -->
+                                <img src="images/floorVLM_diag.png" alt="FloorPlan2Guide System Architecture Diagram" class="project-diagram image-diagram" />
+                                <!-- PDF Embed (fallback option) -->
+                                <embed src="images/floorVLM_diag.pdf" type="application/pdf" class="project-diagram pdf-embed" style="display: none;" />
                                 <!-- Fallback if neither loads -->
                                 <div class="diagram-fallback">
                                     <p><i class="fas fa-file-pdf"></i> System Architecture Diagram</p>
@@ -226,32 +226,33 @@
 
     <script src="../js/main.js"></script>
     <script>
-        // Handle PDF diagram loading
+        // Handle diagram loading (PNG first, PDF fallback)
         document.addEventListener('DOMContentLoaded', function() {
             const pdfEmbed = document.querySelector('.project-diagram.pdf-embed');
             const imageDiagram = document.querySelector('.project-diagram.image-diagram');
             const fallback = document.querySelector('.diagram-fallback');
             
-            if (pdfEmbed && imageDiagram) {
-                // Check if PDF loads successfully
-                pdfEmbed.addEventListener('error', function() {
-                    // If PDF fails, show image
-                    pdfEmbed.style.display = 'none';
-                    imageDiagram.style.display = 'block';
-                    if (fallback) fallback.style.display = 'none';
-                });
+            if (imageDiagram && pdfEmbed && fallback) {
+                // Hide fallback initially
+                fallback.style.display = 'none';
                 
-                // Try to load image if PDF doesn't exist
-                imageDiagram.addEventListener('load', function() {
-                    // Image loaded successfully
-                    if (fallback) fallback.style.display = 'none';
-                });
-                
+                // If PNG image fails to load, try PDF
                 imageDiagram.addEventListener('error', function() {
-                    // Both PDF and image failed, show fallback
-                    if (pdfEmbed) pdfEmbed.style.display = 'none';
+                    console.log('PNG failed to load, trying PDF...');
                     imageDiagram.style.display = 'none';
-                    if (fallback) fallback.style.display = 'flex';
+                    pdfEmbed.style.display = 'block';
+                    
+                    // If PDF also fails, show fallback
+                    pdfEmbed.addEventListener('error', function() {
+                        pdfEmbed.style.display = 'none';
+                        fallback.style.display = 'flex';
+                    });
+                });
+                
+                // If PNG loads successfully, ensure PDF is hidden
+                imageDiagram.addEventListener('load', function() {
+                    pdfEmbed.style.display = 'none';
+                    fallback.style.display = 'none';
                 });
             }
         });
