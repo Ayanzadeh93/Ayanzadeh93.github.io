@@ -119,22 +119,41 @@
         <section class="project-section">
             <div class="container">
                 <h2><i class="fas fa-cogs"></i> Technical Approach</h2>
-                <div class="approach-content">
-                    <div class="approach-item">
-                        <h3>1. Floor Plan Processing</h3>
-                        <p>The system processes CAD floor plans and building blueprints to extract navigable paths, room locations, and key landmarks. This creates a graph-based representation of the indoor environment.</p>
+                <div class="approach-layout">
+                    <div class="approach-content">
+                        <div class="approach-item">
+                            <h3>1. Floor Plan Processing</h3>
+                            <p>The system processes CAD floor plans and building blueprints to extract navigable paths, room locations, and key landmarks. This creates a graph-based representation of the indoor environment.</p>
+                        </div>
+                        <div class="approach-item">
+                            <h3>2. Real-time Scene Analysis</h3>
+                            <p>Using GPT-4 Vision, the system continuously analyzes camera input to identify obstacles, doors, signs, and other navigational cues in real-time.</p>
+                        </div>
+                        <div class="approach-item">
+                            <h3>3. Multimodal Fusion</h3>
+                            <p>The system fuses information from the floor plan model, real-time camera analysis, and user queries to generate contextually appropriate navigation instructions.</p>
+                        </div>
+                        <div class="approach-item">
+                            <h3>4. Natural Language Generation</h3>
+                            <p>Instructions are generated in natural, conversational language that is clear and easy to follow for users with visual impairments.</p>
+                        </div>
                     </div>
-                    <div class="approach-item">
-                        <h3>2. Real-time Scene Analysis</h3>
-                        <p>Using GPT-4 Vision, the system continuously analyzes camera input to identify obstacles, doors, signs, and other navigational cues in real-time.</p>
-                    </div>
-                    <div class="approach-item">
-                        <h3>3. Multimodal Fusion</h3>
-                        <p>The system fuses information from the floor plan model, real-time camera analysis, and user queries to generate contextually appropriate navigation instructions.</p>
-                    </div>
-                    <div class="approach-item">
-                        <h3>4. Natural Language Generation</h3>
-                        <p>Instructions are generated in natural, conversational language that is clear and easy to follow for users with visual impairments.</p>
+                    <div class="approach-visual">
+                        <div class="diagram-container">
+                            <h3>System Architecture</h3>
+                            <div class="diagram-wrapper">
+                                <!-- PDF Embed (preferred) -->
+                                <embed src="images/floorVLM_diag.pdf" type="application/pdf" class="project-diagram pdf-embed" />
+                                <!-- Image fallback (if PDF doesn't load, use image) -->
+                                <img src="images/floorVLM_diag.png" alt="FloorPlan2Guide System Architecture Diagram" class="project-diagram image-diagram" style="display: none;" />
+                                <!-- Fallback if neither loads -->
+                                <div class="diagram-fallback">
+                                    <p><i class="fas fa-file-pdf"></i> System Architecture Diagram</p>
+                                    <a href="images/floorVLM_diag.pdf" target="_blank" class="diagram-link">View PDF <i class="fas fa-external-link-alt"></i></a>
+                                </div>
+                            </div>
+                            <p class="diagram-caption">FloorPlan2Guide system architecture showing floor plan parsing and navigation generation pipeline.</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -206,6 +225,37 @@
     </footer>
 
     <script src="../js/main.js"></script>
+    <script>
+        // Handle PDF diagram loading
+        document.addEventListener('DOMContentLoaded', function() {
+            const pdfEmbed = document.querySelector('.project-diagram.pdf-embed');
+            const imageDiagram = document.querySelector('.project-diagram.image-diagram');
+            const fallback = document.querySelector('.diagram-fallback');
+            
+            if (pdfEmbed && imageDiagram) {
+                // Check if PDF loads successfully
+                pdfEmbed.addEventListener('error', function() {
+                    // If PDF fails, show image
+                    pdfEmbed.style.display = 'none';
+                    imageDiagram.style.display = 'block';
+                    if (fallback) fallback.style.display = 'none';
+                });
+                
+                // Try to load image if PDF doesn't exist
+                imageDiagram.addEventListener('load', function() {
+                    // Image loaded successfully
+                    if (fallback) fallback.style.display = 'none';
+                });
+                
+                imageDiagram.addEventListener('error', function() {
+                    // Both PDF and image failed, show fallback
+                    if (pdfEmbed) pdfEmbed.style.display = 'none';
+                    imageDiagram.style.display = 'none';
+                    if (fallback) fallback.style.display = 'flex';
+                });
+            }
+        });
+    </script>
 </body>
 </html>
 
