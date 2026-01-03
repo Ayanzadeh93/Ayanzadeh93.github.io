@@ -78,8 +78,40 @@
             </div>
         </section>
 
-        <!-- Key Features -->
+        <!-- Methodology -->
         <section class="project-section alt-bg">
+            <div class="container">
+                <h2><i class="fas fa-cogs"></i> Methodology</h2>
+                <div class="approach-layout">
+                    <div class="approach-content">
+                        <div class="approach-item">
+                            <h3>(a) Feature Extraction</h3>
+                            <p>The framework begins by extracting features from input images through successive neural network layers. These layers progressively reduce spatial dimensions while increasing feature depth, creating rich representations that capture hierarchical patterns in the data.</p>
+                        </div>
+                        <div class="approach-item">
+                            <h3>(b) Hint Point Selection</h3>
+                            <p>Layer representations are clustered to identify the most informative features. The clustering algorithm groups similar layer activations, and from these clusters, specific hint points (HP1, HP2, HP3) are selected. These hint points represent the most valuable intermediate representations for knowledge transfer.</p>
+                        </div>
+                        <div class="approach-item">
+                            <h3>(c) Knowledge Distillation Training</h3>
+                            <p>The Student model is trained using three loss components: <strong>L_hint</strong> (matching intermediate features with Teacher), <strong>L_logit</strong> (matching final predictions with Teacher), and <strong>L_cls</strong> (matching predictions with ground truth). This multi-objective approach ensures the Student learns both from the Teacher's knowledge and the true labels.</p>
+                        </div>
+                    </div>
+                    <div class="approach-visual">
+                        <div class="diagram-container">
+                            <h3>PURSUhInT Framework</h3>
+                            <div class="diagram-wrapper">
+                                <img src="images/elsevier_knowledge_distillation.jpg" alt="PURSUhInT Knowledge Distillation Framework: Feature Extraction, Hint Point Selection, and Knowledge Distillation Training" class="project-diagram image-diagram" />
+                            </div>
+                            <p class="diagram-caption">The PURSUhInT framework showing (a) feature extraction, (b) hint point selection through clustering, and (c) knowledge distillation training with Teacher-Student architecture.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Key Features -->
+        <section class="project-section">
             <div class="container">
                 <h2><i class="fas fa-star"></i> Key Contributions</h2>
                 <div class="features-grid">
