@@ -3978,10 +3978,51 @@ textarea,
     .approach-item,
     .focus-item,
     .mentoring-item,
-    .course-item {
-        background: var(--background-alt);
+    .course-item,
+    .teaching-item,
+    .teaching-philosophy,
+    .achievement-item,
+    .research-statement {
+        background: var(--background-alt) !important;
         color: var(--text-dark);
         border-color: var(--border-color);
+    }
+    
+    /* Remove gradient backgrounds in dark mode */
+    .focus-item,
+    .approach-item,
+    .teaching-philosophy,
+    .achievement-item {
+        background: var(--background-alt) !important;
+    }
+    
+    /* Award items */
+    .award-item,
+    .featured-award {
+        background: var(--background-alt) !important;
+    }
+    
+    /* Project items */
+    .project-item,
+    .project-badge-container {
+        background: var(--background-alt) !important;
+    }
+    
+    /* Reviewer section */
+    .journal-item,
+    .reviewer-category {
+        background: transparent !important;
+    }
+    
+    /* Modals and popups */
+    .modal-content,
+    .modal-body {
+        background: var(--background-alt) !important;
+        color: var(--text-dark);
+    }
+    
+    .modal-backdrop {
+        background: rgba(0, 0, 0, 0.8) !important;
     }
     
     /* Tags and badges */
