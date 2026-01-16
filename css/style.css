@@ -3921,29 +3921,144 @@ textarea,
 /* Dark mode support (system preference) */
 @media (prefers-color-scheme: dark) {
     :root {
-        --text-dark: #e9ecef;
+        --text-dark: #f8f9fa;
+        --text-medium: #ced4da;
         --text-light: #adb5bd;
-        --background-light: #212529;
-        --background-white: #343a40;
-        --border-color: #495057;
+        --background-light: #1a1d23;
+        --background-white: #212529;
+        --background-alt: #2b3035;
+        --border-color: #3d4349;
+        --border-light: #343a40;
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+        --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+        --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
+        --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
     }
     
     body {
-        background-color: var(--background-white);
+        background-color: var(--background-light);
         color: var(--text-dark);
     }
     
-    .hero {
-        background: linear-gradient(135deg, #343a40 0%, #495057 50%, #6c757d 100%);
+    /* Navigation */
+    .top-navbar {
+        background: rgba(33, 37, 41, 0.98);
+        border-bottom: 1px solid var(--border-color);
     }
     
+    .mobile-menu-toggle span {
+        background: var(--text-dark);
+    }
+    
+    /* Hero section */
+    .hero {
+        background: linear-gradient(135deg, #0f1419 0%, #1a1d23 50%, #212529 100%);
+    }
+    
+    /* Sections */
+    .section {
+        background-color: var(--background-white);
+    }
+    
+    .section-alt {
+        background-color: var(--background-alt);
+    }
+    
+    /* Cards and content boxes */
     .timeline-content,
     .experience-card,
     .publication-item,
     .award-item,
-    .contact-card {
-        background: var(--background-white);
+    .contact-card,
+    .project-card,
+    .news-card,
+    .sidebar-card,
+    .blog-post,
+    .feature-card,
+    .approach-item,
+    .focus-item,
+    .mentoring-item,
+    .course-item {
+        background: var(--background-alt);
         color: var(--text-dark);
+        border-color: var(--border-color);
+    }
+    
+    /* Tags and badges */
+    .tag,
+    .skill-tag,
+    .tech-tag,
+    .expertise-tag {
+        background: rgba(37, 99, 235, 0.3);
+        color: #6ea8fe;
+        border-color: rgba(37, 99, 235, 0.4);
+    }
+    
+    /* Forms */
+    .form-field input,
+    .form-field textarea,
+    .form-field select {
+        background: var(--background-alt);
+        color: var(--text-dark);
+        border-color: var(--border-color);
+    }
+    
+    .form-field input:focus,
+    .form-field textarea:focus,
+    .form-field select:focus {
+        background: var(--background-white);
+        border-color: var(--primary-color);
+    }
+    
+    /* Links */
+    .pub-link,
+    .paper-link {
+        background: var(--background-alt);
+        color: var(--text-dark);
+        border-color: var(--border-color);
+    }
+    
+    .pub-link:hover,
+    .paper-link:hover {
+        background: var(--background-light);
+        border-color: var(--primary-color);
+    }
+    
+    /* Tables */
+    .results-table th {
+        background: var(--background-alt);
+        color: var(--text-dark);
+    }
+    
+    .results-table td {
+        border-color: var(--border-color);
+    }
+    
+    /* Code blocks */
+    .code-block {
+        background: #0d1117;
+    }
+    
+    .code-header {
+        background: #010409;
+    }
+    
+    /* Info boxes */
+    .info-box {
+        background: rgba(37, 99, 235, 0.1);
+        border-color: rgba(37, 99, 235, 0.3);
+    }
+    
+    /* Newsletter */
+    .newsletter-form input {
+        background: var(--background-alt);
+        color: var(--text-dark);
+    }
+    
+    /* Footer */
+    .footer {
+        background: var(--background-alt);
+        border-top: 1px solid var(--border-color);
     }
 }
 

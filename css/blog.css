@@ -1057,4 +1057,45 @@ html {
     .cta-box {
         padding: 24px;
     }
+}
+
+/* Dark mode support for blog */
+@media (prefers-color-scheme: dark) {
+    .blog-header {
+        background: linear-gradient(135deg, #212529 0%, #2b3035 100%);
+    }
+    
+    .blog-title,
+    .post-title,
+    .post-main-title,
+    .author-name {
+        color: var(--text-dark);
+    }
+    
+    .blog-post,
+    .sidebar-widget,
+    .related-card {
+        background: var(--background-alt);
+        border-color: var(--border-color);
+    }
+    
+    .post-image-placeholder,
+    .featured-image-placeholder,
+    .related-placeholder {
+        background: linear-gradient(135deg, #0d1117 0%, #1a1d23 100%);
+    }
+    
+    .post-tags .tag {
+        background: rgba(37, 99, 235, 0.3);
+        color: #6ea8fe;
+    }
+    
+    .newsletter {
+        background: linear-gradient(135deg, #1557b0 0%, #0d47a1 100%);
+    }
+    
+    .newsletter-form input {
+        background: var(--background-alt);
+        color: var(--text-dark);
+    }
 } 
