@@ -650,52 +650,13 @@ function updateLayoutForScreenSize() {
     }
 }
 
-// Initialize responsive behavior
-initResponsiveBehavior(); 
-
-// Copy to clipboard functionality
-window.copyToClipboard = function(text) {
-    if (navigator.clipboard && window.isSecureContext) {
-        // Use the modern Clipboard API
-        navigator.clipboard.writeText(text).then(() => {
-            showSuccessMessage('Citation copied to clipboard!');
-        }).catch(err => {
-            console.error('Failed to copy: ', err);
-            fallbackCopyTextToClipboard(text);
-        });
-    } else {
-        // Fallback for older browsers
-        fallbackCopyTextToClipboard(text);
-    }
-};
-
-function fallbackCopyTextToClipboard(text) {
-    const textArea = document.createElement('textarea');
-    textArea.value = text;
-    
-    // Avoid scrolling to bottom
-    textArea.style.top = '0';
-    textArea.style.left = '0';
-    textArea.style.position = 'fixed';
-    
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
-    
-    try {
-        const successful = document.execCommand('copy');
-        if (successful) {
-            showSuccessMessage('Citation copied to clipboard!');
-        } else {
-            showErrorMessage('Unable to copy citation. Please copy manually.');
-        }
-    } catch (err) {
-        console.error('Fallback: Could not copy text: ', err);
-        showErrorMessage('Unable to copy citation. Please copy manually.');
-    }
-    
-    document.body.removeChild(textArea);
+// Initialize responsive behavior when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initResponsiveBehavior);
+} else {
+    initResponsiveBehavior();
 }
+
 
 // Privacy and Accessibility Info Functions
 window.showPrivacyInfo = function() {
@@ -1189,6 +1150,9 @@ function initializeAccessibilityBadge() {
 function initializeCommitmentBanner() {
     const banner = document.querySelector('.a11y-commitment-banner');
     const closeBtn = document.querySelector('.close-banner');
+    
+    // Exit early if banner doesn't exist in the page
+    if (!banner) return;
     
     // Check if banner was previously closed
     const bannerClosed = localStorage.getItem('a11y-banner-closed');

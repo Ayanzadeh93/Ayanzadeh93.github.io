@@ -1,50 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
     <!-- Primary Meta Tags -->
     <title>Blog - Aydin Ayanzadeh | Computer Vision & AI Research</title>
     <meta name="title" content="Blog - Aydin Ayanzadeh | Computer Vision & AI Research">
-    <meta name="description" content="Latest research insights, publications, and thoughts on Computer Vision, Medical Image Analysis, and AI from Aydin Ayanzadeh, Ph.D. candidate at UMBC.">
-    <meta name="keywords" content="computer vision blog, AI research, medical image analysis, machine learning blog, PhD research, UMBC, deep learning articles">
+    <meta name="description"
+        content="Latest research insights, publications, and thoughts on Computer Vision, Medical Image Analysis, and AI from Aydin Ayanzadeh, Ph.D. candidate at UMBC.">
+    <meta name="keywords"
+        content="computer vision blog, AI research, medical image analysis, machine learning blog, PhD research, UMBC, deep learning articles">
     <meta name="author" content="Aydin Ayanzadeh">
     <meta name="robots" content="index, follow">
-    
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://ayanzadeh93.github.io/blog.html">
     <meta property="og:title" content="Blog - Aydin Ayanzadeh | Computer Vision & AI Research">
-    <meta property="og:description" content="Latest research insights, publications, and thoughts on Computer Vision, Medical Image Analysis, and AI.">
+    <meta property="og:description"
+        content="Latest research insights, publications, and thoughts on Computer Vision, Medical Image Analysis, and AI.">
     <meta property="og:image" content="https://ayanzadeh93.github.io/images/profile-compressed.jpg">
     <meta property="og:site_name" content="Aydin Ayanzadeh Portfolio">
-    
+
     <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://ayanzadeh93.github.io/blog.html">
-    <meta property="twitter:title" content="Blog - Aydin Ayanzadeh | Computer Vision & AI Research">
-    <meta property="twitter:description" content="Latest research insights, publications, and thoughts on Computer Vision, Medical Image Analysis, and AI.">
-    <meta property="twitter:image" content="https://ayanzadeh93.github.io/images/profile-compressed.jpg">
-    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://ayanzadeh93.github.io/blog.html">
+    <meta name="twitter:title" content="Blog - Aydin Ayanzadeh | Computer Vision & AI Research">
+    <meta name="twitter:description"
+        content="Latest research insights, publications, and thoughts on Computer Vision, Medical Image Analysis, and AI.">
+    <meta name="twitter:image" content="https://ayanzadeh93.github.io/images/profile-compressed.jpg">
+
     <!-- Canonical URL -->
     <link rel="canonical" href="https://ayanzadeh93.github.io/blog.html">
-    
+
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="apple-touch-icon" sizes="180x180" href="favicon.svg">
-    
+
     <!-- Performance and Accessibility -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-    
+
     <!-- Stylesheets -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/blog.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
+
     <!-- Structured Data for Blog -->
     <script type="application/ld+json">
     {
@@ -65,10 +70,11 @@
     }
     </script>
 </head>
+
 <body>
     <!-- Skip to content for accessibility -->
     <a href="#main-content" class="skip-to-content">Skip to main content</a>
-    
+
     <!-- Loading overlay -->
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-spinner">
@@ -77,18 +83,22 @@
     </div>
 
     <!-- Top Navigation -->
-    <nav class="top-navbar">
+    <nav class="top-navbar" role="navigation" aria-label="Main navigation">
         <div class="top-nav-container">
             <div class="nav-brand">
-                <h2><a href="index.html">Aydin Ayanzadeh</a></h2>
+                <a href="index.html" class="brand-link"><span class="brand-text">Aydin Ayanzadeh</span></a>
             </div>
             <ul class="top-nav-menu">
-                <li><a href="blog.html" class="top-nav-link active"><i class="fas fa-blog"></i> Blog</a></li>
-                <li><a href="index.html#contact" class="top-nav-link"><i class="fas fa-envelope"></i> Contact</a></li>
+                <li><a href="blog.html" class="top-nav-link active"><i class="fas fa-blog" aria-hidden="true"></i>
+                        Blog</a></li>
+                <li><a href="index.html#contact" class="top-nav-link"><i class="fas fa-envelope" aria-hidden="true"></i>
+                        Contact</a></li>
             </ul>
-            <div class="sidebar-toggle">
-                <i class="fas fa-bars"></i>
-            </div>
+            <button class="mobile-menu-toggle" aria-label="Toggle mobile navigation menu" aria-expanded="false">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </button>
         </div>
     </nav>
 
@@ -102,8 +112,10 @@
         <ul class="sidebar-menu">
             <li><a href="index.html#home" class="sidebar-link"><i class="fas fa-home"></i> Home</a></li>
             <li><a href="index.html#about" class="sidebar-link"><i class="fas fa-user"></i> About</a></li>
-            <li><a href="index.html#education" class="sidebar-link"><i class="fas fa-graduation-cap"></i> Education</a></li>
-            <li><a href="index.html#experience" class="sidebar-link"><i class="fas fa-briefcase"></i> Experience</a></li>
+            <li><a href="index.html#education" class="sidebar-link"><i class="fas fa-graduation-cap"></i> Education</a>
+            </li>
+            <li><a href="index.html#experience" class="sidebar-link"><i class="fas fa-briefcase"></i> Experience</a>
+            </li>
             <li><a href="index.html#publications" class="sidebar-link"><i class="fas fa-book"></i> Publications</a></li>
             <li><a href="index.html#skills" class="sidebar-link"><i class="fas fa-code"></i> Skills</a></li>
             <li><a href="index.html#awards" class="sidebar-link"><i class="fas fa-trophy"></i> Awards</a></li>
@@ -114,12 +126,13 @@
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <!-- Main Content -->
-    <div class="main-content">
+    <main class="main-content" id="main-content">
         <!-- Blog Header -->
         <section class="blog-header">
             <div class="container">
                 <h1 class="blog-title">Research Blog</h1>
-                <p class="blog-subtitle">Insights, discoveries, and thoughts on Computer Vision, Medical Image Analysis, and AI</p>
+                <p class="blog-subtitle">Insights, discoveries, and thoughts on Computer Vision, Medical Image Analysis,
+                    and AI</p>
             </div>
         </section>
 
@@ -142,14 +155,17 @@
                             </div>
                             <h2 class="post-title">Multi-Task Learning in Medical Image Analysis: A Deep Dive</h2>
                             <p class="post-excerpt">
-                                Exploring how multi-task learning architectures can significantly improve performance on medical image segmentation and classification tasks, particularly when dealing with imbalanced datasets.
+                                Exploring how multi-task learning architectures can significantly improve performance on
+                                medical image segmentation and classification tasks, particularly when dealing with
+                                imbalanced datasets.
                             </p>
                             <div class="post-tags">
                                 <span class="tag">Computer Vision</span>
                                 <span class="tag">Medical AI</span>
                                 <span class="tag">Deep Learning</span>
                             </div>
-                            <a href="blog-post.html" class="read-more-btn">Read More <i class="fas fa-arrow-right"></i></a>
+                            <a href="blog-post.html" class="read-more-btn">Read More <i
+                                    class="fas fa-arrow-right"></i></a>
                         </div>
                     </article>
 
@@ -167,13 +183,15 @@
                             </div>
                             <h3 class="post-title">Res-VGAE: Enhancing Graph Autoencoders with Residual Connections</h3>
                             <p class="post-excerpt">
-                                A technical overview of our work on variational graph autoencoders with residual connections and their applications in social network analysis.
+                                A technical overview of our work on variational graph autoencoders with residual
+                                connections and their applications in social network analysis.
                             </p>
                             <div class="post-tags">
                                 <span class="tag">Graph Neural Networks</span>
                                 <span class="tag">Social Networks</span>
                             </div>
-                            <a href="blog-post.html" class="read-more-btn">Read More <i class="fas fa-arrow-right"></i></a>
+                            <a href="blog-post.html" class="read-more-btn">Read More <i
+                                    class="fas fa-arrow-right"></i></a>
                         </div>
                     </article>
 
@@ -190,14 +208,16 @@
                             </div>
                             <h3 class="post-title">Advanced Cell Tracking in Phase-Contrast Microscopy</h3>
                             <p class="post-excerpt">
-                                How we improved cell tracking efficiency using novel autoencoder architectures for time-series analysis in label-free optical microscopy.
+                                How we improved cell tracking efficiency using novel autoencoder architectures for
+                                time-series analysis in label-free optical microscopy.
                             </p>
                             <div class="post-tags">
                                 <span class="tag">Microscopy</span>
                                 <span class="tag">Cell Biology</span>
                                 <span class="tag">Time Series</span>
                             </div>
-                            <a href="blog-post.html" class="read-more-btn">Read More <i class="fas fa-arrow-right"></i></a>
+                            <a href="blog-post.html" class="read-more-btn">Read More <i
+                                    class="fas fa-arrow-right"></i></a>
                         </div>
                     </article>
 
@@ -214,14 +234,16 @@
                             </div>
                             <h3 class="post-title">Optimizing Deep Learning Models for Edge Devices</h3>
                             <p class="post-excerpt">
-                                Practical insights into model compression and quantization techniques that can accelerate inference from 2 fps to 18 fps on surveillance systems.
+                                Practical insights into model compression and quantization techniques that can
+                                accelerate inference from 2 fps to 18 fps on surveillance systems.
                             </p>
                             <div class="post-tags">
                                 <span class="tag">Edge Computing</span>
                                 <span class="tag">Model Compression</span>
                                 <span class="tag">Optimization</span>
                             </div>
-                            <a href="blog-post.html" class="read-more-btn">Read More <i class="fas fa-arrow-right"></i></a>
+                            <a href="blog-post.html" class="read-more-btn">Read More <i
+                                    class="fas fa-arrow-right"></i></a>
                         </div>
                     </article>
 
@@ -236,16 +258,19 @@
                                 <span class="post-date"><i class="fas fa-calendar"></i> October 5, 2024</span>
                                 <span class="post-read-time"><i class="fas fa-clock"></i> 9 min read</span>
                             </div>
-                            <h3 class="post-title">PURSUhInT: Finding Informative Hint Points in Knowledge Distillation</h3>
+                            <h3 class="post-title">PURSUhInT: Finding Informative Hint Points in Knowledge Distillation
+                            </h3>
                             <p class="post-excerpt">
-                                Deep dive into our layer clustering approach for identifying the most informative hint points in knowledge distillation networks.
+                                Deep dive into our layer clustering approach for identifying the most informative hint
+                                points in knowledge distillation networks.
                             </p>
                             <div class="post-tags">
                                 <span class="tag">Knowledge Distillation</span>
                                 <span class="tag">Model Compression</span>
                                 <span class="tag">Transfer Learning</span>
                             </div>
-                            <a href="blog-post.html" class="read-more-btn">Read More <i class="fas fa-arrow-right"></i></a>
+                            <a href="blog-post.html" class="read-more-btn">Read More <i
+                                    class="fas fa-arrow-right"></i></a>
                         </div>
                     </article>
 
@@ -262,14 +287,16 @@
                             </div>
                             <h3 class="post-title">My Journey from Industry to Academia</h3>
                             <p class="post-excerpt">
-                                Reflections on transitioning from industry research roles at Vodafone and Arcelik to pursuing a PhD in Computer Science at UMBC.
+                                Reflections on transitioning from industry research roles at Vodafone and Arcelik to
+                                pursuing a PhD in Computer Science at UMBC.
                             </p>
                             <div class="post-tags">
                                 <span class="tag">Career</span>
                                 <span class="tag">Academia</span>
                                 <span class="tag">Research</span>
                             </div>
-                            <a href="blog-post.html" class="read-more-btn">Read More <i class="fas fa-arrow-right"></i></a>
+                            <a href="blog-post.html" class="read-more-btn">Read More <i
+                                    class="fas fa-arrow-right"></i></a>
                         </div>
                     </article>
                 </div>
@@ -290,26 +317,31 @@
                     <h2>Stay Updated</h2>
                     <p>Subscribe to get notified about new blog posts and research updates</p>
                     <form id="newsletterForm" class="newsletter-form">
-                        <input type="email" placeholder="Enter your email address" required>
+                        <label for="newsletter-email" class="sr-only">Email address</label>
+                        <input type="email" id="newsletter-email" placeholder="Enter your email address" required
+                            autocomplete="email">
                         <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-paper-plane"></i> Subscribe
+                            <i class="fas fa-paper-plane" aria-hidden="true"></i> Subscribe
                         </button>
                     </form>
                 </div>
             </div>
         </section>
-    </div>
+    </main>
 
     <!-- Footer -->
     <footer class="footer">
         <div class="container footer-content">
             <div class="footer-social">
-                <a href="mailto:aydina1@umbc.edu" title="Email"><i class="fas fa-envelope"></i></a>
-                <a href="https://linkedin.com/in/ayanzadeh93" target="_blank" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
-                <a href="https://github.com/Ayanzadeh93" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+                <a href="mailto:aydina1@umbc.edu" title="Email" aria-label="Send email"><i
+                        class="fas fa-envelope"></i></a>
+                <a href="https://linkedin.com/in/ayanzadeh93" target="_blank" rel="noopener noreferrer" title="LinkedIn"
+                    aria-label="LinkedIn profile"><i class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/Ayanzadeh93" target="_blank" rel="noopener noreferrer" title="GitHub"
+                    aria-label="GitHub profile"><i class="fab fa-github"></i></a>
             </div>
             <div class="footer-copyright">
-                &copy; 2026 Aydin Ayanzadeh. All rights reserved.
+                <p>&copy; 2026 Aydin Ayanzadeh. All rights reserved.</p>
             </div>
         </div>
     </footer>
@@ -317,4 +349,5 @@
     <script src="js/main.js"></script>
     <script src="js/blog.js"></script>
 </body>
-</html> 
+
+</html>
