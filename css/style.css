@@ -4096,6 +4096,89 @@ textarea,
         color: var(--text-dark);
     }
     
+    /* Certificates */
+    .certificates {
+        background-color: var(--background-alt) !important;
+        color: var(--text-dark);
+        border: 1px solid var(--border-color);
+    }
+
+    .certificates h3 {
+        color: var(--text-dark);
+    }
+
+    .certificates li {
+        color: var(--text-medium);
+    }
+
+    /* Contact section */
+    .contact-section {
+        background: var(--background-white) !important;
+    }
+
+    .section-subtitle-modern {
+        color: var(--text-light);
+    }
+
+    /* Contact form */
+    .contact-main-form {
+        background: var(--background-alt) !important;
+        border-color: var(--border-color);
+    }
+
+    .elegant-form label {
+        color: var(--text-dark);
+    }
+
+    .elegant-form input,
+    .elegant-form textarea {
+        background: var(--background-white);
+        color: var(--text-dark);
+        border-color: var(--border-color);
+    }
+
+    .elegant-form input::placeholder,
+    .elegant-form textarea::placeholder {
+        color: var(--text-light);
+    }
+
+    .elegant-form input:focus,
+    .elegant-form textarea:focus {
+        background: var(--background-alt);
+        border-color: var(--primary-color);
+    }
+
+    /* Sidebar cards */
+    .sidebar-card {
+        background: var(--background-alt) !important;
+        border-color: var(--border-color) !important;
+    }
+
+    .sidebar-card h3 {
+        color: var(--text-dark);
+        border-bottom-color: var(--border-color);
+    }
+
+    .detail-label {
+        color: var(--text-light);
+    }
+
+    .detail-content span,
+    .detail-content a {
+        color: var(--text-dark);
+    }
+
+    /* Social card */
+    .social-card-simple {
+        background: var(--background-alt) !important;
+        border-color: var(--border-color) !important;
+    }
+
+    .social-card-simple h3 {
+        color: var(--text-dark);
+        border-bottom-color: var(--border-color);
+    }
+
     /* Footer */
     .footer {
         background: var(--background-alt);
