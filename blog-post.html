@@ -1,46 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
     <!-- Primary Meta Tags - Will be updated per post -->
     <title>Blog Post - Aydin Ayanzadeh | Computer Vision & AI Research</title>
     <meta name="title" content="Blog Post - Aydin Ayanzadeh">
-    <meta name="description" content="Research insights and thoughts on Computer Vision, Medical Image Analysis, and AI.">
+    <meta name="description"
+        content="Research insights and thoughts on Computer Vision, Medical Image Analysis, and AI.">
     <meta name="author" content="Aydin Ayanzadeh">
     <meta name="robots" content="index, follow">
-    
+
     <!-- Open Graph -->
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://ayanzadeh93.github.io/blog-post.html">
     <meta property="og:title" content="Blog Post - Aydin Ayanzadeh">
     <meta property="og:description" content="Research insights on Computer Vision and AI.">
     <meta property="og:image" content="https://ayanzadeh93.github.io/images/profile-compressed.jpg">
-    
+
     <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://ayanzadeh93.github.io/blog-post.html">
-    <meta property="twitter:title" content="Blog Post - Aydin Ayanzadeh">
-    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://ayanzadeh93.github.io/blog-post.html">
+    <meta name="twitter:title" content="Blog Post - Aydin Ayanzadeh">
+
     <!-- Canonical URL -->
     <link rel="canonical" href="https://ayanzadeh93.github.io/blog-post.html">
-    
+
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="apple-touch-icon" sizes="180x180" href="favicon.svg">
-    
+
     <!-- Performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-    
+
     <!-- Stylesheets -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/blog.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
+
     <!-- Article Structured Data -->
     <script type="application/ld+json">
     {
@@ -62,10 +64,11 @@
     }
     </script>
 </head>
+
 <body>
     <!-- Skip to content for accessibility -->
     <a href="#main-content" class="skip-to-content">Skip to main content</a>
-    
+
     <!-- Loading overlay -->
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-spinner">
@@ -92,9 +95,12 @@
             </div>
             <ul class="top-nav-menu">
                 <li><a href="index.html" class="top-nav-link"><i class="fas fa-home"></i> <span>Home</span></a></li>
-                <li><a href="blog.html" class="top-nav-link active"><i class="fas fa-blog"></i> <span>Blog</span></a></li>
-                <li><a href="index.html#publications" class="top-nav-link"><i class="fas fa-book"></i> <span>Publications</span></a></li>
-                <li><a href="index.html#contact" class="top-nav-link"><i class="fas fa-envelope"></i> <span>Contact</span></a></li>
+                <li><a href="blog.html" class="top-nav-link active"><i class="fas fa-blog"></i> <span>Blog</span></a>
+                </li>
+                <li><a href="index.html#publications" class="top-nav-link"><i class="fas fa-book"></i>
+                        <span>Publications</span></a></li>
+                <li><a href="index.html#contact" class="top-nav-link"><i class="fas fa-envelope"></i>
+                        <span>Contact</span></a></li>
             </ul>
             <button class="mobile-menu-toggle" aria-label="Toggle mobile navigation menu" aria-expanded="false">
                 <span></span>
@@ -155,51 +161,72 @@
                     <div class="post-content-wrapper">
                         <!-- Main Content -->
                         <div class="post-main-content">
-                            <section class="post-section">
+                            <section class="post-section" id="introduction">
                                 <h2>Introduction</h2>
-                                <p>Multi-task learning (MTL) has emerged as a powerful paradigm in deep learning, particularly for medical image analysis applications. By training a single model to perform multiple related tasks simultaneously, we can leverage shared representations and improve generalization across all tasks.</p>
-                                
-                                <p>In this post, I'll explore the fundamental concepts behind multi-task learning, discuss its applications in medical imaging, and share insights from our recent research on handling imbalanced datasets in multi-task settings.</p>
+                                <p>Multi-task learning (MTL) has emerged as a powerful paradigm in deep learning,
+                                    particularly for medical image analysis applications. By training a single model to
+                                    perform multiple related tasks simultaneously, we can leverage shared
+                                    representations and improve generalization across all tasks.</p>
+
+                                <p>In this post, I'll explore the fundamental concepts behind multi-task learning,
+                                    discuss its applications in medical imaging, and share insights from our recent
+                                    research on handling imbalanced datasets in multi-task settings.</p>
                             </section>
 
-                            <section class="post-section">
+                            <section class="post-section" id="what-is-mtl">
                                 <h2>What is Multi-Task Learning?</h2>
-                                <p>Multi-task learning is a machine learning approach where a model is trained on multiple related tasks simultaneously. The key insight is that by sharing representations between tasks, the model can learn more robust features that generalize better.</p>
-                                
+                                <p>Multi-task learning is a machine learning approach where a model is trained on
+                                    multiple related tasks simultaneously. The key insight is that by sharing
+                                    representations between tasks, the model can learn more robust features that
+                                    generalize better.</p>
+
                                 <blockquote class="post-quote">
-                                    <p>"Multi-task learning improves generalization by leveraging the domain-specific information contained in the training signals of related tasks."</p>
+                                    <p>"Multi-task learning improves generalization by leveraging the domain-specific
+                                        information contained in the training signals of related tasks."</p>
                                     <cite>— Rich Caruana, Machine Learning, 1997</cite>
                                 </blockquote>
 
                                 <h3>Key Benefits</h3>
                                 <ul>
-                                    <li><strong>Improved Generalization:</strong> Shared representations help prevent overfitting on individual tasks</li>
-                                    <li><strong>Data Efficiency:</strong> Related tasks can share learned features, reducing the need for large labeled datasets</li>
-                                    <li><strong>Computational Efficiency:</strong> A single model handles multiple tasks instead of separate models</li>
-                                    <li><strong>Implicit Data Augmentation:</strong> Learning multiple tasks acts as a regularizer</li>
+                                    <li><strong>Improved Generalization:</strong> Shared representations help prevent
+                                        overfitting on individual tasks</li>
+                                    <li><strong>Data Efficiency:</strong> Related tasks can share learned features,
+                                        reducing the need for large labeled datasets</li>
+                                    <li><strong>Computational Efficiency:</strong> A single model handles multiple tasks
+                                        instead of separate models</li>
+                                    <li><strong>Implicit Data Augmentation:</strong> Learning multiple tasks acts as a
+                                        regularizer</li>
                                 </ul>
                             </section>
 
-                            <section class="post-section">
+                            <section class="post-section" id="applications">
                                 <h2>Applications in Medical Imaging</h2>
-                                <p>Medical image analysis presents unique challenges that make it particularly well-suited for multi-task learning approaches:</p>
+                                <p>Medical image analysis presents unique challenges that make it particularly
+                                    well-suited for multi-task learning approaches:</p>
 
                                 <div class="info-box">
                                     <h4><i class="fas fa-lightbulb"></i> Key Insight</h4>
-                                    <p>In medical imaging, related tasks like segmentation, classification, and detection often share low-level features (edges, textures) while differing in high-level representations. MTL can exploit this structure effectively.</p>
+                                    <p>In medical imaging, related tasks like segmentation, classification, and
+                                        detection often share low-level features (edges, textures) while differing in
+                                        high-level representations. MTL can exploit this structure effectively.</p>
                                 </div>
 
                                 <h3>Common Multi-Task Scenarios</h3>
                                 <ol>
-                                    <li><strong>Segmentation + Classification:</strong> Simultaneously segmenting anatomical structures and classifying pathologies</li>
-                                    <li><strong>Detection + Grading:</strong> Detecting lesions while also grading their severity</li>
-                                    <li><strong>Multi-organ Segmentation:</strong> Segmenting multiple organs in a single forward pass</li>
+                                    <li><strong>Segmentation + Classification:</strong> Simultaneously segmenting
+                                        anatomical structures and classifying pathologies</li>
+                                    <li><strong>Detection + Grading:</strong> Detecting lesions while also grading their
+                                        severity</li>
+                                    <li><strong>Multi-organ Segmentation:</strong> Segmenting multiple organs in a
+                                        single forward pass</li>
                                 </ol>
                             </section>
 
-                            <section class="post-section">
+                            <section class="post-section" id="imbalanced">
                                 <h2>Handling Imbalanced Datasets</h2>
-                                <p>One of the major challenges in medical image analysis is dealing with imbalanced datasets. Rare conditions or small structures may be underrepresented, leading to biased models.</p>
+                                <p>One of the major challenges in medical image analysis is dealing with imbalanced
+                                    datasets. Rare conditions or small structures may be underrepresented, leading to
+                                    biased models.</p>
 
                                 <p>In our research, we've developed several strategies to address this challenge:</p>
 
@@ -230,11 +257,14 @@
                                 </div>
                             </section>
 
-                            <section class="post-section">
+                            <section class="post-section" id="our-approach">
                                 <h2>Our Approach: Adaptive Task Weighting</h2>
-                                <p>Traditional multi-task learning uses fixed weights for each task's loss. However, this can be suboptimal when tasks have different learning dynamics or when the dataset is imbalanced across tasks.</p>
+                                <p>Traditional multi-task learning uses fixed weights for each task's loss. However,
+                                    this can be suboptimal when tasks have different learning dynamics or when the
+                                    dataset is imbalanced across tasks.</p>
 
-                                <p>We propose an adaptive weighting scheme that automatically adjusts task weights during training based on:</p>
+                                <p>We propose an adaptive weighting scheme that automatically adjusts task weights
+                                    during training based on:</p>
 
                                 <ul>
                                     <li>Task difficulty (measured by gradient magnitude)</li>
@@ -276,9 +306,11 @@
                                 </div>
                             </section>
 
-                            <section class="post-section">
+                            <section class="post-section" id="conclusion">
                                 <h2>Conclusion</h2>
-                                <p>Multi-task learning offers a powerful framework for tackling complex medical image analysis problems. By carefully designing the task relationships and handling dataset imbalances, we can build more robust and efficient models.</p>
+                                <p>Multi-task learning offers a powerful framework for tackling complex medical image
+                                    analysis problems. By carefully designing the task relationships and handling
+                                    dataset imbalances, we can build more robust and efficient models.</p>
 
                                 <p>In future work, we plan to explore:</p>
                                 <ul>
@@ -289,7 +321,8 @@
 
                                 <div class="cta-box">
                                     <h4>Interested in collaborating?</h4>
-                                    <p>I'm always looking for opportunities to collaborate on medical AI research. Feel free to reach out!</p>
+                                    <p>I'm always looking for opportunities to collaborate on medical AI research. Feel
+                                        free to reach out!</p>
                                     <a href="index.html#contact" class="btn btn-primary">
                                         <i class="fas fa-envelope"></i> Contact Me
                                     </a>
@@ -304,11 +337,18 @@
                                 <div class="author-card">
                                     <img src="images/profile-compressed.jpg" alt="Aydin Ayanzadeh" class="author-image">
                                     <h4>Aydin Ayanzadeh</h4>
-                                    <p>Ph.D. Student in Computer Science at UMBC, specializing in Computer Vision and Medical AI.</p>
+                                    <p>Ph.D. Student in Computer Science at UMBC, specializing in Computer Vision and
+                                        Medical AI.</p>
                                     <div class="author-social">
-                                        <a href="https://linkedin.com/in/ayanzadeh93" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
-                                        <a href="https://github.com/Ayanzadeh93" target="_blank" aria-label="GitHub"><i class="fab fa-github"></i></a>
-                                        <a href="https://scholar.google.com/citations?user=ayanzadeh93" target="_blank" aria-label="Google Scholar"><i class="fas fa-graduation-cap"></i></a>
+                                        <a href="https://linkedin.com/in/ayanzadeh93" target="_blank"
+                                            rel="noopener noreferrer" aria-label="LinkedIn profile"><i
+                                                class="fab fa-linkedin"></i></a>
+                                        <a href="https://github.com/Ayanzadeh93" target="_blank"
+                                            rel="noopener noreferrer" aria-label="GitHub profile"><i
+                                                class="fab fa-github"></i></a>
+                                        <a href="https://scholar.google.com/citations?user=ayanzadeh93" target="_blank"
+                                            rel="noopener noreferrer" aria-label="Google Scholar profile"><i
+                                                class="fas fa-graduation-cap"></i></a>
                                     </div>
                                 </div>
                             </div>
@@ -330,17 +370,20 @@
                             <div class="sidebar-widget share-widget">
                                 <h3>Share This Post</h3>
                                 <div class="share-buttons">
-                                    <a href="#" class="share-btn twitter" aria-label="Share on Twitter">
-                                        <i class="fab fa-twitter"></i>
+                                    <a href="#" class="share-btn twitter" aria-label="Share on Twitter"
+                                        data-platform="twitter">
+                                        <i class="fab fa-twitter" aria-hidden="true"></i>
                                     </a>
-                                    <a href="#" class="share-btn linkedin" aria-label="Share on LinkedIn">
-                                        <i class="fab fa-linkedin-in"></i>
+                                    <a href="#" class="share-btn linkedin" aria-label="Share on LinkedIn"
+                                        data-platform="linkedin">
+                                        <i class="fab fa-linkedin-in" aria-hidden="true"></i>
                                     </a>
-                                    <a href="#" class="share-btn email" aria-label="Share via Email">
-                                        <i class="fas fa-envelope"></i>
+                                    <a href="#" class="share-btn email" aria-label="Share via Email"
+                                        data-platform="email">
+                                        <i class="fas fa-envelope" aria-hidden="true"></i>
                                     </a>
-                                    <button class="share-btn copy" onclick="copyLink()" aria-label="Copy link">
-                                        <i class="fas fa-link"></i>
+                                    <button class="share-btn copy" aria-label="Copy link" data-platform="copy">
+                                        <i class="fas fa-link" aria-hidden="true"></i>
                                     </button>
                                 </div>
                             </div>
@@ -397,9 +440,12 @@
     <footer class="footer">
         <div class="container footer-content">
             <div class="footer-social">
-                <a href="mailto:aydina1@umbc.edu" title="Email"><i class="fas fa-envelope"></i></a>
-                <a href="https://linkedin.com/in/ayanzadeh93" target="_blank" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
-                <a href="https://github.com/Ayanzadeh93" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+                <a href="mailto:aydina1@umbc.edu" title="Email" aria-label="Send email"><i
+                        class="fas fa-envelope"></i></a>
+                <a href="https://linkedin.com/in/ayanzadeh93" target="_blank" rel="noopener noreferrer" title="LinkedIn"
+                    aria-label="LinkedIn profile"><i class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/Ayanzadeh93" target="_blank" rel="noopener noreferrer" title="GitHub"
+                    aria-label="GitHub profile"><i class="fab fa-github"></i></a>
             </div>
             <div class="footer-copyright">
                 <p>&copy; 2026 Aydin Ayanzadeh. All rights reserved.</p>
@@ -417,25 +463,6 @@
 
     <script src="js/main.js"></script>
     <script src="js/blog.js"></script>
-    <script>
-        // Copy code functionality
-        function copyCode(button) {
-            const codeBlock = button.closest('.code-block').querySelector('code');
-            navigator.clipboard.writeText(codeBlock.textContent).then(() => {
-                button.innerHTML = '<i class="fas fa-check"></i> Copied!';
-                setTimeout(() => {
-                    button.innerHTML = '<i class="fas fa-copy"></i> Copy';
-                }, 2000);
-            });
-        }
-
-        // Copy link functionality
-        function copyLink() {
-            navigator.clipboard.writeText(window.location.href).then(() => {
-                alert('Link copied to clipboard!');
-            });
-        }
-    </script>
 </body>
-</html>
 
+</html>
