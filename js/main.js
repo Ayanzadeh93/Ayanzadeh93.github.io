@@ -401,6 +401,8 @@ function initAccessibilityFeatures() {
 
 function initFocusTrap() {
     const sidebar = document.getElementById('sidebar');
+    if (!sidebar) return;
+    
     const focusableElements = sidebar.querySelectorAll(
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
     );
