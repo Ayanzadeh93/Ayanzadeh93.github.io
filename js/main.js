@@ -481,6 +481,13 @@ function submitForm(form) {
     submitButton.disabled = true;
     submitButton.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Sending...';
     
+    // Keep reply-to synced with the email field for easier responses.
+    const emailInput = form.querySelector('input[name="email"]');
+    const replyToInput = form.querySelector('input[name="_replyto"]');
+    if (emailInput && replyToInput) {
+        replyToInput.value = emailInput.value.trim();
+    }
+
     // Prepare form data
     const formData = new FormData(form);
     
@@ -531,7 +538,7 @@ function submitForm(form) {
         submitButton.disabled = false;
         submitButton.innerHTML = originalText;
         console.error('Form submission error:', error);
-        showErrorMessage('There was a problem sending your message. Please check your connection and try again.');
+        showErrorMessage('There was a problem sending your message. Please check your connection and try again, or email me directly at a.ayanzadeh@gmail.com.');
     });
 }
 
@@ -556,6 +563,13 @@ function showMessage(message, type) {
     
     const contactForm = document.getElementById('contactForm');
     if (contactForm) {
+        const formStatus = contactForm.querySelector('#form-status');
+        if (formStatus) {
+            formStatus.classList.remove('success', 'error');
+            formStatus.classList.add(type);
+            formStatus.textContent = message;
+        }
+
         contactForm.insertBefore(messageEl, contactForm.firstChild);
         
         // Auto-hide after 5 seconds
@@ -727,7 +741,7 @@ Accessibility Features:
 • Alt text for all images
 • Focus indicators on all interactive elements
 
-If you encounter any accessibility issues, please contact me at aydina1@umbc.edu
+If you encounter any accessibility issues, please contact me at a.ayanzadeh@gmail.com
     `;
     showCustomModal('Accessibility Information', message);
 };
