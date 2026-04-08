@@ -809,11 +809,77 @@ window.closeCustomModal = function() {
 
 // Advanced Accessibility Features
 function initializeAccessibilityFeatures() {
+    ensureAccessibilityStructure();
     initializeAccessibilityMenu();
     initializeKeyboardEnhancements();
     initializeScreenReaderSupport();
     initializeReadingGuide();
+    initializePageReader();
     loadAccessibilityPreferences();
+}
+
+function ensureAccessibilityStructure() {
+    if (!document.getElementById('accessibility-menu-toggle')) {
+        document.body.insertAdjacentHTML('beforeend', `
+            <button id="accessibility-menu-toggle" class="accessibility-toggle show" type="button"
+                aria-label="Open accessibility tools" aria-expanded="false" aria-controls="accessibility-menu">
+                <i class="fas fa-universal-access" aria-hidden="true"></i>
+                <span class="sr-only">Open accessibility tools</span>
+            </button>
+        `);
+    }
+
+    if (!document.getElementById('accessibility-menu')) {
+        document.body.insertAdjacentHTML('beforeend', `
+            <div id="accessibility-menu" class="accessibility-menu" role="dialog" aria-modal="true"
+                aria-labelledby="accessibility-menu-title" aria-hidden="true">
+                <div class="accessibility-content">
+                    <button class="accessibility-close" type="button" aria-label="Close accessibility menu">×</button>
+                    <h2 id="accessibility-menu-title">Accessibility Tools</h2>
+                    <div class="accessibility-options">
+                        <div class="accessibility-group">
+                            <h3>Display & Motion</h3>
+                            <label class="accessibility-option" for="high-contrast-toggle"><input type="checkbox" id="high-contrast-toggle"><span>High Contrast</span></label>
+                            <label class="accessibility-option" for="large-text-toggle"><input type="checkbox" id="large-text-toggle"><span>Large Text</span></label>
+                            <label class="accessibility-option" for="dyslexia-font-toggle"><input type="checkbox" id="dyslexia-font-toggle"><span>Dyslexia-Friendly Font</span></label>
+                            <label class="accessibility-option" for="reduce-motion-toggle"><input type="checkbox" id="reduce-motion-toggle"><span>Reduce Motion</span></label>
+                        </div>
+                        <div class="accessibility-group">
+                            <h3>Navigation & Focus</h3>
+                            <label class="accessibility-option" for="focus-highlight-toggle"><input type="checkbox" id="focus-highlight-toggle"><span>Enhanced Focus Indicators</span></label>
+                            <label class="accessibility-option" for="keyboard-nav-toggle"><input type="checkbox" id="keyboard-nav-toggle"><span>Enhanced Keyboard Navigation</span></label>
+                            <label class="accessibility-option" for="nav-announcements-toggle"><input type="checkbox" id="nav-announcements-toggle" checked><span>Navigation Announcements</span></label>
+                            <label class="accessibility-option" for="reading-guide-toggle"><input type="checkbox" id="reading-guide-toggle"><span>Reading Guide Line</span></label>
+                        </div>
+                        <div class="accessibility-group">
+                            <h3>Reader</h3>
+                            <div class="accessibility-reader-controls">
+                                <button type="button" id="start-reading-btn" class="accessibility-reader-btn">Read this page aloud</button>
+                                <button type="button" id="stop-reading-btn" class="accessibility-reader-btn secondary" disabled>Stop reading</button>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="accessibility-reset" type="button">Reset accessibility settings</button>
+                </div>
+            </div>
+        `);
+    }
+
+    if (!document.getElementById('reading-guide')) {
+        document.body.insertAdjacentHTML('beforeend', '<div id="reading-guide" class="reading-guide" aria-hidden="true"></div>');
+    }
+
+    if (!document.getElementById('sr-status')) {
+        document.body.insertAdjacentHTML('beforeend', '<div id="sr-status" class="sr-only" aria-live="polite" aria-atomic="true"></div>');
+    }
+
+    if (!document.getElementById('sr-alerts')) {
+        document.body.insertAdjacentHTML('beforeend', '<div id="sr-alerts" class="sr-only" aria-live="assertive" aria-atomic="true"></div>');
+    }
+
+    if (typeof window.navigationAnnouncementsEnabled === 'undefined') {
+        window.navigationAnnouncementsEnabled = true;
+    }
 }
 
 
@@ -823,6 +889,8 @@ function initializeAccessibilityMenu() {
     const menu = document.getElementById('accessibility-menu');
     const closeBtn = menu?.querySelector('.accessibility-close');
     const resetBtn = menu?.querySelector('.accessibility-reset');
+    const startReadingBtn = menu?.querySelector('#start-reading-btn');
+    const stopReadingBtn = menu?.querySelector('#stop-reading-btn');
     
     if (toggle && menu) {
         toggle.addEventListener('click', function() {
@@ -842,6 +910,14 @@ function initializeAccessibilityMenu() {
         // Reset button
         if (resetBtn) {
             resetBtn.addEventListener('click', resetAccessibilitySettings);
+        }
+
+        if (startReadingBtn) {
+            startReadingBtn.addEventListener('click', startPageReader);
+        }
+
+        if (stopReadingBtn) {
+            stopReadingBtn.addEventListener('click', stopPageReader);
         }
         
         // Close on escape
@@ -1147,8 +1223,86 @@ function resetAccessibilitySettings() {
     } catch (e) {
         console.warn('Could not clear accessibility preferences:', e);
     }
+
+    stopPageReader();
     
     announceToScreenReader('All accessibility settings have been reset');
+}
+
+function initializePageReader() {
+    const startBtn = document.getElementById('start-reading-btn');
+    const stopBtn = document.getElementById('stop-reading-btn');
+
+    if (!startBtn || !stopBtn) return;
+
+    if (!('speechSynthesis' in window)) {
+        startBtn.disabled = true;
+        stopBtn.disabled = true;
+        startBtn.textContent = 'Reader not supported in this browser';
+        return;
+    }
+
+    updatePageReaderButtons(false);
+}
+
+function getPageReaderText() {
+    const contentRoot = document.querySelector('main, #main-content, article') || document.body;
+    const readableElements = contentRoot.querySelectorAll('h1, h2, h3, p, li, blockquote');
+    const content = Array.from(readableElements)
+        .map((el) => el.textContent.trim().replace(/\s+/g, ' '))
+        .filter(Boolean)
+        .join('. ');
+
+    return content.slice(0, 12000);
+}
+
+function startPageReader() {
+    if (!('speechSynthesis' in window)) return;
+
+    const text = getPageReaderText();
+    if (!text) {
+        announceToScreenReader('No readable content found on this page.', 'assertive');
+        return;
+    }
+
+    stopPageReader();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = document.documentElement.lang || 'en-US';
+    utterance.rate = 1;
+
+    utterance.onend = () => {
+        updatePageReaderButtons(false);
+        announceToScreenReader('Page reading completed.');
+    };
+
+    utterance.onerror = () => {
+        updatePageReaderButtons(false);
+        announceToScreenReader('Unable to read the page aloud.', 'assertive');
+    };
+
+    window.activeReaderUtterance = utterance;
+    window.speechSynthesis.speak(utterance);
+    updatePageReaderButtons(true);
+    announceToScreenReader('Reading page content aloud.');
+}
+
+function stopPageReader() {
+    if ('speechSynthesis' in window && window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
+    }
+
+    window.activeReaderUtterance = null;
+    updatePageReaderButtons(false);
+}
+
+function updatePageReaderButtons(isReading) {
+    const startBtn = document.getElementById('start-reading-btn');
+    const stopBtn = document.getElementById('stop-reading-btn');
+    if (!startBtn || !stopBtn) return;
+
+    startBtn.disabled = isReading;
+    stopBtn.disabled = !isReading;
 }
 
 // Initialize accessibility features when DOM is loaded

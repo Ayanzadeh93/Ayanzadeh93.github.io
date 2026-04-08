@@ -2835,8 +2835,8 @@ button.theme-toggle-btn {
 /* Accessibility Toggle Button */
 .accessibility-toggle {
     position: fixed;
-    top: 10px;
-    right: 10px;
+    bottom: 24px;
+    right: 24px;
     background: var(--primary-color);
     color: white;
     border: none;
@@ -2848,8 +2848,7 @@ button.theme-toggle-btn {
     box-shadow: 0 4px 15px rgba(26, 115, 232, 0.3);
     transition: all 0.3s ease;
     z-index: 10003;
-    display: none;
-    /* Hidden by default */
+    display: flex;
     align-items: center;
     justify-content: center;
 }
@@ -2964,6 +2963,43 @@ body.accessibility-active .accessibility-toggle {
 .accessibility-option span {
     color: var(--text-dark);
     font-weight: 500;
+}
+
+.accessibility-reader-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.accessibility-reader-btn {
+    width: 100%;
+    border: 1px solid var(--border-color);
+    background: var(--primary-color);
+    color: #fff;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.accessibility-reader-btn:hover,
+.accessibility-reader-btn:focus {
+    background: #1557b0;
+}
+
+.accessibility-reader-btn.secondary {
+    background: #4b5563;
+}
+
+.accessibility-reader-btn.secondary:hover,
+.accessibility-reader-btn.secondary:focus {
+    background: #374151;
+}
+
+.accessibility-reader-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .accessibility-reset {
@@ -3094,8 +3130,8 @@ body.enhanced-keyboard .top-nav-link:focus {
     }
 
     .accessibility-toggle {
-        top: 5px;
-        right: 5px;
+        bottom: 16px;
+        right: 16px;
         width: 45px;
         height: 45px;
         font-size: 1.1rem;
