@@ -1247,12 +1247,13 @@ function initializePageReader() {
 
 function getPageReaderText() {
     const contentRoot = document.querySelector('main, #main-content, article') || document.body;
-    const readableElements = contentRoot.querySelectorAll('h1, h2, h3, p, li, blockquote');
+    const readableElements = contentRoot.querySelectorAll('h1, h2, h3, h4, h5, h6, p, li, blockquote, figcaption, caption');
     const content = Array.from(readableElements)
         .map((el) => el.textContent.trim().replace(/\s+/g, ' '))
         .filter(Boolean)
         .join('. ');
 
+    // Keep speech payload bounded to avoid long utterances that can stall on some browser engines.
     return content.slice(0, 12000);
 }
 
