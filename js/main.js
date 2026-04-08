@@ -1246,6 +1246,7 @@ function initializePageReader() {
 }
 
 const MAX_SPEECH_CONTENT_LENGTH = 12000;
+const MIN_SENTENCE_BREAK_RATIO = 0.6;
 
 function getPageReaderText() {
     const contentRoot = document.querySelector('main, #main-content, article') || document.body;
@@ -1266,7 +1267,7 @@ function getPageReaderText() {
         truncated.lastIndexOf('? ')
     );
 
-    if (lastSentenceBreak > MAX_SPEECH_CONTENT_LENGTH * 0.6) {
+    if (lastSentenceBreak > MAX_SPEECH_CONTENT_LENGTH * MIN_SENTENCE_BREAK_RATIO) {
         return truncated.slice(0, lastSentenceBreak + 1);
     }
 
@@ -1285,6 +1286,7 @@ function startPageReader() {
     stopPageReader();
 
     const utterance = new SpeechSynthesisUtterance(text);
+    // English fallback keeps pronunciation predictable when no page/user locale is available.
     utterance.lang = document.documentElement.lang || navigator.language || 'en-US';
     utterance.rate = 1;
 
