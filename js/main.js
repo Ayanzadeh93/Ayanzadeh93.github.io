@@ -1253,7 +1253,7 @@ function getPageReaderText() {
     const content = Array.from(readableElements)
         .map((el) => el.textContent.trim().replace(/\s+/g, ' '))
         .filter(Boolean)
-        .map((text) => /[.!?]$/.test(text) ? text : `${text}.`)
+        .map((text) => /[.!?:;…]$/.test(text) ? text : `${text}.`)
         .join(' ');
 
     // Keep speech payload bounded to avoid long utterances that can stall on some browser engines.
@@ -1285,7 +1285,7 @@ function startPageReader() {
     stopPageReader();
 
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = document.documentElement.lang || 'en-US';
+    utterance.lang = document.documentElement.lang || navigator.language || 'en-US';
     utterance.rate = 1;
 
     utterance.onend = () => {
@@ -1293,7 +1293,8 @@ function startPageReader() {
         announceToScreenReader('Page reading completed.');
     };
 
-    utterance.onerror = () => {
+    utterance.onerror = (event) => {
+        console.warn('Speech synthesis failed:', event.error || event);
         updatePageReaderButtons(false);
         announceToScreenReader('Unable to read the page aloud.', 'assertive');
     };
