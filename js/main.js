@@ -1245,6 +1245,8 @@ function initializePageReader() {
     updatePageReaderButtons(false);
 }
 
+const MAX_SPEECH_CONTENT_LENGTH = 12000;
+
 function getPageReaderText() {
     const contentRoot = document.querySelector('main, #main-content, article') || document.body;
     const readableElements = contentRoot.querySelectorAll('h1, h2, h3, h4, h5, h6, p, li, blockquote, figcaption, caption');
@@ -1254,7 +1256,7 @@ function getPageReaderText() {
         .join('. ');
 
     // Keep speech payload bounded to avoid long utterances that can stall on some browser engines.
-    return content.slice(0, 12000);
+    return content.slice(0, MAX_SPEECH_CONTENT_LENGTH);
 }
 
 function startPageReader() {
