@@ -1253,10 +1253,24 @@ function getPageReaderText() {
     const content = Array.from(readableElements)
         .map((el) => el.textContent.trim().replace(/\s+/g, ' '))
         .filter(Boolean)
-        .join('. ');
+        .map((text) => /[.!?]$/.test(text) ? text : `${text}.`)
+        .join(' ');
 
     // Keep speech payload bounded to avoid long utterances that can stall on some browser engines.
-    return content.slice(0, MAX_SPEECH_CONTENT_LENGTH);
+    if (content.length <= MAX_SPEECH_CONTENT_LENGTH) return content;
+
+    const truncated = content.slice(0, MAX_SPEECH_CONTENT_LENGTH);
+    const lastSentenceBreak = Math.max(
+        truncated.lastIndexOf('. '),
+        truncated.lastIndexOf('! '),
+        truncated.lastIndexOf('? ')
+    );
+
+    if (lastSentenceBreak > MAX_SPEECH_CONTENT_LENGTH * 0.6) {
+        return truncated.slice(0, lastSentenceBreak + 1);
+    }
+
+    return `${truncated.trimEnd()}...`;
 }
 
 function startPageReader() {
