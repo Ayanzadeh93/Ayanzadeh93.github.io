@@ -51,35 +51,39 @@ function initThemeToggle() {
 
     if (!themeToggleBtn) return;
 
-    // Check saved theme
-    const savedTheme = localStorage.getItem('theme');
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const applyTheme = (theme) => {
+        const isDark = theme === 'dark';
 
-    if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
-        root.setAttribute('data-theme', 'dark');
+        root.setAttribute('data-theme', isDark ? 'dark' : 'light');
+        themeToggleBtn.setAttribute('aria-pressed', isDark ? 'true' : 'false');
+        themeToggleBtn.setAttribute('aria-label', isDark ? 'Switch to light theme' : 'Switch to dark theme');
+
         if (themeIcon) {
-            themeIcon.classList.replace('fa-moon', 'fa-sun');
+            themeIcon.classList.toggle('fa-sun', isDark);
+            themeIcon.classList.toggle('fa-moon', !isDark);
         }
-    } else {
-        root.setAttribute('data-theme', 'light');
-        if (themeIcon) {
-            themeIcon.classList.replace('fa-sun', 'fa-moon');
-        }
+    };
+
+    let savedTheme = null;
+    try {
+        savedTheme = localStorage.getItem('theme');
+    } catch (error) {
+        savedTheme = null;
     }
+
+    // Default to light unless user explicitly selected dark
+    const initialTheme = savedTheme === 'dark' ? 'dark' : 'light';
+    applyTheme(initialTheme);
 
     themeToggleBtn.addEventListener('click', () => {
         const currentTheme = root.getAttribute('data-theme');
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        
-        root.setAttribute('data-theme', newTheme);
-        localStorage.setItem('theme', newTheme);
-        
-        if (themeIcon) {
-            if (newTheme === 'dark') {
-                themeIcon.classList.replace('fa-moon', 'fa-sun');
-            } else {
-                themeIcon.classList.replace('fa-sun', 'fa-moon');
-            }
+        applyTheme(newTheme);
+
+        try {
+            localStorage.setItem('theme', newTheme);
+        } catch (error) {
+            // Ignore storage errors and continue with in-memory theme state.
         }
     });
 }
