@@ -39,6 +39,249 @@
     --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
+/* ========================================
+   DARK THEME - ELEMENT LEVEL STYLES
+   Covers manual toggle (data-theme="dark")
+   ======================================== */
+
+[data-theme="dark"] .top-navbar {
+    background: rgba(26, 26, 26, 0.98);
+    border-bottom-color: var(--border-color);
+}
+
+[data-theme="dark"] .top-nav-menu {
+    background: var(--background-light);
+    border-top-color: var(--border-color);
+}
+
+[data-theme="dark"] .mobile-menu-toggle span {
+    background: var(--text-dark);
+}
+
+[data-theme="dark"] .section {
+    background-color: var(--background-white);
+}
+
+[data-theme="dark"] .section-alt {
+    background-color: var(--background-alt);
+}
+
+/* Cards & content boxes */
+[data-theme="dark"] .timeline-content,
+[data-theme="dark"] .experience-card,
+[data-theme="dark"] .publication-item,
+[data-theme="dark"] .award-item,
+[data-theme="dark"] .featured-award,
+[data-theme="dark"] .project-card,
+[data-theme="dark"] .project-card-body,
+[data-theme="dark"] .news-card,
+[data-theme="dark"] .feature-card,
+[data-theme="dark"] .approach-item,
+[data-theme="dark"] .focus-item,
+[data-theme="dark"] .current-focus,
+[data-theme="dark"] .research-approach,
+[data-theme="dark"] .teaching-item,
+[data-theme="dark"] .teaching-philosophy,
+[data-theme="dark"] .course-item,
+[data-theme="dark"] .mentoring-item,
+[data-theme="dark"] .achievement-item,
+[data-theme="dark"] .research-statement,
+[data-theme="dark"] .featured-paper-card,
+[data-theme="dark"] .reviewer-section {
+    background: var(--background-alt) !important;
+    color: var(--text-dark);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .featured-award,
+[data-theme="dark"] .project-item.featured {
+    border-color: var(--primary-light);
+}
+
+/* News card featured variant */
+[data-theme="dark"] .news-card.featured {
+    background: linear-gradient(135deg, #1e2d20 0%, var(--background-alt) 100%) !important;
+    border-color: #a16207;
+}
+
+/* Featured spotlight paper card stays dark-themed */
+[data-theme="dark"] .featured-paper-card.spotlight {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
+}
+
+/* Project items (research section) */
+[data-theme="dark"] .project-item {
+    background: var(--background-alt) !important;
+    border-color: var(--border-color);
+}
+
+/* Journal reviewer items */
+[data-theme="dark"] .journal-item {
+    background: var(--background-white) !important;
+    border-color: var(--border-color);
+}
+
+/* Contact section */
+[data-theme="dark"] .contact-section {
+    background: var(--background-white) !important;
+}
+
+[data-theme="dark"] .contact-main-form {
+    background: var(--background-alt) !important;
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .elegant-form label {
+    color: var(--text-dark);
+}
+
+[data-theme="dark"] .elegant-form input,
+[data-theme="dark"] .elegant-form textarea {
+    background: var(--background-white);
+    color: var(--text-dark);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .elegant-form input::placeholder,
+[data-theme="dark"] .elegant-form textarea::placeholder {
+    color: var(--text-light);
+}
+
+[data-theme="dark"] .elegant-form input:focus,
+[data-theme="dark"] .elegant-form textarea:focus {
+    background: var(--background-alt);
+    border-color: var(--primary-color);
+}
+
+[data-theme="dark"] .sidebar-card {
+    background: var(--background-alt) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .sidebar-card h3 {
+    color: var(--text-dark);
+    border-bottom-color: var(--border-color);
+}
+
+[data-theme="dark"] .detail-label {
+    color: var(--text-light);
+}
+
+[data-theme="dark"] .detail-content span,
+[data-theme="dark"] .detail-content a {
+    color: var(--text-dark);
+}
+
+[data-theme="dark"] .social-card-simple {
+    background: var(--background-alt) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .social-card-simple h3 {
+    color: var(--text-dark);
+    border-bottom-color: var(--border-color);
+}
+
+[data-theme="dark"] .social-btn-simple {
+    background: var(--background-white);
+    border-color: var(--border-color);
+    color: var(--text-medium);
+}
+
+/* Modal */
+[data-theme="dark"] .modal-content,
+[data-theme="dark"] .modal-header,
+[data-theme="dark"] .modal-footer {
+    background: var(--background-alt) !important;
+    border-color: var(--border-color);
+    color: var(--text-dark);
+}
+
+[data-theme="dark"] .modal-body {
+    background: var(--background-alt) !important;
+    color: var(--text-dark);
+}
+
+[data-theme="dark"] .modal-container {
+    background: var(--background-white) !important;
+}
+
+[data-theme="dark"] .modal-backdrop {
+    background: rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Tags and badges */
+[data-theme="dark"] .tag,
+[data-theme="dark"] .skill-tag,
+[data-theme="dark"] .tech-tag,
+[data-theme="dark"] .expertise-tag {
+    background: rgba(37, 99, 235, 0.25);
+    color: #6ea8fe;
+    border-color: rgba(37, 99, 235, 0.35);
+}
+
+[data-theme="dark"] .project-tags span {
+    background: var(--background-white);
+    color: var(--primary-light);
+    border-color: var(--border-color);
+}
+
+/* Forms */
+[data-theme="dark"] .form-group input,
+[data-theme="dark"] .form-group textarea {
+    background: var(--background-alt);
+    color: var(--text-dark);
+    border-color: var(--border-color);
+}
+
+/* News category badges - improve dark mode contrast */
+[data-theme="dark"] .news-category.achievement { background: rgba(21, 128, 61, 0.25); color: #4ade80; }
+[data-theme="dark"] .news-category.conference { background: rgba(30, 64, 175, 0.25); color: #60a5fa; }
+[data-theme="dark"] .news-category.research { background: rgba(124, 58, 237, 0.25); color: #c084fc; }
+[data-theme="dark"] .news-category.publication { background: rgba(67, 56, 202, 0.25); color: #818cf8; }
+[data-theme="dark"] .news-category.project { background: rgba(194, 65, 12, 0.25); color: #fb923c; }
+[data-theme="dark"] .news-category.award { background: rgba(146, 64, 14, 0.25); color: #fbbf24; }
+
+/* Footer */
+[data-theme="dark"] .footer {
+    background: var(--background-alt);
+    border-top: 1px solid var(--border-color);
+}
+
+/* Certificates */
+[data-theme="dark"] .certificates {
+    background-color: var(--background-alt) !important;
+    color: var(--text-dark);
+    border: 1px solid var(--border-color);
+}
+
+[data-theme="dark"] .certificates h3 { color: var(--text-dark); }
+[data-theme="dark"] .certificates li { color: var(--text-medium); }
+
+/* Accessibility menu */
+[data-theme="dark"] .accessibility-menu {
+    background: var(--background-alt);
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.4);
+}
+
+/* Section subtitle */
+[data-theme="dark"] .section-subtitle-modern {
+    color: var(--text-light);
+}
+
+/* Pub links */
+[data-theme="dark"] .pub-link,
+[data-theme="dark"] .paper-link:not(.primary) {
+    background: var(--background-alt);
+    color: var(--text-medium);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .pub-link:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
         --background-white: #1a1a1a;
@@ -1812,7 +2055,7 @@ button.theme-toggle-btn {
    ======================================== */
 
 .contact-section {
-    background: #ffffff;
+    background: var(--background-white);
     position: relative;
     overflow: hidden;
 }
@@ -1844,7 +2087,7 @@ button.theme-toggle-btn {
 
 /* Elegant Form */
 .contact-main-form {
-    background: white;
+    background: var(--background-white);
     padding: 40px;
     border-radius: 16px;
     box-shadow: var(--shadow-sm);
@@ -1865,7 +2108,7 @@ button.theme-toggle-btn {
 .elegant-form label {
     display: block;
     font-weight: 600;
-    color: #1e293b;
+    color: var(--text-dark);
     margin-bottom: 10px;
     font-size: 0.95rem;
     letter-spacing: 0.3px;
@@ -1875,26 +2118,26 @@ button.theme-toggle-btn {
 .elegant-form textarea {
     width: 100%;
     padding: 15px 18px;
-    border: 2px solid #e2e8f0;
+    border: 2px solid var(--border-color);
     border-radius: 12px;
     font-size: 1rem;
     font-family: inherit;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    background: #fafbfc;
+    background: var(--background-light);
     box-sizing: border-box;
-    color: #1e293b;
+    color: var(--text-dark);
 }
 
 .elegant-form input::placeholder,
 .elegant-form textarea::placeholder {
-    color: #94a3b8;
+    color: var(--text-light);
 }
 
 .elegant-form input:focus,
 .elegant-form textarea:focus {
     outline: none;
     border-color: var(--primary-color);
-    background: white;
+    background: var(--background-white);
     box-shadow: 0 0 0 4px rgba(26, 115, 232, 0.08);
     transform: translateY(-1px);
 }
@@ -1950,11 +2193,11 @@ button.theme-toggle-btn {
 }
 
 .sidebar-card {
-    background: white;
+    background: var(--background-white);
     padding: 35px;
     border-radius: 20px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
-    border: 1px solid #f1f5f9;
+    border: 1px solid var(--border-color);
 }
 
 .sidebar-card h3 {
@@ -2000,14 +2243,14 @@ button.theme-toggle-btn {
 .detail-label {
     font-size: 0.85rem;
     font-weight: 600;
-    color: #64748b;
+    color: var(--text-light);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
 .detail-content span,
 .detail-content a {
-    color: #1e293b;
+    color: var(--text-dark);
     font-size: 1rem;
     font-weight: 500;
     text-decoration: none;
@@ -2020,13 +2263,13 @@ button.theme-toggle-btn {
 
 /* Social Card */
 .social-card-simple {
-    background: white;
-    border: 1px solid #e5e7eb;
+    background: var(--background-white);
+    border: 1px solid var(--border-color);
 }
 
 .social-card-simple h3 {
-    color: #1e293b;
-    border-bottom: 1px solid #e5e7eb;
+    color: var(--text-dark);
+    border-bottom: 1px solid var(--border-color);
 }
 
 .social-buttons-simple {
@@ -2039,13 +2282,13 @@ button.theme-toggle-btn {
 .social-btn-simple {
     width: 60px;
     height: 60px;
-    background: #f8fafc;
-    border: 2px solid #e5e7eb;
+    background: var(--background-light);
+    border: 2px solid var(--border-color);
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #64748b;
+    color: var(--text-light);
     font-size: 1.6rem;
     text-decoration: none;
     transition: all 0.3s ease;
@@ -3403,18 +3646,6 @@ body.enhanced-keyboard .top-nav-link:focus {
     position: relative;
 }
 
-@keyframes modalSlideIn {
-    from {
-        opacity: 0;
-        transform: scale(0.9) translateY(30px);
-    }
-
-    to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-    }
-}
-
 .modal-header {
     position: relative;
     padding: 40px;
@@ -3611,15 +3842,20 @@ body.enhanced-keyboard .top-nav-link:focus {
     }
 }
 
-/* Enhanced Mobile Navigation */
+/* Mobile Navigation - single unified approach for all breakpoints ≤ 900px */
 @media (max-width: 900px) {
+    .mobile-menu-toggle {
+        display: flex;
+    }
+
     .top-nav-menu {
-        display: none;
         position: fixed;
         top: var(--nav-height);
         left: 0;
         right: 0;
-        background: white;
+        background: var(--background-white, rgba(255, 255, 255, 0.97));
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
         flex-direction: column;
         padding: 16px;
         gap: 4px;
@@ -3627,10 +3863,21 @@ body.enhanced-keyboard .top-nav-link:focus {
         border-top: 1px solid var(--border-color);
         max-height: calc(100vh - var(--nav-height));
         overflow-y: auto;
+        /* Animated show/hide — avoid display:none so transitions work */
+        transform: translateY(-8px);
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                    opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                    visibility 0.25s;
     }
 
     .top-nav-menu.active {
-        display: flex;
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
     }
 
     .top-nav-link {
@@ -3647,10 +3894,8 @@ body.enhanced-keyboard .top-nav-link:focus {
 
     .top-nav-link i {
         font-size: 1rem;
-    }
-
-    .mobile-menu-toggle {
-        display: flex;
+        width: 20px;
+        text-align: center;
     }
 }
 
@@ -3835,9 +4080,7 @@ body.enhanced-keyboard .top-nav-link:focus {
 
 @media print {
 
-    .top-navbar,
-    .sidebar,
-    .sidebar-overlay {
+    .top-navbar {
         display: none;
     }
 
@@ -3947,7 +4190,6 @@ body.enhanced-keyboard .top-nav-link:focus {
 }
 
 .btn:focus,
-.sidebar-link:focus,
 .top-nav-link:focus {
     outline: 3px solid var(--primary-color);
     outline-offset: 3px;
@@ -4021,12 +4263,6 @@ body.enhanced-keyboard .top-nav-link:focus {
 /* Enhanced contrast and readability */
 .text-light {
     color: #5a6c7d !important;
-}
-
-/* Improve text contrast ratios */
-:root {
-    --text-light: #5a6c7d;
-    --text-medium: #495057;
 }
 
 /* Better line heights for readability */
@@ -4136,7 +4372,6 @@ textarea,
 @media (max-width: 768px) {
 
     .btn,
-    .sidebar-link,
     .top-nav-link,
     .contact-item a {
         min-height: 44px;
@@ -4147,9 +4382,9 @@ textarea,
     }
 }
 
-/* Dark mode support (system preference) */
+/* Dark mode support (system preference) — only applies when user hasn't explicitly chosen light */
 @media (prefers-color-scheme: dark) {
-    :root {
+    :root:not([data-theme="light"]) {
         --text-dark: #f8f9fa;
         --text-medium: #ced4da;
         --text-light: #adb5bd;
@@ -4430,18 +4665,7 @@ img[loading="lazy"].loaded {
     opacity: 1;
 }
 
-/* Enhanced animations with better performance */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translate3d(0, 30px, 0);
-    }
-
-    to {
-        opacity: 1;
-        transform: translate3d(0, 0, 0);
-    }
-}
+/* fadeInUp is defined earlier — using translate3d for GPU acceleration */
 
 @keyframes float {
 
@@ -4462,8 +4686,7 @@ img[loading="lazy"].loaded {
 /* GPU acceleration for better performance */
 .profile-img,
 .btn,
-.experience-card,
-.sidebar {
+.experience-card {
     will-change: transform;
 }
 
@@ -4534,7 +4757,6 @@ img[loading="lazy"].loaded {
         transition: transform 0.1s ease;
     }
 
-    .sidebar-link:active,
     .top-nav-link:active {
         background-color: rgba(26, 115, 232, 0.2);
     }
@@ -4555,18 +4777,8 @@ img[loading="lazy"].loaded {
         padding-top: env(safe-area-inset-top);
     }
 
-    .sidebar {
-        padding-left: max(0px, env(safe-area-inset-left));
-        padding-top: env(safe-area-inset-top);
-    }
-
     .main-content {
         padding-bottom: max(20px, env(safe-area-inset-bottom));
-    }
-
-    /* Adjust button positioning in safe areas */
-    .sidebar-toggle {
-        margin-right: env(safe-area-inset-right);
     }
 }
 
@@ -4714,59 +4926,15 @@ img[loading="lazy"].loaded {
     }
 }
 
-@keyframes pulse {
-
-    0%,
-    100% {
-        transform: scale(1);
-        opacity: 0.7;
-    }
-
-    50% {
-        transform: scale(1.2);
-        opacity: 1;
-    }
-}
-
-/* Mobile Menu Styles */
+/* Mobile ≤ 768px: larger tap targets for mobile nav links */
 @media (max-width: 768px) {
-    .mobile-menu-toggle {
-        display: flex;
-    }
-
-    .top-nav-menu {
-        position: fixed;
-        top: 70px;
-        left: 0;
-        width: 100%;
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 251, 0.95) 100%);
-        backdrop-filter: blur(10px);
-        flex-direction: column;
-        padding: 20px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        transform: translateY(-100%);
-        opacity: 0;
-        visibility: hidden;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        z-index: 1000;
-    }
-
-    .top-nav-menu.active {
-        transform: translateY(0);
-        opacity: 1;
-        visibility: visible;
+    .top-nav-link {
+        padding: 14px 16px;
+        font-size: 1rem;
     }
 
     .top-nav-menu li {
-        margin-bottom: 10px;
-    }
-
-    .top-nav-link {
-        width: 100%;
-        justify-content: flex-start;
-        padding: 15px 20px;
-        border-radius: 10px;
-        font-size: 1.1rem;
+        margin-bottom: 4px;
     }
 }
 
@@ -4800,10 +4968,10 @@ img[loading="lazy"].loaded {
 }
 
 .project-item {
-    background: white;
+    background: var(--background-white);
     padding: 30px;
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--shadow-sm);
     transition: all 0.3s ease;
     border-left: 4px solid transparent;
     position: relative;
@@ -4983,10 +5151,10 @@ img[loading="lazy"].loaded {
 }
 
 .current-focus {
-    background: white;
+    background: var(--background-white);
     padding: 30px;
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-sm);
 }
 
 .focus-items {
@@ -5033,10 +5201,10 @@ img[loading="lazy"].loaded {
 }
 
 .research-approach {
-    background: white;
+    background: var(--background-white);
     padding: 30px;
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-sm);
 }
 
 .approach-grid {
@@ -5115,10 +5283,10 @@ img[loading="lazy"].loaded {
 }
 
 .course-item {
-    background: white;
+    background: var(--background-white);
     padding: 25px;
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--shadow-sm);
     transition: all 0.3s ease;
     border-left: 4px solid transparent;
 }
@@ -5188,9 +5356,9 @@ img[loading="lazy"].loaded {
 .mentoring-item {
     text-align: center;
     padding: 25px;
-    background: white;
+    background: var(--background-white);
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--shadow-sm);
     transition: all 0.3s ease;
     border: 1px solid rgba(26, 115, 232, 0.1);
 }
@@ -5496,7 +5664,7 @@ img[loading="lazy"].loaded {
 }
 
 .news-card {
-    background: white;
+    background: var(--background-white);
     border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 24px;
@@ -5514,7 +5682,7 @@ img[loading="lazy"].loaded {
 
 .news-card.featured {
     border: 2px solid #f59e0b;
-    background: linear-gradient(135deg, #fffbeb 0%, white 100%);
+    background: linear-gradient(135deg, #fffbeb 0%, var(--background-white) 100%);
 }
 
 .news-card-header {
@@ -5705,7 +5873,7 @@ img[loading="lazy"].loaded {
 }
 
 .featured-paper-card {
-    background: white;
+    background: var(--background-white);
     border-radius: 16px;
     padding: 32px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
@@ -5972,4 +6140,100 @@ img[loading="lazy"].loaded {
     .paper-link {
         justify-content: center;
     }
+}
+
+/* ========================================
+   LIGHT THEME EXPLICIT RESET
+   Overrides prefers-color-scheme: dark when
+   user has explicitly chosen the light theme.
+   These selectors have higher specificity (0,2,0)
+   than the media query rules (0,1,0).
+   ======================================== */
+
+[data-theme="light"] {
+    --background-white: #ffffff;
+    --background-light: #f8fafc;
+    --background-alt: #f1f5f9;
+    --text-dark: #0f172a;
+    --text-medium: #475569;
+    --text-light: #64748b;
+    --border-color: #e2e8f0;
+    --border-light: #f1f5f9;
+}
+
+[data-theme="light"] .top-navbar {
+    background: rgba(255, 255, 255, 0.98);
+    border-bottom-color: var(--border-color);
+}
+
+[data-theme="light"] .top-nav-menu {
+    background: white;
+}
+
+[data-theme="light"] .section {
+    background-color: var(--background-white);
+}
+
+[data-theme="light"] .section-alt {
+    background-color: var(--background-alt);
+}
+
+[data-theme="light"] .timeline-content,
+[data-theme="light"] .experience-card,
+[data-theme="light"] .publication-item,
+[data-theme="light"] .award-item,
+[data-theme="light"] .project-card,
+[data-theme="light"] .project-card-body,
+[data-theme="light"] .news-card,
+[data-theme="light"] .current-focus,
+[data-theme="light"] .research-approach,
+[data-theme="light"] .teaching-philosophy,
+[data-theme="light"] .course-item,
+[data-theme="light"] .mentoring-item,
+[data-theme="light"] .featured-paper-card {
+    background: var(--background-white) !important;
+    color: var(--text-dark);
+    border-color: var(--border-color);
+}
+
+[data-theme="light"] .focus-item,
+[data-theme="light"] .approach-item,
+[data-theme="light"] .achievement-item,
+[data-theme="light"] .research-statement {
+    background: linear-gradient(135deg, #f8fafb 0%, #ffffff 100%) !important;
+    color: var(--text-dark);
+}
+
+[data-theme="light"] .contact-section {
+    background: #ffffff !important;
+}
+
+[data-theme="light"] .contact-main-form {
+    background: white !important;
+    border-color: var(--border-color);
+}
+
+[data-theme="light"] .elegant-form label { color: #1e293b; }
+
+[data-theme="light"] .elegant-form input,
+[data-theme="light"] .elegant-form textarea {
+    background: #fafbfc;
+    color: #1e293b;
+    border-color: #e2e8f0;
+}
+
+[data-theme="light"] .sidebar-card {
+    background: white !important;
+    border-color: #f1f5f9 !important;
+}
+
+[data-theme="light"] .tag,
+[data-theme="light"] .skill-tag {
+    background: var(--background-light);
+    color: var(--text-dark);
+    border-color: var(--border-color);
+}
+
+[data-theme="light"] .footer {
+    background: var(--secondary-color);
 }

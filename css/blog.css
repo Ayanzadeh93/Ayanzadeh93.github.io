@@ -712,7 +712,7 @@ html {
 .results-table table {
     width: 100%;
     border-collapse: collapse;
-    background: white;
+    background: var(--background-white);
     border-radius: 12px;
     overflow: hidden;
     box-shadow: var(--shadow-sm);
@@ -776,7 +776,7 @@ html {
 }
 
 .sidebar-widget {
-    background: white;
+    background: var(--background-white);
     border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 24px;
@@ -931,7 +931,7 @@ html {
 }
 
 .related-card {
-    background: white;
+    background: var(--background-white);
     border-radius: 12px;
     overflow: hidden;
     text-decoration: none;
@@ -1059,43 +1059,71 @@ html {
     }
 }
 
-/* Dark mode support for blog */
+/* Dark mode support for blog — system preference */
 @media (prefers-color-scheme: dark) {
-    .blog-header {
+    :root:not([data-theme="light"]) .blog-header {
         background: linear-gradient(135deg, #212529 0%, #2b3035 100%);
     }
-    
-    .blog-title,
-    .post-title,
-    .post-main-title,
-    .author-name {
+
+    :root:not([data-theme="light"]) .blog-title,
+    :root:not([data-theme="light"]) .post-title,
+    :root:not([data-theme="light"]) .post-main-title,
+    :root:not([data-theme="light"]) .author-name {
         color: var(--text-dark);
     }
-    
-    .blog-post,
-    .sidebar-widget,
-    .related-card {
+
+    :root:not([data-theme="light"]) .blog-post,
+    :root:not([data-theme="light"]) .sidebar-widget,
+    :root:not([data-theme="light"]) .related-card {
         background: var(--background-alt);
         border-color: var(--border-color);
     }
-    
-    .post-image-placeholder,
-    .featured-image-placeholder,
-    .related-placeholder {
+
+    :root:not([data-theme="light"]) .post-image-placeholder,
+    :root:not([data-theme="light"]) .featured-image-placeholder,
+    :root:not([data-theme="light"]) .related-placeholder {
         background: linear-gradient(135deg, #0d1117 0%, #1a1d23 100%);
     }
-    
-    .post-tags .tag {
+
+    :root:not([data-theme="light"]) .post-tags .tag {
         background: rgba(37, 99, 235, 0.3);
         color: #6ea8fe;
     }
-    
-    .newsletter {
+
+    :root:not([data-theme="light"]) .newsletter {
         background: linear-gradient(135deg, #1557b0 0%, #0d47a1 100%);
     }
-    
-    .newsletter-form input {
+
+    :root:not([data-theme="light"]) .newsletter-form input {
         background: var(--background-alt);
         color: var(--text-dark);
     }
-} 
+}
+
+/* Dark mode support for blog — manual toggle */
+[data-theme="dark"] .blog-header {
+    background: linear-gradient(135deg, #212529 0%, #2b3035 100%);
+}
+
+[data-theme="dark"] .blog-post,
+[data-theme="dark"] .sidebar-widget,
+[data-theme="dark"] .related-card {
+    background: var(--background-alt);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .post-image-placeholder,
+[data-theme="dark"] .featured-image-placeholder,
+[data-theme="dark"] .related-placeholder {
+    background: linear-gradient(135deg, #0d1117 0%, #1a1d23 100%);
+}
+
+[data-theme="dark"] .post-tags .tag {
+    background: rgba(37, 99, 235, 0.3);
+    color: #6ea8fe;
+}
+
+[data-theme="dark"] .newsletter-form input {
+    background: var(--background-alt);
+    color: var(--text-dark);
+}
