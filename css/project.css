@@ -10,11 +10,13 @@
     top: 0;
     left: 0;
     right: 0;
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--background-white, rgba(255, 255, 255, 0.95));
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--border-color);
     z-index: 1000;
     padding: 16px 0;
+    transition: background 0.3s ease;
 }
 
 .project-nav .container {
@@ -220,7 +222,7 @@
 }
 
 .feature-card {
-    background: white;
+    background: var(--background-white);
     padding: 32px;
     border-radius: 16px;
     box-shadow: var(--shadow-sm);
@@ -299,7 +301,7 @@
 }
 
 .diagram-container {
-    background: white;
+    background: var(--background-white);
     border: 1px solid var(--border-color);
     border-radius: 16px;
     padding: 24px;
@@ -445,7 +447,7 @@
 
 .tech-item {
     padding: 10px 20px;
-    background: white;
+    background: var(--background-white);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     font-size: 0.9rem;
@@ -474,7 +476,7 @@
 
 .publication-entry.planned {
     border-left-color: #f59e0b;
-    background: #fffbeb;
+    background: var(--background-alt);
 }
 
 .publication-entry h3 {
