@@ -194,7 +194,9 @@ function initIntersectionObserver() {
                 const id = entry.target.getAttribute('id');
                 if (id) updateActiveNavLink(`#${id}`);
 
-                observer.unobserve(entry.target);
+                if (!entry.target.matches('section')) {
+                    observer.unobserve(entry.target);
+                }
             }
         });
     }, observerOptions);
@@ -204,17 +206,17 @@ function initIntersectionObserver() {
         observer.observe(section);
     });
 
-    const observeWithStagger = (elements) => {
+    const observeElements = (elements) => {
         elements.forEach((element) => {
             observer.observe(element);
         });
     };
 
-    observeWithStagger(
+    observeElements(
         document.querySelectorAll('.experience-card, .timeline-item, .publication-item, .award-item')
     );
 
-    observeWithStagger(
+    observeElements(
         document.querySelectorAll('.project-card, .project-item, .news-card, .teaching-item, .course-item, .journal-item, .reviewer-category, .focus-item')
     );
 }
