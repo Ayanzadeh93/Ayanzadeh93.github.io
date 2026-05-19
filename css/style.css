@@ -1213,7 +1213,6 @@ body.high-contrast .section-title {
 
 .js-enabled .section,
 .js-enabled .timeline-item,
-.js-enabled .experience-card,
 .js-enabled .publication-item,
 .js-enabled .award-item,
 .js-enabled .project-card,
@@ -1519,7 +1518,7 @@ html.js-enabled body.reduce-motion .focus-item {
     border: 1px solid var(--surface-border);
     padding: 28px;
     border-radius: 12px;
-    transition: box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
+    transition: opacity 0.6s ease, transform 0.6s ease, box-shadow 0.3s ease, border-color 0.3s ease;
     box-shadow: var(--shadow-md);
     position: relative;
     overflow: hidden;
@@ -1885,8 +1884,8 @@ html.js-enabled body.reduce-motion .focus-item {
     border-radius: 8px;
     box-shadow: var(--shadow);
     transition: all 0.3s ease;
-    border-left: 3px solid transparent;
     border: 1px solid var(--surface-border);
+    border-left: 3px solid transparent;
 }
 
 .journal-item:hover {

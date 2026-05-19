@@ -230,9 +230,11 @@ function initIntersectionObserver() {
     );
 
     setTimeout(() => {
-        if (!document.querySelector('.section.animate-in')) {
-            document.querySelectorAll(REVEAL_FALLBACK_SELECTOR)
-                .forEach(element => element.classList.add('animate-in'));
+        const revealTargets = Array.from(document.querySelectorAll(REVEAL_FALLBACK_SELECTOR));
+        const hasAnimated = revealTargets.some(element => element.classList.contains('animate-in'));
+
+        if (!hasAnimated) {
+            revealTargets.forEach(element => element.classList.add('animate-in'));
         }
     }, REVEAL_FALLBACK_DELAY);
 }
