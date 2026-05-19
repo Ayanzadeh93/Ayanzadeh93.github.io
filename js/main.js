@@ -2,6 +2,9 @@
 
 const supportsIntersectionObserver = 'IntersectionObserver' in window;
 const REVEAL_FALLBACK_DELAY = 2000; // Fallback delay to reveal content if observers do not trigger.
+const REVEAL_PRIMARY_SELECTOR = '.experience-card, .timeline-item, .publication-item, .award-item';
+const REVEAL_SECONDARY_SELECTOR = '.project-card, .project-item, .news-card, .teaching-item, .course-item, .journal-item, .reviewer-category, .focus-item';
+const REVEAL_FALLBACK_SELECTOR = `.section, ${REVEAL_PRIMARY_SELECTOR}, ${REVEAL_SECONDARY_SELECTOR}`;
 
 if (supportsIntersectionObserver) {
     document.documentElement.classList.add('js-enabled');
@@ -219,16 +222,16 @@ function initIntersectionObserver() {
     };
 
     observeElements(
-        document.querySelectorAll('.experience-card, .timeline-item, .publication-item, .award-item')
+        document.querySelectorAll(REVEAL_PRIMARY_SELECTOR)
     );
 
     observeElements(
-        document.querySelectorAll('.project-card, .project-item, .news-card, .teaching-item, .course-item, .journal-item, .reviewer-category, .focus-item')
+        document.querySelectorAll(REVEAL_SECONDARY_SELECTOR)
     );
 
     setTimeout(() => {
         if (!document.querySelector('.section.animate-in')) {
-            document.querySelectorAll('.section, .timeline-item, .experience-card, .publication-item, .award-item, .project-card, .project-item, .news-card, .teaching-item, .course-item, .journal-item, .reviewer-category, .focus-item')
+            document.querySelectorAll(REVEAL_FALLBACK_SELECTOR)
                 .forEach(element => element.classList.add('animate-in'));
         }
     }, REVEAL_FALLBACK_DELAY);
