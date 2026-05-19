@@ -1,5 +1,15 @@
 // Enhanced main.js with performance optimizations and accessibility features
 
+const supportsIntersectionObserver = 'IntersectionObserver' in window;
+const REVEAL_FALLBACK_DELAY = 2000; // Fallback delay to reveal content if observers do not trigger.
+const REVEAL_PRIMARY_SELECTOR = '.experience-card, .timeline-item, .publication-item, .award-item';
+const REVEAL_SECONDARY_SELECTOR = '.project-card, .project-item, .news-card, .teaching-item, .course-item, .journal-item, .reviewer-category, .focus-item';
+const REVEAL_FALLBACK_SELECTOR = `.section, ${REVEAL_PRIMARY_SELECTOR}, ${REVEAL_SECONDARY_SELECTOR}`;
+
+if (supportsIntersectionObserver) {
+    document.documentElement.classList.add('js-enabled');
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize all components
     initMobileMenu();
@@ -178,9 +188,13 @@ function initSmoothScrolling() {
 
 // Intersection Observer for animations and active nav links
 function initIntersectionObserver() {
+    if (!supportsIntersectionObserver) {
+        return;
+    }
+
     const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '-50px 0px'
+        threshold: 0.15,
+        rootMargin: '-40px 0px'
     };
 
     const observer = new IntersectionObserver((entries) => {
@@ -191,6 +205,7 @@ function initIntersectionObserver() {
                 // Update active navigation link
                 const id = entry.target.getAttribute('id');
                 if (id) updateActiveNavLink(`#${id}`);
+
             }
         });
     }, observerOptions);
@@ -200,10 +215,28 @@ function initIntersectionObserver() {
         observer.observe(section);
     });
 
-    // Observe cards and timeline items
-    document.querySelectorAll('.experience-card, .timeline-item, .publication-item, .award-item').forEach(item => {
-        observer.observe(item);
-    });
+    const observeElements = (elements) => {
+        elements.forEach((element) => {
+            observer.observe(element);
+        });
+    };
+
+    observeElements(
+        document.querySelectorAll(REVEAL_PRIMARY_SELECTOR)
+    );
+
+    observeElements(
+        document.querySelectorAll(REVEAL_SECONDARY_SELECTOR)
+    );
+
+    setTimeout(() => {
+        const revealTargets = Array.from(document.querySelectorAll(REVEAL_FALLBACK_SELECTOR));
+        const hasAnimated = revealTargets.some(element => element.classList.contains('animate-in'));
+
+        if (!hasAnimated) {
+            revealTargets.forEach(element => element.classList.add('animate-in'));
+        }
+    }, REVEAL_FALLBACK_DELAY);
 }
 
 // Form validation with accessibility
