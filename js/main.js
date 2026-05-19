@@ -1,6 +1,10 @@
 // Enhanced main.js with performance optimizations and accessibility features
 
-document.documentElement.classList.add('js-enabled');
+const supportsIntersectionObserver = 'IntersectionObserver' in window;
+
+if (supportsIntersectionObserver) {
+    document.documentElement.classList.add('js-enabled');
+}
 
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize all components
@@ -180,6 +184,10 @@ function initSmoothScrolling() {
 
 // Intersection Observer for animations and active nav links
 function initIntersectionObserver() {
+    if (!supportsIntersectionObserver) {
+        return;
+    }
+
     const observerOptions = {
         threshold: 0.15,
         rootMargin: '-40px 0px'
@@ -216,6 +224,13 @@ function initIntersectionObserver() {
     observeElements(
         document.querySelectorAll('.project-card, .project-item, .news-card, .teaching-item, .course-item, .journal-item, .reviewer-category, .focus-item')
     );
+
+    setTimeout(() => {
+        if (!document.querySelector('.section.animate-in')) {
+            document.querySelectorAll('.section, .timeline-item, .experience-card, .publication-item, .award-item, .project-card, .project-item, .news-card, .teaching-item, .course-item, .journal-item, .reviewer-category, .focus-item')
+                .forEach(element => element.classList.add('animate-in'));
+        }
+    }, 2000);
 }
 
 // Form validation with accessibility
