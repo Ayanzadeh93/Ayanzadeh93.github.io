@@ -1226,22 +1226,22 @@ button.theme-toggle-btn {
     transform: translateY(0);
 }
 
-body.reduce-motion .section,
-body.reduce-motion .timeline-item,
-body.reduce-motion .experience-card,
-body.reduce-motion .publication-item,
-body.reduce-motion .award-item,
-body.reduce-motion .project-card,
-body.reduce-motion .project-item,
-body.reduce-motion .news-card,
-body.reduce-motion .teaching-item,
-body.reduce-motion .course-item,
-body.reduce-motion .journal-item,
-body.reduce-motion .reviewer-category,
-body.reduce-motion .focus-item {
-    opacity: 1 !important;
-    transform: none !important;
-    transition: none !important;
+html.js-enabled body.reduce-motion .section,
+html.js-enabled body.reduce-motion .timeline-item,
+html.js-enabled body.reduce-motion .experience-card,
+html.js-enabled body.reduce-motion .publication-item,
+html.js-enabled body.reduce-motion .award-item,
+html.js-enabled body.reduce-motion .project-card,
+html.js-enabled body.reduce-motion .project-item,
+html.js-enabled body.reduce-motion .news-card,
+html.js-enabled body.reduce-motion .teaching-item,
+html.js-enabled body.reduce-motion .course-item,
+html.js-enabled body.reduce-motion .journal-item,
+html.js-enabled body.reduce-motion .reviewer-category,
+html.js-enabled body.reduce-motion .focus-item {
+    opacity: 1;
+    transform: none;
+    transition: none;
 }
 
 /* About Section */

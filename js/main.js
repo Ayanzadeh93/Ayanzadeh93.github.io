@@ -194,9 +194,6 @@ function initIntersectionObserver() {
                 const id = entry.target.getAttribute('id');
                 if (id) updateActiveNavLink(`#${id}`);
 
-                if (!entry.target.matches('section')) {
-                    observer.unobserve(entry.target);
-                }
             }
         });
     }, observerOptions);
