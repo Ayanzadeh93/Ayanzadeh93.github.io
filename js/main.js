@@ -1,5 +1,7 @@
 // Enhanced main.js with performance optimizations and accessibility features
 
+document.documentElement.classList.add('js-enabled');
+
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize all components
     initMobileMenu();
@@ -179,8 +181,8 @@ function initSmoothScrolling() {
 // Intersection Observer for animations and active nav links
 function initIntersectionObserver() {
     const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '-50px 0px'
+        threshold: 0.15,
+        rootMargin: '-40px 0px'
     };
 
     const observer = new IntersectionObserver((entries) => {
@@ -191,6 +193,8 @@ function initIntersectionObserver() {
                 // Update active navigation link
                 const id = entry.target.getAttribute('id');
                 if (id) updateActiveNavLink(`#${id}`);
+
+                observer.unobserve(entry.target);
             }
         });
     }, observerOptions);
@@ -200,10 +204,19 @@ function initIntersectionObserver() {
         observer.observe(section);
     });
 
-    // Observe cards and timeline items
-    document.querySelectorAll('.experience-card, .timeline-item, .publication-item, .award-item').forEach(item => {
-        observer.observe(item);
-    });
+    const observeWithStagger = (elements) => {
+        elements.forEach((element) => {
+            observer.observe(element);
+        });
+    };
+
+    observeWithStagger(
+        document.querySelectorAll('.experience-card, .timeline-item, .publication-item, .award-item')
+    );
+
+    observeWithStagger(
+        document.querySelectorAll('.project-card, .project-item, .news-card, .teaching-item, .course-item, .journal-item, .reviewer-category, .focus-item')
+    );
 }
 
 // Form validation with accessibility
