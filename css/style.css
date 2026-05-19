@@ -23,8 +23,9 @@
     --nav-height: 70px;
     /* Hero colors */
     --hero-bg: #0f172a;
+    --hero-bg-mid: #0b1220;
     --hero-bg-alt: #1e293b;
-    --accent-gradient: linear-gradient(135deg, #2563eb 0%, #38bdf8 100%);
+    --section-title-gradient: linear-gradient(135deg, #2563eb 0%, #38bdf8 100%);
     --accent-soft: rgba(37, 99, 235, 0.12);
     --surface-glass: rgba(255, 255, 255, 0.92);
     --surface-glass-alt: rgba(248, 250, 252, 0.92);
@@ -625,7 +626,7 @@ button.theme-toggle-btn {
     min-width: 100%;
     max-width: 100%;
     padding: 100px 0 80px;
-    background: linear-gradient(135deg, var(--hero-bg) 0%, #0b1220 45%, var(--hero-bg-alt) 100%);
+    background: linear-gradient(135deg, var(--hero-bg) 0%, var(--hero-bg-mid) 45%, var(--hero-bg-alt) 100%);
     background-size: 200% 200%;
     animation: heroGradientShift 18s ease infinite;
     color: white;
@@ -1194,7 +1195,7 @@ button.theme-toggle-btn {
     margin: 16px auto 0;
     width: 48px;
     height: 3px;
-    background: var(--accent-gradient);
+    background: var(--section-title-gradient);
     border-radius: 2px;
     box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
 }
@@ -1507,7 +1508,7 @@ html.js-enabled body.reduce-motion .focus-item {
     border: 1px solid var(--surface-border);
     padding: 28px;
     border-radius: 12px;
-    transition: var(--transition);
+    transition: box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
     box-shadow: var(--shadow-md);
     position: relative;
     overflow: hidden;
