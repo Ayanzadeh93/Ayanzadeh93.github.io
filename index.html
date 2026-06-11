@@ -101,7 +101,7 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="preload" href="css/style.css" as="style">
     <link rel="preload" href="js/main.js" as="script">
-    <link rel="preload" href="images/profile-compressed.jpg" as="image" type="image/jpeg" importance="high">
+    <link rel="preload" href="images/profile-400.jpg" as="image" type="image/jpeg" importance="high">
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
         as="style">
     <link rel="dns-prefetch" href="https://formspree.io">
@@ -118,12 +118,12 @@
     <meta name="apple-mobile-web-app-title" content="Aydin Ayanzadeh">
     <meta name="application-name" content="Aydin Ayanzadeh Portfolio">
     <meta name="msapplication-TileColor" content="#1a73e8">
-    <meta name="msapplication-config" content="/browserconfig.xml">
 
     <!-- Stylesheets -->
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"></noscript>
 
     <!-- Enhanced Structured Data -->
     <script type="application/ld+json">
@@ -359,11 +359,11 @@
                         <div class="profile-image">
                             <div class="ai-frame">
                                 <picture>
-                                    <source media="(max-width: 480px)" srcset="images/profile-compressed.jpg"
+                                    <source media="(max-width: 480px)" srcset="images/profile-400.jpg"
                                         width="130" height="130">
-                                    <source media="(max-width: 768px)" srcset="images/profile-compressed.jpg"
+                                    <source media="(max-width: 768px)" srcset="images/profile-400.jpg"
                                         width="160" height="160">
-                                    <img src="images/profile-compressed.jpg"
+                                    <img src="images/profile-400.jpg"
                                         alt="Professional headshot of Aydin Ayanzadeh" class="profile-img"
                                         loading="eager" width="200" height="200">
                                 </picture>
@@ -373,7 +373,7 @@
                         <div class="profile-info">
                             <h1 class="hero-title">
                                 <span class="ai-text">Aydin Ayanzadeh</span>
-                                <div class="typing-cursor"></div>
+                                <span class="typing-cursor" aria-hidden="true"></span>
                             </h1>
                             <p class="hero-subtitle">
                                 <span class="ai-badge">AI Expert</span>
@@ -415,6 +415,11 @@
                     </div>
                 </div>
             </div>
+
+            <a href="#about" class="scroll-indicator" aria-label="Scroll to the About section">
+                <span>Scroll</span>
+                <i class="fas fa-chevron-down" aria-hidden="true"></i>
+            </a>
         </section>
 
         <!-- About Section -->
