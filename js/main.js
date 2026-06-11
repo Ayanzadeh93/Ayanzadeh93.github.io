@@ -162,26 +162,26 @@ function initMobileMenu() {
     mobileToggle.setAttribute('aria-expanded', 'false');
 }
 
-// Enhanced smooth scrolling with loading states
+// Smooth scrolling for in-page anchor links
 function initSmoothScrolling() {
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            
-            if (target) {
-                showLoadingSpinner();
-                
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
+            const href = this.getAttribute('href');
 
-                // Update active link
-                updateActiveNavLink(this.getAttribute('href'));
-                
-                setTimeout(hideLoadingSpinner, 500);
-            }
+            // Bare "#" links (e.g. share buttons) are handled elsewhere
+            if (!href || href === '#') return;
+
+            const target = document.querySelector(href);
+            if (!target) return;
+
+            e.preventDefault();
+
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+
+            updateActiveNavLink(href);
         });
     });
 }
@@ -390,80 +390,40 @@ function initLazyLoading() {
 
 // Performance optimizations
 function initPerformanceOptimizations() {
-    // Debounce scroll events
-    let scrollTimeout;
+    initHeroParallax();
+}
+
+// Subtle parallax on the hero background only, driven by requestAnimationFrame
+// so it stays in sync with scrolling instead of jumping after scroll stops.
+function initHeroParallax() {
+    const heroBackground = document.querySelector('.hero .ai-background');
+    if (!heroBackground) return;
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    let ticking = false;
+
     window.addEventListener('scroll', function() {
-        if (scrollTimeout) clearTimeout(scrollTimeout);
-        scrollTimeout = setTimeout(updateScrollPosition, 10);
-    });
+        if (ticking) return;
+        ticking = true;
 
-    // Preload critical resources
-    preloadCriticalResources();
-    
-    // Optimize animations
-    optimizeAnimations();
-}
-
-function preloadCriticalResources() {
-    // Preload hero image
-    const heroImg = new Image();
-    heroImg.src = 'images/profile-compressed.jpg';
-    
-    // Preload critical CSS if not already loaded
-    const criticalCSS = document.createElement('link');
-    criticalCSS.rel = 'preload';
-    criticalCSS.href = 'css/style.css';
-    criticalCSS.as = 'style';
-    document.head.appendChild(criticalCSS);
-}
-
-function optimizeAnimations() {
-    // Reduce motion for users who prefer it
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        document.documentElement.style.setProperty('--animation-duration', '0.01ms');
-    }
+        requestAnimationFrame(() => {
+            const scrolled = window.scrollY;
+            if (scrolled <= window.innerHeight) {
+                heroBackground.style.transform = `translateY(${scrolled * 0.25}px)`;
+            }
+            ticking = false;
+        });
+    }, { passive: true });
 }
 
 // Accessibility features
 function initAccessibilityFeatures() {
-    // Focus trap for sidebar
-    initFocusTrap();
-    
     // Announce dynamic content changes
     initAriaLiveRegions();
-    
+
     // High contrast mode detection
     detectHighContrastMode();
-}
-
-function initFocusTrap() {
-    const sidebar = document.getElementById('sidebar');
-    if (!sidebar) return;
-    
-    const focusableElements = sidebar.querySelectorAll(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-    );
-    
-    if (focusableElements.length === 0) return;
-    
-    const firstElement = focusableElements[0];
-    const lastElement = focusableElements[focusableElements.length - 1];
-
-    sidebar.addEventListener('keydown', function(e) {
-        if (e.key !== 'Tab') return;
-        
-        if (e.shiftKey) {
-            if (document.activeElement === firstElement) {
-                e.preventDefault();
-                lastElement.focus();
-            }
-        } else {
-            if (document.activeElement === lastElement) {
-                e.preventDefault();
-                firstElement.focus();
-            }
-        }
-    });
 }
 
 function initAriaLiveRegions() {
@@ -488,24 +448,13 @@ function detectHighContrastMode() {
 
 // Utility functions
 function updateActiveNavLink(href) {
-    document.querySelectorAll('.sidebar-link, .top-nav-link').forEach(link => {
+    document.querySelectorAll('.top-nav-link').forEach(link => {
         link.classList.remove('active');
     });
-    
+
     const activeLink = document.querySelector(`a[href="${href}"]`);
     if (activeLink) {
         activeLink.classList.add('active');
-    }
-}
-
-function updateScrollPosition() {
-    const scrolled = window.pageYOffset;
-    const rate = scrolled * -0.5;
-    
-    // Parallax effect for hero background
-    const hero = document.querySelector('.hero');
-    if (hero && scrolled < window.innerHeight) {
-        hero.style.transform = `translateY(${rate}px)`;
     }
 }
 
@@ -663,37 +612,31 @@ document.head.appendChild(style);
 
 // Initialize AI animations and effects
 function initAIAnimations() {
-    // Add typing effect to hero title
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Add typing effect to hero title (skipped for users who prefer reduced motion)
     const heroTitle = document.querySelector('.ai-text');
-    if (heroTitle) {
+    if (heroTitle && !prefersReducedMotion) {
         const text = heroTitle.textContent;
+        // Keep the full name available to assistive tech while characters type in
+        heroTitle.setAttribute('aria-label', text);
         heroTitle.textContent = '';
         let i = 0;
-        
+
         function typeWriter() {
             if (i < text.length) {
                 heroTitle.textContent += text.charAt(i);
                 i++;
-                setTimeout(typeWriter, 100);
+                setTimeout(typeWriter, 70);
+            } else {
+                heroTitle.removeAttribute('aria-label');
             }
         }
-        
+
         // Start typing after a short delay
-        setTimeout(typeWriter, 1000);
+        setTimeout(typeWriter, 600);
     }
-    
-    // Add hover effects to AI elements
-    const aiElements = document.querySelectorAll('.ai-btn, .expertise-tag, .ai-badge, .vlm-badge, .llm-badge');
-    aiElements.forEach(element => {
-        element.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-3px) scale(1.05)';
-        });
-        
-        element.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0) scale(1)';
-        });
-    });
-    
+
     // Add click ripple effect to buttons
     const buttons = document.querySelectorAll('.ai-btn');
     buttons.forEach(button => {

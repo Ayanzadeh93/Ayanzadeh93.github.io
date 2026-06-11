@@ -321,9 +321,15 @@
 html {
     overflow-x: hidden;
     scroll-behavior: smooth;
+    /* Keep anchored sections clear of the fixed navbar */
+    scroll-padding-top: calc(var(--nav-height, 70px) + 8px);
     -webkit-text-size-adjust: 100%;
     margin: 0;
     padding: 0;
+}
+
+[id] {
+    scroll-margin-top: calc(var(--nav-height, 70px) + 8px);
 }
 
 body {
@@ -796,34 +802,48 @@ button.theme-toggle-btn {
     animation: particleFloat 6s linear infinite;
 }
 
+/* Varied sizes and speeds give the particle field a sense of depth */
 .particle:nth-child(1) {
     top: 20%;
     left: 10%;
     animation-delay: 0s;
+    animation-duration: 7s;
 }
 
 .particle:nth-child(2) {
     top: 40%;
     left: 80%;
+    width: 5px;
+    height: 5px;
     animation-delay: 1s;
+    animation-duration: 9s;
 }
 
 .particle:nth-child(3) {
     top: 60%;
     left: 20%;
+    width: 3px;
+    height: 3px;
     animation-delay: 2s;
+    animation-duration: 6s;
 }
 
 .particle:nth-child(4) {
     top: 80%;
     left: 70%;
+    width: 5px;
+    height: 5px;
     animation-delay: 3s;
+    animation-duration: 10s;
 }
 
 .particle:nth-child(5) {
     top: 30%;
     left: 50%;
+    width: 3px;
+    height: 3px;
     animation-delay: 4s;
+    animation-duration: 7.5s;
 }
 
 .hero>.container {
@@ -844,6 +864,35 @@ button.theme-toggle-btn {
     flex-direction: column;
     align-items: center;
     text-align: center;
+}
+
+/* One-time staggered entrance for hero elements */
+.hero .profile-image {
+    animation: heroFadeUp 0.7s ease-out 0.05s backwards;
+}
+
+.hero .hero-title {
+    animation: heroFadeUp 0.7s ease-out 0.15s backwards;
+}
+
+.hero .hero-subtitle {
+    animation: heroFadeUp 0.7s ease-out 0.25s backwards;
+}
+
+.hero .hero-description {
+    animation: heroFadeUp 0.7s ease-out 0.35s backwards;
+}
+
+.hero .hero-location {
+    animation: heroFadeUp 0.7s ease-out 0.42s backwards;
+}
+
+.hero .expertise-tags {
+    animation: heroFadeUp 0.7s ease-out 0.5s backwards;
+}
+
+.hero .hero-links {
+    animation: heroFadeUp 0.7s ease-out 0.6s backwards;
 }
 
 .hero-profile {
@@ -887,9 +936,17 @@ button.theme-toggle-btn {
     top: 0;
     left: 0;
     width: 100%;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
-    animation: scanLine 2s ease-in-out infinite;
+    height: 100%;
+    /* Soft scanning band with a bright core; swept via transform for GPU acceleration */
+    background: linear-gradient(180deg,
+        transparent 42%,
+        rgba(26, 115, 232, 0.12) 47%,
+        rgba(74, 144, 226, 0.55) 50%,
+        rgba(26, 115, 232, 0.12) 53%,
+        transparent 58%);
+    transform: translateY(-100%);
+    animation: scanLine 5s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+    pointer-events: none;
 }
 
 .profile-img:hover {
@@ -917,7 +974,7 @@ button.theme-toggle-btn {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    text-fill-color: transparent;
+    color: transparent;
     animation: textGlow 3s ease-in-out infinite;
 }
 
@@ -948,7 +1005,13 @@ button.theme-toggle-btn {
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 1px;
-    animation: badgePulse 2s ease-in-out infinite;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.ai-badge:hover,
+.vlm-badge:hover,
+.llm-badge:hover {
+    transform: translateY(-2px) scale(1.03);
 }
 
 .ai-badge {
@@ -1001,23 +1064,6 @@ button.theme-toggle-btn {
     font-size: 0.85rem;
     font-weight: 500;
     transition: var(--transition);
-    animation: tagFloat 3s ease-in-out infinite;
-}
-
-.expertise-tag:nth-child(1) {
-    animation-delay: 0s;
-}
-
-.expertise-tag:nth-child(2) {
-    animation-delay: 0.5s;
-}
-
-.expertise-tag:nth-child(3) {
-    animation-delay: 1s;
-}
-
-.expertise-tag:nth-child(4) {
-    animation-delay: 1.5s;
 }
 
 .expertise-tag:hover {
@@ -1127,6 +1173,57 @@ button.theme-toggle-btn {
 
 .ai-btn:hover .btn-glow {
     left: 100%;
+}
+
+/* Scroll-down indicator */
+.scroll-indicator {
+    position: absolute;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: none;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: color 0.3s ease;
+    animation: heroFadeUp 0.7s ease-out 1s backwards;
+}
+
+.scroll-indicator i {
+    font-size: 1rem;
+    animation: scrollHint 2.2s ease-in-out infinite;
+}
+
+.scroll-indicator:hover,
+.scroll-indicator:focus {
+    color: rgba(255, 255, 255, 0.95);
+}
+
+@keyframes scrollHint {
+
+    0%,
+    100% {
+        transform: translateY(0);
+        opacity: 0.6;
+    }
+
+    50% {
+        transform: translateY(6px);
+        opacity: 1;
+    }
+}
+
+/* Hide the indicator on short viewports where it would crowd the buttons */
+@media (max-height: 700px) {
+    .scroll-indicator {
+        display: none;
+    }
 }
 
 /* Sections */
@@ -5045,18 +5142,28 @@ img[loading="lazy"].loaded {
     }
 }
 
+/* Sweep top-to-bottom, then rest before the next pass */
 @keyframes scanLine {
     0% {
-        top: 0;
+        transform: translateY(-100%);
         opacity: 0;
     }
 
-    50% {
+    8% {
         opacity: 1;
     }
 
+    52% {
+        opacity: 1;
+    }
+
+    60% {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+
     100% {
-        top: 100%;
+        transform: translateY(100%);
         opacity: 0;
     }
 }
@@ -5086,28 +5193,31 @@ img[loading="lazy"].loaded {
     }
 }
 
-@keyframes badgePulse {
-
-    0%,
-    100% {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(1.05);
+/* Hero entrance — one-time staggered reveal.
+   Only "from" is defined so the animation releases the transform/opacity
+   properties once it finishes (keeps hover transforms working afterwards). */
+@keyframes heroFadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(24px);
     }
 }
 
-@keyframes tagFloat {
-
-    0%,
-    100% {
-        transform: translateY(0);
+/* Scroll reveal for sections and cards (class added by IntersectionObserver) */
+@keyframes revealUp {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
     }
+}
 
-    50% {
-        transform: translateY(-5px);
-    }
+.animate-in {
+    animation: revealUp 0.55s ease-out backwards;
+}
+
+/* The hero has its own staggered entrance — skip the generic reveal */
+.hero.animate-in {
+    animation: none;
 }
 
 /* Mobile ≤ 768px: larger tap targets for mobile nav links */
