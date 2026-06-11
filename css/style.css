@@ -338,6 +338,8 @@ body {
     line-height: 1.7;
     color: var(--text-dark);
     background-color: var(--hero-bg);
+    /* Soften the light/dark theme switch */
+    transition: background-color 0.3s ease, color 0.3s ease;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
@@ -724,7 +726,9 @@ button.theme-toggle-btn {
     background: var(--primary-color);
     border-radius: 50%;
     box-shadow: 0 0 20px var(--primary-color);
+    /* Pulse via opacity/transform only — keeps the animation on the compositor */
     animation: neuronGlow 3s ease-in-out infinite;
+    will-change: opacity, transform;
 }
 
 .neural-layer.layer-1 .neuron:nth-child(1) {
@@ -918,9 +922,14 @@ button.theme-toggle-btn {
     height: 200px;
     border-radius: 50%;
     border: 3px solid var(--primary-color);
-    box-shadow: 0 0 30px rgba(26, 115, 232, 0.5);
+    /* Static glow — the old infinite box-shadow pulse repainted constantly */
+    box-shadow: 0 0 35px rgba(26, 115, 232, 0.55);
     overflow: hidden;
-    animation: aiFrameGlow 3s ease-in-out infinite;
+    transition: box-shadow 0.4s ease;
+}
+
+.ai-frame:hover {
+    box-shadow: 0 0 50px rgba(26, 115, 232, 0.8);
 }
 
 .profile-img {
@@ -975,7 +984,8 @@ button.theme-toggle-btn {
     -webkit-text-fill-color: transparent;
     background-clip: text;
     color: transparent;
-    animation: textGlow 3s ease-in-out infinite;
+    /* Static glow — animating drop-shadow filters forces repaints every frame */
+    filter: drop-shadow(0 0 14px rgba(26, 115, 232, 0.4));
 }
 
 .typing-cursor {
@@ -1234,6 +1244,9 @@ button.theme-toggle-btn {
     background-color: var(--background-white);
     position: relative;
     overflow: hidden;
+    /* Skip rendering below-fold sections until they near the viewport */
+    content-visibility: auto;
+    contain-intrinsic-size: auto 700px;
 }
 
 .section>.container {
@@ -4437,8 +4450,18 @@ body.enhanced-keyboard .top-nav-link:focus {
     }
 }
 
-/* Improve focus indicators for accessibility */
+/* Improve focus indicators for accessibility.
+   Show the ring for keyboard navigation, hide it for mouse/touch. */
 *:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+*:focus:not(:focus-visible) {
+    outline: none;
+}
+
+*:focus-visible {
     outline: 2px solid var(--primary-color);
     outline-offset: 2px;
 }
@@ -5082,13 +5105,13 @@ img[loading="lazy"].loaded {
 
     0%,
     100% {
-        box-shadow: 0 0 20px var(--primary-color);
+        opacity: 0.7;
         transform: scale(1);
     }
 
     50% {
-        box-shadow: 0 0 30px var(--primary-color), 0 0 40px rgba(26, 115, 232, 0.5);
-        transform: scale(1.1);
+        opacity: 1;
+        transform: scale(1.15);
     }
 }
 
@@ -5128,20 +5151,6 @@ img[loading="lazy"].loaded {
     }
 }
 
-@keyframes aiFrameGlow {
-
-    0%,
-    100% {
-        box-shadow: 0 0 30px rgba(26, 115, 232, 0.5);
-        border-color: var(--primary-color);
-    }
-
-    50% {
-        box-shadow: 0 0 50px rgba(26, 115, 232, 0.8);
-        border-color: #4a90e2;
-    }
-}
-
 /* Sweep top-to-bottom, then rest before the next pass */
 @keyframes scanLine {
     0% {
@@ -5165,18 +5174,6 @@ img[loading="lazy"].loaded {
     100% {
         transform: translateY(100%);
         opacity: 0;
-    }
-}
-
-@keyframes textGlow {
-
-    0%,
-    100% {
-        filter: drop-shadow(0 0 10px rgba(26, 115, 232, 0.3));
-    }
-
-    50% {
-        filter: drop-shadow(0 0 20px rgba(26, 115, 232, 0.6));
     }
 }
 
