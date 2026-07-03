@@ -14,33 +14,12 @@
         content="Aydin Ayanzadeh, Computer Vision Researcher, Medical Image Analysis, Machine Learning, AI Researcher, UMBC Computer Science, PhD Student, Deep Learning, Multimodal Learning, Vision Language Models, VLM, LLM, Medical AI, Accessibility AI, Image Segmentation, Knowledge Distillation, Graph Neural Networks, Indoor Navigation, Artificial Intelligence, Baltimore Researcher">
     <meta name="author" content="Aydin Ayanzadeh">
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
-    <meta name="googlebot" content="index, follow">
-    <meta name="google" content="notranslate">
-    <meta name="theme-color" content="#1a73e8">
+    <meta name="theme-color" content="#2563eb">
     <meta name="color-scheme" content="light dark">
-    <meta name="language" content="English">
-    <meta name="revisit-after" content="3 days">
-    <meta name="distribution" content="global">
-    <meta name="rating" content="general">
     <meta name="referrer" content="no-referrer-when-downgrade">
 
     <!-- Canonical URL -->
     <link rel="canonical" href="https://ayanzadeh93.github.io/">
-
-    <!-- Google Scholar Meta Tags -->
-    <meta name="citation_author" content="Ayanzadeh, Aydin">
-    <meta name="citation_author_institution" content="University of Maryland, Baltimore County">
-    <meta name="DC.creator" content="Aydin Ayanzadeh">
-    <meta name="DC.title" content="Aydin Ayanzadeh - Computer Vision and Medical AI Research">
-    <meta name="DC.subject"
-        content="Computer Vision; Medical Image Analysis; Machine Learning; Artificial Intelligence">
-
-    <!-- Academic & Research Meta Tags -->
-    <meta name="academicfield" content="Computer Science">
-    <meta name="research_interests"
-        content="Computer Vision, Medical Image Analysis, Multimodal Learning, Vision-Language Models, Deep Learning, Accessibility AI">
-    <meta name="institution" content="University of Maryland, Baltimore County">
-    <meta name="degree" content="Ph.D. (In Progress), M.S. Computer Science">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="profile">
@@ -49,8 +28,8 @@
     <meta property="og:description"
         content="Ph.D. Student in Computer Science at UMBC (M.S. 2025) specializing in Computer Vision, Medical Image Analysis, and Multimodal Learning. Published researcher in AI accessibility technologies.">
     <meta property="og:image" content="https://ayanzadeh93.github.io/images/profile-compressed.jpg">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
+    <meta property="og:image:width" content="656">
+    <meta property="og:image:height" content="800">
     <meta property="og:image:alt" content="Aydin Ayanzadeh - Computer Vision Researcher at UMBC">
     <meta property="og:site_name" content="Aydin Ayanzadeh - Research Portfolio">
     <meta property="og:locale" content="en_US">
@@ -68,25 +47,6 @@
     <meta name="twitter:creator" content="@ayanzadeh93">
     <meta name="twitter:site" content="@ayanzadeh93">
 
-    <!-- Additional SEO Meta Tags -->
-    <meta name="geo.region" content="US-MD">
-    <meta name="geo.placename" content="Baltimore, Maryland">
-    <meta name="geo.position" content="39.2904;-76.6122">
-    <meta name="ICBM" content="39.2904, -76.6122">
-    <meta name="contact" content="a.ayanzadeh@gmail.com">
-    <meta name="copyright" content="© 2026 Aydin Ayanzadeh">
-    <meta name="reply-to" content="a.ayanzadeh@gmail.com">
-    <meta name="owner" content="Aydin Ayanzadeh">
-    <meta name="url" content="https://ayanzadeh93.github.io/">
-    <meta name="identifier-URL" content="https://ayanzadeh93.github.io/">
-    <meta name="directory" content="submission">
-    <meta name="category" content="Science, Research, Education, Technology">
-    <meta name="coverage" content="Worldwide">
-    <meta name="target" content="researchers, academics, students, industry professionals">
-    <meta name="HandheldFriendly" content="True">
-    <meta name="MobileOptimized" content="320">
-    <meta http-equiv="cleartype" content="on">
-
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="apple-touch-icon" sizes="180x180" href="favicon.svg">
@@ -101,7 +61,7 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="preload" href="css/style.css" as="style">
     <link rel="preload" href="js/main.js" as="script">
-    <link rel="preload" href="images/profile-400.jpg" as="image" type="image/jpeg" importance="high">
+    <link rel="preload" href="images/profile-400.jpg" as="image" type="image/jpeg" fetchpriority="high">
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
         as="style">
     <link rel="dns-prefetch" href="https://formspree.io">
@@ -117,7 +77,18 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Aydin Ayanzadeh">
     <meta name="application-name" content="Aydin Ayanzadeh Portfolio">
-    <meta name="msapplication-TileColor" content="#1a73e8">
+    <meta name="msapplication-TileColor" content="#2563eb">
+
+    <!-- Apply the saved (or system) theme before first paint to avoid a light-mode flash -->
+    <script>
+        (function () {
+            try {
+                var saved = localStorage.getItem('theme');
+                var dark = saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+            } catch (e) { /* keep default theme */ }
+        })();
+    </script>
 
     <!-- Stylesheets -->
     <link rel="stylesheet" href="css/style.css">
@@ -129,7 +100,7 @@
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
-        "@type": ["Person", "Researcher"],
+        "@type": "Person",
         "name": "Aydin Ayanzadeh",
         "givenName": "Aydin",
         "familyName": "Ayanzadeh",
@@ -163,8 +134,8 @@
         "image": {
             "@type": "ImageObject",
             "url": "https://ayanzadeh93.github.io/images/profile-compressed.jpg",
-            "width": 400,
-            "height": 400
+            "width": 656,
+            "height": 800
         },
         "sameAs": [
             "https://linkedin.com/in/ayanzadeh93",
@@ -230,11 +201,6 @@
         "copyrightHolder": {
             "@type": "Person",
             "name": "Aydin Ayanzadeh"
-        },
-        "potentialAction": {
-            "@type": "SearchAction",
-            "target": "https://ayanzadeh93.github.io/#{search_term_string}",
-            "query-input": "required name=search_term_string"
         }
     }
     </script>
@@ -264,45 +230,33 @@
                     <span class="brand-text">Aydin Ayanzadeh</span>
                 </a>
             </div>
-            <ul class="top-nav-menu" role="menubar" aria-label="Main navigation menu">
-                <li role="none"><a href="#home" class="top-nav-link" role="menuitem"
-                        aria-label="Navigate to home section" tabindex="0"><i class="fas fa-home"
-                            aria-hidden="true"></i> <span>Home</span></a></li>
-                <li role="none"><a href="#about" class="top-nav-link" role="menuitem"
-                        aria-label="Navigate to about section" tabindex="-1"><i class="fas fa-user"
-                            aria-hidden="true"></i> <span>About</span></a></li>
-                <li role="none"><a href="#education" class="top-nav-link" role="menuitem"
-                        aria-label="Navigate to education section" tabindex="-1"><i class="fas fa-graduation-cap"
-                            aria-hidden="true"></i> <span>Education</span></a></li>
-                <li role="none"><a href="#experience" class="top-nav-link" role="menuitem"
-                        aria-label="Navigate to experience section" tabindex="-1"><i class="fas fa-briefcase"
-                            aria-hidden="true"></i> <span>Experience</span></a></li>
-                <li role="none"><a href="#teaching" class="top-nav-link" role="menuitem"
-                        aria-label="Navigate to teaching section" tabindex="-1"><i class="fas fa-chalkboard-teacher"
-                            aria-hidden="true"></i> <span>Teaching</span></a></li>
-                <li role="none"><a href="#news" class="top-nav-link" role="menuitem"
-                        aria-label="Navigate to news section" tabindex="-1"><i class="fas fa-newspaper"
-                            aria-hidden="true"></i> <span>News</span></a></li>
-                <li role="none"><a href="#publications" class="top-nav-link" role="menuitem"
-                        aria-label="Navigate to publications section" tabindex="-1"><i class="fas fa-book"
-                            aria-hidden="true"></i> <span>Papers</span></a></li>
-                <li role="none"><a href="#research-projects" class="top-nav-link" role="menuitem"
-                        aria-label="Navigate to research projects section" tabindex="-1"><i class="fas fa-flask"
-                            aria-hidden="true"></i> <span>Research</span></a></li>
-                <li role="none"><a href="#projects" class="top-nav-link" role="menuitem"
-                        aria-label="Navigate to projects section" tabindex="-1"><i class="fas fa-laptop-code"
-                            aria-hidden="true"></i> <span>Projects</span></a></li>
-                <li role="none"><a href="#skills" class="top-nav-link" role="menuitem"
-                        aria-label="Navigate to skills section" tabindex="-1"><i class="fas fa-code"
-                            aria-hidden="true"></i> <span>Skills</span></a></li>
-                <li role="none"><a href="#awards" class="top-nav-link" role="menuitem"
-                        aria-label="Navigate to awards section" tabindex="-1"><i class="fas fa-trophy"
-                            aria-hidden="true"></i> <span>Awards</span></a></li>
-                <li role="none"><a href="#contact" class="top-nav-link" role="menuitem"
-                        aria-label="Navigate to contact section" tabindex="-1"><i class="fas fa-envelope"
-                            aria-hidden="true"></i> <span>Contact</span></a></li>
-                <li role="none">
-                    <button id="theme-toggle" class="top-nav-link theme-toggle-btn" aria-label="Switch to dark theme" tabindex="-1">
+            <ul class="top-nav-menu" id="top-nav-menu">
+                <li><a href="#home" class="top-nav-link"><i class="fas fa-home" aria-hidden="true"></i>
+                        <span>Home</span></a></li>
+                <li><a href="#about" class="top-nav-link"><i class="fas fa-user" aria-hidden="true"></i>
+                        <span>About</span></a></li>
+                <li><a href="#education" class="top-nav-link"><i class="fas fa-graduation-cap" aria-hidden="true"></i>
+                        <span>Education</span></a></li>
+                <li><a href="#experience" class="top-nav-link"><i class="fas fa-briefcase" aria-hidden="true"></i>
+                        <span>Experience</span></a></li>
+                <li><a href="#teaching" class="top-nav-link"><i class="fas fa-chalkboard-teacher" aria-hidden="true"></i>
+                        <span>Teaching</span></a></li>
+                <li><a href="#news" class="top-nav-link"><i class="fas fa-newspaper" aria-hidden="true"></i>
+                        <span>News</span></a></li>
+                <li><a href="#publications" class="top-nav-link"><i class="fas fa-book" aria-hidden="true"></i>
+                        <span>Papers</span></a></li>
+                <li><a href="#research-projects" class="top-nav-link"><i class="fas fa-flask" aria-hidden="true"></i>
+                        <span>Research</span></a></li>
+                <li><a href="#projects" class="top-nav-link"><i class="fas fa-laptop-code" aria-hidden="true"></i>
+                        <span>Projects</span></a></li>
+                <li><a href="#skills" class="top-nav-link"><i class="fas fa-code" aria-hidden="true"></i>
+                        <span>Skills</span></a></li>
+                <li><a href="#awards" class="top-nav-link"><i class="fas fa-trophy" aria-hidden="true"></i>
+                        <span>Awards</span></a></li>
+                <li><a href="#contact" class="top-nav-link"><i class="fas fa-envelope" aria-hidden="true"></i>
+                        <span>Contact</span></a></li>
+                <li>
+                    <button id="theme-toggle" class="top-nav-link theme-toggle-btn" aria-label="Switch to dark theme">
                         <i class="fas fa-moon" aria-hidden="true"></i> <span>Theme</span>
                     </button>
                 </li>
@@ -375,12 +329,7 @@
                                 <span class="ai-text">Aydin Ayanzadeh</span>
                                 <span class="typing-cursor" aria-hidden="true"></span>
                             </h1>
-                            <p class="hero-subtitle">
-                                <span class="ai-badge">AI Expert</span>
-                                <span class="vlm-badge">VLM Specialist</span>
-                                <span class="llm-badge">LLM Researcher</span>
-                            </p>
-                            <p class="hero-description">Ph.D. Student in Computer Science | M.S. Graduate</p>
+                            <p class="hero-description">Ph.D. Student in Computer Science</p>
                             <p class="hero-location">University of Maryland, Baltimore County</p>
                             <div class="expertise-tags">
                                 <span class="expertise-tag">Computer Vision</span>
@@ -807,7 +756,7 @@
                     <article class="news-card">
                         <div class="news-card-header">
                             <div class="news-date-badge">
-                                <span class="date-day">Jan</span>
+                                <span class="date-month">Jan</span>
                                 <span class="date-year">2025</span>
                             </div>
                             <div class="news-category conference">
@@ -838,7 +787,7 @@
                     <article class="news-card">
                         <div class="news-card-header">
                             <div class="news-date-badge">
-                                <span class="date-day">Oct</span>
+                                <span class="date-month">Oct</span>
                                 <span class="date-year">2024</span>
                             </div>
                             <div class="news-category conference">
@@ -881,7 +830,7 @@
                     <article class="news-card">
                         <div class="news-card-header">
                             <div class="news-date-badge">
-                                <span class="date-day">May</span>
+                                <span class="date-month">May</span>
                                 <span class="date-year">2019</span>
                             </div>
                             <div class="news-category award">

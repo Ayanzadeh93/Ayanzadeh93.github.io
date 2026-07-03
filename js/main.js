@@ -81,8 +81,9 @@ function initThemeToggle() {
         savedTheme = null;
     }
 
-    // Default to light unless user explicitly selected dark
-    const initialTheme = savedTheme === 'dark' ? 'dark' : 'light';
+    // Saved choice wins; otherwise follow the operating system preference
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const initialTheme = savedTheme === 'dark' || (!savedTheme && prefersDark) ? 'dark' : 'light';
     applyTheme(initialTheme);
 
     themeToggleBtn.addEventListener('click', () => {
@@ -172,7 +173,11 @@ function initSmoothScrolling() {
             if (!href || href === '#') return;
 
             const target = document.querySelector(href);
-            if (!target) return;
+            if (!target) {
+                // Dead anchors (e.g. citation copy links) should not change the URL hash
+                e.preventDefault();
+                return;
+            }
 
             e.preventDefault();
 
@@ -452,7 +457,7 @@ function updateActiveNavLink(href) {
         link.classList.remove('active');
     });
 
-    const activeLink = document.querySelector(`a[href="${href}"]`);
+    const activeLink = document.querySelector(`.top-nav-link[href="${href}"]`);
     if (activeLink) {
         activeLink.classList.add('active');
     }
@@ -1309,9 +1314,7 @@ function updatePageReaderButtons(isReading) {
 document.addEventListener('DOMContentLoaded', function() {
     // Add to existing initialization
     initializeAccessibilityFeatures();
-    initializeAccessibilityBadge();
-    initializeCommitmentBanner();
-    
+
     // Add keyboard shortcut to toggle accessibility menu (Alt + A)
     document.addEventListener('keydown', function(e) {
         if (e.altKey && e.key.toLowerCase() === 'a') {
@@ -1339,56 +1342,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
-
-// Accessibility Badge Functions
-function initializeAccessibilityBadge() {
-    const badge = document.querySelector('.badge-trigger');
-    if (badge) {
-        badge.addEventListener('click', function() {
-            const toggle = document.getElementById('accessibility-menu-toggle');
-            const menu = document.getElementById('accessibility-menu');
-            
-            if (toggle && menu) {
-                toggle.classList.add('show');
-                document.body.classList.add('accessibility-active');
-                openAccessibilityMenu();
-                announceToScreenReader('Accessibility menu opened');
-            }
-        });
-    }
-}
-
-// Commitment Banner Functions
-function initializeCommitmentBanner() {
-    const banner = document.querySelector('.a11y-commitment-banner');
-    const closeBtn = document.querySelector('.close-banner');
-    
-    // Exit early if banner doesn't exist in the page
-    if (!banner) return;
-    
-    // Check if banner was previously closed
-    const bannerClosed = localStorage.getItem('a11y-banner-closed');
-    
-    if (bannerClosed) {
-        banner.classList.add('hidden');
-    } else {
-        // Auto-hide after 10 seconds
-        setTimeout(() => {
-            if (banner && !banner.classList.contains('hidden')) {
-                banner.classList.add('hidden');
-            }
-        }, 10000);
-    }
-    
-    // Close button handler
-    if (closeBtn) {
-        closeBtn.addEventListener('click', function() {
-            banner.classList.add('hidden');
-            localStorage.setItem('a11y-banner-closed', 'true');
-            announceToScreenReader('Accessibility banner closed');
-        });
-    }
-}
 
 // ========================================
 // CITATION COPY FUNCTION
@@ -1462,249 +1415,3 @@ function showCitationNotification(message, type = 'success') {
         }, 300);
     }, 3000);
 }
-
-// ========================================
-// PROJECT MODAL SYSTEM
-// ========================================
-
-const projectData = {
-    project1: {
-        title: 'Medical Image Segmentation Platform',
-        category: 'Deep Learning',
-        year: '2024',
-        status: 'Active',
-        overview: 'Comprehensive deep learning platform designed for automated medical image analysis and segmentation using state-of-the-art multi-task learning approaches to handle imbalanced medical datasets.',
-        objectives: [
-            'Develop robust segmentation models for various medical imaging modalities',
-            'Handle class imbalance using novel sampling strategies',
-            'Implement multi-task learning for simultaneous segmentation and classification',
-            'Achieve real-time inference for clinical deployment'
-        ],
-        features: [
-            'Multi-task neural network combining segmentation and classification',
-            'Advanced data augmentation pipeline for medical images',
-            'Handling of highly imbalanced datasets with focal loss',
-            'Support for multiple imaging modalities (CT, MRI, X-Ray)',
-            'Real-time visualization dashboard'
-        ],
-        technologies: ['PyTorch', 'TorchVision', 'NumPy', 'Scikit-learn', 'OpenCV', 'MONAI', 'TensorBoard'],
-        results: 'Achieved 92% Dice coefficient on polyp segmentation and 95% accuracy on multi-class classification. Significantly improved performance on minority classes.',
-        github: 'https://github.com/Ayanzadeh93'
-    },
-    project2: {
-        title: 'LLM-Based Indoor Navigation System',
-        category: 'LLM Application',
-        year: '2024',
-        status: 'Under Review',
-        overview: 'Innovative navigation system leveraging Large Language Models and computer vision to assist visually impaired individuals navigate complex indoor environments with real-time guidance.',
-        objectives: [
-            'Create accessible navigation solution for visually impaired users',
-            'Integrate LLMs for natural language interaction',
-            'Provide real-time environmental awareness',
-            'Enable independent navigation in unfamiliar spaces'
-        ],
-        features: [
-            'GPT-4 powered natural language processing',
-            'Computer vision pipeline for obstacle detection',
-            'Real-time audio feedback with spatial cues',
-            'Dynamic path planning with obstacle avoidance',
-            'Indoor positioning using visual odometry',
-            'Multi-modal feedback (audio, haptic)'
-        ],
-        technologies: ['Python', 'GPT-4 API', 'OpenCV', 'YOLOv8', 'PyTorch', 'ROS', 'Text-to-Speech'],
-        results: 'Demonstrated at STARS Celebration 2024 and CMD-IT/ACM Richard Tapia Conference. 87% improvement in navigation confidence for visually impaired participants.',
-        github: 'https://github.com/Ayanzadeh93'
-    },
-    project3: {
-        title: 'Knowledge Distillation Framework',
-        category: 'Model Optimization',
-        year: '2023',
-        status: 'Published',
-        overview: 'Novel framework for efficient knowledge distillation implementing hint-based learning with layer clustering for model compression while maintaining high accuracy.',
-        objectives: [
-            'Reduce model size while preserving accuracy',
-            'Develop novel hint selection strategy',
-            'Enable deployment on resource-constrained devices',
-            'Improve knowledge transfer efficiency'
-        ],
-        features: [
-            'PURSUhInT algorithm for intelligent hint identification',
-            'Layer-wise clustering for optimal knowledge transfer',
-            'Flexible teacher-student architecture support',
-            'Automated hyperparameter tuning',
-            'Support for various architectures (ResNet, VGG, MobileNet)'
-        ],
-        technologies: ['PyTorch', 'Scikit-learn', 'NumPy', 'K-means Clustering', 'CIFAR-10/100', 'ImageNet'],
-        results: 'Published in Expert Systems with Applications (IF: 8.5). Achieved 2.5x compression with only 1.2% accuracy drop. Outperformed traditional methods by 3-5%.',
-        github: 'https://github.com/Ayanzadeh93'
-    },
-    project4: {
-        title: 'Vision-Language Medical Models',
-        category: 'Multimodal AI',
-        year: '2024',
-        status: 'In Progress',
-        overview: 'Custom implementation of vision-language models with enhanced multimodal learning capabilities specifically designed for medical imaging applications.',
-        objectives: [
-            'Bridge gap between medical imaging and clinical reports',
-            'Enable natural language queries for medical databases',
-            'Improve diagnostic accuracy through multimodal learning',
-            'Develop interpretable AI systems for healthcare'
-        ],
-        features: [
-            'Custom CLIP-based architecture for medical domain',
-            'Contrastive learning with medical image-text pairs',
-            'Zero-shot classification for rare conditions',
-            'Medical report generation from imaging',
-            'Cross-modal retrieval for similar cases',
-            'Attention visualization for interpretability'
-        ],
-        technologies: ['PyTorch', 'Transformers', 'CLIP', 'BERT', 'Vision Transformer', 'Hugging Face'],
-        results: 'Achieved 89% accuracy on zero-shot medical image classification. Generated clinically relevant descriptions with 0.85 BLEU score.',
-        github: 'https://github.com/Ayanzadeh93'
-    },
-    project5: {
-        title: 'Graph Autoencoder Framework',
-        category: 'Graph Learning',
-        year: '2020',
-        status: 'Published',
-        overview: 'Advanced GNN implementation featuring residual connections in graph autoencoders for improved representation learning on complex graph-structured data.',
-        objectives: [
-            'Improve graph representation with residual connections',
-            'Enable unsupervised learning on graphs',
-            'Handle large-scale graph datasets efficiently',
-            'Preserve graph topology in representations'
-        ],
-        features: [
-            'Graph autoencoder with residual connections',
-            'Scalable implementation for large graphs',
-            'Unsupervised node embedding generation',
-            'Graph reconstruction with high fidelity',
-            'Support for various graph types',
-            'Visualization tools for learned embeddings'
-        ],
-        technologies: ['PyTorch', 'PyTorch Geometric', 'NetworkX', 'Scikit-learn', 'NumPy'],
-        results: 'Published in IEEE SIU 2020 and arXiv. Achieved 94% accuracy on node classification. Improved graph reconstruction by 15%.',
-        github: 'https://github.com/Ayanzadeh93'
-    },
-    project6: {
-        title: 'ML Data Pipeline System',
-        category: 'Data Engineering',
-        year: '2023',
-        status: 'Production',
-        overview: 'Scalable data processing pipeline for ML workflows with automated preprocessing, feature engineering, and quality validation.',
-        objectives: [
-            'Automate data preprocessing for ML workflows',
-            'Ensure data quality and consistency',
-            'Enable scalable processing of large datasets',
-            'Reduce time from raw data to model training'
-        ],
-        features: [
-            'Automated data ingestion from multiple sources',
-            'Distributed processing with Apache Spark',
-            'Feature engineering with custom transformers',
-            'Data quality checks and validation',
-            'Dataset and transformation versioning',
-            'Integration with MLflow for tracking',
-            'Real-time monitoring and alerting'
-        ],
-        technologies: ['Python', 'Apache Spark', 'Apache Airflow', 'Docker', 'PostgreSQL', 'MLflow', 'AWS S3'],
-        results: 'Reduced preprocessing time by 75%. Processing 10TB+ daily with 99.9% uptime. Serving 15+ ML models in production.',
-        github: 'https://github.com/Ayanzadeh93'
-    }
-};
-
-function openProjectModal(projectId) {
-    const project = projectData[projectId];
-    if (!project) return;
-    
-    const modal = document.createElement('div');
-    modal.className = 'project-modal';
-    modal.id = 'projectModal';
-    
-    modal.innerHTML = `
-        <div class="modal-container">
-            <div class="modal-header">
-                <button class="modal-close" onclick="closeProjectModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-                <h2>${project.title}</h2>
-                <div class="modal-meta">
-                    <span><i class="fas fa-tag"></i> ${project.category}</span>
-                    <span><i class="fas fa-calendar"></i> ${project.year}</span>
-                    <span><i class="fas fa-circle"></i> ${project.status}</span>
-                </div>
-            </div>
-            
-            <div class="modal-body">
-                <div class="modal-section">
-                    <h3><i class="fas fa-align-left"></i> Overview</h3>
-                    <p>${project.overview}</p>
-                </div>
-                
-                <div class="modal-section">
-                    <h3><i class="fas fa-bullseye"></i> Objectives</h3>
-                    <ul>
-                        ${project.objectives.map(obj => `<li>${obj}</li>`).join('')}
-                    </ul>
-                </div>
-                
-                <div class="modal-section">
-                    <h3><i class="fas fa-star"></i> Key Features</h3>
-                    <ul>
-                        ${project.features.map(feature => `<li>${feature}</li>`).join('')}
-                    </ul>
-                </div>
-                
-                <div class="modal-section">
-                    <h3><i class="fas fa-tools"></i> Technologies</h3>
-                    <div class="tech-stack-grid">
-                        ${project.technologies.map(tech => `<span class="tech-item">${tech}</span>`).join('')}
-                    </div>
-                </div>
-                
-                <div class="modal-section">
-                    <h3><i class="fas fa-chart-line"></i> Results & Impact</h3>
-                    <p>${project.results}</p>
-                </div>
-                
-                <div class="modal-section">
-                    <a href="${project.github}" target="_blank" class="github-link">
-                        <i class="fab fa-github"></i>
-                        <span>View on GitHub</span>
-                        <i class="fas fa-external-link-alt"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    
-    setTimeout(() => modal.classList.add('active'), 10);
-    
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) closeProjectModal();
-    });
-    
-    document.addEventListener('keydown', handleEscapeKey);
-    document.body.style.overflow = 'hidden';
-}
-
-function closeProjectModal() {
-    const modal = document.getElementById('projectModal');
-    if (modal) {
-        modal.classList.remove('active');
-        setTimeout(() => {
-            modal.remove();
-            document.body.style.overflow = '';
-        }, 300);
-    }
-    document.removeEventListener('keydown', handleEscapeKey);
-}
-
-function handleEscapeKey(e) {
-    if (e.key === 'Escape') closeProjectModal();
-}
-
-window.openProjectModal = openProjectModal;
-window.closeProjectModal = closeProjectModal; 
