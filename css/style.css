@@ -337,7 +337,8 @@ body {
     font-size: 16px;
     line-height: 1.7;
     color: var(--text-dark);
-    background-color: var(--hero-bg);
+    /* Match the page surface so sections fading in don't flash the dark hero color */
+    background-color: var(--background-white);
     /* Soften the light/dark theme switch */
     transition: background-color 0.3s ease, color 0.3s ease;
     -webkit-font-smoothing: antialiased;
@@ -879,10 +880,6 @@ button.theme-toggle-btn {
     animation: heroFadeUp 0.7s ease-out 0.15s backwards;
 }
 
-.hero .hero-subtitle {
-    animation: heroFadeUp 0.7s ease-out 0.25s backwards;
-}
-
 .hero .hero-description {
     animation: heroFadeUp 0.7s ease-out 0.35s backwards;
 }
@@ -995,51 +992,6 @@ button.theme-toggle-btn {
     background: var(--primary-color);
     margin-left: 5px;
     animation: blink 1s infinite;
-}
-
-.hero-subtitle {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    justify-content: flex-start;
-    margin-bottom: 16px;
-    align-items: center;
-}
-
-.ai-badge,
-.vlm-badge,
-.llm-badge {
-    padding: 8px 20px;
-    border-radius: 25px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-
-.ai-badge:hover,
-.vlm-badge:hover,
-.llm-badge:hover {
-    transform: translateY(-2px) scale(1.03);
-}
-
-.ai-badge {
-    background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-    color: white;
-    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
-}
-
-.vlm-badge {
-    background: linear-gradient(135deg, #4ecdc4, #44a08d);
-    color: white;
-    box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
-}
-
-.llm-badge {
-    background: linear-gradient(135deg, #a8e6cf, #7fcdcd);
-    color: #2c3e50;
-    box-shadow: 0 4px 15px rgba(168, 230, 207, 0.3);
 }
 
 .hero-description {
@@ -1244,9 +1196,8 @@ button.theme-toggle-btn {
     background-color: var(--background-white);
     position: relative;
     overflow: hidden;
-    /* Skip rendering below-fold sections until they near the viewport */
-    content-visibility: auto;
-    contain-intrinsic-size: auto 700px;
+    /* Note: content-visibility was removed here — the 700px placeholder heights
+       made in-page anchor navigation land in the wrong section. */
 }
 
 .section>.container {
@@ -1545,6 +1496,8 @@ html.js-enabled body.reduce-motion .focus-item {
     border: 1px solid var(--border-color);
     position: relative;
     transition: var(--transition);
+    /* Keep card copy readable even when the alternating timeline item is right-aligned */
+    text-align: left;
 }
 
 .timeline-content:hover {
@@ -4186,10 +4139,6 @@ body.enhanced-keyboard .top-nav-link:focus {
         line-height: 1.2;
     }
 
-    .hero-subtitle {
-        justify-content: center;
-    }
-
     .hero-profile {
         flex-direction: column;
         gap: 32px;
@@ -4306,13 +4255,6 @@ body.enhanced-keyboard .top-nav-link:focus {
 
     .hero-profile {
         gap: 24px;
-    }
-
-    .ai-badge,
-    .vlm-badge,
-    .llm-badge {
-        padding: 6px 14px;
-        font-size: 0.75rem;
     }
 
     .expertise-tag {
@@ -4521,20 +4463,21 @@ body.enhanced-keyboard .top-nav-link:focus {
 
 /* Skip to content link for screen readers */
 .skip-to-content {
-    position: absolute;
-    top: -40px;
+    position: fixed;
+    top: 6px;
     left: 6px;
+    transform: translateY(calc(-100% - 12px));
     background: var(--primary-color);
     color: white;
     padding: 8px 16px;
     text-decoration: none;
     border-radius: 4px;
     z-index: 10000;
-    transition: top 0.3s;
+    transition: transform 0.3s;
 }
 
 .skip-to-content:focus {
-    top: 6px;
+    transform: translateY(0);
 }
 
 /* Enhanced contrast and readability */
@@ -6025,6 +5968,15 @@ img[loading="lazy"].loaded {
     font-size: 1rem;
     font-weight: 600;
     color: var(--primary-color);
+}
+
+/* When the month leads (no day), give it the prominent slot */
+.news-date-badge .date-month:first-child {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    line-height: 1;
+    margin-top: 0;
 }
 
 .news-category {
