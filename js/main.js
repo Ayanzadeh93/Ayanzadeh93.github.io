@@ -20,7 +20,6 @@ document.addEventListener('DOMContentLoaded', function() {
     initLazyLoading();
     initPerformanceOptimizations();
     initAccessibilityFeatures();
-    initAIAnimations();
     initNavbarScroll();
     initThemeToggle();
     hideLoadingOverlay();
@@ -614,57 +613,6 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
-
-// Initialize AI animations and effects
-function initAIAnimations() {
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    // Add typing effect to hero title (skipped for users who prefer reduced motion)
-    const heroTitle = document.querySelector('.ai-text');
-    if (heroTitle && !prefersReducedMotion) {
-        const text = heroTitle.textContent;
-        // Keep the full name available to assistive tech while characters type in
-        heroTitle.setAttribute('aria-label', text);
-        heroTitle.textContent = '';
-        let i = 0;
-
-        function typeWriter() {
-            if (i < text.length) {
-                heroTitle.textContent += text.charAt(i);
-                i++;
-                setTimeout(typeWriter, 70);
-            } else {
-                heroTitle.removeAttribute('aria-label');
-            }
-        }
-
-        // Start typing after a short delay
-        setTimeout(typeWriter, 600);
-    }
-
-    // Add click ripple effect to buttons
-    const buttons = document.querySelectorAll('.ai-btn');
-    buttons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            const ripple = document.createElement('span');
-            const rect = this.getBoundingClientRect();
-            const size = Math.max(rect.width, rect.height);
-            const x = e.clientX - rect.left - size / 2;
-            const y = e.clientY - rect.top - size / 2;
-            
-            ripple.style.width = ripple.style.height = size + 'px';
-            ripple.style.left = x + 'px';
-            ripple.style.top = y + 'px';
-            ripple.classList.add('ripple');
-            
-            this.appendChild(ripple);
-            
-            setTimeout(() => {
-                ripple.remove();
-            }, 600);
-        });
-    });
-}
 
 // Initialize responsive behavior
 function initResponsiveBehavior() {
