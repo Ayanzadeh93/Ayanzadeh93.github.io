@@ -1,0 +1,35 @@
+name: Lint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install tidy and codespell
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tidy
+          pip install codespell
+
+      - name: Run tidy on HTML files
+        run: |
+          set -o errexit -o pipefail
+          html_files="$(git ls-files '*.html')"
+          if [ -n "$html_files" ]; then
+            for file in $html_files; do
+              echo "Running tidy on $file"
+              tidy -qe "$file"
+            done
+          fi
+
+      - name: Run codespell
+        run: |
+          codespell --quiet-level=2
+
