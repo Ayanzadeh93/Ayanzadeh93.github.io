@@ -395,6 +395,60 @@ function initLazyLoading() {
 // Performance optimizations
 function initPerformanceOptimizations() {
     initHeroParallax();
+    initHeroVizPlayback();
+    initScrollProgress();
+}
+
+// The hero visualization animates stroke offsets, which repaint rather than
+// composite. Park it whenever nobody can see it: scrolled past, or tab hidden.
+function initHeroVizPlayback() {
+    const viz = document.querySelector('.hero-viz');
+    if (!viz) return;
+
+    let onScreen = true;
+
+    const sync = () => {
+        viz.classList.toggle('is-paused', document.hidden || !onScreen);
+    };
+
+    if (supportsIntersectionObserver) {
+        new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                onScreen = entry.isIntersecting;
+            });
+            sync();
+        }, { threshold: 0 }).observe(viz);
+    }
+
+    document.addEventListener('visibilitychange', sync);
+    sync();
+}
+
+// Reading progress bar. Scaled rather than resized so the browser can keep it
+// on the compositor, and left decorative — the scrollbar already tells
+// assistive technology where we are in the document.
+function initScrollProgress() {
+    const bar = document.getElementById('scroll-progress-bar');
+    if (!bar) return;
+
+    let ticking = false;
+
+    const update = () => {
+        const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+        const progress = scrollable > 0 ? Math.min(window.scrollY / scrollable, 1) : 0;
+        bar.style.transform = `scaleX(${progress})`;
+        ticking = false;
+    };
+
+    const request = () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(update);
+    };
+
+    window.addEventListener('scroll', request, { passive: true });
+    window.addEventListener('resize', request, { passive: true });
+    update();
 }
 
 // Subtle parallax on the hero background only, driven by requestAnimationFrame
