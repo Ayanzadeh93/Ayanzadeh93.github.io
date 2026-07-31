@@ -44,6 +44,18 @@ This is the personal website of Aydin Ayanzadeh, Ph.D. Student in Computer Scien
 3. Open `index.html` in a web browser
 4. No build process required - it's a static website
 
+## Testing
+
+The site scripts (`js/main.js`, `js/blog.js`) are covered by Jest unit tests that run in a jsdom
+environment. The site itself still needs no build step — the scripts export their functions only
+when a CommonJS `module` object exists, which is never the case in the browser.
+
+```bash
+npm install       # one-time, installs the dev-only test toolchain
+npm test          # run the unit tests
+npm run test:coverage   # run them with a coverage report
+```
+
 ## Customization
 
 To customize the website:

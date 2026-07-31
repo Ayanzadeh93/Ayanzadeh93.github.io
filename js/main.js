@@ -1363,3 +1363,56 @@ function showCitationNotification(message, type = 'success') {
         }, 300);
     }, 3000);
 }
+
+// Exposed for unit tests; browsers ignore this because `module` is undefined there.
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        initNavbarScroll,
+        initThemeToggle,
+        initMobileMenu,
+        initSmoothScrolling,
+        initFormValidation,
+        initIntersectionObserver,
+        initLazyLoading,
+        initHeroParallax,
+        initAriaLiveRegions,
+        initializeAccessibilityFeatures,
+        ensureAccessibilityStructure,
+        initializeAccessibilityMenu,
+        openAccessibilityMenu,
+        closeAccessibilityMenu,
+        initializeKeyboardEnhancements,
+        initializeScreenReaderSupport,
+        initializeReadingGuide,
+        initializeReadingGuideTracking,
+        removeReadingGuideTracking,
+        updateReadingGuide,
+        initializePageReader,
+        showCustomModal,
+        validateField,
+        showFieldError,
+        removeFieldError,
+        showLoadingSpinner,
+        hideLoadingSpinner,
+        showLoadingOverlay,
+        hideLoadingOverlay,
+        updateActiveNavLink,
+        submitForm,
+        showMessage,
+        showErrorMessage,
+        showSuccessMessage,
+        updateLayoutForScreenSize,
+        announceToScreenReader,
+        saveAccessibilityPreference,
+        loadAccessibilityPreferences,
+        resetAccessibilitySettings,
+        getPageReaderText,
+        startPageReader,
+        stopPageReader,
+        updatePageReaderButtons,
+        copyToClipboard,
+        fallbackCopyTextToClipboard,
+        showCitationNotification,
+        detectHighContrastMode
+    };
+}

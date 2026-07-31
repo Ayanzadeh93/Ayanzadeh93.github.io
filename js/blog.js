@@ -557,3 +557,33 @@ window.copyLink = function () {
         document.body.removeChild(textArea);
     });
 };
+
+// Exposed for unit tests; browsers ignore this because `module` is undefined there.
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        initBlogFeatures,
+        calculateReadingTimes,
+        initPostAnimations,
+        initAccessibilityFeatures,
+        initLoadMorePosts,
+        initNewsletterForm,
+        validateEmail,
+        submitNewsletter,
+        loadMorePosts,
+        generateMorePosts,
+        initPostSearch,
+        performSearch,
+        updateSearchResults,
+        initPostFiltering,
+        filterPosts,
+        initSocialSharing,
+        improveHeadingStructure,
+        addAriaLabels,
+        showFieldError,
+        removeFieldError,
+        showFormError,
+        showFormSuccess,
+        showFormMessage,
+        hideLoadingOverlay
+    };
+}
