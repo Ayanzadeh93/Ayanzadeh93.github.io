@@ -589,12 +589,22 @@ button.theme-toggle-btn {
     text-align: center;
     position: relative;
     overflow: hidden;
-    min-height: 100vh;
+    /* .main-content is offset by the fixed navbar, so a plain 100vh overflowed
+       the viewport by exactly the navbar's height and pushed the scroll
+       indicator below the fold. Declared here rather than appended later so
+       the `min-height: auto` mobile override further down still wins. */
+    min-height: calc(100vh - var(--nav-height));
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 0;
     box-sizing: border-box;
+}
+
+@supports (min-height: 100svh) {
+    .hero {
+        min-height: calc(100svh - var(--nav-height));
+    }
 }
 
 .hero::before {
@@ -6306,9 +6316,12 @@ img[loading="lazy"].loaded {
     .project-item,
     .project-card,
     .news-card,
-    .award-item {
+    .award-item:not(.featured-award) {
         position: relative;
         overflow: hidden;
+        /* Confines the sweep's negative z-index to this card, so it paints
+           over the card's own background rather than behind it. */
+        isolation: isolate;
     }
 
     .publication-item::after,
@@ -6316,11 +6329,14 @@ img[loading="lazy"].loaded {
     .project-item::after,
     .project-card::after,
     .news-card::after,
-    .award-item::after {
+    .award-item:not(.featured-award)::after {
         content: '';
         position: absolute;
         inset: 0;
-        z-index: 0;
+        /* Behind the card's content, not above it. Promoting every direct
+           child with `position: relative` instead would knock the absolutely
+           positioned corner badges into the text flow. */
+        z-index: -1;
         pointer-events: none;
         background: linear-gradient(115deg,
                 transparent 38%,
@@ -6336,7 +6352,7 @@ img[loading="lazy"].loaded {
     .project-item:hover::after,
     .project-card:hover::after,
     .news-card:hover::after,
-    .award-item:hover::after {
+    .award-item:not(.featured-award):hover::after {
         opacity: 1;
         transform: translateX(55%);
     }
@@ -6348,7 +6364,7 @@ img[loading="lazy"].loaded {
     body.reduce-motion .project-item::after,
     body.reduce-motion .project-card::after,
     body.reduce-motion .news-card::after,
-    body.reduce-motion .award-item::after {
+    body.reduce-motion .award-item:not(.featured-award)::after {
         content: none;
     }
 }
@@ -6359,38 +6375,15 @@ img[loading="lazy"].loaded {
     .project-item::after,
     .project-card::after,
     .news-card::after,
-    .award-item::after {
+    .award-item:not(.featured-award)::after {
         content: none;
     }
 }
 
-/* Card content sits above the sweep layer. */
-.publication-item > *,
-.experience-card > *,
-.project-item > *,
-.project-card > *,
-.news-card > *,
-.award-item > * {
-    position: relative;
-    z-index: 1;
-}
 
 /* --------------------------------------------------------------------------
    Layout corrections that surfaced while fitting the new visuals
    -------------------------------------------------------------------------- */
-
-/* .main-content is offset by the fixed navbar, so a 100vh hero always
-   overflowed the viewport by exactly the navbar's height — which pushed the
-   scroll indicator and the heartbeat trace below the fold on first paint. */
-.hero {
-    min-height: calc(100vh - var(--nav-height));
-}
-
-@supports (min-height: 100svh) {
-    .hero {
-        min-height: calc(100svh - var(--nav-height));
-    }
-}
 
 /* Three research pillars now fit on one row inside the About panel instead of
    wrapping 2 + 1. */
