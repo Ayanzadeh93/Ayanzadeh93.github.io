@@ -222,7 +222,8 @@ function generateMorePosts(count) {
         post.className = 'blog-post';
         post.setAttribute('role', 'article');
 
-        const randomTitle = sampleTitles[Math.floor(Math.random() * sampleTitles.length)];
+        const escape = window.escapeHtml || (value => String(value));
+        const randomTitle = escape(sampleTitles[Math.floor(Math.random() * sampleTitles.length)]);
         const randomDate = new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toLocaleDateString();
 
         post.innerHTML = `
@@ -381,7 +382,7 @@ function initSocialSharing() {
             }
 
             if (shareUrl) {
-                window.open(shareUrl, 'share', 'width=600,height=400');
+                window.open(shareUrl, 'share', 'width=600,height=400,noopener,noreferrer');
             }
         });
     });
