@@ -10,6 +10,24 @@ if (supportsIntersectionObserver) {
     document.documentElement.classList.add('js-enabled');
 }
 
+// Report a failure without letting it abort the caller, so one broken feature
+// never takes down the rest of the page.
+function reportError(context, error) {
+    console.error(`[site] ${context}:`, error);
+}
+
+function safeInvoke(context, fn) {
+    try {
+        return fn();
+    } catch (error) {
+        reportError(context, error);
+        return undefined;
+    }
+}
+
+window.siteReportError = reportError;
+window.siteSafeInvoke = safeInvoke;
+
 // Escape text before it is interpolated into an HTML template string.
 function escapeHtml(value) {
     return String(value)
@@ -23,18 +41,26 @@ function escapeHtml(value) {
 window.escapeHtml = escapeHtml;
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize all components
-    initMobileMenu();
-    initSmoothScrolling();
-    initIntersectionObserver();
-    initFormValidation();
-    initLoadingStates();
-    initLazyLoading();
-    initPerformanceOptimizations();
-    initAccessibilityFeatures();
-    initNavbarScroll();
-    initThemeToggle();
-    hideLoadingOverlay();
+    // Initialize all components. Each initializer is isolated so a failure in one
+    // still leaves the others (and the loading overlay teardown) working.
+    const initializers = [
+        initMobileMenu,
+        initSmoothScrolling,
+        initIntersectionObserver,
+        initFormValidation,
+        initLoadingStates,
+        initLazyLoading,
+        initPerformanceOptimizations,
+        initAccessibilityFeatures,
+        initNavbarScroll,
+        initThemeToggle
+    ];
+
+    try {
+        initializers.forEach(initializer => safeInvoke(initializer.name, initializer));
+    } finally {
+        hideLoadingOverlay();
+    }
 });
 
 // Navbar scroll effect
@@ -90,6 +116,7 @@ function initThemeToggle() {
         savedTheme = localStorage.getItem('theme');
     } catch (error) {
         savedTheme = null;
+        reportError('Could not read saved theme, falling back to system preference', error);
     }
 
     // Saved choice wins; otherwise follow the operating system preference
@@ -105,7 +132,8 @@ function initThemeToggle() {
         try {
             localStorage.setItem('theme', newTheme);
         } catch (error) {
-            // Ignore storage errors and continue with in-memory theme state.
+            // Storage can be unavailable (private mode, quota); keep the in-memory theme.
+            reportError('Could not persist theme preference', error);
         }
     });
 }
@@ -389,12 +417,24 @@ function initLazyLoading() {
         // Fallback for browsers without native lazy loading
         const imageObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const img = entry.target;
-                    img.src = img.dataset.src;
-                    img.classList.add('loaded');
-                    imageObserver.unobserve(img);
+                if (!entry.isIntersecting) return;
+
+                const img = entry.target;
+                imageObserver.unobserve(img);
+
+                const source = img.dataset.src;
+                if (!source) {
+                    reportError('Lazy image has no data-src', img);
+                    return;
                 }
+
+                img.addEventListener('load', () => img.classList.add('loaded'), { once: true });
+                img.addEventListener('error', () => {
+                    img.classList.add('load-failed');
+                    reportError(`Lazy image failed to load: ${source}`, null);
+                }, { once: true });
+
+                img.src = source;
             });
         });
 
@@ -479,9 +519,19 @@ function submitForm(form) {
     
     // Disable submit button to prevent double submission
     const submitButton = form.querySelector('button[type="submit"]');
-    const originalText = submitButton.innerHTML;
-    submitButton.disabled = true;
-    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Sending...';
+    const originalText = submitButton ? submitButton.innerHTML : '';
+    if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Sending...';
+    }
+
+    const restoreForm = () => {
+        hideLoadingSpinner();
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.innerHTML = originalText;
+        }
+    };
     
     // Keep reply-to synced with the email field for easier responses.
     const emailInput = form.querySelector('input[name="email"]');
@@ -502,9 +552,7 @@ function submitForm(form) {
         }
     })
     .then(response => {
-        hideLoadingSpinner();
-        submitButton.disabled = false;
-        submitButton.innerHTML = originalText;
+        restoreForm();
         
         if (response.ok) {
         showSuccessMessage('Thank you for your message! I will get back to you soon.');
@@ -523,23 +571,24 @@ function submitForm(form) {
                 window.announceToScreenReader('Message sent successfully!');
             }
         } else {
-            response.json().then(data => {
-                if (data.errors) {
+            reportError(`Form submission rejected with status ${response.status}`, null);
+
+            return response.json().then(data => {
+                if (data && data.errors) {
                     const errorMessages = data.errors.map(error => error.message).join(', ');
                     showErrorMessage(`Error: ${errorMessages}`);
                 } else {
                     showErrorMessage('There was a problem sending your message. Please try again.');
                 }
-            }).catch(() => {
+            }).catch(parseError => {
+                reportError('Could not parse form submission error response', parseError);
                 showErrorMessage('There was a problem sending your message. Please try again.');
             });
         }
     })
     .catch(error => {
-        hideLoadingSpinner();
-        submitButton.disabled = false;
-        submitButton.innerHTML = originalText;
-        console.error('Form submission error:', error);
+        restoreForm();
+        reportError('Form submission failed', error);
         showErrorMessage('There was a problem sending your message. Please check your connection and try again, or email me directly at a.ayanzadeh@gmail.com.');
     });
 }
@@ -589,13 +638,11 @@ function showMessage(message, type) {
 
 // Error handling
 window.addEventListener('error', function(e) {
-    console.error('JavaScript error:', e.error);
-    // Could implement error reporting here
+    reportError(`Uncaught error at ${e.filename || 'unknown'}:${e.lineno || 0}`, e.error || e.message);
 });
 
 window.addEventListener('unhandledrejection', function(e) {
-    console.error('Unhandled promise rejection:', e.reason);
-    // Could implement error reporting here
+    reportError('Unhandled promise rejection', e.reason);
 });
 
 // Screen reader only class for accessibility
@@ -648,7 +695,12 @@ function updateLayoutForScreenSize() {
     if (!isMobile && topNavMenu && topNavMenu.classList.contains('active')) {
         // Close mobile menu on desktop
         topNavMenu.classList.remove('active');
-        document.querySelector('.mobile-menu-toggle').classList.remove('active');
+
+        const mobileToggle = document.querySelector('.mobile-menu-toggle');
+        if (mobileToggle) {
+            mobileToggle.classList.remove('active');
+        }
+
         document.body.style.overflow = '';
     }
 }
@@ -728,7 +780,11 @@ function showCustomModal(title, content) {
     const firstElement = focusableElements[0];
     const lastElement = focusableElements[focusableElements.length - 1];
     
-    firstElement.focus();
+    if (firstElement) {
+        firstElement.focus();
+    } else {
+        reportError('Modal opened without focusable elements', title);
+    }
     
     modal.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
@@ -754,13 +810,15 @@ window.closeCustomModal = function() {
 
 // Advanced Accessibility Features
 function initializeAccessibilityFeatures() {
-    ensureAccessibilityStructure();
-    initializeAccessibilityMenu();
-    initializeKeyboardEnhancements();
-    initializeScreenReaderSupport();
-    initializeReadingGuide();
-    initializePageReader();
-    loadAccessibilityPreferences();
+    [
+        ensureAccessibilityStructure,
+        initializeAccessibilityMenu,
+        initializeKeyboardEnhancements,
+        initializeScreenReaderSupport,
+        initializeReadingGuide,
+        initializePageReader,
+        loadAccessibilityPreferences
+    ].forEach(initializer => safeInvoke(initializer.name, initializer));
 }
 
 function ensureAccessibilityStructure() {
@@ -1124,54 +1182,95 @@ function announceToScreenReader(message, priority = 'polite') {
 }
 
 // Accessibility Preferences
-function saveAccessibilityPreference(key, value) {
+const ACCESSIBILITY_PREFERENCES_KEY = 'accessibilityPreferences';
+
+// Reads stored preferences, discarding corrupt data instead of failing every
+// later read and write against it.
+function readAccessibilityPreferences() {
+    let raw;
     try {
-        const preferences = JSON.parse(localStorage.getItem('accessibilityPreferences') || '{}');
-        preferences[key] = value;
-        localStorage.setItem('accessibilityPreferences', JSON.stringify(preferences));
+        raw = localStorage.getItem(ACCESSIBILITY_PREFERENCES_KEY);
     } catch (e) {
-        console.warn('Could not save accessibility preference:', e);
+        reportError('Could not read accessibility preferences', e);
+        return null;
+    }
+
+    if (!raw) return {};
+
+    try {
+        const parsed = JSON.parse(raw);
+        if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+            throw new Error('Stored accessibility preferences are not an object');
+        }
+        return parsed;
+    } catch (e) {
+        reportError('Discarding corrupt accessibility preferences', e);
+        clearStoredAccessibilityPreferences();
+        return {};
+    }
+}
+
+function clearStoredAccessibilityPreferences() {
+    try {
+        localStorage.removeItem(ACCESSIBILITY_PREFERENCES_KEY);
+        return true;
+    } catch (e) {
+        reportError('Could not clear accessibility preferences', e);
+        return false;
+    }
+}
+
+function saveAccessibilityPreference(key, value) {
+    const preferences = readAccessibilityPreferences();
+    if (!preferences) return;
+
+    preferences[key] = value;
+
+    try {
+        localStorage.setItem(ACCESSIBILITY_PREFERENCES_KEY, JSON.stringify(preferences));
+    } catch (e) {
+        reportError(`Could not save accessibility preference "${key}"`, e);
     }
 }
 
 function loadAccessibilityPreferences() {
-    try {
-        const preferences = JSON.parse(localStorage.getItem('accessibilityPreferences') || '{}');
-        
-        // Apply saved preferences
-        Object.entries(preferences).forEach(([key, value]) => {
-            const toggleId = key.replace(/([A-Z])/g, '-$1').toLowerCase() + '-toggle';
-            const toggle = document.getElementById(toggleId);
-            
-            if (toggle) {
-                toggle.checked = value;
-                // Trigger the change event to apply the setting
-                toggle.dispatchEvent(new Event('change'));
-            }
+    const preferences = readAccessibilityPreferences();
+    if (!preferences) return;
+
+    // Apply each preference independently so one failing toggle handler does not
+    // stop the remaining preferences from being restored.
+    Object.entries(preferences).forEach(([key, value]) => {
+        const toggleId = key.replace(/([A-Z])/g, '-$1').toLowerCase() + '-toggle';
+        const toggle = document.getElementById(toggleId);
+
+        if (!toggle) return;
+
+        safeInvoke(`Applying accessibility preference "${key}"`, () => {
+            toggle.checked = Boolean(value);
+            // Trigger the change event to apply the setting
+            toggle.dispatchEvent(new Event('change'));
         });
-    } catch (e) {
-        console.warn('Could not load accessibility preferences:', e);
-    }
+    });
 }
 
 function resetAccessibilitySettings() {
     // Reset all toggles
     const toggles = document.querySelectorAll('#accessibility-menu input[type="checkbox"]');
     toggles.forEach(toggle => {
-        toggle.checked = false;
-        toggle.dispatchEvent(new Event('change'));
+        safeInvoke(`Resetting accessibility toggle "${toggle.id || 'unknown'}"`, () => {
+            toggle.checked = false;
+            toggle.dispatchEvent(new Event('change'));
+        });
     });
     
-    // Clear localStorage
-    try {
-        localStorage.removeItem('accessibilityPreferences');
-    } catch (e) {
-        console.warn('Could not clear accessibility preferences:', e);
-    }
+    const cleared = clearStoredAccessibilityPreferences();
 
     stopPageReader();
     
-    announceToScreenReader('All accessibility settings have been reset');
+    announceToScreenReader(cleared
+        ? 'All accessibility settings have been reset'
+        : 'Accessibility settings were reset for this page, but could not be cleared from storage.',
+        cleared ? 'polite' : 'assertive');
 }
 
 function initializePageReader() {
@@ -1241,20 +1340,30 @@ function startPageReader() {
     };
 
     utterance.onerror = (event) => {
-        console.warn('Speech synthesis failed:', event.error || event);
+        reportError('Speech synthesis failed', event.error || event);
         updatePageReaderButtons(false);
         announceToScreenReader('Unable to read the page aloud.', 'assertive');
     };
 
     window.activeReaderUtterance = utterance;
-    window.speechSynthesis.speak(utterance);
+
+    try {
+        window.speechSynthesis.speak(utterance);
+    } catch (error) {
+        window.activeReaderUtterance = null;
+        reportError('Speech synthesis could not start', error);
+        updatePageReaderButtons(false);
+        announceToScreenReader('Unable to read the page aloud.', 'assertive');
+        return;
+    }
+
     updatePageReaderButtons(true);
     announceToScreenReader('Reading page content aloud.');
 }
 
 function stopPageReader() {
     if ('speechSynthesis' in window && window.speechSynthesis.speaking) {
-        window.speechSynthesis.cancel();
+        safeInvoke('Cancelling speech synthesis', () => window.speechSynthesis.cancel());
     }
 
     window.activeReaderUtterance = null;
@@ -1273,7 +1382,7 @@ function updatePageReaderButtons(isReading) {
 // Initialize accessibility features when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     // Add to existing initialization
-    initializeAccessibilityFeatures();
+    safeInvoke('initializeAccessibilityFeatures', initializeAccessibilityFeatures);
 
     // Add keyboard shortcut to toggle accessibility menu (Alt + A)
     document.addEventListener('keydown', function(e) {
@@ -1313,6 +1422,7 @@ function copyToClipboard(text) {
         navigator.clipboard.writeText(text).then(function() {
             showCitationNotification('Citation copied to clipboard!');
         }).catch(function(err) {
+            reportError('Clipboard API copy failed, using fallback', err);
             fallbackCopyTextToClipboard(text);
         });
     } else {
@@ -1330,19 +1440,24 @@ function fallbackCopyTextToClipboard(text) {
     document.body.appendChild(textArea);
     textArea.focus();
     textArea.select();
-    
+
+    let successful = false;
     try {
-        const successful = document.execCommand('copy');
-        if (successful) {
-            showCitationNotification('Citation copied to clipboard!');
-        } else {
-            showCitationNotification('Failed to copy citation', 'error');
+        successful = document.execCommand('copy');
+        if (!successful) {
+            reportError('execCommand("copy") reported failure', null);
         }
     } catch (err) {
-        showCitationNotification('Failed to copy citation', 'error');
+        reportError('Fallback clipboard copy failed', err);
+    } finally {
+        // Always remove the scratch element, even if copying threw.
+        textArea.remove();
     }
-    
-    document.body.removeChild(textArea);
+
+    showCitationNotification(
+        successful ? 'Citation copied to clipboard!' : 'Failed to copy citation. Please copy it manually.',
+        successful ? 'success' : 'error'
+    );
 }
 
 function showCitationNotification(message, type = 'success') {
