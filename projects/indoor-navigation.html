@@ -240,7 +240,9 @@
                 
                 // If PNG image fails to load, try PDF
                 imageDiagram.addEventListener('error', function() {
-                    console.log('PNG failed to load, trying PDF...');
+                    if (window.siteReportError) {
+                        window.siteReportError('Diagram image failed to load, falling back to PDF', imageDiagram.src);
+                    }
                     imageDiagram.style.display = 'none';
                     pdfEmbed.style.display = 'block';
                     

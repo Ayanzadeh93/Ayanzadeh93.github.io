@@ -1,26 +1,48 @@
 // Enhanced Blog JavaScript with Performance and Accessibility
 
+// main.js is always loaded first on blog pages; keep local fallbacks so blog.js
+// still degrades gracefully if it is used on its own.
+function blogReportError(context, error) {
+    if (typeof window.siteReportError === 'function') {
+        window.siteReportError(context, error);
+        return;
+    }
+
+    console.error(`[blog] ${context}:`, error);
+}
+
+function blogSafeInvoke(context, fn) {
+    try {
+        return fn();
+    } catch (error) {
+        blogReportError(context, error);
+        return undefined;
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function () {
-    initBlogFeatures();
-    initNewsletterForm();
-    initLoadMorePosts();
-    initPostSearch();
-    initAccessibilityFeatures();
-    hideLoadingOverlay();
+    const initializers = [
+        initBlogFeatures,
+        initNewsletterForm,
+        initLoadMorePosts,
+        initPostSearch,
+        initAccessibilityFeatures
+    ];
+
+    try {
+        initializers.forEach(initializer => blogSafeInvoke(initializer.name, initializer));
+    } finally {
+        hideLoadingOverlay();
+    }
 });
 
 function initBlogFeatures() {
-    // Initialize reading time calculation
-    calculateReadingTimes();
-
-    // Initialize post animations
-    initPostAnimations();
-
-    // Initialize social sharing
-    initSocialSharing();
-
-    // Initialize post filtering
-    initPostFiltering();
+    [
+        calculateReadingTimes,
+        initPostAnimations,
+        initSocialSharing,
+        initPostFiltering
+    ].forEach(initializer => blogSafeInvoke(initializer.name, initializer));
 }
 
 function calculateReadingTimes() {
@@ -55,11 +77,21 @@ function initPostAnimations() {
                 // Lazy load images if any
                 const images = entry.target.querySelectorAll('img[data-src]');
                 images.forEach(img => {
-                    img.src = img.dataset.src;
+                    const source = img.dataset.src;
                     img.removeAttribute('data-src');
-                    img.addEventListener('load', () => {
-                        img.classList.add('loaded');
-                    });
+
+                    if (!source) {
+                        blogReportError('Lazy image has no data-src', img);
+                        return;
+                    }
+
+                    img.addEventListener('load', () => img.classList.add('loaded'), { once: true });
+                    img.addEventListener('error', () => {
+                        img.classList.add('load-failed');
+                        blogReportError(`Lazy image failed to load: ${source}`, null);
+                    }, { once: true });
+
+                    img.src = source;
                 });
             }
         });
@@ -76,7 +108,10 @@ function initNewsletterForm() {
     if (!newsletterForm) return;
 
     const emailInput = newsletterForm.querySelector('input[type="email"]');
-    const submitButton = newsletterForm.querySelector('button[type="submit"]');
+    if (!emailInput) {
+        blogReportError('Newsletter form is missing its email input; subscription disabled', newsletterForm);
+        return;
+    }
 
     // Email validation
     emailInput.addEventListener('input', function () {
@@ -175,35 +210,70 @@ function loadMorePosts(button) {
     button.disabled = true;
     button.setAttribute('aria-busy', 'true');
 
-    // Simulate loading more posts
-    setTimeout(() => {
-        const blogGrid = document.querySelector('.blog-grid');
-        const newPosts = generateMorePosts(3); // Generate 3 more posts
-
-        newPosts.forEach(post => {
-            blogGrid.appendChild(post);
-        });
-
-        // Restore button state
+    const restoreButton = () => {
         button.innerHTML = originalText;
         button.disabled = false;
         button.setAttribute('aria-busy', 'false');
+    };
 
-        // Update screen reader announcement
-        if (window.announceToScreenReader) {
-            window.announceToScreenReader('3 more posts loaded');
-        }
+    // Simulate loading more posts
+    setTimeout(() => {
+        // Always restore the button, otherwise a failure leaves it stuck in the
+        // disabled "Loading..." state with aria-busy set.
+        try {
+            const blogGrid = document.querySelector('.blog-grid');
+            if (!blogGrid) {
+                throw new Error('Blog grid container not found');
+            }
 
-        // Hide button if no more posts (simulate)
-        if (Math.random() < 0.3) { // 30% chance to hide button
-            button.style.display = 'none';
-            const endMessage = document.createElement('p');
-            endMessage.textContent = 'No more posts to load.';
-            endMessage.className = 'end-message';
-            endMessage.setAttribute('role', 'status');
-            button.parentNode.appendChild(endMessage);
+            const newPosts = generateMorePosts(3); // Generate 3 more posts
+
+            newPosts.forEach(post => {
+                blogGrid.appendChild(post);
+            });
+
+            // Update screen reader announcement
+            if (window.announceToScreenReader) {
+                window.announceToScreenReader('3 more posts loaded');
+            }
+
+            // Hide button if no more posts (simulate)
+            if (Math.random() < 0.3) { // 30% chance to hide button
+                button.style.display = 'none';
+                const endMessage = document.createElement('p');
+                endMessage.textContent = 'No more posts to load.';
+                endMessage.className = 'end-message';
+                endMessage.setAttribute('role', 'status');
+                if (button.parentNode) {
+                    button.parentNode.appendChild(endMessage);
+                }
+            }
+        } catch (error) {
+            blogReportError('Could not load more posts', error);
+            showLoadMoreError(button);
+        } finally {
+            restoreButton();
         }
     }, 1500);
+}
+
+function showLoadMoreError(button) {
+    const container = button.parentNode;
+    if (!container) return;
+
+    let errorMessage = container.querySelector('.load-more-error');
+    if (!errorMessage) {
+        errorMessage = document.createElement('p');
+        errorMessage.className = 'load-more-error error-message';
+        errorMessage.setAttribute('role', 'alert');
+        container.appendChild(errorMessage);
+    }
+
+    errorMessage.textContent = 'Could not load more posts. Please try again.';
+
+    if (window.announceToScreenReader) {
+        window.announceToScreenReader('Could not load more posts');
+    }
 }
 
 function generateMorePosts(count) {
@@ -273,14 +343,21 @@ function initPostSearch() {
     }
 }
 
+// Posts do not always contain every sub-element, so read text defensively
+// rather than throwing and aborting the whole search or filter pass.
+function getPostText(post, selector) {
+    const element = post.querySelector(selector);
+    return element ? element.textContent.trim().toLowerCase() : '';
+}
+
 function performSearch(query) {
     const posts = document.querySelectorAll('.blog-post');
     let visibleCount = 0;
 
     posts.forEach(post => {
-        const title = post.querySelector('.post-title').textContent.toLowerCase();
-        const excerpt = post.querySelector('.post-excerpt').textContent.toLowerCase();
-        const category = post.querySelector('.post-category').textContent.toLowerCase();
+        const title = getPostText(post, '.post-title');
+        const excerpt = getPostText(post, '.post-excerpt');
+        const category = getPostText(post, '.post-category');
 
         const isVisible = !query ||
             title.includes(query.toLowerCase()) ||
@@ -299,12 +376,17 @@ function updateSearchResults(query, count) {
     let resultsElement = document.querySelector('.search-results');
 
     if (!resultsElement) {
+        const blogGrid = document.querySelector('.blog-grid');
+        if (!blogGrid || !blogGrid.parentNode) {
+            blogReportError('Cannot show search results: blog grid container not found', null);
+            return;
+        }
+
         resultsElement = document.createElement('div');
         resultsElement.className = 'search-results';
         resultsElement.setAttribute('role', 'status');
         resultsElement.setAttribute('aria-live', 'polite');
 
-        const blogGrid = document.querySelector('.blog-grid');
         blogGrid.parentNode.insertBefore(resultsElement, blogGrid);
     }
 
@@ -342,7 +424,7 @@ function filterPosts(filter) {
     const posts = document.querySelectorAll('.blog-post');
 
     posts.forEach(post => {
-        const category = post.querySelector('.post-category').textContent.toLowerCase();
+        const category = getPostText(post, '.post-category');
         const isVisible = filter === 'all' || category === filter.toLowerCase();
 
         post.style.display = isVisible ? 'block' : 'none';
@@ -388,11 +470,9 @@ function initSocialSharing() {
 }
 
 function initAccessibilityFeatures() {
-    // Improve heading structure
-    improveHeadingStructure();
-
-    // Add ARIA labels where needed
-    addAriaLabels();
+    [improveHeadingStructure, addAriaLabels].forEach(
+        initializer => blogSafeInvoke(initializer.name, initializer)
+    );
 }
 
 
@@ -485,14 +565,17 @@ function hideLoadingOverlay() {
     }
 }
 
-// Error handling
-window.addEventListener('error', function (e) {
-    console.error('Blog JavaScript error:', e.error);
-});
+// Error handling. main.js already installs these handlers, so only register
+// them when blog.js runs without it to avoid duplicate reports.
+if (typeof window.siteReportError !== 'function') {
+    window.addEventListener('error', function (e) {
+        blogReportError(`Uncaught error at ${e.filename || 'unknown'}:${e.lineno || 0}`, e.error || e.message);
+    });
 
-window.addEventListener('unhandledrejection', function (e) {
-    console.error('Unhandled promise rejection in blog:', e.reason);
-});
+    window.addEventListener('unhandledrejection', function (e) {
+        blogReportError('Unhandled promise rejection', e.reason);
+    });
+}
 
 // Performance monitoring
 if ('performance' in window) {
@@ -507,53 +590,90 @@ if ('performance' in window) {
     });
 }
 
+// Legacy clipboard path; returns whether the copy actually succeeded instead of
+// assuming it did.
+function legacyCopyToClipboard(text) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-9999px';
+    document.body.appendChild(textArea);
+    textArea.select();
+
+    try {
+        const successful = document.execCommand('copy');
+        if (!successful) {
+            blogReportError('execCommand("copy") reported failure', null);
+        }
+        return successful;
+    } catch (error) {
+        blogReportError('Fallback clipboard copy failed', error);
+        return false;
+    } finally {
+        textArea.remove();
+    }
+}
+
+function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+        return navigator.clipboard.writeText(text).then(() => true).catch(error => {
+            blogReportError('Clipboard API copy failed, using fallback', error);
+            return legacyCopyToClipboard(text);
+        });
+    }
+
+    return Promise.resolve(legacyCopyToClipboard(text));
+}
+
+function flashButtonState(button, html, resetHtml) {
+    button.innerHTML = html;
+    setTimeout(() => {
+        button.innerHTML = resetHtml;
+    }, 2000);
+}
+
 // Copy code block functionality
 window.copyCode = function (button) {
-    const codeBlock = button.closest('.code-block').querySelector('code');
-    if (!codeBlock) return;
+    const codeBlockContainer = button.closest('.code-block');
+    const codeBlock = codeBlockContainer ? codeBlockContainer.querySelector('code') : null;
+    if (!codeBlock) {
+        blogReportError('Copy button is not attached to a code block', button);
+        return;
+    }
 
-    navigator.clipboard.writeText(codeBlock.textContent).then(() => {
-        button.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> Copied!';
-        setTimeout(() => {
-            button.innerHTML = '<i class="fas fa-copy" aria-hidden="true"></i> Copy';
-        }, 2000);
-    }).catch(() => {
-        // Fallback for older browsers
-        const textArea = document.createElement('textarea');
-        textArea.value = codeBlock.textContent;
-        textArea.style.position = 'fixed';
-        textArea.style.left = '-9999px';
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
-        button.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> Copied!';
-        setTimeout(() => {
-            button.innerHTML = '<i class="fas fa-copy" aria-hidden="true"></i> Copy';
-        }, 2000);
+    const resetHtml = '<i class="fas fa-copy" aria-hidden="true"></i> Copy';
+
+    copyText(codeBlock.textContent).then(successful => {
+        flashButtonState(
+            button,
+            successful
+                ? '<i class="fas fa-check" aria-hidden="true"></i> Copied!'
+                : '<i class="fas fa-exclamation-circle" aria-hidden="true"></i> Copy failed',
+            resetHtml
+        );
+
+        if (window.announceToScreenReader) {
+            window.announceToScreenReader(successful ? 'Code copied to clipboard' : 'Could not copy code');
+        }
     });
 };
 
 // Copy page link functionality
 window.copyLink = function () {
-    navigator.clipboard.writeText(window.location.href).then(() => {
+    copyText(window.location.href).then(successful => {
         const copyBtn = document.querySelector('.share-btn.copy');
         if (copyBtn) {
-            const originalHTML = copyBtn.innerHTML;
-            copyBtn.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i>';
-            setTimeout(() => {
-                copyBtn.innerHTML = originalHTML;
-            }, 2000);
+            flashButtonState(
+                copyBtn,
+                successful
+                    ? '<i class="fas fa-check" aria-hidden="true"></i>'
+                    : '<i class="fas fa-exclamation-circle" aria-hidden="true"></i>',
+                copyBtn.innerHTML
+            );
         }
-    }).catch(() => {
-        // Fallback
-        const textArea = document.createElement('textarea');
-        textArea.value = window.location.href;
-        textArea.style.position = 'fixed';
-        textArea.style.left = '-9999px';
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
+
+        if (window.announceToScreenReader) {
+            window.announceToScreenReader(successful ? 'Link copied to clipboard' : 'Could not copy link');
+        }
     });
 };
