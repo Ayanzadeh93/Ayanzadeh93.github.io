@@ -1,4 +1,5 @@
 // Enhanced main.js with performance optimizations and accessibility features
+// Shared helpers live in js/utils.js (window.SiteUtils).
 
 const supportsIntersectionObserver = 'IntersectionObserver' in window;
 const REVEAL_FALLBACK_DELAY = 2000; // Fallback delay to reveal content if observers do not trigger.
@@ -73,12 +74,7 @@ function initThemeToggle() {
         }
     };
 
-    let savedTheme = null;
-    try {
-        savedTheme = localStorage.getItem('theme');
-    } catch (error) {
-        savedTheme = null;
-    }
+    const savedTheme = SiteUtils.readStoredValue('theme');
 
     // Saved choice wins; otherwise follow the operating system preference
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -89,12 +85,7 @@ function initThemeToggle() {
         const currentTheme = root.getAttribute('data-theme');
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
         applyTheme(newTheme);
-
-        try {
-            localStorage.setItem('theme', newTheme);
-        } catch (error) {
-            // Ignore storage errors and continue with in-memory theme state.
-        }
+        SiteUtils.writeStoredValue('theme', newTheme);
     });
 }
 
@@ -196,41 +187,17 @@ function initIntersectionObserver() {
         return;
     }
 
-    const observerOptions = {
-        threshold: 0.15,
-        rootMargin: '-40px 0px'
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('animate-in');
-                
+    SiteUtils.observeReveal(
+        ['section', REVEAL_PRIMARY_SELECTOR, REVEAL_SECONDARY_SELECTOR],
+        {
+            threshold: 0.15,
+            rootMargin: '-40px 0px',
+            onReveal: (target) => {
                 // Update active navigation link
-                const id = entry.target.getAttribute('id');
+                const id = target.getAttribute('id');
                 if (id) updateActiveNavLink(`#${id}`);
-
             }
-        });
-    }, observerOptions);
-
-    // Observe all sections
-    document.querySelectorAll('section').forEach(section => {
-        observer.observe(section);
-    });
-
-    const observeElements = (elements) => {
-        elements.forEach((element) => {
-            observer.observe(element);
-        });
-    };
-
-    observeElements(
-        document.querySelectorAll(REVEAL_PRIMARY_SELECTOR)
-    );
-
-    observeElements(
-        document.querySelectorAll(REVEAL_SECONDARY_SELECTOR)
+        }
     );
 
     setTimeout(() => {
@@ -287,7 +254,7 @@ function validateField(field) {
 
     // Remove existing error states
     field.classList.remove('error');
-    removeFieldError(field);
+    SiteUtils.removeFieldError(field);
 
     // Validation rules
     switch (fieldName) {
@@ -298,8 +265,7 @@ function validateField(field) {
             }
             break;
         case 'email':
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(value)) {
+            if (!SiteUtils.isValidEmail(value)) {
                 errorMessage = 'Please enter a valid email address.';
                 isValid = false;
             }
@@ -314,28 +280,10 @@ function validateField(field) {
 
     if (!isValid) {
         field.classList.add('error');
-        showFieldError(field, errorMessage);
+        SiteUtils.showFieldError(field, errorMessage);
     }
 
     return isValid;
-}
-
-function showFieldError(field, message) {
-    let errorElement = field.parentNode.querySelector('.field-error');
-    if (!errorElement) {
-        errorElement = document.createElement('div');
-        errorElement.className = 'field-error';
-        errorElement.setAttribute('role', 'alert');
-        field.parentNode.appendChild(errorElement);
-    }
-    errorElement.textContent = message;
-}
-
-function removeFieldError(field) {
-    const errorElement = field.parentNode.querySelector('.field-error');
-    if (errorElement) {
-        errorElement.remove();
-    }
 }
 
 // Loading states
@@ -355,13 +303,11 @@ function hideLoadingSpinner() {
 }
 
 function showLoadingOverlay() {
-    const overlay = document.getElementById('loadingOverlay');
-    if (overlay) overlay.classList.add('active');
+    SiteUtils.setLoadingOverlay(true);
 }
 
 function hideLoadingOverlay() {
-    const overlay = document.getElementById('loadingOverlay');
-    if (overlay) overlay.classList.remove('active');
+    SiteUtils.setLoadingOverlay(false);
 }
 
 // Lazy loading for images
@@ -380,6 +326,7 @@ function initLazyLoading() {
                 if (entry.isIntersecting) {
                     const img = entry.target;
                     img.src = img.dataset.src;
+                    img.removeAttribute('data-src');
                     img.classList.add('loaded');
                     imageObserver.unobserve(img);
                 }
@@ -423,25 +370,11 @@ function initHeroParallax() {
 
 // Accessibility features
 function initAccessibilityFeatures() {
-    // Announce dynamic content changes
-    initAriaLiveRegions();
+    // Single announcement channel shared by every page script
+    window.announceToScreenReader = announceToScreenReader;
 
     // High contrast mode detection
     detectHighContrastMode();
-}
-
-function initAriaLiveRegions() {
-    // Create live region for announcements
-    const liveRegion = document.createElement('div');
-    liveRegion.setAttribute('aria-live', 'polite');
-    liveRegion.setAttribute('aria-atomic', 'true');
-    liveRegion.className = 'sr-only';
-    document.body.appendChild(liveRegion);
-    
-    window.announceToScreenReader = function(message) {
-        liveRegion.textContent = message;
-        setTimeout(() => liveRegion.textContent = '', 1000);
-    };
 }
 
 function detectHighContrastMode() {
@@ -467,9 +400,10 @@ function submitForm(form) {
     
     // Disable submit button to prevent double submission
     const submitButton = form.querySelector('button[type="submit"]');
-    const originalText = submitButton.innerHTML;
-    submitButton.disabled = true;
-    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Sending...';
+    const restoreButton = SiteUtils.setButtonBusy(
+        submitButton,
+        '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Sending...'
+    );
     
     // Keep reply-to synced with the email field for easier responses.
     const emailInput = form.querySelector('input[name="email"]');
@@ -491,8 +425,7 @@ function submitForm(form) {
     })
     .then(response => {
         hideLoadingSpinner();
-        submitButton.disabled = false;
-        submitButton.innerHTML = originalText;
+        restoreButton();
         
         if (response.ok) {
         showSuccessMessage('Thank you for your message! I will get back to you soon.');
@@ -525,8 +458,7 @@ function submitForm(form) {
     })
     .catch(error => {
         hideLoadingSpinner();
-        submitButton.disabled = false;
-        submitButton.innerHTML = originalText;
+        restoreButton();
         console.error('Form submission error:', error);
         showErrorMessage('There was a problem sending your message. Please check your connection and try again, or email me directly at a.ayanzadeh@gmail.com.');
     });
@@ -546,10 +478,10 @@ function showMessage(message, type) {
         msg.remove();
     });
     
-    const messageEl = document.createElement('div');
-    messageEl.className = `${type}-message show`;
-    messageEl.textContent = message;
-    messageEl.setAttribute('role', 'alert');
+    const messageEl = SiteUtils.createDismissibleMessage(`${type}-message show`, message, 5000, (element) => {
+        element.classList.remove('show');
+        setTimeout(() => element.remove(), 300);
+    });
     
     const contactForm = document.getElementById('contactForm');
     if (contactForm) {
@@ -561,12 +493,6 @@ function showMessage(message, type) {
         }
 
         contactForm.insertBefore(messageEl, contactForm.firstChild);
-        
-        // Auto-hide after 5 seconds
-        setTimeout(() => {
-            messageEl.classList.remove('show');
-            setTimeout(() => messageEl.remove(), 300);
-        }, 5000);
     }
     
     // Announce to screen readers
@@ -1094,52 +1020,31 @@ function initializeScreenReaderSupport() {
 }
 
 function announceToScreenReader(message, priority = 'polite') {
-    const announcer = document.getElementById(priority === 'assertive' ? 'sr-alerts' : 'sr-status');
-    if (announcer) {
-        // Clear previous message
-        announcer.textContent = '';
-        
-        // Add new message after a brief delay to ensure it's announced
-        setTimeout(() => {
-            announcer.textContent = message;
-        }, 100);
-        
-        // Clear message after it's been announced
-        setTimeout(() => {
-            announcer.textContent = '';
-        }, 3000);
-    }
+    SiteUtils.announce(message, priority);
 }
 
 // Accessibility Preferences
+const ACCESSIBILITY_PREFERENCES_KEY = 'accessibilityPreferences';
+
 function saveAccessibilityPreference(key, value) {
-    try {
-        const preferences = JSON.parse(localStorage.getItem('accessibilityPreferences') || '{}');
-        preferences[key] = value;
-        localStorage.setItem('accessibilityPreferences', JSON.stringify(preferences));
-    } catch (e) {
-        console.warn('Could not save accessibility preference:', e);
-    }
+    const preferences = SiteUtils.readStoredJSON(ACCESSIBILITY_PREFERENCES_KEY, {});
+    preferences[key] = value;
+    SiteUtils.writeStoredJSON(ACCESSIBILITY_PREFERENCES_KEY, preferences);
 }
 
 function loadAccessibilityPreferences() {
-    try {
-        const preferences = JSON.parse(localStorage.getItem('accessibilityPreferences') || '{}');
-        
-        // Apply saved preferences
-        Object.entries(preferences).forEach(([key, value]) => {
-            const toggleId = key.replace(/([A-Z])/g, '-$1').toLowerCase() + '-toggle';
-            const toggle = document.getElementById(toggleId);
-            
-            if (toggle) {
-                toggle.checked = value;
-                // Trigger the change event to apply the setting
-                toggle.dispatchEvent(new Event('change'));
-            }
-        });
-    } catch (e) {
-        console.warn('Could not load accessibility preferences:', e);
-    }
+    const preferences = SiteUtils.readStoredJSON(ACCESSIBILITY_PREFERENCES_KEY, {});
+
+    Object.entries(preferences).forEach(([key, value]) => {
+        const toggleId = key.replace(/([A-Z])/g, '-$1').toLowerCase() + '-toggle';
+        const toggle = document.getElementById(toggleId);
+
+        if (toggle) {
+            toggle.checked = value;
+            // Trigger the change event to apply the setting
+            toggle.dispatchEvent(new Event('change'));
+        }
+    });
 }
 
 function resetAccessibilitySettings() {
@@ -1150,12 +1055,7 @@ function resetAccessibilitySettings() {
         toggle.dispatchEvent(new Event('change'));
     });
     
-    // Clear localStorage
-    try {
-        localStorage.removeItem('accessibilityPreferences');
-    } catch (e) {
-        console.warn('Could not clear accessibility preferences:', e);
-    }
+    SiteUtils.removeStoredValue(ACCESSIBILITY_PREFERENCES_KEY);
 
     stopPageReader();
     
@@ -1296,41 +1196,13 @@ document.addEventListener('DOMContentLoaded', function() {
 // ========================================
 
 function copyToClipboard(text) {
-    // Try using the modern Clipboard API first
-    if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(text).then(function() {
-            showCitationNotification('Citation copied to clipboard!');
-        }).catch(function(err) {
-            fallbackCopyTextToClipboard(text);
-        });
-    } else {
-        // Fallback for older browsers or non-HTTPS
-        fallbackCopyTextToClipboard(text);
-    }
-}
-
-function fallbackCopyTextToClipboard(text) {
-    const textArea = document.createElement("textarea");
-    textArea.value = text;
-    textArea.style.position = "fixed";
-    textArea.style.top = "-9999px";
-    textArea.style.left = "-9999px";
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
-    
-    try {
-        const successful = document.execCommand('copy');
-        if (successful) {
+    SiteUtils.copyText(text).then(copied => {
+        if (copied) {
             showCitationNotification('Citation copied to clipboard!');
         } else {
             showCitationNotification('Failed to copy citation', 'error');
         }
-    } catch (err) {
-        showCitationNotification('Failed to copy citation', 'error');
-    }
-    
-    document.body.removeChild(textArea);
+    });
 }
 
 function showCitationNotification(message, type = 'success') {

@@ -1,12 +1,13 @@
 // Enhanced Blog JavaScript with Performance and Accessibility
+// Shared helpers live in js/utils.js (window.SiteUtils).
 
 document.addEventListener('DOMContentLoaded', function () {
     initBlogFeatures();
     initNewsletterForm();
     initLoadMorePosts();
     initPostSearch();
-    initAccessibilityFeatures();
-    hideLoadingOverlay();
+    initBlogAccessibilityFeatures();
+    SiteUtils.setLoadingOverlay(false);
 });
 
 function initBlogFeatures() {
@@ -42,32 +43,10 @@ function calculateReadingTimes() {
 }
 
 function initPostAnimations() {
-    const observerOptions = {
+    SiteUtils.observeReveal('.blog-post, .featured-post', {
         threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('animate-in');
-
-                // Lazy load images if any
-                const images = entry.target.querySelectorAll('img[data-src]');
-                images.forEach(img => {
-                    img.src = img.dataset.src;
-                    img.removeAttribute('data-src');
-                    img.addEventListener('load', () => {
-                        img.classList.add('loaded');
-                    });
-                });
-            }
-        });
-    }, observerOptions);
-
-    // Observe blog posts
-    document.querySelectorAll('.blog-post, .featured-post').forEach(post => {
-        observer.observe(post);
+        rootMargin: '0px 0px -50px 0px',
+        onReveal: (post) => SiteUtils.loadDeferredImages(post)
     });
 }
 
@@ -101,20 +80,19 @@ function initNewsletterForm() {
 
 function validateEmail(emailInput) {
     const email = emailInput.value.trim();
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     // Remove previous validation states
     emailInput.classList.remove('error', 'valid');
-    removeFieldError(emailInput);
+    SiteUtils.removeFieldError(emailInput);
 
     if (!email) {
-        showFieldError(emailInput, 'Email is required.');
+        SiteUtils.showFieldError(emailInput, 'Email is required.');
         emailInput.classList.add('error');
         return false;
     }
 
-    if (!emailRegex.test(email)) {
-        showFieldError(emailInput, 'Please enter a valid email address.');
+    if (!SiteUtils.isValidEmail(email)) {
+        SiteUtils.showFieldError(emailInput, 'Please enter a valid email address.');
         emailInput.classList.add('error');
         return false;
     }
@@ -125,12 +103,10 @@ function validateEmail(emailInput) {
 
 function submitNewsletter(form) {
     const submitButton = form.querySelector('button[type="submit"]');
-    const originalText = submitButton.innerHTML;
-
-    // Show loading state
-    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Subscribing...';
-    submitButton.disabled = true;
-    submitButton.setAttribute('aria-busy', 'true');
+    const restoreButton = SiteUtils.setButtonBusy(
+        submitButton,
+        '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Subscribing...'
+    );
 
     // Simulate subscription (replace with actual API call)
     setTimeout(() => {
@@ -142,10 +118,8 @@ function submitNewsletter(form) {
         // Reset form after delay
         setTimeout(() => {
             form.reset();
-            submitButton.innerHTML = originalText;
-            submitButton.disabled = false;
             submitButton.classList.remove('success');
-            submitButton.setAttribute('aria-busy', 'false');
+            restoreButton();
         }, 3000);
 
         // Announce to screen readers
@@ -168,12 +142,10 @@ function initLoadMorePosts() {
 }
 
 function loadMorePosts(button) {
-    const originalText = button.innerHTML;
-
-    // Show loading state
-    button.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Loading...';
-    button.disabled = true;
-    button.setAttribute('aria-busy', 'true');
+    const restoreButton = SiteUtils.setButtonBusy(
+        button,
+        '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Loading...'
+    );
 
     // Simulate loading more posts
     setTimeout(() => {
@@ -184,10 +156,7 @@ function loadMorePosts(button) {
             blogGrid.appendChild(post);
         });
 
-        // Restore button state
-        button.innerHTML = originalText;
-        button.disabled = false;
-        button.setAttribute('aria-busy', 'false');
+        restoreButton();
 
         // Update screen reader announcement
         if (window.announceToScreenReader) {
@@ -387,7 +356,7 @@ function initSocialSharing() {
     });
 }
 
-function initAccessibilityFeatures() {
+function initBlogAccessibilityFeatures() {
     // Improve heading structure
     improveHeadingStructure();
 
@@ -433,25 +402,6 @@ function addAriaLabels() {
     });
 }
 
-// Utility functions
-function showFieldError(field, message) {
-    removeFieldError(field);
-
-    const errorElement = document.createElement('div');
-    errorElement.className = 'field-error';
-    errorElement.textContent = message;
-    errorElement.setAttribute('role', 'alert');
-
-    field.parentNode.appendChild(errorElement);
-}
-
-function removeFieldError(field) {
-    const existingError = field.parentNode.querySelector('.field-error');
-    if (existingError) {
-        existingError.remove();
-    }
-}
-
 function showFormError(form, message) {
     showFormMessage(form, message, 'error');
 }
@@ -462,27 +412,10 @@ function showFormSuccess(form, message) {
 
 function showFormMessage(form, message, type) {
     // Remove existing messages
-    const existingMessages = form.querySelectorAll('.form-message');
-    existingMessages.forEach(msg => msg.remove());
+    form.querySelectorAll('.form-message').forEach(msg => msg.remove());
 
-    const messageElement = document.createElement('div');
-    messageElement.className = `form-message ${type}-message`;
-    messageElement.textContent = message;
-    messageElement.setAttribute('role', 'alert');
-
+    const messageElement = SiteUtils.createDismissibleMessage(`form-message ${type}-message`, message);
     form.insertBefore(messageElement, form.firstChild);
-
-    // Auto-remove after 5 seconds
-    setTimeout(() => {
-        messageElement.remove();
-    }, 5000);
-}
-
-function hideLoadingOverlay() {
-    const overlay = document.getElementById('loadingOverlay');
-    if (overlay) {
-        overlay.classList.remove('active');
-    }
 }
 
 // Error handling
@@ -509,51 +442,24 @@ if ('performance' in window) {
 
 // Copy code block functionality
 window.copyCode = function (button) {
-    const codeBlock = button.closest('.code-block').querySelector('code');
+    const codeBlock = button.closest('.code-block')?.querySelector('code');
     if (!codeBlock) return;
 
-    navigator.clipboard.writeText(codeBlock.textContent).then(() => {
-        button.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> Copied!';
-        setTimeout(() => {
-            button.innerHTML = '<i class="fas fa-copy" aria-hidden="true"></i> Copy';
-        }, 2000);
-    }).catch(() => {
-        // Fallback for older browsers
-        const textArea = document.createElement('textarea');
-        textArea.value = codeBlock.textContent;
-        textArea.style.position = 'fixed';
-        textArea.style.left = '-9999px';
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
-        button.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> Copied!';
-        setTimeout(() => {
-            button.innerHTML = '<i class="fas fa-copy" aria-hidden="true"></i> Copy';
-        }, 2000);
+    SiteUtils.copyText(codeBlock.textContent).then(copied => {
+        if (copied) {
+            SiteUtils.flashButtonContent(button, '<i class="fas fa-check" aria-hidden="true"></i> Copied!');
+        }
     });
 };
 
 // Copy page link functionality
 window.copyLink = function () {
-    navigator.clipboard.writeText(window.location.href).then(() => {
-        const copyBtn = document.querySelector('.share-btn.copy');
-        if (copyBtn) {
-            const originalHTML = copyBtn.innerHTML;
-            copyBtn.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i>';
-            setTimeout(() => {
-                copyBtn.innerHTML = originalHTML;
-            }, 2000);
+    SiteUtils.copyText(window.location.href).then(copied => {
+        if (copied) {
+            SiteUtils.flashButtonContent(
+                document.querySelector('.share-btn.copy'),
+                '<i class="fas fa-check" aria-hidden="true"></i>'
+            );
         }
-    }).catch(() => {
-        // Fallback
-        const textArea = document.createElement('textarea');
-        textArea.value = window.location.href;
-        textArea.style.position = 'fixed';
-        textArea.style.left = '-9999px';
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
     });
 };

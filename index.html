@@ -80,15 +80,7 @@
     <meta name="msapplication-TileColor" content="#2563eb">
 
     <!-- Apply the saved (or system) theme before first paint to avoid a light-mode flash -->
-    <script>
-        (function () {
-            try {
-                var saved = localStorage.getItem('theme');
-                var dark = saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches);
-                document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-            } catch (e) { /* keep default theme */ }
-        })();
-    </script>
+    <script src="js/theme-init.js"></script>
 
     <!-- Stylesheets -->
     <link rel="stylesheet" href="css/style.css">
@@ -1701,6 +1693,7 @@
     <div id="sr-status" class="sr-only" aria-live="polite" aria-atomic="true"></div>
     <div id="sr-alerts" class="sr-only" aria-live="assertive" aria-atomic="true"></div>
 
+    <script src="js/utils.js"></script>
     <script src="js/main.js"></script>
 </body>
 
