@@ -10,6 +10,18 @@ if (supportsIntersectionObserver) {
     document.documentElement.classList.add('js-enabled');
 }
 
+// Escape text before it is interpolated into an HTML template string.
+function escapeHtml(value) {
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+window.escapeHtml = escapeHtml;
+
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize all components
     initMobileMenu();
@@ -694,13 +706,13 @@ function showCustomModal(title, content) {
         <div class="modal-backdrop" onclick="closeCustomModal()"></div>
         <div class="modal-content" role="dialog" aria-labelledby="modalTitle" aria-describedby="modalContent">
             <div class="modal-header">
-                <h3 id="modalTitle">${title}</h3>
+                <h3 id="modalTitle">${escapeHtml(title)}</h3>
                 <button class="modal-close" onclick="closeCustomModal()" aria-label="Close modal">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="modal-body">
-                <pre id="modalContent">${content}</pre>
+                <pre id="modalContent">${escapeHtml(content)}</pre>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-primary" onclick="closeCustomModal()">Close</button>
@@ -1345,7 +1357,7 @@ function showCitationNotification(message, type = 'success') {
     notification.className = `citation-notification ${type}`;
     notification.innerHTML = `
         <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
-        <span>${message}</span>
+        <span>${escapeHtml(message)}</span>
     `;
     
     document.body.appendChild(notification);
