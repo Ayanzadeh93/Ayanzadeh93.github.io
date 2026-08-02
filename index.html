@@ -441,6 +441,41 @@
             </a>
         </section>
 
+        <!-- Research at a glance. Every figure is recounted from this page's own
+             markup at runtime (see initMetricCounters in js/main.js), so a number
+             here can never drift from the section it summarises. The values in
+             the markup are the accurate no-JS fallback. -->
+        <section class="metrics-band" aria-label="Research at a glance">
+            <div class="container">
+                <ul class="metrics-grid">
+                    <li class="metric">
+                        <a class="metric__link" href="#publications">
+                            <span class="metric__value" data-count-of="#publications .publication-item">15</span>
+                            <span class="metric__label">Publications</span>
+                        </a>
+                    </li>
+                    <li class="metric">
+                        <a class="metric__link" href="#research-projects">
+                            <span class="metric__value" data-count-of="#research-projects .project-item">5</span>
+                            <span class="metric__label">Research Projects</span>
+                        </a>
+                    </li>
+                    <li class="metric">
+                        <a class="metric__link" href="#projects">
+                            <span class="metric__value" data-count-of="#projects .project-card">6</span>
+                            <span class="metric__label">Projects</span>
+                        </a>
+                    </li>
+                    <li class="metric">
+                        <a class="metric__link" href="#teaching">
+                            <span class="metric__value" data-count-of="#teaching .course-item">4</span>
+                            <span class="metric__label">Courses Taught</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
         <!-- About Section -->
         <section id="about" class="section" aria-label="About me">
             <div class="container">

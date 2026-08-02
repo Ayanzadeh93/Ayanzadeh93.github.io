@@ -6402,3 +6402,78 @@ img[loading="lazy"].loaded {
 .ai-text {
     background-image: linear-gradient(135deg, #ffffff 0%, #e0f2fe 45%, #93c5fd 100%);
 }
+
+/* --------------------------------------------------------------------------
+   Research at a glance — a metrics band bridging the dark hero and the
+   light About section. Each tile links to the section it counts, so the
+   figure is verifiable in one click.
+   -------------------------------------------------------------------------- */
+
+.metrics-band {
+    width: 100%;
+    padding: 36px 0;
+    background: var(--background-light);
+    border-bottom: 1px solid var(--border-color);
+    position: relative;
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr));
+    gap: 12px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.metric {
+    text-align: center;
+}
+
+.metric__link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 14px 10px;
+    border-radius: 12px;
+    text-decoration: none;
+    color: inherit;
+    transition: background-color 0.25s ease, transform 0.25s var(--ease-out-soft);
+}
+
+.metric__link:hover,
+.metric__link:focus-visible {
+    background: var(--accent-soft);
+    transform: translateY(-2px);
+}
+
+.metric__value {
+    font-size: clamp(2rem, 5vw, 2.75rem);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    background-image: var(--section-title-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    /* Digits change width as the counter runs; tabular figures stop the
+       label beneath from shuffling sideways. */
+    font-variant-numeric: tabular-nums;
+}
+
+.metric__label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-light);
+}
+
+/* Separators between tiles, dropped once the grid wraps to one column. */
+@media (min-width: 641px) {
+    .metric + .metric {
+        border-left: 1px solid var(--border-color);
+    }
+}
