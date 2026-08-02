@@ -216,20 +216,30 @@
     <!-- Skip to Content for Accessibility -->
     <a href="#main-content" class="skip-to-content">Skip to main content</a>
 
+    <!-- Reading progress: decorative mirror of the scrollbar, so it stays out of the a11y tree -->
+    <div class="scroll-progress" aria-hidden="true">
+        <span class="scroll-progress__bar" id="scroll-progress-bar"></span>
+    </div>
+
     <!-- Enhanced Top Navigation -->
     <nav class="top-navbar" role="navigation" aria-label="Main navigation" id="main-navigation">
         <div class="top-nav-container">
             <div class="nav-brand">
                 <a href="#home" class="brand-link" aria-label="Aydin Ayanzadeh - Go to home section">
-                    <div class="ai-logo" role="img" aria-label="AI-themed logo with neural network design">
-                        <div class="neural-network-icon">
-                            <div class="node" aria-hidden="true"></div>
-                            <div class="node" aria-hidden="true"></div>
-                            <div class="node" aria-hidden="true"></div>
-                            <div class="connection" aria-hidden="true"></div>
-                            <div class="connection" aria-hidden="true"></div>
-                        </div>
-                    </div>
+                    <span class="ai-logo" role="img" aria-label="Neural network logo">
+                        <svg class="ai-logo__svg" viewBox="0 0 40 40" focusable="false" aria-hidden="true">
+                            <g class="ai-logo__links">
+                                <line x1="20" y1="9" x2="10" y2="30" pathLength="100" />
+                                <line x1="20" y1="9" x2="30" y2="30" pathLength="100" />
+                                <line x1="10" y1="30" x2="30" y2="30" pathLength="100" />
+                            </g>
+                            <g class="ai-logo__nodes">
+                                <circle cx="20" cy="9" r="4" />
+                                <circle cx="10" cy="30" r="4" />
+                                <circle cx="30" cy="30" r="4" />
+                            </g>
+                        </svg>
+                    </span>
                     <span class="brand-text">Aydin Ayanzadeh</span>
                 </a>
             </div>
@@ -279,35 +289,98 @@
     <main class="main-content" id="main-content">
         <!-- Enhanced AI-Themed Hero Section -->
         <section id="home" class="hero" aria-label="Introduction">
-            <!-- AI Background Animation -->
-            <div class="ai-background">
-                <div class="neural-network">
-                    <div class="neural-layer layer-1">
-                        <div class="neuron"></div>
-                        <div class="neuron"></div>
-                        <div class="neuron"></div>
-                        <div class="neuron"></div>
-                    </div>
-                    <div class="neural-layer layer-2">
-                        <div class="neuron"></div>
-                        <div class="neuron"></div>
-                        <div class="neuron"></div>
-                        <div class="neuron"></div>
-                        <div class="neuron"></div>
-                    </div>
-                    <div class="neural-layer layer-3">
-                        <div class="neuron"></div>
-                        <div class="neuron"></div>
-                        <div class="neuron"></div>
-                    </div>
-                </div>
-                <div class="data-particles">
-                    <div class="particle"></div>
-                    <div class="particle"></div>
-                    <div class="particle"></div>
-                    <div class="particle"></div>
-                    <div class="particle"></div>
-                </div>
+            <!-- Decorative visualization: a layered neural network carrying signal
+                 pulses, over a heartbeat trace. Presentational only. -->
+            <div class="ai-background hero-viz" aria-hidden="true">
+                <svg class="hero-net" viewBox="0 0 1200 560" preserveAspectRatio="xMidYMid meet"
+                    focusable="false" role="presentation">
+                    <g class="hero-net__edges">
+                        <line x1="150" y1="120" x2="450" y2="80" />
+                        <line x1="150" y1="120" x2="450" y2="190" />
+                        <line x1="150" y1="120" x2="450" y2="300" />
+                        <line x1="150" y1="240" x2="450" y2="190" />
+                        <line x1="150" y1="240" x2="450" y2="300" />
+                        <line x1="150" y1="240" x2="450" y2="410" />
+                        <line x1="150" y1="360" x2="450" y2="300" />
+                        <line x1="150" y1="360" x2="450" y2="410" />
+                        <line x1="150" y1="360" x2="450" y2="500" />
+                        <line x1="150" y1="470" x2="450" y2="300" />
+                        <line x1="150" y1="470" x2="450" y2="410" />
+                        <line x1="150" y1="470" x2="450" y2="500" />
+                        <line x1="450" y1="80" x2="760" y2="130" />
+                        <line x1="450" y1="80" x2="760" y2="250" />
+                        <line x1="450" y1="190" x2="760" y2="130" />
+                        <line x1="450" y1="190" x2="760" y2="250" />
+                        <line x1="450" y1="190" x2="760" y2="370" />
+                        <line x1="450" y1="300" x2="760" y2="250" />
+                        <line x1="450" y1="300" x2="760" y2="370" />
+                        <line x1="450" y1="410" x2="760" y2="250" />
+                        <line x1="450" y1="410" x2="760" y2="370" />
+                        <line x1="450" y1="410" x2="760" y2="470" />
+                        <line x1="450" y1="500" x2="760" y2="370" />
+                        <line x1="450" y1="500" x2="760" y2="470" />
+                        <line x1="760" y1="130" x2="1050" y2="220" />
+                        <line x1="760" y1="130" x2="1050" y2="340" />
+                        <line x1="760" y1="250" x2="1050" y2="220" />
+                        <line x1="760" y1="250" x2="1050" y2="340" />
+                        <line x1="760" y1="370" x2="1050" y2="220" />
+                        <line x1="760" y1="370" x2="1050" y2="340" />
+                        <line x1="760" y1="470" x2="1050" y2="220" />
+                        <line x1="760" y1="470" x2="1050" y2="340" />
+                    </g>
+                    <g class="hero-net__pulses">
+                        <line x1="150" y1="120" x2="450" y2="80" pathLength="100" style="animation-delay: 0s" />
+                        <line x1="150" y1="240" x2="450" y2="300" pathLength="100" style="animation-delay: 1.1s" />
+                        <line x1="150" y1="360" x2="450" y2="500" pathLength="100" style="animation-delay: 2.3s" />
+                        <line x1="150" y1="470" x2="450" y2="500" pathLength="100" style="animation-delay: 3.1s" />
+                        <line x1="450" y1="80" x2="760" y2="250" pathLength="100" style="animation-delay: 0.6s" />
+                        <line x1="450" y1="300" x2="760" y2="370" pathLength="100" style="animation-delay: 1.8s" />
+                        <line x1="450" y1="410" x2="760" y2="470" pathLength="100" style="animation-delay: 2.8s" />
+                        <line x1="450" y1="500" x2="760" y2="470" pathLength="100" style="animation-delay: 3.7s" />
+                        <line x1="760" y1="130" x2="1050" y2="340" pathLength="100" style="animation-delay: 1.3s" />
+                        <line x1="760" y1="370" x2="1050" y2="220" pathLength="100" style="animation-delay: 2.1s" />
+                        <line x1="760" y1="470" x2="1050" y2="220" pathLength="100" style="animation-delay: 3.4s" />
+                    </g>
+                    <g class="hero-net__nodes">
+                        <circle class="hero-net__halo" cx="150" cy="120" r="15" style="animation-delay: 0.00s" />
+                        <circle class="hero-net__halo" cx="150" cy="240" r="15" style="animation-delay: 0.37s" />
+                        <circle class="hero-net__halo" cx="150" cy="360" r="15" style="animation-delay: 0.74s" />
+                        <circle class="hero-net__halo" cx="150" cy="470" r="15" style="animation-delay: 1.11s" />
+                        <circle class="hero-net__halo" cx="450" cy="80" r="15" style="animation-delay: 1.48s" />
+                        <circle class="hero-net__halo" cx="450" cy="190" r="15" style="animation-delay: 1.85s" />
+                        <circle class="hero-net__halo" cx="450" cy="300" r="15" style="animation-delay: 2.22s" />
+                        <circle class="hero-net__halo" cx="450" cy="410" r="15" style="animation-delay: 2.59s" />
+                        <circle class="hero-net__halo" cx="450" cy="500" r="15" style="animation-delay: 2.96s" />
+                        <circle class="hero-net__halo" cx="760" cy="130" r="15" style="animation-delay: 3.33s" />
+                        <circle class="hero-net__halo" cx="760" cy="250" r="15" style="animation-delay: 3.70s" />
+                        <circle class="hero-net__halo" cx="760" cy="370" r="15" style="animation-delay: 4.07s" />
+                        <circle class="hero-net__halo" cx="760" cy="470" r="15" style="animation-delay: 4.44s" />
+                        <circle class="hero-net__halo" cx="1050" cy="220" r="15" style="animation-delay: 4.81s" />
+                        <circle class="hero-net__halo" cx="1050" cy="340" r="15" style="animation-delay: 5.18s" />
+                        <circle class="hero-net__core" cx="150" cy="120" r="5" style="animation-delay: 0.00s" />
+                        <circle class="hero-net__core" cx="150" cy="240" r="5" style="animation-delay: 0.37s" />
+                        <circle class="hero-net__core" cx="150" cy="360" r="5" style="animation-delay: 0.74s" />
+                        <circle class="hero-net__core" cx="150" cy="470" r="5" style="animation-delay: 1.11s" />
+                        <circle class="hero-net__core" cx="450" cy="80" r="5" style="animation-delay: 1.48s" />
+                        <circle class="hero-net__core" cx="450" cy="190" r="5" style="animation-delay: 1.85s" />
+                        <circle class="hero-net__core" cx="450" cy="300" r="5" style="animation-delay: 2.22s" />
+                        <circle class="hero-net__core" cx="450" cy="410" r="5" style="animation-delay: 2.59s" />
+                        <circle class="hero-net__core" cx="450" cy="500" r="5" style="animation-delay: 2.96s" />
+                        <circle class="hero-net__core" cx="760" cy="130" r="5" style="animation-delay: 3.33s" />
+                        <circle class="hero-net__core" cx="760" cy="250" r="5" style="animation-delay: 3.70s" />
+                        <circle class="hero-net__core" cx="760" cy="370" r="5" style="animation-delay: 4.07s" />
+                        <circle class="hero-net__core" cx="760" cy="470" r="5" style="animation-delay: 4.44s" />
+                        <circle class="hero-net__core" cx="1050" cy="220" r="5" style="animation-delay: 4.81s" />
+                        <circle class="hero-net__core" cx="1050" cy="340" r="5" style="animation-delay: 5.18s" />
+                    </g>
+                </svg>
+                <svg class="hero-ecg" viewBox="0 0 1200 120" preserveAspectRatio="none"
+                    focusable="false" role="presentation">
+                    <path class="hero-ecg__base" pathLength="1200"
+                        d="M0 60 h100 l10 -8 l8 8 h22 l8 4 l8 -44 l8 48 l8 -8 h28 l14 -12 l14 12 h72 h100 l10 -8 l8 8 h22 l8 4 l8 -44 l8 48 l8 -8 h28 l14 -12 l14 12 h72 h100 l10 -8 l8 8 h22 l8 4 l8 -44 l8 48 l8 -8 h28 l14 -12 l14 12 h72 h100 l10 -8 l8 8 h22 l8 4 l8 -44 l8 48 l8 -8 h28 l14 -12 l14 12 h72" />
+                    <path class="hero-ecg__sweep" pathLength="1200"
+                        d="M0 60 h100 l10 -8 l8 8 h22 l8 4 l8 -44 l8 48 l8 -8 h28 l14 -12 l14 12 h72 h100 l10 -8 l8 8 h22 l8 4 l8 -44 l8 48 l8 -8 h28 l14 -12 l14 12 h72 h100 l10 -8 l8 8 h22 l8 4 l8 -44 l8 48 l8 -8 h28 l14 -12 l14 12 h72 h100 l10 -8 l8 8 h22 l8 4 l8 -44 l8 48 l8 -8 h28 l14 -12 l14 12 h72" />
+                </svg>
             </div>
 
             <div class="container">
@@ -371,6 +444,41 @@
             </a>
         </section>
 
+        <!-- Research at a glance. Every figure is recounted from this page's own
+             markup at runtime (see initMetricCounters in js/main.js), so a number
+             here can never drift from the section it summarises. The values in
+             the markup are the accurate no-JS fallback. -->
+        <section class="metrics-band" aria-label="Research at a glance">
+            <div class="container">
+                <ul class="metrics-grid">
+                    <li class="metric">
+                        <a class="metric__link" href="#publications">
+                            <span class="metric__value" data-count-of="#publications .publication-item">15</span>
+                            <span class="metric__label">Publications</span>
+                        </a>
+                    </li>
+                    <li class="metric">
+                        <a class="metric__link" href="#research-projects">
+                            <span class="metric__value" data-count-of="#research-projects .project-item">5</span>
+                            <span class="metric__label">Research Projects</span>
+                        </a>
+                    </li>
+                    <li class="metric">
+                        <a class="metric__link" href="#projects">
+                            <span class="metric__value" data-count-of="#projects .project-card">6</span>
+                            <span class="metric__label">Projects</span>
+                        </a>
+                    </li>
+                    <li class="metric">
+                        <a class="metric__link" href="#teaching">
+                            <span class="metric__value" data-count-of="#teaching .course-item">4</span>
+                            <span class="metric__label">Courses Taught</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
         <!-- About Section -->
         <section id="about" class="section" aria-label="About me">
             <div class="container">
@@ -417,7 +525,23 @@
                             <h3>Current Focus</h3>
                             <div class="focus-items">
                                 <div class="focus-item">
-                                    <i class="fas fa-eye"></i>
+                                    <!-- Sonar rings: spatial guidance for blind and low-vision users -->
+                                    <span class="focus-glyph focus-glyph--sonar" aria-hidden="true">
+                                        <svg viewBox="0 0 48 48" focusable="false" role="presentation">
+                                            <g class="focus-glyph__rings">
+                                                <circle cx="24" cy="25" r="8" />
+                                                <circle cx="24" cy="25" r="8" style="animation-delay: 0.8s" />
+                                                <circle cx="24" cy="25" r="8" style="animation-delay: 1.6s" />
+                                            </g>
+                                            <g class="focus-glyph__figure">
+                                                <circle cx="24" cy="10" r="3.4" />
+                                                <path d="M14.5 19h19" />
+                                                <path d="M24 16.5v11" />
+                                                <path d="M24 27.5 18.5 38" />
+                                                <path d="M24 27.5 29.5 38" />
+                                            </g>
+                                        </svg>
+                                    </span>
                                     <div>
                                         <h4>Accessibility AI</h4>
                                         <p>Developing LLM-based navigation systems for individuals with visual
@@ -425,7 +549,20 @@
                                     </div>
                                 </div>
                                 <div class="focus-item">
-                                    <i class="fas fa-fire"></i>
+                                    <!-- Flame with rising embers: wildfire detection -->
+                                    <span class="focus-glyph focus-glyph--ember" aria-hidden="true">
+                                        <svg viewBox="0 0 48 48" focusable="false" role="presentation">
+                                            <g class="focus-glyph__embers">
+                                                <circle cx="16" cy="34" r="1.8" />
+                                                <circle cx="24" cy="36" r="1.4" style="animation-delay: 0.9s" />
+                                                <circle cx="32" cy="34" r="1.6" style="animation-delay: 1.7s" />
+                                            </g>
+                                            <path class="focus-glyph__flame"
+                                                d="M24 40c-6.6 0-11-4.3-11-10.4 0-7.4 6.3-11.6 8.1-21.6 4.9 3.6 6.6 8.2 6.6 11.7 1.5-1.2 2.4-3 2.6-5.3 3.1 3.4 4.7 8 4.7 12.6C35 35.4 30.6 40 24 40Z" />
+                                            <path class="focus-glyph__flame-core"
+                                                d="M24 36c-3.3 0-5.6-2.2-5.6-5.4 0-3.7 3.4-5.8 4.5-10.3 2.9 2.7 6.7 6 6.7 10.3 0 3.2-2.3 5.4-5.6 5.4Z" />
+                                        </svg>
+                                    </span>
                                     <div>
                                         <h4>Environmental AI</h4>
                                         <p>Creating Vision-Language Models for early wildfire detection and
@@ -433,7 +570,16 @@
                                     </div>
                                 </div>
                                 <div class="focus-item">
-                                    <i class="fas fa-microscope"></i>
+                                    <!-- Heartbeat trace under a sweeping scan line: medical image analysis -->
+                                    <span class="focus-glyph focus-glyph--scan" aria-hidden="true">
+                                        <svg viewBox="0 0 48 48" focusable="false" role="presentation">
+                                            <rect class="focus-glyph__monitor" x="5" y="9" width="38" height="30"
+                                                rx="5" />
+                                            <path class="focus-glyph__trace" pathLength="100"
+                                                d="M10 26h6l3-7 4 14 3-9 2 2h10" />
+                                            <line class="focus-glyph__scanline" x1="6" y1="10" x2="42" y2="10" />
+                                        </svg>
+                                    </span>
                                     <div>
                                         <h4>Medical AI</h4>
                                         <p>Advancing deep learning techniques for medical image analysis and diagnosis
@@ -447,6 +593,14 @@
                 </div>
             </div>
         </section>
+
+        <!-- Vitals divider: decorative section break on the medical theme -->
+        <div class="vitals-divider" aria-hidden="true">
+            <svg viewBox="0 0 1200 60" preserveAspectRatio="none" focusable="false" role="presentation">
+                <path class="vitals-divider__base" pathLength="1200" d="M0 30 h100 l10 -4 l8 4 h22 l8 2 l8 -22 l8 24 l8 -4 h28 l14 -6 l14 6 h72 h100 l10 -4 l8 4 h22 l8 2 l8 -22 l8 24 l8 -4 h28 l14 -6 l14 6 h72 h100 l10 -4 l8 4 h22 l8 2 l8 -22 l8 24 l8 -4 h28 l14 -6 l14 6 h72 h100 l10 -4 l8 4 h22 l8 2 l8 -22 l8 24 l8 -4 h28 l14 -6 l14 6 h72" />
+                <path class="vitals-divider__sweep" pathLength="1200" d="M0 30 h100 l10 -4 l8 4 h22 l8 2 l8 -22 l8 24 l8 -4 h28 l14 -6 l14 6 h72 h100 l10 -4 l8 4 h22 l8 2 l8 -22 l8 24 l8 -4 h28 l14 -6 l14 6 h72 h100 l10 -4 l8 4 h22 l8 2 l8 -22 l8 24 l8 -4 h28 l14 -6 l14 6 h72 h100 l10 -4 l8 4 h22 l8 2 l8 -22 l8 24 l8 -4 h28 l14 -6 l14 6 h72" />
+            </svg>
+        </div>
 
         <!-- Education Section -->
         <section id="education" class="section section-alt">
