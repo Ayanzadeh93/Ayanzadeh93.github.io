@@ -22,20 +22,32 @@ function escapeHtml(value) {
 
 window.escapeHtml = escapeHtml;
 
+// Pages share this bundle but not their markup, so isolate each module: a
+// failure in one must not stop the rest from initialising.
+function runInit(name, fn) {
+    try {
+        fn();
+    } catch (error) {
+        console.error(`Failed to initialize ${name}:`, error);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize all components
-    initMobileMenu();
-    initSmoothScrolling();
-    initIntersectionObserver();
-    initFormValidation();
-    initLoadingStates();
-    initLazyLoading();
-    initPerformanceOptimizations();
-    initAccessibilityFeatures();
-    initNavbarScroll();
-    initThemeToggle();
-    initBackToTop();
-    initReadingProgress();
+    [
+        ['mobile menu', initMobileMenu],
+        ['smooth scrolling', initSmoothScrolling],
+        ['scroll reveal', initIntersectionObserver],
+        ['form validation', initFormValidation],
+        ['loading states', initLoadingStates],
+        ['lazy loading', initLazyLoading],
+        ['performance optimizations', initPerformanceOptimizations],
+        ['accessibility features', initAccessibilityFeatures],
+        ['navbar scroll', initNavbarScroll],
+        ['theme toggle', initThemeToggle],
+        ['back to top', initBackToTop],
+        ['reading progress', initReadingProgress]
+    ].forEach(([name, fn]) => runInit(name, fn));
+
     hideLoadingOverlay();
 });
 

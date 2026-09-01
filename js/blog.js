@@ -1,11 +1,21 @@
 // Blog listing and article behaviour: browsing, newsletter, sharing, code copy
 
 document.addEventListener('DOMContentLoaded', function () {
-    initPostBrowsing();
-    initPostAnimations();
-    initNewsletterForm();
-    initSocialSharing();
-    initTableOfContents();
+    // The listing and article pages share this file, so isolate each module.
+    [
+        ['post browsing', initPostBrowsing],
+        ['post animations', initPostAnimations],
+        ['newsletter form', initNewsletterForm],
+        ['social sharing', initSocialSharing],
+        ['table of contents', initTableOfContents]
+    ].forEach(([name, fn]) => {
+        try {
+            fn();
+        } catch (error) {
+            console.error(`Failed to initialize ${name}:`, error);
+        }
+    });
+
     hideLoadingOverlay();
 });
 

@@ -553,6 +553,9 @@ html {
     gap: 48px;
     max-width: 1100px;
     margin: 0 auto;
+    /* Grid items stretch by default, which leaves position: sticky on the
+       sidebar no room to travel. */
+    align-items: start;
 }
 
 .post-main-content {
@@ -760,8 +763,16 @@ html {
 /* Sidebar */
 .post-sidebar {
     position: sticky;
-    top: 100px;
+    top: calc(var(--nav-height) + 24px);
     height: fit-content;
+    max-height: calc(100vh - var(--nav-height) - 48px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.toc-nav a.active {
+    color: var(--primary-color);
+    font-weight: 600;
 }
 
 .sidebar-widget {
