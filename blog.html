@@ -45,6 +45,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://formspree.io">
 
     <!-- Apply the saved (or system) theme before first paint to avoid a light-mode flash -->
     <script>
@@ -378,10 +379,12 @@
                 <div class="newsletter-content">
                     <h2>Stay Updated</h2>
                     <p>Subscribe to get notified about new blog posts and research updates</p>
-                    <form id="newsletterForm" class="newsletter-form">
+                    <form id="newsletterForm" class="newsletter-form"
+                        action="https://formspree.io/f/xzdkodzv" method="POST">
                         <label for="newsletter-email" class="sr-only">Email address</label>
-                        <input type="email" id="newsletter-email" placeholder="Enter your email address" required
-                            autocomplete="email">
+                        <input type="email" id="newsletter-email" name="email"
+                            placeholder="Enter your email address" required autocomplete="email">
+                        <input type="hidden" name="_subject" value="Blog newsletter signup">
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-paper-plane" aria-hidden="true"></i> Subscribe
                         </button>

@@ -256,23 +256,38 @@ function submitNewsletter(form) {
     submitButton.disabled = true;
     submitButton.setAttribute('aria-busy', 'true');
 
-    // No newsletter backend is wired up yet, so point people at email instead of
-    // implying a subscription was stored.
-    setTimeout(() => {
+    function finish(message, type, announcement) {
         submitButton.innerHTML = originalText;
         submitButton.disabled = false;
         submitButton.setAttribute('aria-busy', 'false');
 
-        showFormMessage(
-            form,
-            'Subscriptions are not automated yet — email a.ayanzadeh@gmail.com and you will be added to the list.',
-            'success'
-        );
+        showFormMessage(form, message, type);
 
         if (window.announceToScreenReader) {
-            window.announceToScreenReader('Newsletter signup is handled by email');
+            window.announceToScreenReader(announcement);
         }
-    }, 600);
+    }
+
+    fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { Accept: 'application/json' }
+    }).then(response => {
+        if (!response.ok) throw new Error(`Request failed with status ${response.status}`);
+
+        form.reset();
+        finish(
+            'Thank you for subscribing! Please confirm via the email you receive.',
+            'success',
+            'Successfully subscribed to the newsletter'
+        );
+    }).catch(() => {
+        finish(
+            'Subscription could not be sent right now. Please email a.ayanzadeh@gmail.com instead.',
+            'error',
+            'Subscription failed, please use email instead'
+        );
+    });
 }
 
 /* ========================================
@@ -330,7 +345,7 @@ function showFormMessage(form, message, type) {
     const messageElement = document.createElement('div');
     messageElement.className = `form-message ${type}-message`;
     messageElement.textContent = message;
-    messageElement.setAttribute('role', 'status');
+    messageElement.setAttribute('role', type === 'error' ? 'alert' : 'status');
 
     form.insertBefore(messageElement, form.firstChild);
 
