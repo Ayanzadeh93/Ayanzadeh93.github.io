@@ -5754,10 +5754,11 @@ img[loading="lazy"].loaded {
    affordances used on every page
    ======================================== */
 
+/* Sits above the fixed accessibility toggle, which occupies bottom: 24px */
 .back-to-top {
     position: fixed;
-    right: 24px;
-    bottom: 24px;
+    right: 27px;
+    bottom: 86px;
     width: 44px;
     height: 44px;
     display: flex;
@@ -5769,15 +5770,18 @@ img[loading="lazy"].loaded {
     color: var(--text-medium);
     box-shadow: var(--shadow-md);
     cursor: pointer;
-    z-index: 1002;
+    z-index: 10002;
     opacity: 0;
+    visibility: hidden;
     transform: translateY(8px);
     transition: opacity 0.25s var(--ease-out-soft), transform 0.25s var(--ease-out-soft),
-        background-color 0.2s ease, color 0.2s ease;
+        visibility 0.25s linear, background-color 0.2s ease, color 0.2s ease;
 }
 
+/* Keep the control out of the tab order until it is actually on screen */
 .back-to-top.is-visible {
     opacity: 1;
+    visibility: visible;
     transform: translateY(0);
 }
 
@@ -5809,7 +5813,14 @@ img[loading="lazy"].loaded {
 
 @media (max-width: 480px) {
     .back-to-top {
-        right: 16px;
-        bottom: 16px;
+        right: 19px;
+        bottom: 78px;
+    }
+}
+
+/* The floating controls overlap content on very short viewports */
+@media (max-height: 480px) {
+    .back-to-top {
+        display: none;
     }
 }
