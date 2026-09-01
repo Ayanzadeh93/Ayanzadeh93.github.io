@@ -34,8 +34,68 @@ document.addEventListener('DOMContentLoaded', function() {
     initAccessibilityFeatures();
     initNavbarScroll();
     initThemeToggle();
+    initBackToTop();
+    initReadingProgress();
     hideLoadingOverlay();
 });
+
+// Floating scroll-to-top control
+function initBackToTop() {
+    const button = document.getElementById('backToTop');
+    if (!button) return;
+
+    const SHOW_AFTER = 400;
+
+    button.hidden = false;
+
+    function syncVisibility() {
+        button.classList.toggle('is-visible', window.scrollY > SHOW_AFTER);
+    }
+
+    window.addEventListener('scroll', syncVisibility, { passive: true });
+    syncVisibility();
+
+    button.addEventListener('click', () => {
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+    });
+}
+
+// Reading progress indicator for long-form article pages
+function initReadingProgress() {
+    const bar = document.getElementById('readingProgressBar');
+    const article = document.querySelector('.blog-post-article');
+    if (!bar || !article) return;
+
+    const track = bar.parentElement;
+    let frame = null;
+
+    function update() {
+        frame = null;
+
+        const articleHeight = article.scrollHeight - window.innerHeight;
+        const scrolled = window.scrollY - article.offsetTop;
+        const percent = articleHeight > 0
+            ? Math.min(100, Math.max(0, (scrolled / articleHeight) * 100))
+            : 0;
+
+        bar.style.width = `${percent}%`;
+
+        if (track) {
+            track.setAttribute('aria-valuenow', String(Math.round(percent)));
+        }
+    }
+
+    function requestUpdate() {
+        if (frame === null) {
+            frame = window.requestAnimationFrame(update);
+        }
+    }
+
+    window.addEventListener('scroll', requestUpdate, { passive: true });
+    window.addEventListener('resize', requestUpdate, { passive: true });
+    update();
+}
 
 // Navbar scroll effect
 function initNavbarScroll() {
@@ -106,6 +166,38 @@ function initThemeToggle() {
             localStorage.setItem('theme', newTheme);
         } catch (error) {
             // Ignore storage errors and continue with in-memory theme state.
+        }
+
+        if (window.announceToScreenReader) {
+            window.announceToScreenReader(`${newTheme === 'dark' ? 'Dark' : 'Light'} theme enabled`);
+        }
+    });
+
+    // Track the system preference until the visitor makes an explicit choice
+    if (!savedTheme && window.matchMedia) {
+        const systemPreference = window.matchMedia('(prefers-color-scheme: dark)');
+        const followSystem = (event) => {
+            let hasChoice = false;
+            try {
+                hasChoice = Boolean(localStorage.getItem('theme'));
+            } catch (error) {
+                hasChoice = false;
+            }
+
+            if (!hasChoice) {
+                applyTheme(event.matches ? 'dark' : 'light');
+            }
+        };
+
+        if (typeof systemPreference.addEventListener === 'function') {
+            systemPreference.addEventListener('change', followSystem);
+        }
+    }
+
+    // Keep the theme consistent across open tabs
+    window.addEventListener('storage', (event) => {
+        if (event.key === 'theme' && event.newValue) {
+            applyTheme(event.newValue === 'dark' ? 'dark' : 'light');
         }
     });
 }

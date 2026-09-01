@@ -46,6 +46,17 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 
+    <!-- Apply the saved (or system) theme before first paint to avoid a light-mode flash -->
+    <script>
+        (function () {
+            var saved = null;
+            try { saved = localStorage.getItem('theme'); } catch (e) { /* storage unavailable */ }
+            var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            var dark = saved === 'dark' || (!saved && prefersDark);
+            document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+        })();
+    </script>
+
     <!-- Stylesheets -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/blog.css">
@@ -93,13 +104,24 @@
             <div class="nav-brand">
                 <a href="index.html" class="brand-link"><span class="brand-text">Aydin Ayanzadeh</span></a>
             </div>
-            <ul class="top-nav-menu">
+            <ul class="top-nav-menu" id="top-nav-menu">
+                <li><a href="index.html" class="top-nav-link"><i class="fas fa-home" aria-hidden="true"></i>
+                        Home</a></li>
                 <li><a href="blog.html" class="top-nav-link active"><i class="fas fa-blog" aria-hidden="true"></i>
                         Blog</a></li>
+                <li><a href="index.html#publications" class="top-nav-link"><i class="fas fa-book"
+                            aria-hidden="true"></i>
+                        Publications</a></li>
                 <li><a href="index.html#contact" class="top-nav-link"><i class="fas fa-envelope" aria-hidden="true"></i>
                         Contact</a></li>
+                <li>
+                    <button id="theme-toggle" class="top-nav-link theme-toggle-btn" aria-label="Switch to dark theme">
+                        <i class="fas fa-moon" aria-hidden="true"></i> <span>Theme</span>
+                    </button>
+                </li>
             </ul>
-            <button class="mobile-menu-toggle" aria-label="Toggle mobile navigation menu" aria-expanded="false">
+            <button class="mobile-menu-toggle" aria-label="Toggle mobile navigation menu" aria-expanded="false"
+                aria-controls="top-nav-menu">
                 <span aria-hidden="true"></span>
                 <span aria-hidden="true"></span>
                 <span aria-hidden="true"></span>
@@ -144,12 +166,39 @@
         <!-- Blog Posts -->
         <section class="blog-posts">
             <div class="container">
+                <!-- Search & category filters -->
+                <div class="blog-toolbar">
+                    <div class="blog-search" role="search">
+                        <label for="blog-search-input" class="sr-only">Search blog posts</label>
+                        <i class="fas fa-search search-icon" aria-hidden="true"></i>
+                        <input type="search" id="blog-search-input" class="search-input"
+                            placeholder="Search posts by title, topic, or tag&hellip;" autocomplete="off">
+                        <button type="button" class="search-clear" aria-label="Clear search" hidden>
+                            <i class="fas fa-times" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    <div class="blog-filters" role="group" aria-label="Filter posts by category">
+                        <button type="button" class="filter-btn active" data-filter="all"
+                            aria-pressed="true">All</button>
+                        <button type="button" class="filter-btn" data-filter="medical-ai"
+                            aria-pressed="false">Medical AI</button>
+                        <button type="button" class="filter-btn" data-filter="graph-learning"
+                            aria-pressed="false">Graph Learning</button>
+                        <button type="button" class="filter-btn" data-filter="optimization"
+                            aria-pressed="false">Optimization</button>
+                        <button type="button" class="filter-btn" data-filter="career"
+                            aria-pressed="false">Career</button>
+                    </div>
+                </div>
+
+                <p class="search-results" role="status" aria-live="polite" hidden></p>
+
                 <div class="blog-grid">
                     <!-- Featured Post -->
-                    <article class="blog-post featured">
+                    <article class="blog-post featured" data-category="medical-ai">
                         <div class="post-image">
                             <div class="post-image-placeholder">
-                                <i class="fas fa-brain"></i>
+                                <i class="fas fa-brain" aria-hidden="true"></i>
                             </div>
                             <div class="post-category">Featured</div>
                         </div>
@@ -175,11 +224,12 @@
                     </article>
 
                     <!-- Regular Posts -->
-                    <article class="blog-post">
+                    <article class="blog-post" data-category="graph-learning">
                         <div class="post-image">
                             <div class="post-image-placeholder">
-                                <i class="fas fa-project-diagram"></i>
+                                <i class="fas fa-project-diagram" aria-hidden="true"></i>
                             </div>
+                            <div class="post-category">Graph Learning</div>
                         </div>
                         <div class="post-content">
                             <div class="post-meta">
@@ -200,11 +250,12 @@
                         </div>
                     </article>
 
-                    <article class="blog-post">
+                    <article class="blog-post" data-category="medical-ai">
                         <div class="post-image">
                             <div class="post-image-placeholder">
-                                <i class="fas fa-microscope"></i>
+                                <i class="fas fa-microscope" aria-hidden="true"></i>
                             </div>
+                            <div class="post-category">Medical AI</div>
                         </div>
                         <div class="post-content">
                             <div class="post-meta">
@@ -226,11 +277,12 @@
                         </div>
                     </article>
 
-                    <article class="blog-post">
+                    <article class="blog-post" data-category="optimization">
                         <div class="post-image">
                             <div class="post-image-placeholder">
-                                <i class="fas fa-microchip"></i>
+                                <i class="fas fa-microchip" aria-hidden="true"></i>
                             </div>
+                            <div class="post-category">Optimization</div>
                         </div>
                         <div class="post-content">
                             <div class="post-meta">
@@ -252,11 +304,12 @@
                         </div>
                     </article>
 
-                    <article class="blog-post">
+                    <article class="blog-post" data-category="optimization">
                         <div class="post-image">
                             <div class="post-image-placeholder">
-                                <i class="fas fa-compress-arrows-alt"></i>
+                                <i class="fas fa-compress-arrows-alt" aria-hidden="true"></i>
                             </div>
+                            <div class="post-category">Optimization</div>
                         </div>
                         <div class="post-content">
                             <div class="post-meta">
@@ -279,11 +332,12 @@
                         </div>
                     </article>
 
-                    <article class="blog-post">
+                    <article class="blog-post" data-category="career">
                         <div class="post-image">
                             <div class="post-image-placeholder">
-                                <i class="fas fa-route"></i>
+                                <i class="fas fa-route" aria-hidden="true"></i>
                             </div>
+                            <div class="post-category">Career</div>
                         </div>
                         <div class="post-content">
                             <div class="post-meta">
@@ -306,10 +360,13 @@
                     </article>
                 </div>
 
-                <!-- Load More Button -->
-                <div class="load-more-section">
-                    <button class="btn btn-primary load-more-btn">
-                        <i class="fas fa-plus"></i> Load More Posts
+                <!-- Empty state shown when a search or filter matches nothing -->
+                <div class="blog-empty-state" hidden>
+                    <i class="fas fa-folder-open" aria-hidden="true"></i>
+                    <h2>No posts found</h2>
+                    <p>Try a different keyword or clear the filters to see all posts.</p>
+                    <button type="button" class="btn btn-secondary blog-reset-btn">
+                        <i class="fas fa-rotate-left" aria-hidden="true"></i> Reset filters
                     </button>
                 </div>
             </div>
@@ -350,6 +407,10 @@
             </div>
         </div>
     </footer>
+
+    <button type="button" id="backToTop" class="back-to-top" aria-label="Back to top" hidden>
+        <i class="fas fa-arrow-up" aria-hidden="true"></i>
+    </button>
 
     <script src="js/main.js"></script>
     <script src="js/blog.js"></script>

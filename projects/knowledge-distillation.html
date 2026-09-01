@@ -9,6 +9,18 @@
     <meta name="description" content="Novel hint-based knowledge distillation framework achieving 2.5x model compression with minimal accuracy loss.">
     <link rel="canonical" href="https://ayanzadeh93.github.io/projects/knowledge-distillation.html">
     <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+
+    <!-- Apply the saved (or system) theme before first paint to avoid a light-mode flash -->
+    <script>
+        (function () {
+            var saved = null;
+            try { saved = localStorage.getItem('theme'); } catch (e) { /* storage unavailable */ }
+            var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            var dark = saved === 'dark' || (!saved && prefersDark);
+            document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+        })();
+    </script>
+
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="../css/project.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -28,6 +40,9 @@
             <div class="nav-links">
                 <a href="../index.html#projects">All Projects</a>
                 <a href="../index.html#contact">Contact</a>
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Switch to dark theme">
+                    <i class="fas fa-moon" aria-hidden="true"></i> <span>Theme</span>
+                </button>
             </div>
         </div>
     </nav>
@@ -208,6 +223,10 @@
             </div>
         </div>
     </footer>
+
+    <button type="button" id="backToTop" class="back-to-top" aria-label="Back to top" hidden>
+        <i class="fas fa-arrow-up" aria-hidden="true"></i>
+    </button>
 
     <script src="../js/main.js"></script>
 </body>

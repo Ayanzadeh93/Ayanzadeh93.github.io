@@ -39,6 +39,17 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 
+    <!-- Apply the saved (or system) theme before first paint to avoid a light-mode flash -->
+    <script>
+        (function () {
+            var saved = null;
+            try { saved = localStorage.getItem('theme'); } catch (e) { /* storage unavailable */ }
+            var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            var dark = saved === 'dark' || (!saved && prefersDark);
+            document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+        })();
+    </script>
+
     <!-- Stylesheets -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/blog.css">
@@ -98,7 +109,7 @@
                     <span class="brand-text">Aydin Ayanzadeh</span>
                 </a>
             </div>
-            <ul class="top-nav-menu">
+            <ul class="top-nav-menu" id="top-nav-menu">
                 <li><a href="index.html" class="top-nav-link"><i class="fas fa-home"></i> <span>Home</span></a></li>
                 <li><a href="blog.html" class="top-nav-link active"><i class="fas fa-blog"></i> <span>Blog</span></a>
                 </li>
@@ -106,12 +117,22 @@
                         <span>Publications</span></a></li>
                 <li><a href="index.html#contact" class="top-nav-link"><i class="fas fa-envelope"></i>
                         <span>Contact</span></a></li>
+                <li>
+                    <button id="theme-toggle" class="top-nav-link theme-toggle-btn" aria-label="Switch to dark theme">
+                        <i class="fas fa-moon" aria-hidden="true"></i> <span>Theme</span>
+                    </button>
+                </li>
             </ul>
-            <button class="mobile-menu-toggle" aria-label="Toggle mobile navigation menu" aria-expanded="false">
+            <button class="mobile-menu-toggle" aria-label="Toggle mobile navigation menu" aria-expanded="false"
+                aria-controls="top-nav-menu">
                 <span></span>
                 <span></span>
                 <span></span>
             </button>
+        </div>
+        <div class="reading-progress" role="progressbar" aria-label="Article reading progress" aria-valuemin="0"
+            aria-valuemax="100" aria-valuenow="0">
+            <div class="reading-progress-bar" id="readingProgressBar"></div>
         </div>
     </nav>
 
@@ -465,6 +486,10 @@
             </div>
         </div>
     </footer>
+
+    <button type="button" id="backToTop" class="back-to-top" aria-label="Back to top" hidden>
+        <i class="fas fa-arrow-up" aria-hidden="true"></i>
+    </button>
 
     <script src="js/main.js"></script>
     <script src="js/blog.js"></script>

@@ -38,20 +38,39 @@
     --hero-aurora-strong: rgba(59, 130, 246, 0.45);
 }
 
+/* Dark palette: a single slate-based scale shared by the manual toggle and,
+   via the no-JS fallback below, the operating system preference. */
+:root[data-theme="dark"],
+:root:not([data-theme]) {
+    --dark-surface-base: #0f1729;
+    --dark-surface-raised: #16203a;
+    --dark-surface-card: #1b2540;
+    --dark-text-strong: #e9eef7;
+    --dark-text-body: #b3c0d6;
+    --dark-text-muted: #8996ae;
+    --dark-border: #2b3855;
+    --dark-border-subtle: #1f2942;
+}
+
 :root[data-theme="dark"] {
-    --background-white: #1a1a1a;
-    --background-light: #242424;
-    --background-alt: #1e293b;
-    --text-dark: #f1f5f9;
-    --text-medium: #cbd5e1;
-    --text-light: #94a3b8;
-    --border-color: #334155;
-    --border-light: #1e293b;
-    --nav-bg: rgba(26, 26, 26, 0.9);
-    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    --surface-glass: rgba(30, 41, 59, 0.85);
-    --surface-glass-alt: rgba(15, 23, 42, 0.9);
-    --surface-border: rgba(51, 65, 85, 0.75);
+    --background-white: var(--dark-surface-base);
+    --background-light: var(--dark-surface-raised);
+    --background-alt: var(--dark-surface-card);
+    --text-dark: var(--dark-text-strong);
+    --text-medium: var(--dark-text-body);
+    --text-light: var(--dark-text-muted);
+    --border-color: var(--dark-border);
+    --border-light: var(--dark-border-subtle);
+    --nav-bg: rgba(15, 23, 41, 0.92);
+    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.55), 0 4px 6px -4px rgba(0, 0, 0, 0.45);
+    --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+    --accent-soft: rgba(96, 165, 250, 0.16);
+    --surface-glass: rgba(27, 37, 64, 0.85);
+    --surface-glass-alt: rgba(15, 23, 41, 0.9);
+    --surface-border: rgba(43, 56, 85, 0.75);
 }
 
 /* ========================================
@@ -297,18 +316,28 @@
     color: white;
 }
 
+/* No-JS fallback. Pages set data-theme before first paint, so this only
+   applies when that script could not run. */
 @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-        --background-white: #1a1a1a;
-        --background-light: #242424;
-        --background-alt: #1e293b;
-        --text-dark: #f1f5f9;
-        --text-medium: #cbd5e1;
-        --text-light: #94a3b8;
-        --border-color: #334155;
-        --border-light: #1e293b;
-        --nav-bg: rgba(26, 26, 26, 0.9);
-        --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    :root:not([data-theme]) {
+        --background-white: var(--dark-surface-base);
+        --background-light: var(--dark-surface-raised);
+        --background-alt: var(--dark-surface-card);
+        --text-dark: var(--dark-text-strong);
+        --text-medium: var(--dark-text-body);
+        --text-light: var(--dark-text-muted);
+        --border-color: var(--dark-border);
+        --border-light: var(--dark-border-subtle);
+        --nav-bg: rgba(15, 23, 41, 0.92);
+        --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+        --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+        --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.55), 0 4px 6px -4px rgba(0, 0, 0, 0.45);
+        --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+        --accent-soft: rgba(96, 165, 250, 0.16);
+        --surface-glass: rgba(27, 37, 64, 0.85);
+        --surface-glass-alt: rgba(15, 23, 41, 0.9);
+        --surface-border: rgba(43, 56, 85, 0.75);
     }
 }
 
@@ -4268,273 +4297,9 @@ textarea,
     }
 }
 
-/* Dark mode support (system preference) — only applies when user hasn't explicitly chosen light */
-@media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-        --text-dark: #f8f9fa;
-        --text-medium: #ced4da;
-        --text-light: #adb5bd;
-        --background-light: #1a1d23;
-        --background-white: #212529;
-        --background-alt: #2b3035;
-        --border-color: #3d4349;
-        --border-light: #343a40;
-        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-        --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
-        --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
-        --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
-    }
-
-    body {
-        background-color: var(--background-light);
-        color: var(--text-dark);
-    }
-
-    /* Navigation */
-    .top-navbar {
-        background: rgba(33, 37, 41, 0.98);
-        border-bottom: 1px solid var(--border-color);
-    }
-
-    .mobile-menu-toggle span {
-        background: var(--text-dark);
-    }
-
-    /* Hero section */
-    .hero {
-        background: linear-gradient(135deg, #0f1419 0%, #1a1d23 50%, #212529 100%);
-    }
-
-    /* Sections */
-    .section {
-        background-color: var(--background-white);
-    }
-
-    .section-alt {
-        background-color: var(--background-alt);
-    }
-
-    /* Cards and content boxes */
-    .timeline-content,
-    .experience-card,
-    .publication-item,
-    .award-item,
-    .contact-card,
-    .project-card,
-    .news-card,
-    .sidebar-card,
-    .blog-post,
-    .feature-card,
-    .approach-item,
-    .focus-item,
-    .mentoring-item,
-    .course-item,
-    .teaching-item,
-    .teaching-philosophy,
-    .achievement-item,
-    .research-statement {
-        background: var(--background-alt) !important;
-        color: var(--text-dark);
-        border-color: var(--border-color);
-    }
-
-    /* Remove gradient backgrounds in dark mode */
-    .focus-item,
-    .approach-item,
-    .teaching-philosophy,
-    .achievement-item {
-        background: var(--background-alt) !important;
-    }
-
-    /* Award items */
-    .award-item,
-    .featured-award {
-        background: var(--background-alt) !important;
-    }
-
-    /* Project items */
-    .project-item,
-    .project-badge-container {
-        background: var(--background-alt) !important;
-    }
-
-    /* Reviewer section */
-    .journal-item,
-    .reviewer-category {
-        background: transparent !important;
-    }
-
-    /* Modals and popups */
-    .modal-content,
-    .modal-body {
-        background: var(--background-alt) !important;
-        color: var(--text-dark);
-    }
-
-    .modal-backdrop {
-        background: rgba(0, 0, 0, 0.8) !important;
-    }
-
-    /* Tags and badges */
-    .tag,
-    .skill-tag,
-    .tech-tag,
-    .expertise-tag {
-        background: rgba(37, 99, 235, 0.3);
-        color: #6ea8fe;
-        border-color: rgba(37, 99, 235, 0.4);
-    }
-
-    /* Forms */
-    .form-field input,
-    .form-field textarea,
-    .form-field select {
-        background: var(--background-alt);
-        color: var(--text-dark);
-        border-color: var(--border-color);
-    }
-
-    .form-field input:focus,
-    .form-field textarea:focus,
-    .form-field select:focus {
-        background: var(--background-white);
-        border-color: var(--primary-color);
-    }
-
-    /* Links */
-    .pub-link,
-    .paper-link {
-        background: var(--background-alt);
-        color: var(--text-dark);
-        border-color: var(--border-color);
-    }
-
-    .pub-link:hover,
-    .paper-link:hover {
-        background: var(--background-light);
-        border-color: var(--primary-color);
-    }
-
-    /* Tables */
-    .results-table th {
-        background: var(--background-alt);
-        color: var(--text-dark);
-    }
-
-    .results-table td {
-        border-color: var(--border-color);
-    }
-
-    /* Code blocks */
-    .code-block {
-        background: #0d1117;
-    }
-
-    .code-header {
-        background: #010409;
-    }
-
-    /* Info boxes */
-    .info-box {
-        background: rgba(37, 99, 235, 0.1);
-        border-color: rgba(37, 99, 235, 0.3);
-    }
-
-    /* Newsletter */
-    .newsletter-form input {
-        background: var(--background-alt);
-        color: var(--text-dark);
-    }
-
-    /* Certificates */
-    .certificates {
-        background-color: var(--background-alt) !important;
-        color: var(--text-dark);
-        border: 1px solid var(--border-color);
-    }
-
-    .certificates h3 {
-        color: var(--text-dark);
-    }
-
-    .certificates li {
-        color: var(--text-medium);
-    }
-
-    /* Contact section */
-    .contact-section {
-        background: var(--background-white) !important;
-    }
-
-    .section-subtitle-modern {
-        color: var(--text-light);
-    }
-
-    /* Contact form */
-    .contact-main-form {
-        background: var(--background-alt) !important;
-        border-color: var(--border-color);
-    }
-
-    .elegant-form label {
-        color: var(--text-dark);
-    }
-
-    .elegant-form input,
-    .elegant-form textarea {
-        background: var(--background-white);
-        color: var(--text-dark);
-        border-color: var(--border-color);
-    }
-
-    .elegant-form input::placeholder,
-    .elegant-form textarea::placeholder {
-        color: var(--text-light);
-    }
-
-    .elegant-form input:focus,
-    .elegant-form textarea:focus {
-        background: var(--background-alt);
-        border-color: var(--primary-color);
-    }
-
-    /* Sidebar cards */
-    .sidebar-card {
-        background: var(--background-alt) !important;
-        border-color: var(--border-color) !important;
-    }
-
-    .sidebar-card h3 {
-        color: var(--text-dark);
-        border-bottom-color: var(--border-color);
-    }
-
-    .detail-label {
-        color: var(--text-light);
-    }
-
-    .detail-content span,
-    .detail-content a {
-        color: var(--text-dark);
-    }
-
-    /* Social card */
-    .social-card-simple {
-        background: var(--background-alt) !important;
-        border-color: var(--border-color) !important;
-    }
-
-    .social-card-simple h3 {
-        color: var(--text-dark);
-        border-bottom-color: var(--border-color);
-    }
-
-    /* Footer */
-    .footer {
-        background: var(--background-alt);
-        border-top: 1px solid var(--border-color);
-    }
-}
+/* System-preference dark styling is handled by the consolidated token block
+   near the top of this file; the per-element duplicates that used to live here
+   were removed because [data-theme="dark"] already covers every surface. */
 
 /* Image optimization and lazy loading */
 img {
@@ -5980,98 +5745,71 @@ img[loading="lazy"].loaded {
     }
 }
 
+/* The light theme is the base cascade, so no explicit reset block is needed:
+   dark tokens now apply only under [data-theme="dark"] or the no-JS fallback. */
+
 /* ========================================
-   LIGHT THEME EXPLICIT RESET
-   Overrides prefers-color-scheme: dark when
-   user has explicitly chosen the light theme.
-   These selectors have higher specificity (0,2,0)
-   than the media query rules (0,1,0).
+   SHARED UI CONTROLS
+   Back-to-top button and theme toggle
+   affordances used on every page
    ======================================== */
 
-[data-theme="light"] {
-    --background-white: #ffffff;
-    --background-light: #f8fafc;
-    --background-alt: #f1f5f9;
-    --text-dark: #0f172a;
-    --text-medium: #475569;
-    --text-light: #64748b;
-    --border-color: #e2e8f0;
-    --border-light: #f1f5f9;
+.back-to-top {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    background: var(--background-white);
+    color: var(--text-medium);
+    box-shadow: var(--shadow-md);
+    cursor: pointer;
+    z-index: 1002;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.25s var(--ease-out-soft), transform 0.25s var(--ease-out-soft),
+        background-color 0.2s ease, color 0.2s ease;
 }
 
-[data-theme="light"] .top-navbar {
-    background: rgba(255, 255, 255, 0.98);
-    border-bottom-color: var(--border-color);
+.back-to-top.is-visible {
+    opacity: 1;
+    transform: translateY(0);
 }
 
-[data-theme="light"] .top-nav-menu {
-    background: white;
+.back-to-top:hover {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #fff;
 }
 
-[data-theme="light"] .section {
-    background-color: var(--background-white);
+.back-to-top[hidden] {
+    display: none;
 }
 
-[data-theme="light"] .section-alt {
-    background-color: var(--background-alt);
+/* Theme toggle stays reachable in the collapsed project navigation */
+.theme-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-medium);
+    font-weight: 500;
+    border-radius: 8px;
+    transition: color 0.2s ease, background-color 0.2s ease;
 }
 
-[data-theme="light"] .timeline-content,
-[data-theme="light"] .experience-card,
-[data-theme="light"] .publication-item,
-[data-theme="light"] .award-item,
-[data-theme="light"] .project-card,
-[data-theme="light"] .project-card-body,
-[data-theme="light"] .news-card,
-[data-theme="light"] .current-focus,
-[data-theme="light"] .research-approach,
-[data-theme="light"] .teaching-philosophy,
-[data-theme="light"] .course-item,
-[data-theme="light"] .mentoring-item,
-[data-theme="light"] .featured-paper-card {
-    background: var(--background-white) !important;
-    color: var(--text-dark);
-    border-color: var(--border-color);
+.theme-toggle-btn:hover {
+    color: var(--primary-color);
+    background: var(--accent-soft);
 }
 
-[data-theme="light"] .focus-item,
-[data-theme="light"] .approach-item,
-[data-theme="light"] .achievement-item,
-[data-theme="light"] .research-statement {
-    background: linear-gradient(135deg, #f8fafb 0%, #ffffff 100%) !important;
-    color: var(--text-dark);
-}
-
-[data-theme="light"] .contact-section {
-    background: #ffffff !important;
-}
-
-[data-theme="light"] .contact-main-form {
-    background: white !important;
-    border-color: var(--border-color);
-}
-
-[data-theme="light"] .elegant-form label { color: #1e293b; }
-
-[data-theme="light"] .elegant-form input,
-[data-theme="light"] .elegant-form textarea {
-    background: #fafbfc;
-    color: #1e293b;
-    border-color: #e2e8f0;
-}
-
-[data-theme="light"] .sidebar-card {
-    background: white !important;
-    border-color: #f1f5f9 !important;
-}
-
-[data-theme="light"] .tag,
-[data-theme="light"] .skill-tag {
-    background: var(--background-light);
-    color: var(--text-dark);
-    border-color: var(--border-color);
-}
-
-[data-theme="light"] .footer {
-    background: var(--secondary-color);
+@media (max-width: 480px) {
+    .back-to-top {
+        right: 16px;
+        bottom: 16px;
+    }
 }
