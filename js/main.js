@@ -144,6 +144,9 @@ function initThemeToggle() {
 
     if (!themeToggleBtn) return;
 
+    // Keep the mobile browser chrome in step with the page surface
+    const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+
     const applyTheme = (theme) => {
         const isDark = theme === 'dark';
 
@@ -154,6 +157,10 @@ function initThemeToggle() {
         if (themeIcon) {
             themeIcon.classList.toggle('fa-sun', isDark);
             themeIcon.classList.toggle('fa-moon', !isDark);
+        }
+
+        if (themeColorMeta) {
+            themeColorMeta.setAttribute('content', isDark ? '#0f1729' : '#2563eb');
         }
     };
 

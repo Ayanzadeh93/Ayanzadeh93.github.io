@@ -268,11 +268,19 @@ function submitNewsletter(form) {
         }
     }
 
+    // Without a deadline a stalled request leaves the button spinning and the
+    // visitor with no feedback at all.
+    const controller = typeof AbortController === 'function' ? new AbortController() : null;
+    const timeout = controller ? setTimeout(() => controller.abort(), 10000) : null;
+
     fetch(form.action, {
         method: 'POST',
         body: new FormData(form),
-        headers: { Accept: 'application/json' }
+        headers: { Accept: 'application/json' },
+        signal: controller ? controller.signal : undefined
     }).then(response => {
+        if (timeout) clearTimeout(timeout);
+
         if (!response.ok) throw new Error(`Request failed with status ${response.status}`);
 
         form.reset();
@@ -282,6 +290,8 @@ function submitNewsletter(form) {
             'Successfully subscribed to the newsletter'
         );
     }).catch(() => {
+        if (timeout) clearTimeout(timeout);
+
         finish(
             'Subscription could not be sent right now. Please email a.ayanzadeh@gmail.com instead.',
             'error',
@@ -349,7 +359,10 @@ function showFormMessage(form, message, type) {
 
     form.insertBefore(messageElement, form.firstChild);
 
-    setTimeout(() => messageElement.remove(), 8000);
+    // Errors name a fallback email address, so leave them up to be read.
+    if (type !== 'error') {
+        setTimeout(() => messageElement.remove(), 10000);
+    }
 }
 
 /* ========================================
