@@ -50,7 +50,7 @@ const SORT_OPTIONS = [
     { id: 'relevance', label: 'Best match' },
 ];
 
-const DEFAULT_STATE = { q: '', type: 'all', area: 'all', sort: 'newest' };
+const DEFAULT_STATE = { q: '', type: 'all', area: 'all', year: 'all', sort: 'newest' };
 
 class PubExplorer extends HTMLElement {
     /** @type {object[]} */
@@ -390,9 +390,7 @@ class PubExplorer extends HTMLElement {
     }
 
     #toggleYear(year) {
-        const query = this.#state.q === year ? '' : year;
-        this.#searchInput.value = query;
-        this.#update({ q: query, sort: query ? 'relevance' : 'newest' });
+        this.#update({ year: this.#state.year === year ? 'all' : year });
     }
 
     #reset() {
@@ -414,15 +412,21 @@ class PubExplorer extends HTMLElement {
         this.#order(visible);
 
         const render = () => {
-            for (const { record } of scored) {
-                record.element.hidden = true;
+            // Sorting moves the real nodes rather than setting CSS `order`, so
+            // reading order and tab order keep matching what is on screen.
+            const focused = this.#list.contains(document.activeElement) ? document.activeElement : null;
+            const ordered = document.createDocumentFragment();
+
+            for (const { record } of scored) record.element.hidden = true;
+
+            for (const { record } of visible) {
+                record.element.hidden = false;
+                this.#highlight(record, terms);
+                ordered.append(record.element);
             }
 
-            visible.forEach(({ record }, index) => {
-                record.element.hidden = false;
-                record.element.style.order = String(index);
-                this.#highlight(record, terms);
-            });
+            this.#list.append(ordered);
+            if (focused?.isConnected) focused.focus({ preventScroll: true });
 
             this.#syncChrome(visible.length);
         };
@@ -434,9 +438,10 @@ class PubExplorer extends HTMLElement {
     }
 
     #matches(record) {
-        const { type, area } = this.#state;
+        const { type, area, year } = this.#state;
         if (type !== 'all' && record.type !== type) return false;
         if (area !== 'all' && !record.topics.includes(area)) return false;
+        if (year !== 'all' && String(record.year) !== year) return false;
         return true;
     }
 
@@ -460,7 +465,8 @@ class PubExplorer extends HTMLElement {
 
     #syncChrome(visibleCount) {
         const total = this.#records.length;
-        const isFiltered = this.#state.q !== '' || this.#state.type !== 'all' || this.#state.area !== 'all';
+        const isFiltered = Object.entries(DEFAULT_STATE)
+            .some(([key, fallback]) => key !== 'sort' && this.#state[key] !== fallback);
 
         this.#resultCount.textContent = isFiltered
             ? `Showing ${visibleCount} of ${total} publications`
@@ -480,7 +486,7 @@ class PubExplorer extends HTMLElement {
         }
 
         for (const bar of this.#chart.querySelectorAll('.pub-chart__bar')) {
-            bar.setAttribute('aria-pressed', String(bar.dataset.year === this.#state.q));
+            bar.setAttribute('aria-pressed', String(bar.dataset.year === this.#state.year));
         }
 
         this.#exportButton.disabled = visibleCount === 0;
@@ -614,6 +620,7 @@ function readStateFromUrl() {
     if (state.sort && !SORT_OPTIONS.some((option) => option.id === state.sort)) delete state.sort;
     if (state.type && state.type !== 'all' && !TYPE_LABELS.has(state.type)) delete state.type;
     if (state.area && state.area !== 'all' && !RESEARCH_AREAS.has(state.area)) delete state.area;
+    if (state.year && state.year !== 'all' && !/^\d{4}$/.test(state.year)) delete state.year;
 
     return state;
 }

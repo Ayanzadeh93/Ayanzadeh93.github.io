@@ -32,6 +32,11 @@ pub-explorer {
     container: pubs / inline-size;
 }
 
+/* Component chrome sets explicit `display` values, which would otherwise beat
+   the user-agent `[hidden] { display: none }` rule and leave dead controls
+   (the search clear button, "Clear filters") visible when they do not apply. */
+pub-explorer [hidden] { display: none; }
+
 /* Reserve the toolbar's height before the module upgrades the element, so the
    rest of the page does not jump when the chrome is inserted. The flag class is
    only set when the engine supports modules, i.e. when the chrome is coming. */
@@ -104,7 +109,7 @@ pub-explorer {
 
 .pub-chart__bar {
     flex: 1 1 0;
-    min-inline-size: 2.25rem;
+    min-inline-size: 2rem;
     display: grid;
     grid-template-rows: auto 6.5rem auto;
     gap: 6px;
@@ -231,10 +236,14 @@ pub-explorer {
     color: var(--text-light);
     font-family: ui-monospace, monospace;
     font-size: 0.7rem;
+    transition: opacity 160ms ease;
 }
 
-/* The hint key is noise once you are already typing. */
-.pub-search:has(.pub-search__input:focus-visible) .pub-search__kbd { display: none; }
+/* The shortcut hint is noise once you are already typing, but it has to keep
+   its space in the grid: collapsing it on focus moved the clear button out
+   from under the pointer between mousedown and mouseup, so the click never
+   landed. Fade it instead. */
+.pub-search:has(.pub-search__input:focus-visible) .pub-search__kbd { opacity: 0; }
 
 .pub-toolbar__controls {
     display: flex;
@@ -509,6 +518,14 @@ pub-explorer .pub-link:hover {
 [data-theme='dark'] .pub-chip {
     background: var(--background-light);
     color: var(--text-dark);
+}
+
+/* --background-alt sits almost on top of the dark card surface, which erased
+   the topic pills; give them their own translucent surface instead. */
+[data-theme='dark'] .pub-topic {
+    background: rgb(255 255 255 / 7%);
+    border-color: var(--border-color);
+    color: var(--text-medium);
 }
 
 [data-theme='dark'] .pub-mark {

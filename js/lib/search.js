@@ -65,6 +65,16 @@ function isWordStart(haystack, position) {
     return position === 0 || /[^a-z0-9]/.test(haystack[position - 1]);
 }
 
+/**
+ * Whether a term is loose enough to allow the subsequence fallback.
+ *
+ * Numbers are identifiers, not prose: allowing "2019" to match as a scattered
+ * subsequence pulls in papers from other years, so digits must match literally.
+ */
+function allowsFuzzyFallback(term) {
+    return term.length >= 4 && /[a-z]/.test(term) && !/^\d+$/.test(term);
+}
+
 /** Score a single term against a single folded field. Returns 0 for no match. */
 function scoreTerm(haystack, term) {
     if (!haystack || !term) return 0;
@@ -76,6 +86,8 @@ function scoreTerm(haystack, term) {
     }
 
     if (haystack.includes(term)) return MATCH_QUALITY.substring;
+    if (!allowsFuzzyFallback(term)) return 0;
+
     return isSubsequence(haystack, term) ? MATCH_QUALITY.subsequence : 0;
 }
 
