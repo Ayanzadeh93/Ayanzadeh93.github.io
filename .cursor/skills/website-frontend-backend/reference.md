@@ -49,6 +49,46 @@
 - [ ] sitemap.xml entry with lastmod
 ```
 
+## Publication Entry Template
+
+Goes inside `<pub-explorer><div class="publications-list" data-pub-list>` in
+`index.html`. Omit attributes that do not apply.
+
+```html
+<article class="publication-item" data-pub data-key="lastname2026slug"
+    data-year="2026" data-type="conference" data-publisher="IEEE" data-pages="1--4"
+    data-booktitle="Proceedings of the Full Conference Name (ACRONYM)"
+    data-doi="10.1109/…" data-arxiv="2601.00000" data-primary-class="cs.CV"
+    data-url="https://arxiv.org/abs/2601.00000"
+    data-topics="computer-vision accessibility" itemscope
+    itemtype="https://schema.org/ScholarlyArticle">
+    <meta itemprop="datePublished" content="2026">
+    <link itemprop="url" href="https://arxiv.org/abs/2601.00000">
+    <div class="publication-meta">
+        <span class="publication-badge">Accepted</span>
+        <span class="publication-type">Conference paper</span>
+        <span class="publication-year">2026</span>
+    </div>
+    <h3 class="publication-title" data-pub-title itemprop="headline">Paper Title</h3>
+    <p class="authors" data-pub-authors itemprop="author"><strong>Aydin Ayanzadeh</strong>, Co Author</p>
+    <p class="publication-venue" data-pub-venue>Full Conference Name (ACRONYM), 2026</p>
+    <div class="publication-links" data-pub-links>
+        <a href="…" target="_blank" rel="noopener noreferrer" class="pub-link"><i
+            class="fas fa-external-link-alt"></i> View Paper</a>
+    </div>
+</article>
+```
+
+Notes:
+
+- `data-type` is one of `journal`, `conference`, `chapter`, `preprint`. It picks
+  the BibTeX entry type and the type filter bucket.
+- Use `data-journal` instead of `data-booktitle` for journal articles.
+- Page ranges use BibTeX's `--`; prose citation styles convert it to an en dash.
+- Badge variants: `.publication-badge` (blue), `.preprint-badge` (amber),
+  `.book-badge` (purple).
+- Never add a Cite link by hand; `<pub-explorer>` appends one.
+
 ## Blog Post Checklist
 
 ```

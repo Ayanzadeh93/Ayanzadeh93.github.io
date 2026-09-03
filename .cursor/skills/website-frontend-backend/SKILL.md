@@ -5,13 +5,18 @@ description: Builds and maintains the ayanzadeh.com static portfolio site — HT
 
 # Website Frontend & Backend
 
-Static academic portfolio. No build step, no framework, no bundler.
+Static academic portfolio. No build step, no framework, no bundler — but modern
+platform features (ES modules, Web Components, container queries) are fair game
+because the browser runs the source files as written.
 
 ## Architecture
 
 | Layer | Technology | Location |
 |-------|------------|----------|
-| Frontend | HTML5, CSS3, vanilla JS | `index.html`, `css/`, `js/` |
+| Pages | HTML5 | `index.html`, `blog*.html`, `projects/` |
+| Styles | CSS3 with design tokens | `css/` |
+| Site-wide behaviour | Classic vanilla JS | `js/main.js`, `js/blog.js` |
+| Interactive widgets | Custom elements, ES modules | `js/components/`, `js/lib/` |
 | Backend (forms) | Formspree | Contact + newsletter forms |
 | Hosting | GitHub Pages / Netlify | `CNAME`, `DEPLOYMENT.md` |
 | Assets | Optimized images, SVG favicon | `images/` |
@@ -20,10 +25,13 @@ Static academic portfolio. No build step, no framework, no bundler.
 ├── index.html              # Main portfolio
 ├── blog.html / blog-post.html
 ├── css/style.css           # Global styles + theme tokens
+├── css/components.css      # Web Component styles (unlayered on purpose)
 ├── css/project.css         # Project detail pages
 ├── css/blog.css            # Blog pages
-├── js/main.js              # Site-wide interactivity
-├── js/blog.js              # Blog-only features
+├── js/main.js              # Site-wide interactivity (classic script)
+├── js/blog.js              # Blog-only features (classic script)
+├── js/lib/                 # Pure helpers: citations.js, search.js, dom.js
+├── js/components/          # <pub-explorer>, <cite-dialog>, index.js entry
 ├── projects/*.html         # One page per project
 ├── sitemap.xml / robots.txt
 └── manifest.json           # PWA manifest
@@ -33,9 +41,10 @@ Static academic portfolio. No build step, no framework, no bundler.
 
 1. **Match existing patterns** — Copy structure from the nearest sibling page before inventing new markup or JS.
 2. **Minimal diff** — This is a content site; avoid refactors unrelated to the task.
-3. **No build tooling** — Do not add npm, webpack, or a framework unless explicitly requested.
-4. **Security first** — Preserve CSP meta tags; escape user-generated HTML with `escapeHtml()` before DOM insertion.
-5. **Accessibility** — Use semantic HTML, ARIA labels, keyboard support, and screen-reader announcements.
+3. **No build tooling** — Do not add npm, webpack, or a framework unless explicitly requested. Native modules and custom elements are fine; anything needing a compile step is not.
+4. **Progressive enhancement** — Content ships in the HTML. JavaScript may reorganise or enrich it, never be the only way to read it. Never ship a control that does nothing without JS.
+5. **Security first** — Preserve CSP meta tags; build DOM nodes instead of HTML strings, or escape with `escapeHtml()` before insertion.
+6. **Accessibility** — Semantic HTML, ARIA labels, keyboard support, screen-reader announcements, and DOM order that matches visual order.
 
 ## Frontend Conventions
 
@@ -65,7 +74,7 @@ Root pages use relative paths (`css/style.css`). Subpages under `projects/` use 
 - Feature detection before observers: check `'IntersectionObserver' in window`.
 - Passive scroll listeners: `{ passive: true }`.
 - Export shared helpers on `window` only when multiple scripts need them (e.g. `escapeHtml`).
-- New site-wide behavior → `main.js`. Blog-only → `blog.js`.
+- New site-wide behavior → `main.js`. Blog-only → `blog.js`. A self-contained interactive widget → a custom element in `js/components/`.
 
 ```javascript
 function escapeHtml(value) {
@@ -77,6 +86,39 @@ function escapeHtml(value) {
         .replace(/'/g, '&#39;');
 }
 ```
+
+### Web Components
+
+Registered from `js/components/index.js`, loaded once per page with
+`<script type="module" src="js/components/index.js">`. Module scripts are
+deferred and are ignored by engines without module support, which is exactly the
+fallback behaviour we want.
+
+- **Light DOM for content.** `<pub-explorer>` enhances markup that is already on
+  the page. Content that matters for SEO, Ctrl+F or the page reader must stay in
+  the light DOM.
+- **Shadow DOM for chrome.** `<cite-dialog>` uses a shadow root with
+  `adoptStyles()`. Inside a shadow root, Font Awesome classes and
+  `body.high-contrast`-style descendant selectors do not reach in — use the
+  inline SVG `icon()` helper and `mirrorAccessibilityFlags()`.
+- **Reserve space before upgrade.** The `supports-modules` class set by the
+  inline head script lets CSS hold room for chrome that JS is about to insert,
+  so nothing shifts on load.
+- **Watch for `[hidden]` losing.** Any rule that sets `display` on a component
+  element beats the user-agent `[hidden] { display: none }`. `components.css`
+  has a `pub-explorer [hidden]` rule for this; add the equivalent for new
+  components.
+- **Do not sort with CSS `order`.** It desynchronises visual order from reading
+  and focus order. Move the nodes.
+
+### Modern CSS in use
+
+`css/components.css` relies on container queries (`container: pubs /
+inline-size`), `:has()`, `color-mix()`, `@property` (needed to transition
+`--bar-ratio`), `@starting-style` with `allow-discrete` (dialog open/close), and
+logical properties. It is deliberately **unlayered**: `style.css` is unlayered
+too, and unlayered rules always beat layered ones, so an `@layer` here would
+lose to the rules it needs to refine.
 
 ## Backend / Integrations
 
@@ -106,6 +148,20 @@ Copy checklists from [reference.md](reference.md) when executing these tasks.
 2. Update hero, badges, meta, canonical, and content sections.
 3. Link from `index.html` projects section.
 4. Add URL to `sitemap.xml` with current `<lastmod>`.
+
+### Add a publication
+
+1. Copy an existing `<article class="publication-item" data-pub …>` inside
+   `<pub-explorer>` in `index.html`.
+2. Fill in the `data-*` metadata (see the table in [README.md](../../../README.md)).
+   Title, authors and venue come from `data-pub-title` / `data-pub-authors` /
+   `data-pub-venue`, so do not duplicate them into attributes.
+3. Leave `<div class="publication-links" data-pub-links>` present even when
+   empty — the Cite button is appended there.
+4. Use only research-area slugs listed in `RESEARCH_AREAS` in
+   `js/components/pub-explorer.js`, or add a new one there first.
+5. Citation formats are generated, not written by hand. Check the output in the
+   Cite dialog rather than pasting a citation string.
 
 ### Add or edit blog content
 
@@ -142,6 +198,8 @@ Copy checklists from [reference.md](reference.md) when executing these tasks.
 - [ ] sitemap.xml updated if URLs added/changed
 - [ ] No secrets or API keys in committed files
 - [ ] Images compressed; no multi-MB assets
+- [ ] Page still usable with JavaScript disabled, and no dead controls in that state
+- [ ] Interactive changes checked in a real browser, not just by reading the diff
 ```
 
 ## When User Requests a Real Backend
