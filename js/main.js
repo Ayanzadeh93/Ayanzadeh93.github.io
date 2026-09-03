@@ -22,20 +22,92 @@ function escapeHtml(value) {
 
 window.escapeHtml = escapeHtml;
 
+// Pages share this bundle but not their markup, so isolate each module: a
+// failure in one must not stop the rest from initialising.
+function runInit(name, fn) {
+    try {
+        fn();
+    } catch (error) {
+        console.error(`Failed to initialize ${name}:`, error);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize all components
-    initMobileMenu();
-    initSmoothScrolling();
-    initIntersectionObserver();
-    initFormValidation();
-    initLoadingStates();
-    initLazyLoading();
-    initPerformanceOptimizations();
-    initAccessibilityFeatures();
-    initNavbarScroll();
-    initThemeToggle();
+    [
+        ['mobile menu', initMobileMenu],
+        ['smooth scrolling', initSmoothScrolling],
+        ['scroll reveal', initIntersectionObserver],
+        ['form validation', initFormValidation],
+        ['loading states', initLoadingStates],
+        ['lazy loading', initLazyLoading],
+        ['performance optimizations', initPerformanceOptimizations],
+        ['accessibility features', initAccessibilityFeatures],
+        ['navbar scroll', initNavbarScroll],
+        ['theme toggle', initThemeToggle],
+        ['back to top', initBackToTop],
+        ['reading progress', initReadingProgress]
+    ].forEach(([name, fn]) => runInit(name, fn));
+
     hideLoadingOverlay();
 });
+
+// Floating scroll-to-top control
+function initBackToTop() {
+    const button = document.getElementById('backToTop');
+    if (!button) return;
+
+    const SHOW_AFTER = 400;
+
+    button.hidden = false;
+
+    function syncVisibility() {
+        button.classList.toggle('is-visible', window.scrollY > SHOW_AFTER);
+    }
+
+    window.addEventListener('scroll', syncVisibility, { passive: true });
+    syncVisibility();
+
+    button.addEventListener('click', () => {
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+    });
+}
+
+// Reading progress indicator for long-form article pages
+function initReadingProgress() {
+    const bar = document.getElementById('readingProgressBar');
+    const article = document.querySelector('.blog-post-article');
+    if (!bar || !article) return;
+
+    const track = bar.parentElement;
+    let frame = null;
+
+    function update() {
+        frame = null;
+
+        const articleHeight = article.scrollHeight - window.innerHeight;
+        const scrolled = window.scrollY - article.offsetTop;
+        const percent = articleHeight > 0
+            ? Math.min(100, Math.max(0, (scrolled / articleHeight) * 100))
+            : 0;
+
+        bar.style.width = `${percent}%`;
+
+        if (track) {
+            track.setAttribute('aria-valuenow', String(Math.round(percent)));
+        }
+    }
+
+    function requestUpdate() {
+        if (frame === null) {
+            frame = window.requestAnimationFrame(update);
+        }
+    }
+
+    window.addEventListener('scroll', requestUpdate, { passive: true });
+    window.addEventListener('resize', requestUpdate, { passive: true });
+    update();
+}
 
 // Navbar scroll effect
 function initNavbarScroll() {
@@ -72,6 +144,9 @@ function initThemeToggle() {
 
     if (!themeToggleBtn) return;
 
+    // Keep the mobile browser chrome in step with the page surface
+    const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+
     const applyTheme = (theme) => {
         const isDark = theme === 'dark';
 
@@ -82,6 +157,10 @@ function initThemeToggle() {
         if (themeIcon) {
             themeIcon.classList.toggle('fa-sun', isDark);
             themeIcon.classList.toggle('fa-moon', !isDark);
+        }
+
+        if (themeColorMeta) {
+            themeColorMeta.setAttribute('content', isDark ? '#0f1729' : '#2563eb');
         }
     };
 
@@ -106,6 +185,38 @@ function initThemeToggle() {
             localStorage.setItem('theme', newTheme);
         } catch (error) {
             // Ignore storage errors and continue with in-memory theme state.
+        }
+
+        if (window.announceToScreenReader) {
+            window.announceToScreenReader(`${newTheme === 'dark' ? 'Dark' : 'Light'} theme enabled`);
+        }
+    });
+
+    // Track the system preference until the visitor makes an explicit choice
+    if (!savedTheme && window.matchMedia) {
+        const systemPreference = window.matchMedia('(prefers-color-scheme: dark)');
+        const followSystem = (event) => {
+            let hasChoice = false;
+            try {
+                hasChoice = Boolean(localStorage.getItem('theme'));
+            } catch (error) {
+                hasChoice = false;
+            }
+
+            if (!hasChoice) {
+                applyTheme(event.matches ? 'dark' : 'light');
+            }
+        };
+
+        if (typeof systemPreference.addEventListener === 'function') {
+            systemPreference.addEventListener('change', followSystem);
+        }
+    }
+
+    // Keep the theme consistent across open tabs
+    window.addEventListener('storage', (event) => {
+        if (event.key === 'theme' && event.newValue) {
+            applyTheme(event.newValue === 'dark' ? 'dark' : 'light');
         }
     });
 }
