@@ -1193,10 +1193,22 @@ function initializePageReader() {
 const MAX_SPEECH_CONTENT_LENGTH = 12000;
 const MIN_SENTENCE_BREAK_RATIO = 0.6;
 
+// Elements filtered out of a view (for example publications hidden by the
+// research index) are still in the DOM, so the reader must skip them or it
+// narrates content that is not on screen.
+function isVisibleToReader(element) {
+    if (typeof element.checkVisibility === 'function') {
+        return element.checkVisibility({ contentVisibilityAuto: true, visibilityProperty: true });
+    }
+
+    return element.offsetParent !== null || element.getClientRects().length > 0;
+}
+
 function getPageReaderText() {
     const contentRoot = document.querySelector('main, #main-content, article') || document.body;
     const readableElements = contentRoot.querySelectorAll('h1, h2, h3, h4, h5, h6, p, li, blockquote, figcaption, caption');
     const content = Array.from(readableElements)
+        .filter(isVisibleToReader)
         .map((el) => el.textContent.trim().replace(/\s+/g, ' '))
         .filter(Boolean)
         .map((text) => /[.!?:;…]$/.test(text) ? text : `${text}.`)

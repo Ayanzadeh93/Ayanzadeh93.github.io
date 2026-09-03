@@ -1,0 +1,560 @@
+/* ==========================================================================
+   Web Component styles — publications explorer
+   --------------------------------------------------------------------------
+   Loaded after style.css. Everything here is deliberately *unlayered*: the
+   6k-line global stylesheet is unlayered too, and unlayered rules always beat
+   layered ones regardless of source order, so wrapping this file in @layer
+   would make it lose to the very rules it is meant to refine.
+
+   Design tokens are inherited from :root in style.css, so light/dark theming
+   comes for free. Accent tints are derived with color-mix() instead of the
+   hardcoded rgba(26, 115, 232, …) used elsewhere, which had drifted away from
+   the actual --primary-color (#2563eb).
+   ========================================================================== */
+
+/* Registering the bar ratio makes it interpolable, so the year chart can grow
+   from zero instead of snapping to its final height. */
+@property --bar-ratio {
+    syntax: '<number>';
+    inherits: true;
+    initial-value: 0;
+}
+
+pub-explorer {
+    --pub-accent: var(--primary-color);
+    --pub-tint: color-mix(in srgb, var(--pub-accent) 10%, transparent);
+    --pub-tint-strong: color-mix(in srgb, var(--pub-accent) 18%, transparent);
+    --pub-surface: color-mix(in srgb, var(--background-white) 92%, var(--pub-accent));
+    --pub-gap: 16px;
+    --pub-radius: 14px;
+
+    display: block;
+    container: pubs / inline-size;
+}
+
+/* Reserve the toolbar's height before the module upgrades the element, so the
+   rest of the page does not jump when the chrome is inserted. The flag class is
+   only set when the engine supports modules, i.e. when the chrome is coming. */
+.supports-modules pub-explorer:not([data-enhanced])::before {
+    content: '';
+    display: block;
+    block-size: 420px;
+}
+
+@container pubs (min-width: 600px) {
+    .supports-modules pub-explorer:not([data-enhanced])::before {
+        block-size: 360px;
+    }
+}
+
+/* --------------------------------------------------------------- metrics -- */
+
+.pub-explorer__header {
+    display: grid;
+    gap: var(--pub-gap);
+    margin-block-end: 28px;
+}
+
+.pub-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.5rem), 1fr));
+    gap: 12px;
+    margin: 0;
+}
+
+.pub-metric {
+    padding: 18px 16px;
+    border: 1px solid var(--surface-border, var(--border-color));
+    border-radius: var(--pub-radius);
+    background: var(--card-surface, var(--background-white));
+    text-align: center;
+}
+
+.pub-metric__value {
+    font-size: clamp(1.5rem, 1.1rem + 1.4cqi, 2rem);
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--pub-accent);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+}
+
+.pub-metric__label {
+    margin: 6px 0 0;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-light);
+}
+
+/* ----------------------------------------------------------------- chart -- */
+
+.pub-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    padding: 16px 18px 12px;
+    border: 1px solid var(--surface-border, var(--border-color));
+    border-radius: var(--pub-radius);
+    background: var(--card-surface, var(--background-white));
+    overflow-x: auto;
+    scrollbar-width: thin;
+}
+
+.pub-chart__bar {
+    flex: 1 1 0;
+    min-inline-size: 2.25rem;
+    display: grid;
+    grid-template-rows: auto 6.5rem auto;
+    gap: 6px;
+    align-items: end;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    cursor: pointer;
+    border-radius: 8px;
+    /* Starts at the registered initial value of 0 and is transitioned to its
+       real ratio on the next frame, so the chart grows in. */
+    transition: --bar-ratio 700ms var(--ease-out-expo, ease-out), background-color 180ms ease;
+}
+
+.pub-chart__bar:hover { background: var(--pub-tint); }
+
+.pub-chart__count,
+.pub-chart__year {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-light);
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+}
+
+.pub-chart__year { font-weight: 500; }
+
+.pub-chart__column {
+    align-self: end;
+    inline-size: 100%;
+    /* A visible stub keeps every year clickable even in a one-paper year. */
+    block-size: max(6px, calc(var(--bar-ratio) * 6.5rem));
+    border-radius: 6px 6px 3px 3px;
+    background: linear-gradient(180deg,
+        color-mix(in srgb, var(--pub-accent) 85%, white) 0%,
+        var(--pub-accent) 100%);
+    opacity: 0.85;
+    transition: opacity 180ms ease;
+}
+
+.pub-chart__bar:hover .pub-chart__column,
+.pub-chart__bar[aria-pressed='true'] .pub-chart__column { opacity: 1; }
+
+.pub-chart__bar[aria-pressed='true'] {
+    background: var(--pub-tint-strong);
+}
+
+.pub-chart__bar[aria-pressed='true'] .pub-chart__count,
+.pub-chart__bar[aria-pressed='true'] .pub-chart__year { color: var(--pub-accent); }
+
+/* --------------------------------------------------------------- toolbar -- */
+
+.pub-toolbar {
+    display: grid;
+    gap: 14px;
+    padding: 18px;
+    border: 1px solid var(--surface-border, var(--border-color));
+    border-radius: var(--pub-radius);
+    background: var(--card-surface, var(--background-white));
+}
+
+@container pubs (min-width: 640px) {
+    .pub-toolbar {
+        grid-template-columns: minmax(16rem, 1fr) auto;
+        align-items: center;
+    }
+
+    .pub-chips { grid-column: 1 / -1; }
+}
+
+.pub-search {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    align-items: center;
+    gap: 8px;
+    padding-inline: 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    background: var(--background-white);
+    transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+
+/* :has() lets the whole pill react to focus inside it, without a JS class. */
+.pub-search:has(.pub-search__input:focus-visible) {
+    border-color: var(--pub-accent);
+    box-shadow: 0 0 0 4px var(--pub-tint);
+}
+
+.pub-search__icon { color: var(--text-light); }
+
+.pub-search__input {
+    padding-block: 12px;
+    border: 0;
+    background: none;
+    color: var(--text-dark);
+    font: inherit;
+    font-size: 0.95rem;
+    min-inline-size: 0;
+}
+
+.pub-search__input:focus { outline: none; }
+.pub-search__input::placeholder { color: var(--text-light); }
+.pub-search__input::-webkit-search-cancel-button { display: none; }
+
+.pub-search__clear {
+    display: grid;
+    place-items: center;
+    inline-size: 24px;
+    block-size: 24px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--pub-tint);
+    color: var(--pub-accent);
+    cursor: pointer;
+}
+
+.pub-search__kbd {
+    padding: 2px 7px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--background-alt);
+    color: var(--text-light);
+    font-family: ui-monospace, monospace;
+    font-size: 0.7rem;
+}
+
+/* The hint key is noise once you are already typing. */
+.pub-search:has(.pub-search__input:focus-visible) .pub-search__kbd { display: none; }
+
+.pub-toolbar__controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.pub-select {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.pub-select__label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-light);
+}
+
+.pub-select__control {
+    padding: 9px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    background: var(--background-white);
+    color: var(--text-dark);
+    font: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.pub-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 16px;
+    border: 1px solid var(--pub-accent);
+    border-radius: 10px;
+    background: var(--pub-accent);
+    color: #fff;
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 180ms ease, color 180ms ease, border-color 180ms ease;
+}
+
+.pub-button:hover { background: var(--primary-dark); border-color: var(--primary-dark); }
+
+.pub-button--ghost {
+    background: var(--pub-tint);
+    color: var(--pub-accent);
+    border-color: transparent;
+}
+
+.pub-button--ghost:hover { background: var(--pub-accent); color: #fff; }
+
+.pub-button--quiet {
+    padding: 6px 12px;
+    background: none;
+    border-color: var(--border-color);
+    color: var(--text-medium);
+}
+
+.pub-button--quiet:hover {
+    background: var(--pub-tint);
+    border-color: var(--pub-accent);
+    color: var(--pub-accent);
+}
+
+.pub-button[disabled] { opacity: 0.5; cursor: not-allowed; }
+
+/* ----------------------------------------------------------------- chips -- */
+
+.pub-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.pub-chip {
+    padding: 7px 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    background: var(--background-white);
+    color: var(--text-medium);
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 180ms ease, color 180ms ease, border-color 180ms ease;
+}
+
+.pub-chip:hover { border-color: var(--pub-accent); color: var(--pub-accent); }
+
+.pub-chip[aria-pressed='true'] {
+    background: var(--pub-accent);
+    border-color: var(--pub-accent);
+    color: #fff;
+}
+
+/* ---------------------------------------------------------------- status -- */
+
+.pub-status {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-block: 20px 14px;
+}
+
+.pub-status__count {
+    margin: 0;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--text-light);
+    font-variant-numeric: tabular-nums;
+}
+
+.pub-empty {
+    padding: 48px 24px;
+    border: 1px dashed var(--border-color);
+    border-radius: var(--pub-radius);
+    text-align: center;
+}
+
+.pub-empty__title {
+    margin: 0 0 6px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.pub-empty__hint {
+    margin: 0 0 18px;
+    font-size: 0.9rem;
+    color: var(--text-light);
+    text-wrap: pretty;
+}
+
+/* ----------------------------------------------------------------- cards -- */
+
+pub-explorer .publications-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pub-gap);
+}
+
+pub-explorer .publication-item {
+    margin-block-end: 0;
+    padding-block: 24px;
+}
+
+pub-explorer .publication-item[hidden] { display: none; }
+
+/* Filtering is animated by the View Transition in withViewTransition(); the
+   cards only need their own transition for hover feedback. */
+
+/* The badge used to be absolutely positioned, which forced an 80px right pad
+   on the title and collided with long titles on narrow screens. */
+pub-explorer .publication-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-block-end: 12px;
+}
+
+pub-explorer .publication-badge {
+    position: static;
+    inset: auto;
+    padding: 4px 11px;
+    font-size: 0.68rem;
+    box-shadow: none;
+}
+
+pub-explorer .publication-type,
+pub-explorer .publication-year {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-light);
+}
+
+pub-explorer .publication-type::after {
+    content: '·';
+    margin-inline-start: 8px;
+}
+
+pub-explorer .publication-title {
+    margin: 0 0 10px;
+    padding-inline-end: 0;
+    font-size: clamp(1.05rem, 0.95rem + 0.6cqi, 1.28rem);
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--text-dark);
+    text-wrap: balance;
+}
+
+pub-explorer .authors { text-wrap: pretty; }
+
+pub-explorer .publication-links {
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+pub-explorer .pub-link {
+    background: var(--pub-tint);
+    border-color: color-mix(in srgb, var(--pub-accent) 22%, transparent);
+}
+
+pub-explorer .pub-link:hover {
+    background: var(--pub-accent);
+    box-shadow: 0 4px 14px color-mix(in srgb, var(--pub-accent) 30%, transparent);
+}
+
+.pub-link--action {
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.pub-link svg { flex: 0 0 auto; }
+
+.pub-topics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 14px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.pub-topic {
+    padding: 3px 10px;
+    border: 1px solid var(--border-light);
+    border-radius: 999px;
+    background: var(--background-alt);
+    color: var(--text-light);
+    font: inherit;
+    font-size: 0.72rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+
+.pub-topic:hover {
+    background: var(--pub-tint);
+    border-color: color-mix(in srgb, var(--pub-accent) 30%, transparent);
+    color: var(--pub-accent);
+}
+
+.pub-mark {
+    padding: 0 1px;
+    border-radius: 3px;
+    background: color-mix(in srgb, #facc15 55%, transparent);
+    color: inherit;
+    font-weight: 600;
+}
+
+/* ------------------------------------------------------------ dark theme -- */
+
+[data-theme='dark'] pub-explorer {
+    --pub-surface: color-mix(in srgb, var(--background-white) 88%, var(--pub-accent));
+}
+
+[data-theme='dark'] .pub-search,
+[data-theme='dark'] .pub-select__control,
+[data-theme='dark'] .pub-chip {
+    background: var(--background-light);
+    color: var(--text-dark);
+}
+
+[data-theme='dark'] .pub-mark {
+    background: color-mix(in srgb, #facc15 32%, transparent);
+    color: #fde68a;
+}
+
+/* --------------------------------------------------- focus & preferences -- */
+
+.pub-chart__bar:focus-visible,
+.pub-chip:focus-visible,
+.pub-topic:focus-visible,
+.pub-button:focus-visible,
+.pub-search__clear:focus-visible,
+.pub-select__control:focus-visible,
+.pub-link--action:focus-visible {
+    outline: 2px solid var(--pub-accent);
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pub-chart__bar { transition: background-color 180ms ease; }
+}
+
+body.reduce-motion .pub-chart__bar { transition: background-color 180ms ease; }
+
+body.high-contrast .pub-metric,
+body.high-contrast .pub-chart,
+body.high-contrast .pub-toolbar,
+body.high-contrast .pub-chip,
+body.high-contrast .pub-search {
+    border-width: 2px;
+    border-color: currentColor;
+}
+
+/* ----------------------------------------------------------------- print -- */
+
+@media print {
+    .pub-explorer__header,
+    .pub-toolbar,
+    .pub-status,
+    .pub-topics,
+    .pub-link--action {
+        display: none !important;
+    }
+
+    /* Print exactly what is on screen: the current filter selection. */
+    pub-explorer .publication-item { break-inside: avoid; }
+}
