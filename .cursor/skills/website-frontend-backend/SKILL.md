@@ -5,13 +5,18 @@ description: Builds and maintains the ayanzadeh.com static portfolio site — HT
 
 # Website Frontend & Backend
 
-Static academic portfolio. No build step, no framework, no bundler.
+Static academic portfolio. No build step, no framework, no bundler — but modern
+platform features (ES modules, Web Components, container queries, View
+Transitions) are fair game, because the browser runs the source files as written.
 
 ## Architecture
 
 | Layer | Technology | Location |
 |-------|------------|----------|
-| Frontend | HTML5, CSS3, vanilla JS | `index.html`, `css/`, `js/` |
+| Pages | HTML5 | `index.html`, `blog*.html`, `projects/` |
+| Styles | CSS3 with design tokens | `css/` |
+| Site-wide behaviour | Classic vanilla JS | `js/main.js`, `js/blog.js` |
+| Interactive widgets | Custom elements, ES modules | `js/components/`, `js/lib/` |
 | Backend (forms) | Formspree | Contact + newsletter forms |
 | Hosting | GitHub Pages / Netlify | `CNAME`, `DEPLOYMENT.md` |
 | Assets | Optimized images, SVG favicon | `images/` |
@@ -20,10 +25,13 @@ Static academic portfolio. No build step, no framework, no bundler.
 ├── index.html              # Main portfolio
 ├── blog.html / blog-post.html
 ├── css/style.css           # Global styles + theme tokens
+├── css/components.css      # Custom-element styles (unlayered on purpose)
 ├── css/project.css         # Project detail pages
 ├── css/blog.css            # Blog pages
-├── js/main.js              # Site-wide interactivity
-├── js/blog.js              # Blog-only features
+├── js/main.js              # Site-wide interactivity (classic script)
+├── js/blog.js              # Blog-only features (classic script)
+├── js/lib/                 # Pure helpers: dom.js, citations.js, search.js
+├── js/components/          # <pub-explorer>, <cite-dialog>, index.js entry
 ├── projects/*.html         # One page per project
 ├── sitemap.xml / robots.txt
 └── manifest.json           # PWA manifest
@@ -33,9 +41,10 @@ Static academic portfolio. No build step, no framework, no bundler.
 
 1. **Match existing patterns** — Copy structure from the nearest sibling page before inventing new markup or JS.
 2. **Minimal diff** — This is a content site; avoid refactors unrelated to the task.
-3. **No build tooling** — Do not add npm, webpack, or a framework unless explicitly requested.
-4. **Security first** — Preserve CSP meta tags; escape user-generated HTML with `escapeHtml()` before DOM insertion.
-5. **Accessibility** — Use semantic HTML, ARIA labels, keyboard support, and screen-reader announcements.
+3. **No build tooling** — Do not add npm, webpack, or a framework unless explicitly requested. Native modules and custom elements are fine; anything needing a compile step is not. jQuery and similar compatibility shims are a step backwards here — the platform APIs they wrapped are now the shorter path.
+4. **Progressive enhancement** — Content ships in the HTML. JavaScript may reorganise or enrich it, never be the only way to read it. Never ship a control that does nothing without JS.
+5. **Security first** — Preserve CSP meta tags; build DOM nodes instead of HTML strings, or escape with `escapeHtml()` before insertion.
+6. **Accessibility** — Semantic HTML, ARIA labels, keyboard support, screen-reader announcements, and DOM order that matches visual order.
 
 ## Frontend Conventions
 
@@ -57,7 +66,9 @@ Root pages use relative paths (`css/style.css`). Subpages under `projects/` use 
 - **Design tokens** live in `:root` in `css/style.css` — change colors/spacing there, not inline.
 - **Dark theme**: `data-theme="dark"` on `<html>`; toggle handled in `main.js`.
 - **Page-specific styles**: add to `project.css` or `blog.css`, not `style.css`, unless the change is global.
+- **Component styles**: `components.css`, deliberately unlayered so it shares the cascade origin with `style.css`.
 - Use existing utility classes (`.container`, `.section`, `.badge`, card patterns) before writing new ones.
+- `style.css` has a universal reset that zeroes every margin. It also hits UA defaults you may be relying on — a modal `<dialog>` needs `margin: auto` restored explicitly, or it pins to the top-left.
 
 ### JavaScript
 
@@ -65,7 +76,9 @@ Root pages use relative paths (`css/style.css`). Subpages under `projects/` use 
 - Feature detection before observers: check `'IntersectionObserver' in window`.
 - Passive scroll listeners: `{ passive: true }`.
 - Export shared helpers on `window` only when multiple scripts need them (e.g. `escapeHtml`).
-- New site-wide behavior → `main.js`. Blog-only → `blog.js`.
+- New site-wide behavior → `main.js`. Blog-only → `blog.js`. A self-contained interactive widget → a custom element in `js/components/`.
+- Prefer one live region per message. An element with `role="status" aria-live="polite"` announces on its own — adding a second region makes screen readers say everything twice.
+- A View Transition defers its callback by a frame or two. Every reader-visible change belonging to one update must happen **inside** the callback, or the count text will announce a state the DOM has not reached yet.
 
 ```javascript
 function escapeHtml(value) {
@@ -116,8 +129,22 @@ Copy checklists from [reference.md](reference.md) when executing these tasks.
 ### Change global navigation or theme
 
 1. Edit shared nav markup in each affected HTML file (no templating engine).
-2. Theme logic stays in `initThemeToggle()` in `main.js`.
-3. Test light + dark mode and mobile menu.
+2. Theme logic stays in `initThemeToggle()` in `main.js`; it swaps inside a View Transition when the browser supports one.
+3. Keep `color-scheme` in step with `data-theme` in `style.css`, or native controls (`<select>` popups, search clear buttons, scrollbars) stay light on a dark page.
+4. Test light + dark mode and mobile menu.
+
+### Add or edit a publication
+
+1. Add the card to the `.publications-list` inside `<pub-explorer>` in `index.html`.
+2. Give it the structured `data-*` attributes — see the checklist in [reference.md](reference.md). `<pub-explorer>` reads them; nothing is duplicated into JavaScript.
+3. Ship the Cite control as `<button type="button" class="pub-link" data-cite hidden>`. The component unhides it, so no-JS readers never see a dead button.
+4. Verify DOIs before adding them (`https://doi.org/<doi>` or the Crossref API). A wrong identifier in a citation is worse than a missing one.
+
+### Add a custom element
+
+1. Module in `js/components/`, pure helpers in `js/lib/`, styles in `css/components.css`.
+2. Register it from `js/components/index.js`; the page loads that one entry as `<script type="module">`.
+3. Enhance markup that already exists in the light DOM. Do not render content the HTML does not already carry.
 
 ### Optimize images
 
@@ -136,12 +163,15 @@ Copy checklists from [reference.md](reference.md) when executing these tasks.
 
 ```
 - [ ] CSP present and correct on all touched HTML files
+- [ ] Page still readable and complete with JavaScript disabled
 - [ ] Relative asset paths correct for page depth (root vs projects/)
 - [ ] Dark theme still readable on changed sections
 - [ ] Mobile nav and smooth scroll unaffected
 - [ ] sitemap.xml updated if URLs added/changed
 - [ ] No secrets or API keys in committed files
 - [ ] Images compressed; no multi-MB assets
+- [ ] Custom elements: keyboard path works (Tab, Escape, arrow keys where used)
+- [ ] Any DOI or external identifier resolves before it ships
 ```
 
 ## When User Requests a Real Backend

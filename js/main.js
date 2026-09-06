@@ -45,7 +45,8 @@ document.addEventListener('DOMContentLoaded', function() {
         ['navbar scroll', initNavbarScroll],
         ['theme toggle', initThemeToggle],
         ['back to top', initBackToTop],
-        ['reading progress', initReadingProgress]
+        ['reading progress', initReadingProgress],
+        ['footer info links', initFooterInfoLinks]
     ].forEach(([name, fn]) => runInit(name, fn));
 
     hideLoadingOverlay();
@@ -176,10 +177,29 @@ function initThemeToggle() {
     const initialTheme = savedTheme === 'dark' || (!savedTheme && prefersDark) ? 'dark' : 'light';
     applyTheme(initialTheme);
 
+    // A View Transition cross-fades the whole page instead of snapping every
+    // surface at once. Feature-detected and skipped under reduced motion, so
+    // the theme still switches instantly wherever it is unsupported or unwanted.
+    const swapTheme = (newTheme) => {
+        const reduceMotion = window.matchMedia
+            && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        if (!document.startViewTransition || reduceMotion) {
+            applyTheme(newTheme);
+            return;
+        }
+
+        root.dataset.viewTransition = 'theme';
+        const transition = document.startViewTransition(() => applyTheme(newTheme));
+        transition.finished
+            .catch(() => { /* a superseded transition is not an error */ })
+            .finally(() => { delete root.dataset.viewTransition; });
+    };
+
     themeToggleBtn.addEventListener('click', () => {
         const currentTheme = root.getAttribute('data-theme');
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        applyTheme(newTheme);
+        swapTheme(newTheme);
 
         try {
             localStorage.setItem('theme', newTheme);
@@ -771,6 +791,25 @@ if (document.readyState === 'loading') {
     initResponsiveBehavior();
 }
 
+
+// Footer info links. The markup carries data-info instead of an inline
+// onclick, so the handler lives here with the rest of the page behaviour.
+function initFooterInfoLinks() {
+    const handlers = {
+        privacy: showPrivacyInfo,
+        accessibility: showAccessibilityInfo
+    };
+
+    document.querySelectorAll('[data-info]').forEach((link) => {
+        const handler = handlers[link.dataset.info];
+        if (!handler) return;
+
+        link.addEventListener('click', function(event) {
+            event.preventDefault();
+            handler();
+        });
+    });
+}
 
 // Privacy and Accessibility Info Functions
 window.showPrivacyInfo = function() {
