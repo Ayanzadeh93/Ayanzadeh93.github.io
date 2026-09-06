@@ -38,6 +38,17 @@
     --hero-aurora-strong: rgba(59, 130, 246, 0.45);
 }
 
+/* Tell the UA which palette its own widgets should use. Without this the
+   native <select> popup, the search field's clear button and the scrollbars
+   stay light while the page is dark. */
+:root[data-theme="light"] {
+    color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+    color-scheme: dark;
+}
+
 /* Dark palette: a single slate-based scale shared by the manual toggle and,
    via the no-JS fallback below, the operating system preference. */
 :root[data-theme="dark"],
@@ -5822,5 +5833,44 @@ img[loading="lazy"].loaded {
 @media (max-height: 480px) {
     .back-to-top {
         display: none;
+    }
+}
+
+/* ========================================
+   MODERN TYPOGRAPHY & MOTION
+   Progressive: each property is ignored by
+   browsers that do not implement it.
+   ======================================== */
+
+/* Balanced headings avoid a single orphaned word on the last line; `pretty`
+   does the lighter version of the same job for body copy. */
+.section-title,
+.publication-item h4,
+.project-card h3,
+.news-card h3 {
+    text-wrap: balance;
+}
+
+.publication-venue,
+.authors,
+.section-subtitle {
+    text-wrap: pretty;
+}
+
+/* The theme toggle runs its swap inside a View Transition (see initThemeToggle
+   in main.js). Cross-fade rather than slide — a wipe on a full page reads as a
+   glitch, and this is a colour change, not a navigation. */
+html[data-view-transition="theme"]::view-transition-old(root),
+html[data-view-transition="theme"]::view-transition-new(root) {
+    animation-duration: 0.32s;
+    animation-timing-function: var(--ease-out-soft);
+    mix-blend-mode: normal;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+        animation: none !important;
     }
 }

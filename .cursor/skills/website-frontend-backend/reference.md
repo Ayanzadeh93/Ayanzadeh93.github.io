@@ -107,3 +107,77 @@ Dark overrides: `:root[data-theme="dark"]` and `[data-theme="dark"] .component` 
 | Netlify | Connect repo | Domain settings + Squarespace DNS |
 
 Post-deploy: test HTTPS, contact form, and image paths on production URL.
+
+## Publication Card Template
+
+Cards live inside `<pub-explorer>` in `index.html`. The visible text stays
+human-readable; the `data-*` attributes carry the structured form that
+`<pub-explorer>` reads for search, faceting and citation export. There is no
+JavaScript copy of this data — the markup is the only source.
+
+```html
+<div class="publication-item"
+     data-type="article"            <!-- article | inproceedings | incollection | preprint -->
+     data-year="2023"
+     data-venue="Expert Systems with Applications"   <!-- clean container title, no vol/pages -->
+     data-volume="213"
+     data-number=""                 <!-- issue, omit when absent -->
+     data-pages="119040"            <!-- a range (33-57) or a bare article number -->
+     data-publisher="Academic Press"
+     data-doi="10.1016/j.eswa.2022.119040"
+     data-arxiv="2512.12177"
+     data-status="Accepted">        <!-- only for in-press work -->
+    <div class="publication-badge">Featured</div>
+    <h4>Paper title, plain text only — the search highlighter rebuilds this node</h4>
+    <p class="authors">First Author, <strong>Aydin Ayanzadeh</strong>, and Last Author</p>
+    <p class="publication-venue">Expert Systems with Applications, vol. 213, 119040, 2023</p>
+    <div class="publication-links">
+        <a href="https://doi.org/…" target="_blank" rel="noopener noreferrer" class="pub-link">
+            <i class="fas fa-external-link-alt"></i> View Paper</a>
+        <button type="button" class="pub-link" data-cite hidden>
+            <i class="fas fa-quote-left" aria-hidden="true"></i> Cite</button>
+    </div>
+</div>
+```
+
+Field notes:
+
+| Attribute | Notes |
+|-----------|-------|
+| `data-type` | Drives the facet chips and the BibTeX entry type. |
+| `data-venue` | Container title only. The rendered `.publication-venue` line stays as prose. |
+| `data-pages` | A value with a dash is a page range; a bare number is treated as an article number (`Art. no.` / `Article`). |
+| `data-doi` / `data-arxiv` | Used for the canonical link, in that order, then the first `.pub-link[href^="http"]`. |
+| `data-status` | Becomes a BibTeX `note` and an "(Accepted)" suffix in the prose styles. |
+
+Title and author names are parsed from the DOM, so `<h4>` must stay plain text —
+the search highlighter replaces its children with text nodes and `<mark>`.
+
+## Component Map
+
+| Element | File | What it does |
+|---------|------|--------------|
+| `<pub-explorer>` | `js/components/pub-explorer.js` | Wraps `.publications-list`; adds ranked search, type facets, sort, and `/` focus shortcut. |
+| `<cite-dialog>` | `js/components/cite-dialog.js` | One per page; native `<dialog>` exporting BibTeX / APA 7 / MLA 9 / IEEE plus a `.bib` download. |
+
+Supporting modules, all pure and side-effect free:
+
+| Module | Exports |
+|--------|---------|
+| `js/lib/dom.js` | `el`, `appendChildren`, `clear`, `escapeHtml`, `debounce`, `prefersReducedMotion`, `withViewTransition`, `copyText` |
+| `js/lib/citations.js` | `parseAuthors`, `splitName`, `bibKey`, `canonicalUrl`, `formatBibTeX/APA/MLA/IEEE`, `formatCitation`, `CITATION_FORMATS` |
+| `js/lib/search.js` | `normalize`, `tokenize`, `scoreRecord`, `filterRecords`, `matchRanges`, `buildHaystack` |
+
+Search semantics: tokens are AND-ed (every token must match somewhere), matching
+is diacritic-folded (`Toreyin` finds `Töreyin`), and field weights are
+title 10 / authors 6 / venue 4 / tags 3 / year 2.
+
+## Adding a Custom Element
+
+1. Write the module in `js/components/`, keeping any reusable logic in `js/lib/`.
+2. Guard registration: `if (!customElements.get('x-y')) customElements.define(…)`.
+3. Import it from `js/components/index.js` — pages load only that entry.
+4. Style it in `css/components.css` using the tokens from `style.css`.
+5. Enhance markup that is already in the page. If the element renders content
+   that is not in the HTML, the no-JS and crawler view loses it.
+6. Ship JS-only controls as `hidden` in the markup and unhide them on upgrade.
