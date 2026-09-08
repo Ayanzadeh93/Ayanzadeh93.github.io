@@ -3497,6 +3497,10 @@ body.enhanced-keyboard .top-nav-link:focus {
     background: linear-gradient(135deg, #f83600 0%, #f9d423 100%);
 }
 
+.developer-tools {
+    background: linear-gradient(135deg, #232526 0%, #5c6b7a 100%);
+}
+
 .project-badge {
     position: absolute;
     top: 12px;
