@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://formspree.io; form-action 'self' https://formspree.io; frame-src 'none'; manifest-src 'self'">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>WildfireVLM: Early Wildfire Detection | Aydin Ayanzadeh</title>
+    <meta name="description" content="Vision-Language Model system for early wildfire detection and risk assessment from satellite imagery. Accepted at IGARSS 2026.">
+    <link rel="canonical" href="https://ayanzadeh93.github.io/projects/wildfire-vlm.html">
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://ayanzadeh93.github.io/projects/wildfire-vlm.html">
+    <meta property="og:title" content="WildfireVLM: AI-Powered Analysis for Early Wildfire Detection">
+    <meta property="og:description" content="Vision-Language Model system for early wildfire detection and risk assessment from satellite imagery. Accepted at IGARSS 2026.">
+    <meta property="og:image" content="https://ayanzadeh93.github.io/images/profile-compressed.jpg">
+    <meta property="og:site_name" content="Aydin Ayanzadeh - Research Portfolio">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://ayanzadeh93.github.io/projects/wildfire-vlm.html">
+    <meta name="twitter:title" content="WildfireVLM: AI-Powered Analysis for Early Wildfire Detection">
+    <meta name="twitter:description" content="Vision-Language Model system for early wildfire detection and risk assessment from satellite imagery. Accepted at IGARSS 2026.">
+    <meta name="twitter:image" content="https://ayanzadeh93.github.io/images/profile-compressed.jpg">
+    <meta name="twitter:creator" content="@ayanzadeh93">
+    <meta name="twitter:site" content="@ayanzadeh93">
+
+    <!-- Apply the saved (or system) theme before first paint to avoid a light-mode flash -->
+    <script>
+        (function () {
+            var saved = null;
+            try { saved = localStorage.getItem('theme'); } catch (e) { /* storage unavailable */ }
+            var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            var dark = saved === 'dark' || (!saved && prefersDark);
+            document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+        })();
+    </script>
+
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/project.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer"></noscript>
+</head>
+<body class="project-page">
+    <!-- Navigation -->
+    <nav class="project-nav">
+        <div class="container">
+            <a href="../index.html" class="back-link">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Portfolio</span>
+            </a>
+            <div class="nav-links">
+                <a href="../index.html#projects">All Projects</a>
+                <a href="../index.html#contact">Contact</a>
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Switch to dark theme">
+                    <i class="fas fa-moon" aria-hidden="true"></i> <span>Theme</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="project-main">
+        <!-- Project Hero -->
+        <section class="project-hero">
+            <div class="container">
+                <div class="project-hero-content">
+                    <div class="project-badges">
+                        <span class="badge featured">Environmental AI</span>
+                        <span class="badge status">Accepted &mdash; IGARSS 2026</span>
+                    </div>
+                    <h1>WildfireVLM</h1>
+                    <p class="project-tagline">AI-Powered Analysis for Early Wildfire Detection Using Satellite Imagery</p>
+                    <div class="project-meta-info">
+                        <div class="meta-item">
+                            <i class="fas fa-user"></i>
+                            <span><strong>Aydin Ayanzadeh</strong>, Prakhar Dixit, Sadia Kamal, Milton Halem</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-university"></i>
+                            <span>University of Maryland, Baltimore County</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-calendar"></i>
+                            <span>2024 &ndash; 2026</span>
+                        </div>
+                    </div>
+                    <div class="project-actions">
+                        <a href="https://arxiv.org/abs/2602.13305" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+                            <i class="fas fa-external-link-alt"></i> View Paper
+                        </a>
+                        <a href="../index.html#publications" class="btn btn-secondary">
+                            <i class="fas fa-book"></i> All Publications
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Project Overview -->
+        <section class="project-section">
+            <div class="container">
+                <h2><i class="fas fa-eye"></i> Overview</h2>
+                <div class="overview-content">
+                    <p class="lead">
+                        WildfireVLM applies Vision-Language Models to satellite imagery so that wildfire activity can be detected and described early &mdash; while a fire is still small enough for intervention to matter.
+                    </p>
+                    <p>
+                        Conventional remote-sensing detectors return a pixel mask or a per-tile label, which tells an analyst that something is burning but not what is happening, how confident the evidence is, or what the surrounding conditions imply. WildfireVLM pairs the visual signal with language, producing both a detection and a readable account of the scene: the extent of the affected area, the environmental context around it, and the factors that raise or lower the assessed risk.
+                    </p>
+                    <p>
+                        The project is joint work with Prakhar Dixit, Sadia Kamal and Prof. Milton Halem at UMBC, and was accepted to the IEEE International Geoscience and Remote Sensing Symposium (IGARSS) 2026.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Key Features -->
+        <section class="project-section alt-bg">
+            <div class="container">
+                <h2><i class="fas fa-star"></i> Key Features</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-satellite"></i>
+                        </div>
+                        <h3>Satellite Imagery Analysis</h3>
+                        <p>Operates directly on multi-band satellite observations, so coverage extends to remote terrain that ground sensors and camera networks never reach.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <h3>Vision-Language Reasoning</h3>
+                        <p>A vision-language backbone grounds the imagery in natural language, turning a detection into an explanation an analyst can read and act on.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <h3>Early Detection</h3>
+                        <p>Targets the earliest visible signatures of ignition, where the difference between detection and confirmation is measured in containment cost.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-triangle-exclamation"></i>
+                        </div>
+                        <h3>Risk Assessment</h3>
+                        <p>Combines the detected activity with surrounding environmental context to characterise spread risk, not just presence.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technical Approach -->
+        <section class="project-section">
+            <div class="container">
+                <h2><i class="fas fa-cogs"></i> Technical Approach</h2>
+                <div class="approach-content">
+                    <div class="approach-item">
+                        <h3>1. Satellite Data Preparation</h3>
+                        <p>Raw satellite scenes are tiled, radiometrically normalised and aligned so that observations from different passes and sensing conditions can be compared on equal footing. Cloud and haze artefacts &mdash; the dominant source of false alarms in optical wildfire detection &mdash; are screened at this stage.</p>
+                    </div>
+                    <div class="approach-item">
+                        <h3>2. Vision-Language Alignment</h3>
+                        <p>Imagery is encoded alongside textual descriptions of fire and non-fire conditions, aligning the visual representation with a language space. This is what lets the model answer open-ended questions about a scene rather than only emitting a fixed class label.</p>
+                    </div>
+                    <div class="approach-item">
+                        <h3>3. Detection and Contextual Description</h3>
+                        <p>For each scene the model reports whether wildfire activity is present and describes the supporting evidence &mdash; smoke plume geometry, burn-scar signatures, and the terrain and vegetation surrounding the affected area.</p>
+                    </div>
+                    <div class="approach-item">
+                        <h3>4. Risk Characterisation</h3>
+                        <p>Detections are lifted into a risk assessment by combining the observed fire signature with its environmental context, so that downstream users receive a prioritised signal rather than an undifferentiated stream of alerts.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Impact -->
+        <section class="project-section alt-bg">
+            <div class="container">
+                <h2><i class="fas fa-globe"></i> Motivation &amp; Impact</h2>
+                <div class="overview-content">
+                    <p>
+                        Wildfire response is dominated by how early a fire is found. Detection latency compounds: a fire located in its first minutes is a containment problem, while the same fire located hours later is an evacuation problem. Satellite coverage is the only observation channel that reaches most at-risk terrain, which makes the accuracy and interpretability of satellite-based detection the practical bottleneck.
+                    </p>
+                    <p>
+                        By emitting language alongside detections, WildfireVLM is aimed at the part of that pipeline where a human has to decide whether an alert warrants dispatch. An alert that explains its own evidence is one an analyst can triage; a bare confidence score is not.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technologies -->
+        <section class="project-section">
+            <div class="container">
+                <h2><i class="fas fa-code"></i> Technologies Used</h2>
+                <div class="tech-stack">
+                    <span class="tech-item">Vision-Language Models</span>
+                    <span class="tech-item">PyTorch</span>
+                    <span class="tech-item">Python</span>
+                    <span class="tech-item">Remote Sensing</span>
+                    <span class="tech-item">Satellite Imagery</span>
+                    <span class="tech-item">Hugging Face Transformers</span>
+                    <span class="tech-item">Computer Vision</span>
+                    <span class="tech-item">Geospatial Analysis</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Publications -->
+        <section class="project-section alt-bg">
+            <div class="container">
+                <h2><i class="fas fa-book"></i> Related Publications</h2>
+                <div class="publications-list">
+                    <div class="publication-entry">
+                        <h3>IEEE International Geoscience and Remote Sensing Symposium (IGARSS) 2026</h3>
+                        <p>WildfireVLM: AI-Powered Analysis for Early Wildfire Detection Using Satellite Imagery. Aydin Ayanzadeh, Prakhar Dixit, Sadia Kamal, Milton Halem.</p>
+                        <a href="https://arxiv.org/abs/2602.13305" target="_blank" rel="noopener noreferrer" class="pub-link">
+                            <i class="fas fa-external-link-alt"></i> View Paper
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact CTA -->
+        <section class="project-cta">
+            <div class="container">
+                <h2>Interested in Environmental AI?</h2>
+                <p>I'm open to collaborations on remote sensing, vision-language models and climate-facing AI systems.</p>
+                <a href="../index.html#contact" class="btn btn-primary btn-lg">
+                    <i class="fas fa-envelope"></i> Get in Touch
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="project-footer">
+        <div class="container">
+            <p>&copy; 2026 Aydin Ayanzadeh. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="../index.html">Home</a>
+                <a href="../index.html#projects">Projects</a>
+                <a href="../index.html#publications">Publications</a>
+            </div>
+        </div>
+    </footer>
+
+    <button type="button" id="backToTop" class="back-to-top" aria-label="Back to top" hidden>
+        <i class="fas fa-arrow-up" aria-hidden="true"></i>
+    </button>
+
+    <script src="../js/main.js"></script>
+</body>
+</html>

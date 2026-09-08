@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://formspree.io; form-action 'self' https://formspree.io; frame-src 'none'; manifest-src 'self'">
 
     <!-- Primary Meta Tags -->
     <title>Aydin Ayanzadeh - PhD Student | Computer Vision & Medical AI Researcher | UMBC</title>
@@ -14,33 +15,12 @@
         content="Aydin Ayanzadeh, Computer Vision Researcher, Medical Image Analysis, Machine Learning, AI Researcher, UMBC Computer Science, PhD Student, Deep Learning, Multimodal Learning, Vision Language Models, VLM, LLM, Medical AI, Accessibility AI, Image Segmentation, Knowledge Distillation, Graph Neural Networks, Indoor Navigation, Artificial Intelligence, Baltimore Researcher">
     <meta name="author" content="Aydin Ayanzadeh">
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
-    <meta name="googlebot" content="index, follow">
-    <meta name="google" content="notranslate">
-    <meta name="theme-color" content="#1a73e8">
+    <meta name="theme-color" content="#2563eb">
     <meta name="color-scheme" content="light dark">
-    <meta name="language" content="English">
-    <meta name="revisit-after" content="3 days">
-    <meta name="distribution" content="global">
-    <meta name="rating" content="general">
-    <meta name="referrer" content="no-referrer-when-downgrade">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
 
     <!-- Canonical URL -->
     <link rel="canonical" href="https://ayanzadeh93.github.io/">
-
-    <!-- Google Scholar Meta Tags -->
-    <meta name="citation_author" content="Ayanzadeh, Aydin">
-    <meta name="citation_author_institution" content="University of Maryland, Baltimore County">
-    <meta name="DC.creator" content="Aydin Ayanzadeh">
-    <meta name="DC.title" content="Aydin Ayanzadeh - Computer Vision and Medical AI Research">
-    <meta name="DC.subject"
-        content="Computer Vision; Medical Image Analysis; Machine Learning; Artificial Intelligence">
-
-    <!-- Academic & Research Meta Tags -->
-    <meta name="academicfield" content="Computer Science">
-    <meta name="research_interests"
-        content="Computer Vision, Medical Image Analysis, Multimodal Learning, Vision-Language Models, Deep Learning, Accessibility AI">
-    <meta name="institution" content="University of Maryland, Baltimore County">
-    <meta name="degree" content="Ph.D. (In Progress), M.S. Computer Science">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="profile">
@@ -49,8 +29,8 @@
     <meta property="og:description"
         content="Ph.D. Student in Computer Science at UMBC (M.S. 2025) specializing in Computer Vision, Medical Image Analysis, and Multimodal Learning. Published researcher in AI accessibility technologies.">
     <meta property="og:image" content="https://ayanzadeh93.github.io/images/profile-compressed.jpg">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
+    <meta property="og:image:width" content="656">
+    <meta property="og:image:height" content="800">
     <meta property="og:image:alt" content="Aydin Ayanzadeh - Computer Vision Researcher at UMBC">
     <meta property="og:site_name" content="Aydin Ayanzadeh - Research Portfolio">
     <meta property="og:locale" content="en_US">
@@ -68,25 +48,6 @@
     <meta name="twitter:creator" content="@ayanzadeh93">
     <meta name="twitter:site" content="@ayanzadeh93">
 
-    <!-- Additional SEO Meta Tags -->
-    <meta name="geo.region" content="US-MD">
-    <meta name="geo.placename" content="Baltimore, Maryland">
-    <meta name="geo.position" content="39.2904;-76.6122">
-    <meta name="ICBM" content="39.2904, -76.6122">
-    <meta name="contact" content="aydina1@umbc.edu">
-    <meta name="copyright" content="© 2026 Aydin Ayanzadeh">
-    <meta name="reply-to" content="aydina1@umbc.edu">
-    <meta name="owner" content="Aydin Ayanzadeh">
-    <meta name="url" content="https://ayanzadeh93.github.io/">
-    <meta name="identifier-URL" content="https://ayanzadeh93.github.io/">
-    <meta name="directory" content="submission">
-    <meta name="category" content="Science, Research, Education, Technology">
-    <meta name="coverage" content="Worldwide">
-    <meta name="target" content="researchers, academics, students, industry professionals">
-    <meta name="HandheldFriendly" content="True">
-    <meta name="MobileOptimized" content="320">
-    <meta http-equiv="cleartype" content="on">
-
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="apple-touch-icon" sizes="180x180" href="favicon.svg">
@@ -101,7 +62,7 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="preload" href="css/style.css" as="style">
     <link rel="preload" href="js/main.js" as="script">
-    <link rel="preload" href="images/profile-compressed.jpg" as="image" type="image/jpeg" importance="high">
+    <link rel="preload" href="images/profile-400.jpg" as="image" type="image/jpeg" fetchpriority="high">
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
         as="style">
     <link rel="dns-prefetch" href="https://formspree.io">
@@ -117,19 +78,33 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Aydin Ayanzadeh">
     <meta name="application-name" content="Aydin Ayanzadeh Portfolio">
-    <meta name="msapplication-TileColor" content="#1a73e8">
-    <meta name="msapplication-config" content="/browserconfig.xml">
+    <meta name="msapplication-TileColor" content="#2563eb">
+
+    <!-- Apply the saved (or system) theme before first paint to avoid a light-mode flash -->
+    <script>
+        (function () {
+            var saved = null;
+            try { saved = localStorage.getItem('theme'); } catch (e) { /* storage unavailable */ }
+            var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            var dark = saved === 'dark' || (!saved && prefersDark);
+            document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+        })();
+    </script>
 
     <!-- Stylesheets -->
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer"></noscript>
 
     <!-- Enhanced Structured Data -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
-        "@type": ["Person", "Researcher"],
+        "@type": "Person",
         "name": "Aydin Ayanzadeh",
         "givenName": "Aydin",
         "familyName": "Ayanzadeh",
@@ -163,8 +138,8 @@
         "image": {
             "@type": "ImageObject",
             "url": "https://ayanzadeh93.github.io/images/profile-compressed.jpg",
-            "width": 400,
-            "height": 400
+            "width": 656,
+            "height": 800
         },
         "sameAs": [
             "https://linkedin.com/in/ayanzadeh93",
@@ -184,7 +159,7 @@
             "Wildfire Detection",
             "Knowledge Distillation"
         ],
-        "email": "aydina1@umbc.edu",
+        "email": "a.ayanzadeh@gmail.com",
         "address": {
             "@type": "PostalAddress",
             "addressLocality": "Baltimore",
@@ -230,11 +205,6 @@
         "copyrightHolder": {
             "@type": "Person",
             "name": "Aydin Ayanzadeh"
-        },
-        "potentialAction": {
-            "@type": "SearchAction",
-            "target": "https://ayanzadeh93.github.io/#{search_term_string}",
-            "query-input": "required name=search_term_string"
         }
     }
     </script>
@@ -264,45 +234,33 @@
                     <span class="brand-text">Aydin Ayanzadeh</span>
                 </a>
             </div>
-            <ul class="top-nav-menu" id="top-nav-menu" role="menubar" aria-label="Main navigation menu">
-                <li role="none"><a href="#home" class="top-nav-link" role="menuitem"
-                        aria-label="Navigate to home section" tabindex="0"><i class="fas fa-home"
-                            aria-hidden="true"></i> <span>Home</span></a></li>
-                <li role="none"><a href="#about" class="top-nav-link" role="menuitem"
-                        aria-label="Navigate to about section" tabindex="-1"><i class="fas fa-user"
-                            aria-hidden="true"></i> <span>About</span></a></li>
-                <li role="none"><a href="#education" class="top-nav-link" role="menuitem"
-                        aria-label="Navigate to education section" tabindex="-1"><i class="fas fa-graduation-cap"
-                            aria-hidden="true"></i> <span>Education</span></a></li>
-                <li role="none"><a href="#experience" class="top-nav-link" role="menuitem"
-                        aria-label="Navigate to experience section" tabindex="-1"><i class="fas fa-briefcase"
-                            aria-hidden="true"></i> <span>Experience</span></a></li>
-                <li role="none"><a href="#teaching" class="top-nav-link" role="menuitem"
-                        aria-label="Navigate to teaching section" tabindex="-1"><i class="fas fa-chalkboard-teacher"
-                            aria-hidden="true"></i> <span>Teaching</span></a></li>
-                <li role="none"><a href="#news" class="top-nav-link" role="menuitem"
-                        aria-label="Navigate to news section" tabindex="-1"><i class="fas fa-newspaper"
-                            aria-hidden="true"></i> <span>News</span></a></li>
-                <li role="none"><a href="#publications" class="top-nav-link" role="menuitem"
-                        aria-label="Navigate to publications section" tabindex="-1"><i class="fas fa-book"
-                            aria-hidden="true"></i> <span>Papers</span></a></li>
-                <li role="none"><a href="#research-projects" class="top-nav-link" role="menuitem"
-                        aria-label="Navigate to research projects section" tabindex="-1"><i class="fas fa-flask"
-                            aria-hidden="true"></i> <span>Research</span></a></li>
-                <li role="none"><a href="#projects" class="top-nav-link" role="menuitem"
-                        aria-label="Navigate to projects section" tabindex="-1"><i class="fas fa-laptop-code"
-                            aria-hidden="true"></i> <span>Projects</span></a></li>
-                <li role="none"><a href="#skills" class="top-nav-link" role="menuitem"
-                        aria-label="Navigate to skills section" tabindex="-1"><i class="fas fa-code"
-                            aria-hidden="true"></i> <span>Skills</span></a></li>
-                <li role="none"><a href="#awards" class="top-nav-link" role="menuitem"
-                        aria-label="Navigate to awards section" tabindex="-1"><i class="fas fa-trophy"
-                            aria-hidden="true"></i> <span>Awards</span></a></li>
-                <li role="none"><a href="#contact" class="top-nav-link" role="menuitem"
-                        aria-label="Navigate to contact section" tabindex="-1"><i class="fas fa-envelope"
-                            aria-hidden="true"></i> <span>Contact</span></a></li>
-                <li role="none">
-                    <button id="theme-toggle" class="top-nav-link theme-toggle-btn" aria-label="Toggle dark mode" tabindex="-1">
+            <ul class="top-nav-menu" id="top-nav-menu">
+                <li><a href="#home" class="top-nav-link"><i class="fas fa-home" aria-hidden="true"></i>
+                        <span>Home</span></a></li>
+                <li><a href="#about" class="top-nav-link"><i class="fas fa-user" aria-hidden="true"></i>
+                        <span>About</span></a></li>
+                <li><a href="#education" class="top-nav-link"><i class="fas fa-graduation-cap" aria-hidden="true"></i>
+                        <span>Education</span></a></li>
+                <li><a href="#experience" class="top-nav-link"><i class="fas fa-briefcase" aria-hidden="true"></i>
+                        <span>Experience</span></a></li>
+                <li><a href="#teaching" class="top-nav-link"><i class="fas fa-chalkboard-teacher" aria-hidden="true"></i>
+                        <span>Teaching</span></a></li>
+                <li><a href="#news" class="top-nav-link"><i class="fas fa-newspaper" aria-hidden="true"></i>
+                        <span>News</span></a></li>
+                <li><a href="#publications" class="top-nav-link"><i class="fas fa-book" aria-hidden="true"></i>
+                        <span>Papers</span></a></li>
+                <li><a href="#research-projects" class="top-nav-link"><i class="fas fa-flask" aria-hidden="true"></i>
+                        <span>Research</span></a></li>
+                <li><a href="#projects" class="top-nav-link"><i class="fas fa-laptop-code" aria-hidden="true"></i>
+                        <span>Projects</span></a></li>
+                <li><a href="#skills" class="top-nav-link"><i class="fas fa-code" aria-hidden="true"></i>
+                        <span>Skills</span></a></li>
+                <li><a href="#awards" class="top-nav-link"><i class="fas fa-trophy" aria-hidden="true"></i>
+                        <span>Awards</span></a></li>
+                <li><a href="#contact" class="top-nav-link"><i class="fas fa-envelope" aria-hidden="true"></i>
+                        <span>Contact</span></a></li>
+                <li>
+                    <button id="theme-toggle" class="top-nav-link theme-toggle-btn" aria-label="Switch to dark theme">
                         <i class="fas fa-moon" aria-hidden="true"></i> <span>Theme</span>
                     </button>
                 </li>
@@ -359,28 +317,21 @@
                         <div class="profile-image">
                             <div class="ai-frame">
                                 <picture>
-                                    <source media="(max-width: 480px)" srcset="images/profile-compressed.jpg"
+                                    <source media="(max-width: 480px)" srcset="images/profile-400.jpg"
                                         width="130" height="130">
-                                    <source media="(max-width: 768px)" srcset="images/profile-compressed.jpg"
+                                    <source media="(max-width: 768px)" srcset="images/profile-400.jpg"
                                         width="160" height="160">
-                                    <img src="images/profile-compressed.jpg"
+                                    <img src="images/profile-400.jpg"
                                         alt="Professional headshot of Aydin Ayanzadeh" class="profile-img"
                                         loading="eager" width="200" height="200">
                                 </picture>
-                                <div class="ai-scan-line"></div>
                             </div>
                         </div>
                         <div class="profile-info">
                             <h1 class="hero-title">
                                 <span class="ai-text">Aydin Ayanzadeh</span>
-                                <div class="typing-cursor"></div>
                             </h1>
-                            <p class="hero-subtitle">
-                                <span class="ai-badge">AI Expert</span>
-                                <span class="vlm-badge">VLM Specialist</span>
-                                <span class="llm-badge">LLM Researcher</span>
-                            </p>
-                            <p class="hero-description">Ph.D. Student in Computer Science | M.S. Graduate</p>
+                            <p class="hero-description">Ph.D. Student in Computer Science</p>
                             <p class="hero-location">University of Maryland, Baltimore County</p>
                             <div class="expertise-tags">
                                 <span class="expertise-tag">Computer Vision</span>
@@ -391,11 +342,10 @@
                         </div>
                     </div>
                     <div class="hero-links">
-                        <a href="mailto:aydina1@umbc.edu" class="btn btn-primary ai-btn"
+                        <a href="mailto:a.ayanzadeh@gmail.com" class="btn btn-primary ai-btn"
                             aria-label="Send email to Aydin">
                             <i class="fas fa-envelope" aria-hidden="true"></i>
                             <span>Email</span>
-                            <div class="btn-glow"></div>
                         </a>
                         <a href="Aydin_Ayanzadeh_CV__final.pdf" target="_blank" rel="noopener noreferrer"
                             class="btn btn-secondary ai-btn" aria-label="Download Aydin's CV">
@@ -415,6 +365,11 @@
                     </div>
                 </div>
             </div>
+
+            <a href="#about" class="scroll-indicator" aria-label="Scroll to the About section">
+                <span>Scroll</span>
+                <i class="fas fa-chevron-down" aria-hidden="true"></i>
+            </a>
         </section>
 
         <!-- About Section -->
@@ -489,31 +444,6 @@
                             </div>
                         </div>
 
-                        <div class="research-approach">
-                            <h3>Research Approach</h3>
-                            <div class="approach-grid">
-                                <div class="approach-item">
-                                    <i class="fas fa-users"></i>
-                                    <h4>Collaborative</h4>
-                                    <p>Working with interdisciplinary teams to tackle complex problems</p>
-                                </div>
-                                <div class="approach-item">
-                                    <i class="fas fa-lightbulb"></i>
-                                    <h4>Innovative</h4>
-                                    <p>Exploring novel methodologies and cutting-edge technologies</p>
-                                </div>
-                                <div class="approach-item">
-                                    <i class="fas fa-globe"></i>
-                                    <h4>Impactful</h4>
-                                    <p>Focusing on solutions that can make a real-world difference</p>
-                                </div>
-                                <div class="approach-item">
-                                    <i class="fas fa-graduation-cap"></i>
-                                    <h4>Mentoring</h4>
-                                    <p>Guiding students and sharing knowledge with the community</p>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -828,7 +758,7 @@
                     <article class="news-card">
                         <div class="news-card-header">
                             <div class="news-date-badge">
-                                <span class="date-day">Jan</span>
+                                <span class="date-month">Jan</span>
                                 <span class="date-year">2025</span>
                             </div>
                             <div class="news-category conference">
@@ -859,7 +789,7 @@
                     <article class="news-card">
                         <div class="news-card-header">
                             <div class="news-date-badge">
-                                <span class="date-day">Oct</span>
+                                <span class="date-month">Oct</span>
                                 <span class="date-year">2024</span>
                             </div>
                             <div class="news-category conference">
@@ -902,7 +832,7 @@
                     <article class="news-card">
                         <div class="news-card-header">
                             <div class="news-date-badge">
-                                <span class="date-day">May</span>
+                                <span class="date-month">May</span>
                                 <span class="date-year">2019</span>
                             </div>
                             <div class="news-category award">
@@ -922,252 +852,224 @@
                 <h2 class="section-title"><i class="fas fa-book-open"></i> Publications</h2>
 
                 <!-- All Publications (Journal & Conference) -->
-                <div class="publications-list">
-                    <div class="publication-item featured">
-                        <div class="publication-badge">Accepted</div>
-                        <h4>AgenticRAG-Driven Floorplan Parsing for Assistive Indoor Navigation for Blind and Low-Vision Users, WP-GRAILV</h4>
-                        <p class="authors"><strong>Aydin Ayanzadeh</strong>, Tim Oates</p>
-                        <p class="publication-venue">Accepted - CVPR 2026 GRAIL-V</p>
-                        <div class="publication-links">
-                            <a href="#citation" class="pub-link"
-                                onclick="copyToClipboard('Aydin Ayanzadeh, Tim Oates. &quot;AgenticRAG-Driven Floorplan Parsing for Assistive Indoor Navigation for Blind and Low-Vision Users, WP-GRAILV, CVPR 2026.&quot;')"><i
-                                    class="fas fa-quote-left"></i> Cite</a>
-                        </div>
-                    </div>
-
-                    <div class="publication-item featured">
-                        <div class="publication-badge">Accepted</div>
-                        <h4>WildfireVLM: AI-Powered Analysis for Early Wildfire Detection Using Satellite Imagery</h4>
-                        <p class="authors"><strong>Aydin Ayanzadeh</strong>, Prakhar Dixit, Sadia Kamal, Milton Halem</p>
-                        <p class="publication-venue">Accepted - IGARSS 2026</p>
-                        <div class="publication-links">
-                            <a href="https://arxiv.org/abs/2602.13305" target="_blank" rel="noopener noreferrer"
-                                class="pub-link"><i class="fas fa-external-link-alt"></i> View Paper</a>
-                            <a href="#citation" class="pub-link"
-                                onclick="copyToClipboard('Aydin Ayanzadeh, Prakhar Dixit, Sadia Kamal, Milton Halem. &quot;WildfireVLM: AI-Powered Analysis for Early Wildfire Detection Using Satellite Imagery, (2026).&quot; (Accepted - IGARSS 2026)')"><i
-                                    class="fas fa-quote-left"></i> Cite</a>
-                        </div>
-                    </div>
-
-                    <div class="publication-item featured">
-                        <div class="publication-badge">Accepted</div>
-                        <h4>Floorplan2Guide: LLM-Guided Floorplan Parsing for BLV Indoor Navigation</h4>
-                        <p class="authors"><strong>Aydin Ayanzadeh</strong>, and Tim Oates</p>
-                        <p class="publication-venue">IEEE Big Data 2025, arXiv preprint arXiv:2512.12177</p>
-                        <div class="publication-links">
-                            <a href="https://arxiv.org/abs/2512.12177" target="_blank" rel="noopener noreferrer"
-                                class="pub-link"><i class="fas fa-external-link-alt"></i> View Paper</a>
-                            <a href="#citation" class="pub-link"
-                                onclick="copyToClipboard('Ayanzadeh, Aydin, and Tim Oates. &quot;Floorplan2Guide: LLM-Guided Floorplan Parsing for BLV Indoor Navigation.&quot; IEEE Big Data, 2025. arXiv preprint arXiv:2512.12177.')"><i
-                                    class="fas fa-quote-left"></i> Cite</a>
-                        </div>
-                    </div>
-
-                    <div class="publication-item featured">
-                        <div class="publication-badge">Featured</div>
-                        <h4>PURSUhInT: In Search of Informative Hint Points Based on Layer Clustering for Knowledge
-                            Distillation</h4>
-                        <p class="authors">Reyhan Kevser Keser, <strong>Aydin Ayanzadeh</strong>, Omid Abdollahi Aghdam,
-                            Caglar Kilcioglu, Behcet Ugur Toreyin, and Nazim Kemal Ure</p>
-                        <p class="publication-venue">Expert Systems with Applications, vol. 213, 119040, 2023</p>
-                        <div class="publication-links">
-                            <a href="https://www.sciencedirect.com/science/article/abs/pii/S0957417422020589"
-                                target="_blank" rel="noopener noreferrer" class="pub-link"><i
-                                    class="fas fa-external-link-alt"></i> View Paper</a>
-                            <a href="https://codeocean.com/capsule/4245746/tree/v1" target="_blank"
-                                rel="noopener noreferrer" class="pub-link"><i class="fas fa-code"></i> Code</a>
-                            <a href="#citation" class="pub-link"
-                                onclick="copyToClipboard('Reyhan Kevser Keser, Aydin Ayanzadeh, et al. &quot;PURSUhInT: Informative Hint Points for Knowledge Distillation.&quot; Expert Systems with Applications 213 (2023): 119040.')"><i
-                                    class="fas fa-quote-left"></i> Cite</a>
-                        </div>
-                    </div>
-
-                    <div class="publication-item">
-                        <h4>Improved cell segmentation using deep learning in label-free optical microscopy images</h4>
-                        <p class="authors"><strong>Aydin Ayanzadeh</strong>, Ozden Yalcin Ozuysal, Devrim Pesen Okvur,
-                            Sevgi Onal, Behcet Ugur Toreyin, and Devrim Unay</p>
-                        <p class="publication-venue">Turkish Journal of Electrical Engineering and Computer Sciences,
-                            vol. 29, no. 8, pp. 2855-2868, 2021</p>
-                        <div class="publication-links">
-                            <a href="https://journals.tubitak.gov.tr/elektrik/vol29/iss8/18/" target="_blank"
-                                rel="noopener noreferrer" class="pub-link"><i class="fas fa-external-link-alt"></i> View
-                                Paper</a>
-                            <a href="#citation" class="pub-link"
-                                onclick="copyToClipboard('Aydin Ayanzadeh, et al. &quot;Improved Cell Segmentation Using Deep Learning in Label-Free Optical Microscopy.&quot; Turkish Journal of EE&amp;CS 29, no. 8 (2021): 2855-2868.')"><i
-                                    class="fas fa-quote-left"></i> Cite</a>
-                        </div>
-                    </div>
-
-                    <div class="publication-item">
-                        <h4>Representation learning using graph autoencoders with residual connections</h4>
-                        <p class="authors">Indrit Nallbani, <strong>Aydin Ayanzadeh</strong>, Reyhan Kevser Keser,
-                            Nurullah Çalık, and Behçet Uğur Töreyin</p>
-                        <p class="publication-venue">arXiv preprint arXiv:2105.00695, 2021</p>
-                        <div class="publication-links">
-                            <a href="https://arxiv.org/abs/2105.00695" target="_blank" rel="noopener noreferrer"
-                                class="pub-link"><i class="fas fa-external-link-alt"></i> View Paper</a>
-                            <a href="#citation" class="pub-link"
-                                onclick="copyToClipboard('Indrit Nallbani, Aydin Ayanzadeh, et al. &quot;Representation Learning Using Graph Autoencoders with Residual Connections.&quot; arXiv preprint arXiv:2105.00695 (2021).')"><i
-                                    class="fas fa-quote-left"></i> Cite</a>
-                        </div>
-                    </div>
-
-                    <div class="publication-item">
-                        <h4>Deep Learning based Segmentation Pipeline for Label-Free Phase-Contrast Microscopy Images
-                        </h4>
-                        <p class="authors"><strong>Aydin Ayanzadeh</strong>, Ozden Yalcin Ozuysal, Devrim Pesen Okvur,
-                            Sevgi Onal, Devrim Unay, Behcet Ugur Toreyin</p>
-                        <p class="publication-venue">2020 28th Signal Processing and Communications Applications
-                            Conference (SIU), pp. 1-4, IEEE, 2020</p>
-                        <div class="publication-links">
-                            <a href="https://ieeexplore.ieee.org/abstract/document/9302304" target="_blank"
-                                rel="noopener noreferrer" class="pub-link"><i class="fas fa-external-link-alt"></i> View
-                                Paper</a>
-                            <a href="#citation" class="pub-link"
-                                onclick="copyToClipboard('Aydin Ayanzadeh, et al. &quot;Deep Learning based Segmentation Pipeline for Label-Free Phase-Contrast Microscopy Images.&quot; 28th IEEE SIU Conference, 2020.')"><i
-                                    class="fas fa-quote-left"></i> Cite</a>
-                        </div>
-                    </div>
-
-                    <div class="publication-item">
-                        <h4>Graph Embedding For Link Prediction Using Residual Variational Graph Autoencoders</h4>
-                        <p class="authors">Reyhan Kevser Keser, Indrit Nallbani, Nurullah Calık, <strong>Aydin
-                                Ayanzadeh</strong>, and Behçet Ugur Töreyin</p>
-                        <p class="publication-venue">2020 28th Signal Processing and Communications Applications
-                            Conference (SIU), pp. 1-4, IEEE, 2020</p>
-                        <div class="publication-links">
-                            <a href="https://ieeexplore.ieee.org/abstract/document/9302271" target="_blank"
-                                rel="noopener noreferrer" class="pub-link"><i class="fas fa-external-link-alt"></i> View
-                                Paper</a>
-                            <a href="#citation" class="pub-link"
-                                onclick="copyToClipboard('Reyhan Kevser Keser, et al. &quot;Graph Embedding For Link Prediction Using Residual Variational Graph Autoencoders.&quot; 28th IEEE SIU Conference, 2020.')"><i
-                                    class="fas fa-quote-left"></i> Cite</a>
-                        </div>
-                    </div>
-
-                    <div class="publication-item">
-                        <h4>A New Class of Scaling Matrices for Scaled Trust Region Algorithms</h4>
-                        <p class="authors"><strong>Aydin Ayanzadeh</strong>, Shokoufeh Yazdanian, and Ehsan Shahamatnia
-                        </p>
-                        <p class="publication-venue">arXiv preprint arXiv:1904.09209, 2019</p>
-                        <div class="publication-links">
-                            <a href="https://arxiv.org/abs/1904.09209" target="_blank" rel="noopener noreferrer"
-                                class="pub-link"><i class="fas fa-external-link-alt"></i> View Paper</a>
-                            <a href="#citation" class="pub-link"
-                                onclick="copyToClipboard('Aydin Ayanzadeh, et al. &quot;A New Class of Scaling Matrices for Scaled Trust Region Algorithms.&quot; arXiv preprint arXiv:1904.09209 (2019).')"><i
-                                    class="fas fa-quote-left"></i> Cite</a>
-                        </div>
-                    </div>
-
-                    <div class="publication-item">
-                        <h4>Cell Segmentation of 2D Phase-Contrast Microscopy Images with Deep Learning Method</h4>
-                        <p class="authors"><strong>Aydin Ayanzadeh</strong>, Hüseyin Onur Yağar, Özden Yalçin Özuysal,
-                            Devrim Pesen Okvur, Behçet Ugur Töreyin, Devrim Ünay, and Sevgi Önal</p>
-                        <p class="publication-venue">2019 Medical Technologies Congress (TIPTEKNO), pp. 1-4, IEEE, 2019
-                        </p>
-                        <div class="publication-links">
-                            <a href="https://ieeexplore.ieee.org/document/8894978" target="_blank"
-                                rel="noopener noreferrer" class="pub-link"><i class="fas fa-external-link-alt"></i> View
-                                Paper</a>
-                            <a href="#citation" class="pub-link"
-                                onclick="copyToClipboard('Aydin Ayanzadeh, et al. &quot;Cell Segmentation of 2D Phase-Contrast Microscopy Images with Deep Learning.&quot; 2019 Medical Technologies Congress (TIPTEKNO), 2019.')"><i
-                                    class="fas fa-quote-left"></i> Cite</a>
-                        </div>
-                    </div>
-
-                    <div class="publication-item">
-                        <h4>Automated Segmentation of Cells in Phase Contrast Optical Microscopy Time Series Images</h4>
-                        <p class="authors">Rıfkı Can Binici, Umut Şahin, <strong>Aydin Ayanzadeh</strong>, Behçet Uğur
-                            Töreyin, Sevgi Önal, Devrim Pesen Okvur, Özden Yalçın Özuysal, and Devrim Ünay</p>
-                        <p class="publication-venue">2019 Medical Technologies Congress (TIPTEKNO), pp. 1-4, IEEE, 2019
-                        </p>
-                        <div class="publication-links">
-                            <a href="https://doi.org/10.1109/TIPTEKNO.2019.8895100" target="_blank"
-                                rel="noopener noreferrer" class="pub-link"><i class="fas fa-external-link-alt"></i> View
-                                Paper</a>
-                            <a href="#citation" class="pub-link"
-                                onclick="copyToClipboard('Binici, R. C., Şahin, U., Ayanzadeh, A., Töreyin, B. U., Önal, S., Okvur, D. P., Özuysal, Ö. Y., & Ünay, D. (2019). Automated Segmentation of Cells in Phase Contrast Optical Microscopy Time Series Images. In 2019 Medical Technologies Congress (TIPTEKNO) (pp. 1-4). IEEE. https://doi.org/10.1109/TIPTEKNO.2019.8895100')"><i
-                                    class="fas fa-quote-left"></i> Cite</a>
-                        </div>
-                    </div>
-
-                    <div class="publication-item">
-                        <h4>Modified Deep Neural Networks for Dog Breeds Identification</h4>
-                        <p class="authors"><strong>Aydin Ayanzadeh</strong>, and Sahand Vahidnia</p>
-                        <p class="publication-venue">Preprints (2018)</p>
-                        <div class="publication-links">
-                            <a href="https://www.preprints.org/manuscript/201812.0232/v1" target="_blank"
-                                rel="noopener noreferrer" class="pub-link"><i class="fas fa-external-link-alt"></i> View
-                                Paper</a>
-                            <a href="https://github.com/Ayanzadeh93/Dog-Breeds-Identification" target="_blank"
-                                rel="noopener noreferrer" class="pub-link"><i class="fas fa-code"></i> Code</a>
-                            <a href="#citation" class="pub-link"
-                                onclick="copyToClipboard('Aydin Ayanzadeh, Sahand Vahidnia. &quot;Modified Deep Neural Networks for Dog Breeds Identification.&quot; Preprints (2018).')"><i
-                                    class="fas fa-quote-left"></i> Cite</a>
-                        </div>
-                    </div>
-
-                    <div class="publication-item">
-                        <h4>A Modified Ant colony Based Approach to Digital Image Edge Detection</h4>
-                        <p class="authors"><strong>Aydin Ayanzadeh</strong>, Hossein Pourghaemi, Yousef Seyfari</p>
-                        <p class="publication-venue">2015 2nd International Conference on Knowledge-Based Engineering
-                            and Innovation (KBEI), pp. 726-729, IEEE, 2015</p>
-                        <div class="publication-links">
-                            <a href="https://ieeexplore.ieee.org/abstract/document/7436096" target="_blank"
-                                rel="noopener noreferrer" class="pub-link"><i class="fas fa-external-link-alt"></i> View
-                                Paper</a>
-                            <a href="https://github.com/Ayanzadeh93/Antcolony-edgedetection" target="_blank"
-                                rel="noopener noreferrer" class="pub-link"><i class="fas fa-code"></i> Code</a>
-                            <a href="#citation" class="pub-link"
-                                onclick="copyToClipboard('Aydin Ayanzadeh, Hossein Pourghaemi, Yousef Seyfari. &quot;A Modified Ant Colony Based Approach to Digital Image Edge Detection.&quot; 2015 2nd International Conference on Knowledge-Based Engineering and Innovation (KBEI), pp. 504-509. IEEE, 2015.')"><i
-                                    class="fas fa-quote-left"></i> Cite</a>
-                        </div>
-                    </div>
-
-                    <div class="publication-item">
-                        <h4>Gaussian Three-Dimensional kernel SVM for Edge Detection Applications</h4>
-                        <p class="authors">Safar Irandoust-Pakchin, <strong>Aydin Ayanzadeh</strong>, and Siamak
-                            Beikzadeh</p>
-                        <p class="publication-venue">International Conference on New Research Findings in Electrical
-                            Engineering and Computer Science, Tehran, 2015</p>
-                        <div class="publication-links">
-                            <a href="#citation" class="pub-link"
-                                onclick="copyToClipboard('Irandoust-Pakchin, S., Ayanzadeh, A., & Beikzadeh, S. (2015). Gaussian Three-Dimensional kernel SVM for Edge Detection Applications. In International Conference on New Research Findings in Electrical Engineering and Computer Science, Tehran.')"><i
-                                    class="fas fa-quote-left"></i> Cite</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Book Chapters -->
-                <div class="publication-category">
-                    <h3 class="category-title">
-                        <i class="fas fa-book"></i>
-                        Book Chapters
-                    </h3>
+                <pub-explorer>
                     <div class="publications-list">
-                        <div class="publication-item book-chapter">
+                        <div class="publication-item featured" data-type="inproceedings" data-year="2026" data-venue="IEEE International Symposium on Workload Characterization (IISWC)" data-status="Accepted">
+                            <div class="publication-badge">Accepted</div>
+                            <h4>Characterizing an On-Device Depth-Aware Multimodal Workload in Assistive Navigation for Blind and Low-Vision Users</h4>
+                            <p class="authors"><strong>Aydin Ayanzadeh</strong></p>
+                            <p class="publication-venue">Accepted - IISWC 2026</p>
+                            <div class="publication-links">
+                                <button type="button" class="pub-link" data-cite hidden><i class="fas fa-quote-left" aria-hidden="true"></i> Cite</button>
+                            </div>
+                        </div>
+
+                        <div class="publication-item featured" data-type="inproceedings" data-year="2026" data-venue="IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)" data-status="Accepted">
+                            <div class="publication-badge">Accepted</div>
+                            <h4>LLM-Guided Agentic Floor Plan Parsing for Accessible Indoor Navigation of Blind and Low-Vision People</h4>
+                            <p class="authors"><strong>Aydin Ayanzadeh</strong>, Tim Oates</p>
+                            <p class="publication-venue">Accepted - CVPR 2026</p>
+                            <div class="publication-links">
+                                <button type="button" class="pub-link" data-cite hidden><i class="fas fa-quote-left" aria-hidden="true"></i> Cite</button>
+                            </div>
+                        </div>
+
+                        <div class="publication-item featured" data-type="inproceedings" data-year="2026" data-venue="IEEE International Geoscience and Remote Sensing Symposium (IGARSS)" data-arxiv="2602.13305" data-status="Accepted">
+                            <div class="publication-badge">Accepted</div>
+                            <h4>WildfireVLM: AI-Powered Analysis for Early Wildfire Detection Using Satellite Imagery</h4>
+                            <p class="authors"><strong>Aydin Ayanzadeh</strong>, Prakhar Dixit, Sadia Kamal, Milton Halem</p>
+                            <p class="publication-venue">Accepted - IGARSS 2026</p>
+                            <div class="publication-links">
+                                <a href="https://arxiv.org/abs/2602.13305" target="_blank" rel="noopener noreferrer"
+                                    class="pub-link"><i class="fas fa-external-link-alt"></i> View Paper</a>
+                                <button type="button" class="pub-link" data-cite hidden><i class="fas fa-quote-left" aria-hidden="true"></i> Cite</button>
+                            </div>
+                        </div>
+
+                        <div class="publication-item featured" data-type="inproceedings" data-year="2025" data-venue="IEEE International Conference on Big Data (Big Data)" data-arxiv="2512.12177">
+                            <div class="publication-badge">Accepted</div>
+                            <h4>Floorplan2Guide: LLM-Guided Floorplan Parsing for BLV Indoor Navigation</h4>
+                            <p class="authors"><strong>Aydin Ayanzadeh</strong>, and Tim Oates</p>
+                            <p class="publication-venue">IEEE Big Data 2025, arXiv preprint arXiv:2512.12177</p>
+                            <div class="publication-links">
+                                <a href="https://arxiv.org/abs/2512.12177" target="_blank" rel="noopener noreferrer"
+                                    class="pub-link"><i class="fas fa-external-link-alt"></i> View Paper</a>
+                                <button type="button" class="pub-link" data-cite hidden><i class="fas fa-quote-left" aria-hidden="true"></i> Cite</button>
+                            </div>
+                        </div>
+
+                        <div class="publication-item featured" data-type="article" data-year="2023" data-venue="Expert Systems with Applications" data-volume="213" data-pages="119040" data-doi="10.1016/j.eswa.2022.119040">
+                            <div class="publication-badge">Featured</div>
+                            <h4>PURSUhInT: In Search of Informative Hint Points Based on Layer Clustering for Knowledge
+                                Distillation</h4>
+                            <p class="authors">Reyhan Kevser Keser, <strong>Aydin Ayanzadeh</strong>, Omid Abdollahi Aghdam,
+                                Caglar Kilcioglu, Behcet Ugur Toreyin, and Nazim Kemal Ure</p>
+                            <p class="publication-venue">Expert Systems with Applications, vol. 213, 119040, 2023</p>
+                            <div class="publication-links">
+                                <a href="https://www.sciencedirect.com/science/article/abs/pii/S0957417422020589"
+                                    target="_blank" rel="noopener noreferrer" class="pub-link"><i
+                                        class="fas fa-external-link-alt"></i> View Paper</a>
+                                <a href="https://codeocean.com/capsule/4245746/tree/v1" target="_blank"
+                                    rel="noopener noreferrer" class="pub-link"><i class="fas fa-code"></i> Code</a>
+                                <button type="button" class="pub-link" data-cite hidden><i class="fas fa-quote-left" aria-hidden="true"></i> Cite</button>
+                            </div>
+                        </div>
+
+                        <div class="publication-item" data-type="article" data-year="2021" data-venue="Turkish Journal of Electrical Engineering and Computer Sciences" data-volume="29" data-number="8" data-pages="2855-2868" data-doi="10.3906/elk-2105-244">
+                            <h4>Improved cell segmentation using deep learning in label-free optical microscopy images</h4>
+                            <p class="authors"><strong>Aydin Ayanzadeh</strong>, Ozden Yalcin Ozuysal, Devrim Pesen Okvur,
+                                Sevgi Onal, Behcet Ugur Toreyin, and Devrim Unay</p>
+                            <p class="publication-venue">Turkish Journal of Electrical Engineering and Computer Sciences,
+                                vol. 29, no. 8, pp. 2855-2868, 2021</p>
+                            <div class="publication-links">
+                                <a href="https://journals.tubitak.gov.tr/elektrik/vol29/iss8/18/" target="_blank"
+                                    rel="noopener noreferrer" class="pub-link"><i class="fas fa-external-link-alt"></i> View
+                                    Paper</a>
+                                <button type="button" class="pub-link" data-cite hidden><i class="fas fa-quote-left" aria-hidden="true"></i> Cite</button>
+                            </div>
+                        </div>
+
+                        <div class="publication-item" data-type="preprint" data-year="2021" data-venue="arXiv preprint" data-arxiv="2105.00695">
+                            <h4>Representation learning using graph autoencoders with residual connections</h4>
+                            <p class="authors">Indrit Nallbani, <strong>Aydin Ayanzadeh</strong>, Reyhan Kevser Keser,
+                                Nurullah Çalık, and Behçet Uğur Töreyin</p>
+                            <p class="publication-venue">arXiv preprint arXiv:2105.00695, 2021</p>
+                            <div class="publication-links">
+                                <a href="https://arxiv.org/abs/2105.00695" target="_blank" rel="noopener noreferrer"
+                                    class="pub-link"><i class="fas fa-external-link-alt"></i> View Paper</a>
+                                <button type="button" class="pub-link" data-cite hidden><i class="fas fa-quote-left" aria-hidden="true"></i> Cite</button>
+                            </div>
+                        </div>
+
+                        <div class="publication-item" data-type="inproceedings" data-year="2020" data-venue="2020 28th Signal Processing and Communications Applications Conference (SIU)" data-pages="1-4" data-publisher="IEEE" data-doi="10.1109/SIU49456.2020.9302304">
+                            <h4>Deep Learning based Segmentation Pipeline for Label-Free Phase-Contrast Microscopy Images
+                            </h4>
+                            <p class="authors"><strong>Aydin Ayanzadeh</strong>, Ozden Yalcin Ozuysal, Devrim Pesen Okvur,
+                                Sevgi Onal, Devrim Unay, Behcet Ugur Toreyin</p>
+                            <p class="publication-venue">2020 28th Signal Processing and Communications Applications
+                                Conference (SIU), pp. 1-4, IEEE, 2020</p>
+                            <div class="publication-links">
+                                <a href="https://ieeexplore.ieee.org/abstract/document/9302304" target="_blank"
+                                    rel="noopener noreferrer" class="pub-link"><i class="fas fa-external-link-alt"></i> View
+                                    Paper</a>
+                                <button type="button" class="pub-link" data-cite hidden><i class="fas fa-quote-left" aria-hidden="true"></i> Cite</button>
+                            </div>
+                        </div>
+
+                        <div class="publication-item" data-type="inproceedings" data-year="2020" data-venue="2020 28th Signal Processing and Communications Applications Conference (SIU)" data-pages="1-4" data-publisher="IEEE" data-doi="10.1109/SIU49456.2020.9302271">
+                            <h4>Graph Embedding For Link Prediction Using Residual Variational Graph Autoencoders</h4>
+                            <p class="authors">Reyhan Kevser Keser, Indrit Nallbani, Nurullah Calık, <strong>Aydin
+                                    Ayanzadeh</strong>, and Behçet Ugur Töreyin</p>
+                            <p class="publication-venue">2020 28th Signal Processing and Communications Applications
+                                Conference (SIU), pp. 1-4, IEEE, 2020</p>
+                            <div class="publication-links">
+                                <a href="https://ieeexplore.ieee.org/abstract/document/9302271" target="_blank"
+                                    rel="noopener noreferrer" class="pub-link"><i class="fas fa-external-link-alt"></i> View
+                                    Paper</a>
+                                <button type="button" class="pub-link" data-cite hidden><i class="fas fa-quote-left" aria-hidden="true"></i> Cite</button>
+                            </div>
+                        </div>
+
+                        <div class="publication-item" data-type="preprint" data-year="2019" data-venue="arXiv preprint" data-arxiv="1904.09209">
+                            <h4>A New Class of Scaling Matrices for Scaled Trust Region Algorithms</h4>
+                            <p class="authors"><strong>Aydin Ayanzadeh</strong>, Shokoufeh Yazdanian, and Ehsan Shahamatnia
+                            </p>
+                            <p class="publication-venue">arXiv preprint arXiv:1904.09209, 2019</p>
+                            <div class="publication-links">
+                                <a href="https://arxiv.org/abs/1904.09209" target="_blank" rel="noopener noreferrer"
+                                    class="pub-link"><i class="fas fa-external-link-alt"></i> View Paper</a>
+                                <button type="button" class="pub-link" data-cite hidden><i class="fas fa-quote-left" aria-hidden="true"></i> Cite</button>
+                            </div>
+                        </div>
+
+                        <div class="publication-item" data-type="inproceedings" data-year="2019" data-venue="2019 Medical Technologies Congress (TIPTEKNO)" data-pages="1-4" data-publisher="IEEE" data-doi="10.1109/TIPTEKNO.2019.8894978">
+                            <h4>Cell Segmentation of 2D Phase-Contrast Microscopy Images with Deep Learning Method</h4>
+                            <p class="authors"><strong>Aydin Ayanzadeh</strong>, Hüseyin Onur Yağar, Özden Yalçin Özuysal,
+                                Devrim Pesen Okvur, Behçet Ugur Töreyin, Devrim Ünay, and Sevgi Önal</p>
+                            <p class="publication-venue">2019 Medical Technologies Congress (TIPTEKNO), pp. 1-4, IEEE, 2019
+                            </p>
+                            <div class="publication-links">
+                                <a href="https://ieeexplore.ieee.org/document/8894978" target="_blank"
+                                    rel="noopener noreferrer" class="pub-link"><i class="fas fa-external-link-alt"></i> View
+                                    Paper</a>
+                                <button type="button" class="pub-link" data-cite hidden><i class="fas fa-quote-left" aria-hidden="true"></i> Cite</button>
+                            </div>
+                        </div>
+
+                        <div class="publication-item" data-type="inproceedings" data-year="2019" data-venue="2019 Medical Technologies Congress (TIPTEKNO)" data-pages="1-4" data-publisher="IEEE" data-doi="10.1109/TIPTEKNO.2019.8895080">
+                            <h4>Automated Segmentation of Cells in Phase Contrast Optical Microscopy Time Series Images</h4>
+                            <p class="authors">Rıfkı Can Binici, Umut Şahin, <strong>Aydin Ayanzadeh</strong>, Behçet Uğur
+                                Töreyin, Sevgi Önal, Devrim Pesen Okvur, Özden Yalçın Özuysal, and Devrim Ünay</p>
+                            <p class="publication-venue">2019 Medical Technologies Congress (TIPTEKNO), pp. 1-4, IEEE, 2019
+                            </p>
+                            <div class="publication-links">
+                                <a href="https://doi.org/10.1109/TIPTEKNO.2019.8895080" target="_blank"
+                                    rel="noopener noreferrer" class="pub-link"><i class="fas fa-external-link-alt"></i> View
+                                    Paper</a>
+                                <button type="button" class="pub-link" data-cite hidden><i class="fas fa-quote-left" aria-hidden="true"></i> Cite</button>
+                            </div>
+                        </div>
+
+                        <div class="publication-item" data-type="preprint" data-year="2018" data-venue="Preprints">
+                            <h4>Modified Deep Neural Networks for Dog Breeds Identification</h4>
+                            <p class="authors"><strong>Aydin Ayanzadeh</strong>, and Sahand Vahidnia</p>
+                            <p class="publication-venue">Preprints (2018)</p>
+                            <div class="publication-links">
+                                <a href="https://www.preprints.org/manuscript/201812.0232/v1" target="_blank"
+                                    rel="noopener noreferrer" class="pub-link"><i class="fas fa-external-link-alt"></i> View
+                                    Paper</a>
+                                <a href="https://github.com/Ayanzadeh93/Dog-Breeds-Identification" target="_blank"
+                                    rel="noopener noreferrer" class="pub-link"><i class="fas fa-code"></i> Code</a>
+                                <button type="button" class="pub-link" data-cite hidden><i class="fas fa-quote-left" aria-hidden="true"></i> Cite</button>
+                            </div>
+                        </div>
+
+                        <div class="publication-item" data-type="inproceedings" data-year="2015" data-venue="2015 2nd International Conference on Knowledge-Based Engineering and Innovation (KBEI)" data-pages="726-729" data-publisher="IEEE" data-doi="10.1109/KBEI.2015.7436096">
+                            <h4>A Modified Ant colony Based Approach to Digital Image Edge Detection</h4>
+                            <p class="authors"><strong>Aydin Ayanzadeh</strong>, Hossein Pourghaemi, Yousef Seyfari</p>
+                            <p class="publication-venue">2015 2nd International Conference on Knowledge-Based Engineering
+                                and Innovation (KBEI), pp. 726-729, IEEE, 2015</p>
+                            <div class="publication-links">
+                                <a href="https://ieeexplore.ieee.org/abstract/document/7436096" target="_blank"
+                                    rel="noopener noreferrer" class="pub-link"><i class="fas fa-external-link-alt"></i> View
+                                    Paper</a>
+                                <a href="https://github.com/Ayanzadeh93/Antcolony-edgedetection" target="_blank"
+                                    rel="noopener noreferrer" class="pub-link"><i class="fas fa-code"></i> Code</a>
+                                <button type="button" class="pub-link" data-cite hidden><i class="fas fa-quote-left" aria-hidden="true"></i> Cite</button>
+                            </div>
+                        </div>
+
+                        <div class="publication-item" data-type="inproceedings" data-year="2015" data-venue="International Conference on New Research Findings in Electrical Engineering and Computer Science">
+                            <h4>Gaussian Three-Dimensional kernel SVM for Edge Detection Applications</h4>
+                            <p class="authors">Safar Irandoust-Pakchin, <strong>Aydin Ayanzadeh</strong>, and Siamak
+                                Beikzadeh</p>
+                            <p class="publication-venue">International Conference on New Research Findings in Electrical
+                                Engineering and Computer Science, Tehran, 2015</p>
+                            <div class="publication-links">
+                                <button type="button" class="pub-link" data-cite hidden><i class="fas fa-quote-left" aria-hidden="true"></i> Cite</button>
+                            </div>
+                        </div>
+
+                        <div class="publication-item book-chapter" data-type="incollection" data-year="2023" data-venue="Diagnostic Biomedical Signal and Image Processing Applications with Deep Learning Methods" data-pages="137-154" data-publisher="Academic Press" data-doi="10.1016/B978-0-323-96129-5.00013-5">
                             <div class="publication-badge book-badge">Book Chapter</div>
                             <h4>Automated analysis of phase-contrast optical microscopy time-lapse images: application
                                 to wound healing and cell motility assays of breast cancer</h4>
                             <p class="authors">Yusuf Sait Erdem, <strong>Aydin Ayanzadeh</strong>, Berkay Mayalı,
                                 Muhammed Balıkçi, Özge Nur Belli, Mahmut Uçar, Özden Yalçın Özyusal et al.</p>
                             <p class="publication-venue">In <em>Diagnostic Biomedical Signal and Image Processing
-                                    Applications with Deep Learning Methods</em>, pp. 33-57, Academic Press, 2023</p>
+                                    Applications with Deep Learning Methods</em>, pp. 137-154, Academic Press, 2023</p>
                             <div class="publication-links">
                                 <a href="https://www.sciencedirect.com/science/article/abs/pii/B9780323961295000135"
                                     target="_blank" rel="noopener noreferrer" class="pub-link"><i
                                         class="fas fa-external-link-alt"></i> View Chapter</a>
-                                <a href="#citation" class="pub-link"
-                                    onclick="copyToClipboard('Yusuf Sait Erdem, Aydin Ayanzadeh, et al. &quot;Automated Analysis of Phase-Contrast Optical Microscopy: Application to Wound Healing.&quot; In Diagnostic Biomedical Signal and Image Processing Applications with Deep Learning, pp. 137-154. Academic Press, 2023.')"><i
-                                        class="fas fa-quote-left"></i> Cite</a>
+                                <button type="button" class="pub-link" data-cite hidden><i class="fas fa-quote-left" aria-hidden="true"></i> Cite</button>
                                 <a href="https://www.sciencedirect.com/book/9780323961295" target="_blank"
                                     rel="noopener noreferrer" class="pub-link"><i class="fas fa-book-open"></i> View
                                     Book</a>
                             </div>
                         </div>
                     </div>
-                </div>
-
+                </pub-explorer>
 
                 <!-- Journal Reviewer Section -->
                 <div class="reviewer-section">
@@ -1261,6 +1163,8 @@
                                 <div class="project-collaborators">
                                     <strong>Collaborator:</strong> Prof. Tim Oates (UMBC)
                                 </div>
+                                <a href="projects/indoor-navigation.html" class="pub-link"><i
+                                        class="fas fa-arrow-right"></i> View Project</a>
                             </div>
                         </div>
 
@@ -1271,7 +1175,7 @@
                                 </h4>
                                 <div class="project-meta">
                                     <span class="project-year">2024</span>
-                                    <span class="project-status">Under Review</span>
+                                    <span class="project-status">Accepted</span>
                                 </div>
                             </div>
                             <p class="project-description">
@@ -1291,9 +1195,12 @@
                                     <strong>Collaborators:</strong> Prakhar Dixit, Sadia Kamal, Prof. Milton Halem
                                     (UMBC)
                                 </div>
-                                <div class="project-venue">
-                                    <strong>Target Venue:</strong> MDP Forest Special Issue
+                                <div class="project-outcome">
+                                    <strong>Accepted at:</strong> IEEE International Geoscience and Remote Sensing
+                                    Symposium (IGARSS) 2026
                                 </div>
+                                <a href="projects/wildfire-vlm.html" class="pub-link"><i
+                                        class="fas fa-arrow-right"></i> View Project</a>
                             </div>
                         </div>
                     </div>
@@ -1329,6 +1236,8 @@
                                 <div class="project-outcome">
                                     <strong>Published in:</strong> Expert Systems with Applications (Impact Factor: 8.5)
                                 </div>
+                                <a href="projects/knowledge-distillation.html" class="pub-link"><i
+                                        class="fas fa-arrow-right"></i> View Project</a>
                             </div>
                         </div>
 
@@ -1356,6 +1265,8 @@
                                     <strong>Published in:</strong> Turkish Journal of Electrical Engineering and
                                     Computer Sciences, IEEE SIU 2020
                                 </div>
+                                <a href="projects/medical-segmentation.html" class="pub-link"><i
+                                        class="fas fa-arrow-right"></i> View Project</a>
                             </div>
                         </div>
 
@@ -1382,6 +1293,8 @@
                                 <div class="project-outcome">
                                     <strong>Published in:</strong> arXiv preprint, IEEE SIU 2020
                                 </div>
+                                <a href="projects/graph-autoencoder.html" class="pub-link"><i
+                                        class="fas fa-arrow-right"></i> View Project</a>
                             </div>
                         </div>
                     </div>
@@ -1533,6 +1446,52 @@
                             </a>
                         </div>
                     </div>
+
+                    <!-- Project 7: WildfireVLM -->
+                    <div class="project-card">
+                        <div class="project-thumbnail">
+                            <div class="project-icon environmental-ai">
+                                <i class="fas fa-fire"></i>
+                            </div>
+                            <div class="project-badge">Environmental AI</div>
+                        </div>
+                        <div class="project-card-body">
+                            <h3>WildfireVLM</h3>
+                            <p>Vision-Language Model for early wildfire detection and risk assessment from satellite
+                                imagery, accepted at IGARSS 2026.</p>
+                            <div class="project-tags">
+                                <span>Vision-Language Models</span>
+                                <span>Remote Sensing</span>
+                                <span>Environmental AI</span>
+                            </div>
+                            <a href="projects/wildfire-vlm.html" class="btn-read-more">
+                                Read More <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Project 8: Claude Code Encyclopedia -->
+                    <div class="project-card">
+                        <div class="project-thumbnail">
+                            <div class="project-icon developer-tools">
+                                <i class="fas fa-terminal"></i>
+                            </div>
+                            <div class="project-badge">Developer Tools</div>
+                        </div>
+                        <div class="project-card-body">
+                            <h3>Claude Code Encyclopedia</h3>
+                            <p>Searchable, offline-capable reference for Claude Code and Codex CLI &mdash; 504 commands,
+                                flags, settings keys and config paths across three platforms.</p>
+                            <div class="project-tags">
+                                <span>Vanilla JS</span>
+                                <span>Developer Tools</span>
+                                <span>Zero Dependencies</span>
+                            </div>
+                            <a href="projects/claude-code-encyclopedia.html" class="btn-read-more">
+                                Read More <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -1641,8 +1600,12 @@
                 <div class="contact-content-wrapper">
                     <!-- Main Contact Form -->
                     <div class="contact-main-form">
-                        <form action="https://formspree.io/f/xpwaqjqr" method="POST" id="contactForm"
+                        <form action="https://formspree.io/f/xzdkodzv" method="POST" id="contactForm"
+                            data-owner-email="a.ayanzadeh@gmail.com"
                             class="elegant-form" novalidate>
+                            <input type="hidden" name="_subject" value="New website contact message">
+                            <input type="hidden" name="_replyto" id="replyto">
+                            <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" hidden aria-hidden="true">
                             <div class="form-grid">
                                 <div class="form-field">
                                     <label for="name">Name</label>
@@ -1689,7 +1652,7 @@
                                 </div>
                                 <div class="detail-content">
                                     <span class="detail-label">Email</span>
-                                    <a href="mailto:aydina1@umbc.edu">aydina1@umbc.edu</a>
+                                    <a href="mailto:a.ayanzadeh@gmail.com">a.ayanzadeh@gmail.com</a>
                                 </div>
                             </div>
 
@@ -1730,7 +1693,7 @@
                                     aria-label="Google Scholar profile">
                                     <i class="fas fa-graduation-cap"></i>
                                 </a>
-                                <a href="mailto:aydina1@umbc.edu" class="social-btn-simple email" title="Email"
+                                <a href="mailto:a.ayanzadeh@gmail.com" class="social-btn-simple email" title="Email"
                                     aria-label="Send email">
                                     <i class="fas fa-envelope"></i>
                                 </a>
@@ -1747,7 +1710,7 @@
     <footer class="footer">
         <div class="container footer-content">
             <div class="footer-social">
-                <a href="mailto:aydina1@umbc.edu" title="Email" aria-label="Send email"><i
+                <a href="mailto:a.ayanzadeh@gmail.com" title="Email" aria-label="Send email"><i
                         class="fas fa-envelope"></i></a>
                 <a href="https://linkedin.com/in/ayanzadeh93" target="_blank" rel="noopener noreferrer" title="LinkedIn"
                     aria-label="LinkedIn profile"><i class="fab fa-linkedin"></i></a>
@@ -1759,20 +1722,30 @@
                 <p class="footer-built">Built with ❤️ for research and innovation</p>
             </div>
             <div class="footer-legal">
-                <a href="#privacy" onclick="showPrivacyInfo()">Privacy</a>
+                <a href="#privacy" data-info="privacy">Privacy</a>
                 <span class="footer-separator">|</span>
-                <a href="#accessibility" onclick="showAccessibilityInfo()">Accessibility</a>
+                <a href="#accessibility" data-info="accessibility">Accessibility</a>
                 <span class="footer-separator">|</span>
-                <a href="sitemap.xml" target="_blank">Sitemap</a>
+                <a href="sitemap.xml" target="_blank" rel="noopener noreferrer">Sitemap</a>
             </div>
         </div>
     </footer>
+
+    <button type="button" id="backToTop" class="back-to-top" aria-label="Back to top" hidden>
+        <i class="fas fa-arrow-up" aria-hidden="true"></i>
+    </button>
 
     <!-- Screen Reader Live Regions -->
     <div id="sr-status" class="sr-only" aria-live="polite" aria-atomic="true"></div>
     <div id="sr-alerts" class="sr-only" aria-live="assertive" aria-atomic="true"></div>
 
+    <!-- Citation exporter, shared by every publication card -->
+    <cite-dialog></cite-dialog>
+
     <script src="js/main.js"></script>
+    <!-- Custom elements. type="module" is deferred and ignored by browsers
+         without module support, so the page degrades to plain markup. -->
+    <script type="module" src="js/components/index.js"></script>
 </body>
 
 </html>

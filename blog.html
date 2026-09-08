@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://formspree.io; form-action 'self' https://formspree.io; frame-src 'none'; manifest-src 'self'">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
 
     <!-- Primary Meta Tags -->
     <title>Blog - Aydin Ayanzadeh | Computer Vision & AI Research</title>
@@ -14,6 +16,7 @@
         content="computer vision blog, AI research, medical image analysis, machine learning blog, PhD research, UMBC, deep learning articles">
     <meta name="author" content="Aydin Ayanzadeh">
     <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#2563eb">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
@@ -43,12 +46,27 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://formspree.io">
+
+    <!-- Apply the saved (or system) theme before first paint to avoid a light-mode flash -->
+    <script>
+        (function () {
+            var saved = null;
+            try { saved = localStorage.getItem('theme'); } catch (e) { /* storage unavailable */ }
+            var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            var dark = saved === 'dark' || (!saved && prefersDark);
+            document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+        })();
+    </script>
 
     <!-- Stylesheets -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/blog.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer"></noscript>
 
     <!-- Structured Data for Blog -->
     <script type="application/ld+json">
@@ -88,13 +106,25 @@
             <div class="nav-brand">
                 <a href="index.html" class="brand-link"><span class="brand-text">Aydin Ayanzadeh</span></a>
             </div>
-            <ul class="top-nav-menu">
-                <li><a href="blog.html" class="top-nav-link active"><i class="fas fa-blog" aria-hidden="true"></i>
+            <ul class="top-nav-menu" id="top-nav-menu">
+                <li><a href="index.html" class="top-nav-link"><i class="fas fa-home" aria-hidden="true"></i>
+                        Home</a></li>
+                <li><a href="blog.html" class="top-nav-link active" aria-current="page"><i class="fas fa-blog"
+                            aria-hidden="true"></i>
                         Blog</a></li>
+                <li><a href="index.html#publications" class="top-nav-link"><i class="fas fa-book"
+                            aria-hidden="true"></i>
+                        Publications</a></li>
                 <li><a href="index.html#contact" class="top-nav-link"><i class="fas fa-envelope" aria-hidden="true"></i>
                         Contact</a></li>
+                <li>
+                    <button id="theme-toggle" class="top-nav-link theme-toggle-btn" aria-label="Switch to dark theme">
+                        <i class="fas fa-moon" aria-hidden="true"></i> <span>Theme</span>
+                    </button>
+                </li>
             </ul>
-            <button class="mobile-menu-toggle" aria-label="Toggle mobile navigation menu" aria-expanded="false">
+            <button class="mobile-menu-toggle" aria-label="Toggle mobile navigation menu" aria-expanded="false"
+                aria-controls="top-nav-menu">
                 <span aria-hidden="true"></span>
                 <span aria-hidden="true"></span>
                 <span aria-hidden="true"></span>
@@ -139,12 +169,39 @@
         <!-- Blog Posts -->
         <section class="blog-posts">
             <div class="container">
+                <!-- Search & category filters -->
+                <div class="blog-toolbar">
+                    <div class="blog-search" role="search">
+                        <label for="blog-search-input" class="sr-only">Search blog posts</label>
+                        <i class="fas fa-search search-icon" aria-hidden="true"></i>
+                        <input type="search" id="blog-search-input" class="search-input"
+                            placeholder="Search posts by title, topic, or tag&hellip;" autocomplete="off">
+                        <button type="button" class="search-clear" aria-label="Clear search" hidden>
+                            <i class="fas fa-times" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    <div class="blog-filters" role="group" aria-label="Filter posts by category">
+                        <button type="button" class="filter-btn active" data-filter="all"
+                            aria-pressed="true">All</button>
+                        <button type="button" class="filter-btn" data-filter="medical-ai"
+                            aria-pressed="false">Medical AI</button>
+                        <button type="button" class="filter-btn" data-filter="graph-learning"
+                            aria-pressed="false">Graph Learning</button>
+                        <button type="button" class="filter-btn" data-filter="optimization"
+                            aria-pressed="false">Optimization</button>
+                        <button type="button" class="filter-btn" data-filter="career"
+                            aria-pressed="false">Career</button>
+                    </div>
+                </div>
+
+                <p class="search-results" role="status" aria-live="polite" hidden></p>
+
                 <div class="blog-grid">
                     <!-- Featured Post -->
-                    <article class="blog-post featured">
+                    <article class="blog-post featured" data-category="medical-ai">
                         <div class="post-image">
                             <div class="post-image-placeholder">
-                                <i class="fas fa-brain"></i>
+                                <i class="fas fa-brain" aria-hidden="true"></i>
                             </div>
                             <div class="post-category">Featured</div>
                         </div>
@@ -170,11 +227,12 @@
                     </article>
 
                     <!-- Regular Posts -->
-                    <article class="blog-post">
+                    <article class="blog-post" data-category="graph-learning">
                         <div class="post-image">
                             <div class="post-image-placeholder">
-                                <i class="fas fa-project-diagram"></i>
+                                <i class="fas fa-project-diagram" aria-hidden="true"></i>
                             </div>
+                            <div class="post-category">Graph Learning</div>
                         </div>
                         <div class="post-content">
                             <div class="post-meta">
@@ -195,11 +253,12 @@
                         </div>
                     </article>
 
-                    <article class="blog-post">
+                    <article class="blog-post" data-category="medical-ai">
                         <div class="post-image">
                             <div class="post-image-placeholder">
-                                <i class="fas fa-microscope"></i>
+                                <i class="fas fa-microscope" aria-hidden="true"></i>
                             </div>
+                            <div class="post-category">Medical AI</div>
                         </div>
                         <div class="post-content">
                             <div class="post-meta">
@@ -221,11 +280,12 @@
                         </div>
                     </article>
 
-                    <article class="blog-post">
+                    <article class="blog-post" data-category="optimization">
                         <div class="post-image">
                             <div class="post-image-placeholder">
-                                <i class="fas fa-microchip"></i>
+                                <i class="fas fa-microchip" aria-hidden="true"></i>
                             </div>
+                            <div class="post-category">Optimization</div>
                         </div>
                         <div class="post-content">
                             <div class="post-meta">
@@ -247,11 +307,12 @@
                         </div>
                     </article>
 
-                    <article class="blog-post">
+                    <article class="blog-post" data-category="optimization">
                         <div class="post-image">
                             <div class="post-image-placeholder">
-                                <i class="fas fa-compress-arrows-alt"></i>
+                                <i class="fas fa-compress-arrows-alt" aria-hidden="true"></i>
                             </div>
+                            <div class="post-category">Optimization</div>
                         </div>
                         <div class="post-content">
                             <div class="post-meta">
@@ -274,11 +335,12 @@
                         </div>
                     </article>
 
-                    <article class="blog-post">
+                    <article class="blog-post" data-category="career">
                         <div class="post-image">
                             <div class="post-image-placeholder">
-                                <i class="fas fa-route"></i>
+                                <i class="fas fa-route" aria-hidden="true"></i>
                             </div>
+                            <div class="post-category">Career</div>
                         </div>
                         <div class="post-content">
                             <div class="post-meta">
@@ -301,10 +363,13 @@
                     </article>
                 </div>
 
-                <!-- Load More Button -->
-                <div class="load-more-section">
-                    <button class="btn btn-primary load-more-btn">
-                        <i class="fas fa-plus"></i> Load More Posts
+                <!-- Empty state shown when a search or filter matches nothing -->
+                <div class="blog-empty-state" hidden>
+                    <i class="fas fa-folder-open" aria-hidden="true"></i>
+                    <h2>No posts found</h2>
+                    <p>Try a different keyword or clear the filters to see all posts.</p>
+                    <button type="button" class="btn btn-secondary blog-reset-btn">
+                        <i class="fas fa-rotate-left" aria-hidden="true"></i> Reset filters
                     </button>
                 </div>
             </div>
@@ -316,10 +381,12 @@
                 <div class="newsletter-content">
                     <h2>Stay Updated</h2>
                     <p>Subscribe to get notified about new blog posts and research updates</p>
-                    <form id="newsletterForm" class="newsletter-form">
+                    <form id="newsletterForm" class="newsletter-form"
+                        action="https://formspree.io/f/xzdkodzv" method="POST">
                         <label for="newsletter-email" class="sr-only">Email address</label>
-                        <input type="email" id="newsletter-email" placeholder="Enter your email address" required
-                            autocomplete="email">
+                        <input type="email" id="newsletter-email" name="email"
+                            placeholder="Enter your email address" required autocomplete="email">
+                        <input type="hidden" name="_subject" value="Blog newsletter signup">
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-paper-plane" aria-hidden="true"></i> Subscribe
                         </button>
@@ -333,7 +400,7 @@
     <footer class="footer">
         <div class="container footer-content">
             <div class="footer-social">
-                <a href="mailto:aydina1@umbc.edu" title="Email" aria-label="Send email"><i
+                <a href="mailto:a.ayanzadeh@gmail.com" title="Email" aria-label="Send email"><i
                         class="fas fa-envelope"></i></a>
                 <a href="https://linkedin.com/in/ayanzadeh93" target="_blank" rel="noopener noreferrer" title="LinkedIn"
                     aria-label="LinkedIn profile"><i class="fab fa-linkedin"></i></a>
@@ -345,6 +412,10 @@
             </div>
         </div>
     </footer>
+
+    <button type="button" id="backToTop" class="back-to-top" aria-label="Back to top" hidden>
+        <i class="fas fa-arrow-up" aria-hidden="true"></i>
+    </button>
 
     <script src="js/main.js"></script>
     <script src="js/blog.js"></script>

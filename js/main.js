@@ -1,20 +1,114 @@
 // Enhanced main.js with performance optimizations and accessibility features
 
+const supportsIntersectionObserver = 'IntersectionObserver' in window;
+const REVEAL_FALLBACK_DELAY = 2000; // Fallback delay to reveal content if observers do not trigger.
+const REVEAL_PRIMARY_SELECTOR = '.experience-card, .timeline-item, .publication-item, .award-item';
+const REVEAL_SECONDARY_SELECTOR = '.project-card, .project-item, .news-card, .teaching-item, .course-item, .journal-item, .reviewer-category, .focus-item';
+const REVEAL_FALLBACK_SELECTOR = `.section, ${REVEAL_PRIMARY_SELECTOR}, ${REVEAL_SECONDARY_SELECTOR}`;
+
+if (supportsIntersectionObserver) {
+    document.documentElement.classList.add('js-enabled');
+}
+
+// Escape text before it is interpolated into an HTML template string.
+function escapeHtml(value) {
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+window.escapeHtml = escapeHtml;
+
+// Pages share this bundle but not their markup, so isolate each module: a
+// failure in one must not stop the rest from initialising.
+function runInit(name, fn) {
+    try {
+        fn();
+    } catch (error) {
+        console.error(`Failed to initialize ${name}:`, error);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize all components
-    initMobileMenu();
-    initSmoothScrolling();
-    initIntersectionObserver();
-    initFormValidation();
-    initLoadingStates();
-    initLazyLoading();
-    initPerformanceOptimizations();
-    initAccessibilityFeatures();
-    initAIAnimations();
-    initNavbarScroll();
-    initThemeToggle();
+    [
+        ['mobile menu', initMobileMenu],
+        ['smooth scrolling', initSmoothScrolling],
+        ['scroll reveal', initIntersectionObserver],
+        ['form validation', initFormValidation],
+        ['loading states', initLoadingStates],
+        ['lazy loading', initLazyLoading],
+        ['performance optimizations', initPerformanceOptimizations],
+        ['accessibility features', initAccessibilityFeatures],
+        ['navbar scroll', initNavbarScroll],
+        ['theme toggle', initThemeToggle],
+        ['back to top', initBackToTop],
+        ['reading progress', initReadingProgress],
+        ['footer info links', initFooterInfoLinks]
+    ].forEach(([name, fn]) => runInit(name, fn));
+
     hideLoadingOverlay();
 });
+
+// Floating scroll-to-top control
+function initBackToTop() {
+    const button = document.getElementById('backToTop');
+    if (!button) return;
+
+    const SHOW_AFTER = 400;
+
+    button.hidden = false;
+
+    function syncVisibility() {
+        button.classList.toggle('is-visible', window.scrollY > SHOW_AFTER);
+    }
+
+    window.addEventListener('scroll', syncVisibility, { passive: true });
+    syncVisibility();
+
+    button.addEventListener('click', () => {
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+    });
+}
+
+// Reading progress indicator for long-form article pages
+function initReadingProgress() {
+    const bar = document.getElementById('readingProgressBar');
+    const article = document.querySelector('.blog-post-article');
+    if (!bar || !article) return;
+
+    const track = bar.parentElement;
+    let frame = null;
+
+    function update() {
+        frame = null;
+
+        const articleHeight = article.scrollHeight - window.innerHeight;
+        const scrolled = window.scrollY - article.offsetTop;
+        const percent = articleHeight > 0
+            ? Math.min(100, Math.max(0, (scrolled / articleHeight) * 100))
+            : 0;
+
+        bar.style.width = `${percent}%`;
+
+        if (track) {
+            track.setAttribute('aria-valuenow', String(Math.round(percent)));
+        }
+    }
+
+    function requestUpdate() {
+        if (frame === null) {
+            frame = window.requestAnimationFrame(update);
+        }
+    }
+
+    window.addEventListener('scroll', requestUpdate, { passive: true });
+    window.addEventListener('resize', requestUpdate, { passive: true });
+    update();
+}
 
 // Navbar scroll effect
 function initNavbarScroll() {
@@ -51,35 +145,98 @@ function initThemeToggle() {
 
     if (!themeToggleBtn) return;
 
-    // Check saved theme
-    const savedTheme = localStorage.getItem('theme');
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    // Keep the mobile browser chrome in step with the page surface
+    const themeColorMeta = document.querySelector('meta[name="theme-color"]');
 
-    if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
-        root.setAttribute('data-theme', 'dark');
+    const applyTheme = (theme) => {
+        const isDark = theme === 'dark';
+
+        root.setAttribute('data-theme', isDark ? 'dark' : 'light');
+        themeToggleBtn.setAttribute('aria-pressed', isDark ? 'true' : 'false');
+        themeToggleBtn.setAttribute('aria-label', isDark ? 'Switch to light theme' : 'Switch to dark theme');
+
         if (themeIcon) {
-            themeIcon.classList.replace('fa-moon', 'fa-sun');
+            themeIcon.classList.toggle('fa-sun', isDark);
+            themeIcon.classList.toggle('fa-moon', !isDark);
         }
-    } else {
-        root.setAttribute('data-theme', 'light');
-        if (themeIcon) {
-            themeIcon.classList.replace('fa-sun', 'fa-moon');
+
+        if (themeColorMeta) {
+            themeColorMeta.setAttribute('content', isDark ? '#0f1729' : '#2563eb');
         }
+    };
+
+    let savedTheme = null;
+    try {
+        savedTheme = localStorage.getItem('theme');
+    } catch (error) {
+        savedTheme = null;
     }
+
+    // Saved choice wins; otherwise follow the operating system preference
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const initialTheme = savedTheme === 'dark' || (!savedTheme && prefersDark) ? 'dark' : 'light';
+    applyTheme(initialTheme);
+
+    // A View Transition cross-fades the whole page instead of snapping every
+    // surface at once. Feature-detected and skipped under reduced motion, so
+    // the theme still switches instantly wherever it is unsupported or unwanted.
+    const swapTheme = (newTheme) => {
+        const reduceMotion = window.matchMedia
+            && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        if (!document.startViewTransition || reduceMotion) {
+            applyTheme(newTheme);
+            return;
+        }
+
+        root.dataset.viewTransition = 'theme';
+        const transition = document.startViewTransition(() => applyTheme(newTheme));
+        transition.finished
+            .catch(() => { /* a superseded transition is not an error */ })
+            .finally(() => { delete root.dataset.viewTransition; });
+    };
 
     themeToggleBtn.addEventListener('click', () => {
         const currentTheme = root.getAttribute('data-theme');
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        
-        root.setAttribute('data-theme', newTheme);
-        localStorage.setItem('theme', newTheme);
-        
-        if (themeIcon) {
-            if (newTheme === 'dark') {
-                themeIcon.classList.replace('fa-moon', 'fa-sun');
-            } else {
-                themeIcon.classList.replace('fa-sun', 'fa-moon');
+        swapTheme(newTheme);
+
+        try {
+            localStorage.setItem('theme', newTheme);
+        } catch (error) {
+            // Ignore storage errors and continue with in-memory theme state.
+        }
+
+        if (window.announceToScreenReader) {
+            window.announceToScreenReader(`${newTheme === 'dark' ? 'Dark' : 'Light'} theme enabled`);
+        }
+    });
+
+    // Track the system preference until the visitor makes an explicit choice
+    if (!savedTheme && window.matchMedia) {
+        const systemPreference = window.matchMedia('(prefers-color-scheme: dark)');
+        const followSystem = (event) => {
+            let hasChoice = false;
+            try {
+                hasChoice = Boolean(localStorage.getItem('theme'));
+            } catch (error) {
+                hasChoice = false;
             }
+
+            if (!hasChoice) {
+                applyTheme(event.matches ? 'dark' : 'light');
+            }
+        };
+
+        if (typeof systemPreference.addEventListener === 'function') {
+            systemPreference.addEventListener('change', followSystem);
+        }
+    }
+
+    // Keep the theme consistent across open tabs
+    window.addEventListener('storage', (event) => {
+        if (event.key === 'theme' && event.newValue) {
+            applyTheme(event.newValue === 'dark' ? 'dark' : 'light');
         }
     });
 }
@@ -148,35 +305,43 @@ function initMobileMenu() {
     mobileToggle.setAttribute('aria-expanded', 'false');
 }
 
-// Enhanced smooth scrolling with loading states
+// Smooth scrolling for in-page anchor links
 function initSmoothScrolling() {
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            
-            if (target) {
-                showLoadingSpinner();
-                
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
+            const href = this.getAttribute('href');
 
-                // Update active link
-                updateActiveNavLink(this.getAttribute('href'));
-                
-                setTimeout(hideLoadingSpinner, 500);
+            // Bare "#" links (e.g. share buttons) are handled elsewhere
+            if (!href || href === '#') return;
+
+            const target = document.querySelector(href);
+            if (!target) {
+                // Dead anchors (e.g. citation copy links) should not change the URL hash
+                e.preventDefault();
+                return;
             }
+
+            e.preventDefault();
+
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+
+            updateActiveNavLink(href);
         });
     });
 }
 
 // Intersection Observer for animations and active nav links
 function initIntersectionObserver() {
+    if (!supportsIntersectionObserver) {
+        return;
+    }
+
     const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '-50px 0px'
+        threshold: 0.15,
+        rootMargin: '-40px 0px'
     };
 
     const observer = new IntersectionObserver((entries) => {
@@ -187,6 +352,7 @@ function initIntersectionObserver() {
                 // Update active navigation link
                 const id = entry.target.getAttribute('id');
                 if (id) updateActiveNavLink(`#${id}`);
+
             }
         });
     }, observerOptions);
@@ -196,10 +362,28 @@ function initIntersectionObserver() {
         observer.observe(section);
     });
 
-    // Observe cards and timeline items
-    document.querySelectorAll('.experience-card, .timeline-item, .publication-item, .award-item').forEach(item => {
-        observer.observe(item);
-    });
+    const observeElements = (elements) => {
+        elements.forEach((element) => {
+            observer.observe(element);
+        });
+    };
+
+    observeElements(
+        document.querySelectorAll(REVEAL_PRIMARY_SELECTOR)
+    );
+
+    observeElements(
+        document.querySelectorAll(REVEAL_SECONDARY_SELECTOR)
+    );
+
+    setTimeout(() => {
+        const revealTargets = Array.from(document.querySelectorAll(REVEAL_FALLBACK_SELECTOR));
+        const hasAnimated = revealTargets.some(element => element.classList.contains('animate-in'));
+
+        if (!hasAnimated) {
+            revealTargets.forEach(element => element.classList.add('animate-in'));
+        }
+    }, REVEAL_FALLBACK_DELAY);
 }
 
 // Form validation with accessibility
@@ -353,80 +537,40 @@ function initLazyLoading() {
 
 // Performance optimizations
 function initPerformanceOptimizations() {
-    // Debounce scroll events
-    let scrollTimeout;
+    initHeroParallax();
+}
+
+// Subtle parallax on the hero background only, driven by requestAnimationFrame
+// so it stays in sync with scrolling instead of jumping after scroll stops.
+function initHeroParallax() {
+    const heroBackground = document.querySelector('.hero .ai-background');
+    if (!heroBackground) return;
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    let ticking = false;
+
     window.addEventListener('scroll', function() {
-        if (scrollTimeout) clearTimeout(scrollTimeout);
-        scrollTimeout = setTimeout(updateScrollPosition, 10);
-    });
+        if (ticking) return;
+        ticking = true;
 
-    // Preload critical resources
-    preloadCriticalResources();
-    
-    // Optimize animations
-    optimizeAnimations();
-}
-
-function preloadCriticalResources() {
-    // Preload hero image
-    const heroImg = new Image();
-    heroImg.src = 'images/profile-compressed.jpg';
-    
-    // Preload critical CSS if not already loaded
-    const criticalCSS = document.createElement('link');
-    criticalCSS.rel = 'preload';
-    criticalCSS.href = 'css/style.css';
-    criticalCSS.as = 'style';
-    document.head.appendChild(criticalCSS);
-}
-
-function optimizeAnimations() {
-    // Reduce motion for users who prefer it
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        document.documentElement.style.setProperty('--animation-duration', '0.01ms');
-    }
+        requestAnimationFrame(() => {
+            const scrolled = window.scrollY;
+            if (scrolled <= window.innerHeight) {
+                heroBackground.style.transform = `translateY(${scrolled * 0.25}px)`;
+            }
+            ticking = false;
+        });
+    }, { passive: true });
 }
 
 // Accessibility features
 function initAccessibilityFeatures() {
-    // Focus trap for sidebar
-    initFocusTrap();
-    
     // Announce dynamic content changes
     initAriaLiveRegions();
-    
+
     // High contrast mode detection
     detectHighContrastMode();
-}
-
-function initFocusTrap() {
-    const sidebar = document.getElementById('sidebar');
-    if (!sidebar) return;
-    
-    const focusableElements = sidebar.querySelectorAll(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-    );
-    
-    if (focusableElements.length === 0) return;
-    
-    const firstElement = focusableElements[0];
-    const lastElement = focusableElements[focusableElements.length - 1];
-
-    sidebar.addEventListener('keydown', function(e) {
-        if (e.key !== 'Tab') return;
-        
-        if (e.shiftKey) {
-            if (document.activeElement === firstElement) {
-                e.preventDefault();
-                lastElement.focus();
-            }
-        } else {
-            if (document.activeElement === lastElement) {
-                e.preventDefault();
-                firstElement.focus();
-            }
-        }
-    });
 }
 
 function initAriaLiveRegions() {
@@ -451,24 +595,13 @@ function detectHighContrastMode() {
 
 // Utility functions
 function updateActiveNavLink(href) {
-    document.querySelectorAll('.sidebar-link, .top-nav-link').forEach(link => {
+    document.querySelectorAll('.top-nav-link').forEach(link => {
         link.classList.remove('active');
     });
-    
-    const activeLink = document.querySelector(`a[href="${href}"]`);
+
+    const activeLink = document.querySelector(`.top-nav-link[href="${href}"]`);
     if (activeLink) {
         activeLink.classList.add('active');
-    }
-}
-
-function updateScrollPosition() {
-    const scrolled = window.pageYOffset;
-    const rate = scrolled * -0.5;
-    
-    // Parallax effect for hero background
-    const hero = document.querySelector('.hero');
-    if (hero && scrolled < window.innerHeight) {
-        hero.style.transform = `translateY(${rate}px)`;
     }
 }
 
@@ -481,6 +614,13 @@ function submitForm(form) {
     submitButton.disabled = true;
     submitButton.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Sending...';
     
+    // Keep reply-to synced with the email field for easier responses.
+    const emailInput = form.querySelector('input[name="email"]');
+    const replyToInput = form.querySelector('input[name="_replyto"]');
+    if (emailInput && replyToInput) {
+        replyToInput.value = emailInput.value.trim();
+    }
+
     // Prepare form data
     const formData = new FormData(form);
     
@@ -531,7 +671,7 @@ function submitForm(form) {
         submitButton.disabled = false;
         submitButton.innerHTML = originalText;
         console.error('Form submission error:', error);
-        showErrorMessage('There was a problem sending your message. Please check your connection and try again.');
+        showErrorMessage('There was a problem sending your message. Please check your connection and try again, or email me directly at a.ayanzadeh@gmail.com.');
     });
 }
 
@@ -556,6 +696,13 @@ function showMessage(message, type) {
     
     const contactForm = document.getElementById('contactForm');
     if (contactForm) {
+        const formStatus = contactForm.querySelector('#form-status');
+        if (formStatus) {
+            formStatus.classList.remove('success', 'error');
+            formStatus.classList.add(type);
+            formStatus.textContent = message;
+        }
+
         contactForm.insertBefore(messageEl, contactForm.firstChild);
         
         // Auto-hide after 5 seconds
@@ -610,63 +757,6 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-// Initialize AI animations and effects
-function initAIAnimations() {
-    // Add typing effect to hero title
-    const heroTitle = document.querySelector('.ai-text');
-    if (heroTitle) {
-        const text = heroTitle.textContent;
-        heroTitle.textContent = '';
-        let i = 0;
-        
-        function typeWriter() {
-            if (i < text.length) {
-                heroTitle.textContent += text.charAt(i);
-                i++;
-                setTimeout(typeWriter, 100);
-            }
-        }
-        
-        // Start typing after a short delay
-        setTimeout(typeWriter, 1000);
-    }
-    
-    // Add hover effects to AI elements
-    const aiElements = document.querySelectorAll('.ai-btn, .expertise-tag, .ai-badge, .vlm-badge, .llm-badge');
-    aiElements.forEach(element => {
-        element.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-3px) scale(1.05)';
-        });
-        
-        element.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0) scale(1)';
-        });
-    });
-    
-    // Add click ripple effect to buttons
-    const buttons = document.querySelectorAll('.ai-btn');
-    buttons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            const ripple = document.createElement('span');
-            const rect = this.getBoundingClientRect();
-            const size = Math.max(rect.width, rect.height);
-            const x = e.clientX - rect.left - size / 2;
-            const y = e.clientY - rect.top - size / 2;
-            
-            ripple.style.width = ripple.style.height = size + 'px';
-            ripple.style.left = x + 'px';
-            ripple.style.top = y + 'px';
-            ripple.classList.add('ripple');
-            
-            this.appendChild(ripple);
-            
-            setTimeout(() => {
-                ripple.remove();
-            }, 600);
-        });
-    });
-}
-
 // Initialize responsive behavior
 function initResponsiveBehavior() {
     // Handle window resize events
@@ -702,6 +792,25 @@ if (document.readyState === 'loading') {
 }
 
 
+// Footer info links. The markup carries data-info instead of an inline
+// onclick, so the handler lives here with the rest of the page behaviour.
+function initFooterInfoLinks() {
+    const handlers = {
+        privacy: showPrivacyInfo,
+        accessibility: showAccessibilityInfo
+    };
+
+    document.querySelectorAll('[data-info]').forEach((link) => {
+        const handler = handlers[link.dataset.info];
+        if (!handler) return;
+
+        link.addEventListener('click', function(event) {
+            event.preventDefault();
+            handler();
+        });
+    });
+}
+
 // Privacy and Accessibility Info Functions
 window.showPrivacyInfo = function() {
     const message = `
@@ -727,7 +836,7 @@ Accessibility Features:
 • Alt text for all images
 • Focus indicators on all interactive elements
 
-If you encounter any accessibility issues, please contact me at aydina1@umbc.edu
+If you encounter any accessibility issues, please contact me at a.ayanzadeh@gmail.com
     `;
     showCustomModal('Accessibility Information', message);
 };
@@ -747,13 +856,13 @@ function showCustomModal(title, content) {
         <div class="modal-backdrop" onclick="closeCustomModal()"></div>
         <div class="modal-content" role="dialog" aria-labelledby="modalTitle" aria-describedby="modalContent">
             <div class="modal-header">
-                <h3 id="modalTitle">${title}</h3>
+                <h3 id="modalTitle">${escapeHtml(title)}</h3>
                 <button class="modal-close" onclick="closeCustomModal()" aria-label="Close modal">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="modal-body">
-                <pre id="modalContent">${content}</pre>
+                <pre id="modalContent">${escapeHtml(content)}</pre>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-primary" onclick="closeCustomModal()">Close</button>
@@ -795,11 +904,77 @@ window.closeCustomModal = function() {
 
 // Advanced Accessibility Features
 function initializeAccessibilityFeatures() {
+    ensureAccessibilityStructure();
     initializeAccessibilityMenu();
     initializeKeyboardEnhancements();
     initializeScreenReaderSupport();
     initializeReadingGuide();
+    initializePageReader();
     loadAccessibilityPreferences();
+}
+
+function ensureAccessibilityStructure() {
+    if (!document.getElementById('accessibility-menu-toggle')) {
+        document.body.insertAdjacentHTML('beforeend', `
+            <button id="accessibility-menu-toggle" class="accessibility-toggle show" type="button"
+                aria-label="Open accessibility tools" aria-expanded="false" aria-controls="accessibility-menu">
+                <i class="fas fa-universal-access" aria-hidden="true"></i>
+                <span class="sr-only">Open accessibility tools</span>
+            </button>
+        `);
+    }
+
+    if (!document.getElementById('accessibility-menu')) {
+        document.body.insertAdjacentHTML('beforeend', `
+            <div id="accessibility-menu" class="accessibility-menu" role="dialog" aria-modal="true"
+                aria-labelledby="accessibility-menu-title" aria-hidden="true">
+                <div class="accessibility-content">
+                    <button class="accessibility-close" type="button" aria-label="Close accessibility menu">×</button>
+                    <h2 id="accessibility-menu-title">Accessibility Tools</h2>
+                    <div class="accessibility-options">
+                        <div class="accessibility-group">
+                            <h3>Display & Motion</h3>
+                            <label class="accessibility-option" for="high-contrast-toggle"><input type="checkbox" id="high-contrast-toggle"><span>High Contrast</span></label>
+                            <label class="accessibility-option" for="large-text-toggle"><input type="checkbox" id="large-text-toggle"><span>Large Text</span></label>
+                            <label class="accessibility-option" for="dyslexia-font-toggle"><input type="checkbox" id="dyslexia-font-toggle"><span>Dyslexia-Friendly Font</span></label>
+                            <label class="accessibility-option" for="reduce-motion-toggle"><input type="checkbox" id="reduce-motion-toggle"><span>Reduce Motion</span></label>
+                        </div>
+                        <div class="accessibility-group">
+                            <h3>Navigation & Focus</h3>
+                            <label class="accessibility-option" for="focus-highlight-toggle"><input type="checkbox" id="focus-highlight-toggle"><span>Enhanced Focus Indicators</span></label>
+                            <label class="accessibility-option" for="keyboard-nav-toggle"><input type="checkbox" id="keyboard-nav-toggle"><span>Enhanced Keyboard Navigation</span></label>
+                            <label class="accessibility-option" for="nav-announcements-toggle"><input type="checkbox" id="nav-announcements-toggle" checked><span>Navigation Announcements</span></label>
+                            <label class="accessibility-option" for="reading-guide-toggle"><input type="checkbox" id="reading-guide-toggle"><span>Reading Guide Line</span></label>
+                        </div>
+                        <div class="accessibility-group">
+                            <h3>Reader</h3>
+                            <div class="accessibility-reader-controls">
+                                <button type="button" id="start-reading-btn" class="accessibility-reader-btn">Read this page aloud</button>
+                                <button type="button" id="stop-reading-btn" class="accessibility-reader-btn secondary" disabled>Stop reading</button>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="accessibility-reset" type="button">Reset accessibility settings</button>
+                </div>
+            </div>
+        `);
+    }
+
+    if (!document.getElementById('reading-guide')) {
+        document.body.insertAdjacentHTML('beforeend', '<div id="reading-guide" class="reading-guide" aria-hidden="true"></div>');
+    }
+
+    if (!document.getElementById('sr-status')) {
+        document.body.insertAdjacentHTML('beforeend', '<div id="sr-status" class="sr-only" aria-live="polite" aria-atomic="true"></div>');
+    }
+
+    if (!document.getElementById('sr-alerts')) {
+        document.body.insertAdjacentHTML('beforeend', '<div id="sr-alerts" class="sr-only" aria-live="assertive" aria-atomic="true"></div>');
+    }
+
+    if (typeof window.navigationAnnouncementsEnabled === 'undefined') {
+        window.navigationAnnouncementsEnabled = true;
+    }
 }
 
 
@@ -809,6 +984,8 @@ function initializeAccessibilityMenu() {
     const menu = document.getElementById('accessibility-menu');
     const closeBtn = menu?.querySelector('.accessibility-close');
     const resetBtn = menu?.querySelector('.accessibility-reset');
+    const startReadingBtn = menu?.querySelector('#start-reading-btn');
+    const stopReadingBtn = menu?.querySelector('#stop-reading-btn');
     
     if (toggle && menu) {
         toggle.addEventListener('click', function() {
@@ -828,6 +1005,14 @@ function initializeAccessibilityMenu() {
         // Reset button
         if (resetBtn) {
             resetBtn.addEventListener('click', resetAccessibilitySettings);
+        }
+
+        if (startReadingBtn) {
+            startReadingBtn.addEventListener('click', startPageReader);
+        }
+
+        if (stopReadingBtn) {
+            stopReadingBtn.addEventListener('click', stopPageReader);
         }
         
         // Close on escape
@@ -1133,17 +1318,113 @@ function resetAccessibilitySettings() {
     } catch (e) {
         console.warn('Could not clear accessibility preferences:', e);
     }
+
+    stopPageReader();
     
     announceToScreenReader('All accessibility settings have been reset');
+}
+
+function initializePageReader() {
+    const startBtn = document.getElementById('start-reading-btn');
+    const stopBtn = document.getElementById('stop-reading-btn');
+
+    if (!startBtn || !stopBtn) return;
+
+    if (!('speechSynthesis' in window)) {
+        startBtn.disabled = true;
+        stopBtn.disabled = true;
+        startBtn.textContent = 'Reader not supported in this browser';
+        return;
+    }
+
+    updatePageReaderButtons(false);
+}
+
+const MAX_SPEECH_CONTENT_LENGTH = 12000;
+const MIN_SENTENCE_BREAK_RATIO = 0.6;
+
+function getPageReaderText() {
+    const contentRoot = document.querySelector('main, #main-content, article') || document.body;
+    const readableElements = contentRoot.querySelectorAll('h1, h2, h3, h4, h5, h6, p, li, blockquote, figcaption, caption');
+    const content = Array.from(readableElements)
+        .map((el) => el.textContent.trim().replace(/\s+/g, ' '))
+        .filter(Boolean)
+        .map((text) => /[.!?:;…]$/.test(text) ? text : `${text}.`)
+        .join(' ');
+
+    // Keep speech payload bounded to avoid long utterances that can stall on some browser engines.
+    if (content.length <= MAX_SPEECH_CONTENT_LENGTH) return content;
+
+    const truncated = content.slice(0, MAX_SPEECH_CONTENT_LENGTH);
+    const lastSentenceBreak = Math.max(
+        truncated.lastIndexOf('. '),
+        truncated.lastIndexOf('! '),
+        truncated.lastIndexOf('? ')
+    );
+
+    if (lastSentenceBreak > MAX_SPEECH_CONTENT_LENGTH * MIN_SENTENCE_BREAK_RATIO) {
+        return truncated.slice(0, lastSentenceBreak + 1);
+    }
+
+    return `${truncated.trimEnd()}...`;
+}
+
+function startPageReader() {
+    if (!('speechSynthesis' in window)) return;
+
+    const text = getPageReaderText();
+    if (!text) {
+        announceToScreenReader('No readable content found on this page.', 'assertive');
+        return;
+    }
+
+    stopPageReader();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    // English fallback keeps pronunciation predictable when no page/user locale is available.
+    utterance.lang = document.documentElement.lang || navigator.language || 'en-US';
+    utterance.rate = 1;
+
+    utterance.onend = () => {
+        updatePageReaderButtons(false);
+        announceToScreenReader('Page reading completed.');
+    };
+
+    utterance.onerror = (event) => {
+        console.warn('Speech synthesis failed:', event.error || event);
+        updatePageReaderButtons(false);
+        announceToScreenReader('Unable to read the page aloud.', 'assertive');
+    };
+
+    window.activeReaderUtterance = utterance;
+    window.speechSynthesis.speak(utterance);
+    updatePageReaderButtons(true);
+    announceToScreenReader('Reading page content aloud.');
+}
+
+function stopPageReader() {
+    if ('speechSynthesis' in window && window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
+    }
+
+    window.activeReaderUtterance = null;
+    updatePageReaderButtons(false);
+}
+
+function updatePageReaderButtons(isReading) {
+    const startBtn = document.getElementById('start-reading-btn');
+    const stopBtn = document.getElementById('stop-reading-btn');
+    if (!startBtn || !stopBtn) return;
+
+    startBtn.disabled = isReading;
+    stopBtn.disabled = !isReading;
 }
 
 // Initialize accessibility features when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     // Add to existing initialization
     initializeAccessibilityFeatures();
-    initializeAccessibilityBadge();
-    initializeCommitmentBanner();
-    
+
     // Add keyboard shortcut to toggle accessibility menu (Alt + A)
     document.addEventListener('keydown', function(e) {
         if (e.altKey && e.key.toLowerCase() === 'a') {
@@ -1171,56 +1452,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
-
-// Accessibility Badge Functions
-function initializeAccessibilityBadge() {
-    const badge = document.querySelector('.badge-trigger');
-    if (badge) {
-        badge.addEventListener('click', function() {
-            const toggle = document.getElementById('accessibility-menu-toggle');
-            const menu = document.getElementById('accessibility-menu');
-            
-            if (toggle && menu) {
-                toggle.classList.add('show');
-                document.body.classList.add('accessibility-active');
-                openAccessibilityMenu();
-                announceToScreenReader('Accessibility menu opened');
-            }
-        });
-    }
-}
-
-// Commitment Banner Functions
-function initializeCommitmentBanner() {
-    const banner = document.querySelector('.a11y-commitment-banner');
-    const closeBtn = document.querySelector('.close-banner');
-    
-    // Exit early if banner doesn't exist in the page
-    if (!banner) return;
-    
-    // Check if banner was previously closed
-    const bannerClosed = localStorage.getItem('a11y-banner-closed');
-    
-    if (bannerClosed) {
-        banner.classList.add('hidden');
-    } else {
-        // Auto-hide after 10 seconds
-        setTimeout(() => {
-            if (banner && !banner.classList.contains('hidden')) {
-                banner.classList.add('hidden');
-            }
-        }, 10000);
-    }
-    
-    // Close button handler
-    if (closeBtn) {
-        closeBtn.addEventListener('click', function() {
-            banner.classList.add('hidden');
-            localStorage.setItem('a11y-banner-closed', 'true');
-            announceToScreenReader('Accessibility banner closed');
-        });
-    }
-}
 
 // ========================================
 // CITATION COPY FUNCTION
@@ -1276,7 +1507,7 @@ function showCitationNotification(message, type = 'success') {
     notification.className = `citation-notification ${type}`;
     notification.innerHTML = `
         <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
-        <span>${message}</span>
+        <span>${escapeHtml(message)}</span>
     `;
     
     document.body.appendChild(notification);
@@ -1294,249 +1525,3 @@ function showCitationNotification(message, type = 'success') {
         }, 300);
     }, 3000);
 }
-
-// ========================================
-// PROJECT MODAL SYSTEM
-// ========================================
-
-const projectData = {
-    project1: {
-        title: 'Medical Image Segmentation Platform',
-        category: 'Deep Learning',
-        year: '2024',
-        status: 'Active',
-        overview: 'Comprehensive deep learning platform designed for automated medical image analysis and segmentation using state-of-the-art multi-task learning approaches to handle imbalanced medical datasets.',
-        objectives: [
-            'Develop robust segmentation models for various medical imaging modalities',
-            'Handle class imbalance using novel sampling strategies',
-            'Implement multi-task learning for simultaneous segmentation and classification',
-            'Achieve real-time inference for clinical deployment'
-        ],
-        features: [
-            'Multi-task neural network combining segmentation and classification',
-            'Advanced data augmentation pipeline for medical images',
-            'Handling of highly imbalanced datasets with focal loss',
-            'Support for multiple imaging modalities (CT, MRI, X-Ray)',
-            'Real-time visualization dashboard'
-        ],
-        technologies: ['PyTorch', 'TorchVision', 'NumPy', 'Scikit-learn', 'OpenCV', 'MONAI', 'TensorBoard'],
-        results: 'Achieved 92% Dice coefficient on polyp segmentation and 95% accuracy on multi-class classification. Significantly improved performance on minority classes.',
-        github: 'https://github.com/Ayanzadeh93'
-    },
-    project2: {
-        title: 'LLM-Based Indoor Navigation System',
-        category: 'LLM Application',
-        year: '2024',
-        status: 'Under Review',
-        overview: 'Innovative navigation system leveraging Large Language Models and computer vision to assist visually impaired individuals navigate complex indoor environments with real-time guidance.',
-        objectives: [
-            'Create accessible navigation solution for visually impaired users',
-            'Integrate LLMs for natural language interaction',
-            'Provide real-time environmental awareness',
-            'Enable independent navigation in unfamiliar spaces'
-        ],
-        features: [
-            'GPT-4 powered natural language processing',
-            'Computer vision pipeline for obstacle detection',
-            'Real-time audio feedback with spatial cues',
-            'Dynamic path planning with obstacle avoidance',
-            'Indoor positioning using visual odometry',
-            'Multi-modal feedback (audio, haptic)'
-        ],
-        technologies: ['Python', 'GPT-4 API', 'OpenCV', 'YOLOv8', 'PyTorch', 'ROS', 'Text-to-Speech'],
-        results: 'Demonstrated at STARS Celebration 2024 and CMD-IT/ACM Richard Tapia Conference. 87% improvement in navigation confidence for visually impaired participants.',
-        github: 'https://github.com/Ayanzadeh93'
-    },
-    project3: {
-        title: 'Knowledge Distillation Framework',
-        category: 'Model Optimization',
-        year: '2023',
-        status: 'Published',
-        overview: 'Novel framework for efficient knowledge distillation implementing hint-based learning with layer clustering for model compression while maintaining high accuracy.',
-        objectives: [
-            'Reduce model size while preserving accuracy',
-            'Develop novel hint selection strategy',
-            'Enable deployment on resource-constrained devices',
-            'Improve knowledge transfer efficiency'
-        ],
-        features: [
-            'PURSUhInT algorithm for intelligent hint identification',
-            'Layer-wise clustering for optimal knowledge transfer',
-            'Flexible teacher-student architecture support',
-            'Automated hyperparameter tuning',
-            'Support for various architectures (ResNet, VGG, MobileNet)'
-        ],
-        technologies: ['PyTorch', 'Scikit-learn', 'NumPy', 'K-means Clustering', 'CIFAR-10/100', 'ImageNet'],
-        results: 'Published in Expert Systems with Applications (IF: 8.5). Achieved 2.5x compression with only 1.2% accuracy drop. Outperformed traditional methods by 3-5%.',
-        github: 'https://github.com/Ayanzadeh93'
-    },
-    project4: {
-        title: 'Vision-Language Medical Models',
-        category: 'Multimodal AI',
-        year: '2024',
-        status: 'In Progress',
-        overview: 'Custom implementation of vision-language models with enhanced multimodal learning capabilities specifically designed for medical imaging applications.',
-        objectives: [
-            'Bridge gap between medical imaging and clinical reports',
-            'Enable natural language queries for medical databases',
-            'Improve diagnostic accuracy through multimodal learning',
-            'Develop interpretable AI systems for healthcare'
-        ],
-        features: [
-            'Custom CLIP-based architecture for medical domain',
-            'Contrastive learning with medical image-text pairs',
-            'Zero-shot classification for rare conditions',
-            'Medical report generation from imaging',
-            'Cross-modal retrieval for similar cases',
-            'Attention visualization for interpretability'
-        ],
-        technologies: ['PyTorch', 'Transformers', 'CLIP', 'BERT', 'Vision Transformer', 'Hugging Face'],
-        results: 'Achieved 89% accuracy on zero-shot medical image classification. Generated clinically relevant descriptions with 0.85 BLEU score.',
-        github: 'https://github.com/Ayanzadeh93'
-    },
-    project5: {
-        title: 'Graph Autoencoder Framework',
-        category: 'Graph Learning',
-        year: '2020',
-        status: 'Published',
-        overview: 'Advanced GNN implementation featuring residual connections in graph autoencoders for improved representation learning on complex graph-structured data.',
-        objectives: [
-            'Improve graph representation with residual connections',
-            'Enable unsupervised learning on graphs',
-            'Handle large-scale graph datasets efficiently',
-            'Preserve graph topology in representations'
-        ],
-        features: [
-            'Graph autoencoder with residual connections',
-            'Scalable implementation for large graphs',
-            'Unsupervised node embedding generation',
-            'Graph reconstruction with high fidelity',
-            'Support for various graph types',
-            'Visualization tools for learned embeddings'
-        ],
-        technologies: ['PyTorch', 'PyTorch Geometric', 'NetworkX', 'Scikit-learn', 'NumPy'],
-        results: 'Published in IEEE SIU 2020 and arXiv. Achieved 94% accuracy on node classification. Improved graph reconstruction by 15%.',
-        github: 'https://github.com/Ayanzadeh93'
-    },
-    project6: {
-        title: 'ML Data Pipeline System',
-        category: 'Data Engineering',
-        year: '2023',
-        status: 'Production',
-        overview: 'Scalable data processing pipeline for ML workflows with automated preprocessing, feature engineering, and quality validation.',
-        objectives: [
-            'Automate data preprocessing for ML workflows',
-            'Ensure data quality and consistency',
-            'Enable scalable processing of large datasets',
-            'Reduce time from raw data to model training'
-        ],
-        features: [
-            'Automated data ingestion from multiple sources',
-            'Distributed processing with Apache Spark',
-            'Feature engineering with custom transformers',
-            'Data quality checks and validation',
-            'Dataset and transformation versioning',
-            'Integration with MLflow for tracking',
-            'Real-time monitoring and alerting'
-        ],
-        technologies: ['Python', 'Apache Spark', 'Apache Airflow', 'Docker', 'PostgreSQL', 'MLflow', 'AWS S3'],
-        results: 'Reduced preprocessing time by 75%. Processing 10TB+ daily with 99.9% uptime. Serving 15+ ML models in production.',
-        github: 'https://github.com/Ayanzadeh93'
-    }
-};
-
-function openProjectModal(projectId) {
-    const project = projectData[projectId];
-    if (!project) return;
-    
-    const modal = document.createElement('div');
-    modal.className = 'project-modal';
-    modal.id = 'projectModal';
-    
-    modal.innerHTML = `
-        <div class="modal-container">
-            <div class="modal-header">
-                <button class="modal-close" onclick="closeProjectModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-                <h2>${project.title}</h2>
-                <div class="modal-meta">
-                    <span><i class="fas fa-tag"></i> ${project.category}</span>
-                    <span><i class="fas fa-calendar"></i> ${project.year}</span>
-                    <span><i class="fas fa-circle"></i> ${project.status}</span>
-                </div>
-            </div>
-            
-            <div class="modal-body">
-                <div class="modal-section">
-                    <h3><i class="fas fa-align-left"></i> Overview</h3>
-                    <p>${project.overview}</p>
-                </div>
-                
-                <div class="modal-section">
-                    <h3><i class="fas fa-bullseye"></i> Objectives</h3>
-                    <ul>
-                        ${project.objectives.map(obj => `<li>${obj}</li>`).join('')}
-                    </ul>
-                </div>
-                
-                <div class="modal-section">
-                    <h3><i class="fas fa-star"></i> Key Features</h3>
-                    <ul>
-                        ${project.features.map(feature => `<li>${feature}</li>`).join('')}
-                    </ul>
-                </div>
-                
-                <div class="modal-section">
-                    <h3><i class="fas fa-tools"></i> Technologies</h3>
-                    <div class="tech-stack-grid">
-                        ${project.technologies.map(tech => `<span class="tech-item">${tech}</span>`).join('')}
-                    </div>
-                </div>
-                
-                <div class="modal-section">
-                    <h3><i class="fas fa-chart-line"></i> Results & Impact</h3>
-                    <p>${project.results}</p>
-                </div>
-                
-                <div class="modal-section">
-                    <a href="${project.github}" target="_blank" class="github-link">
-                        <i class="fab fa-github"></i>
-                        <span>View on GitHub</span>
-                        <i class="fas fa-external-link-alt"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    
-    setTimeout(() => modal.classList.add('active'), 10);
-    
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) closeProjectModal();
-    });
-    
-    document.addEventListener('keydown', handleEscapeKey);
-    document.body.style.overflow = 'hidden';
-}
-
-function closeProjectModal() {
-    const modal = document.getElementById('projectModal');
-    if (modal) {
-        modal.classList.remove('active');
-        setTimeout(() => {
-            modal.remove();
-            document.body.style.overflow = '';
-        }, 300);
-    }
-    document.removeEventListener('keydown', handleEscapeKey);
-}
-
-function handleEscapeKey(e) {
-    if (e.key === 'Escape') closeProjectModal();
-}
-
-window.openProjectModal = openProjectModal;
-window.closeProjectModal = closeProjectModal; 

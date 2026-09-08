@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://formspree.io; form-action 'self' https://formspree.io; frame-src 'none'; manifest-src 'self'">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
 
     <!-- Primary Meta Tags - Will be updated per post -->
     <title>Blog Post - Aydin Ayanzadeh | Computer Vision & AI Research</title>
@@ -12,6 +14,7 @@
         content="Research insights and thoughts on Computer Vision, Medical Image Analysis, and AI.">
     <meta name="author" content="Aydin Ayanzadeh">
     <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#2563eb">
 
     <!-- Open Graph -->
     <meta property="og:type" content="article">
@@ -37,11 +40,25 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 
+    <!-- Apply the saved (or system) theme before first paint to avoid a light-mode flash -->
+    <script>
+        (function () {
+            var saved = null;
+            try { saved = localStorage.getItem('theme'); } catch (e) { /* storage unavailable */ }
+            var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            var dark = saved === 'dark' || (!saved && prefersDark);
+            document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+        })();
+    </script>
+
     <!-- Stylesheets -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/blog.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer"></noscript>
 
     <!-- Article Structured Data -->
     <script type="application/ld+json">
@@ -93,20 +110,31 @@
                     <span class="brand-text">Aydin Ayanzadeh</span>
                 </a>
             </div>
-            <ul class="top-nav-menu">
+            <ul class="top-nav-menu" id="top-nav-menu">
                 <li><a href="index.html" class="top-nav-link"><i class="fas fa-home"></i> <span>Home</span></a></li>
-                <li><a href="blog.html" class="top-nav-link active"><i class="fas fa-blog"></i> <span>Blog</span></a>
+                <li><a href="blog.html" class="top-nav-link active" aria-current="page"><i class="fas fa-blog"></i>
+                        <span>Blog</span></a>
                 </li>
                 <li><a href="index.html#publications" class="top-nav-link"><i class="fas fa-book"></i>
                         <span>Publications</span></a></li>
                 <li><a href="index.html#contact" class="top-nav-link"><i class="fas fa-envelope"></i>
                         <span>Contact</span></a></li>
+                <li>
+                    <button id="theme-toggle" class="top-nav-link theme-toggle-btn" aria-label="Switch to dark theme">
+                        <i class="fas fa-moon" aria-hidden="true"></i> <span>Theme</span>
+                    </button>
+                </li>
             </ul>
-            <button class="mobile-menu-toggle" aria-label="Toggle mobile navigation menu" aria-expanded="false">
+            <button class="mobile-menu-toggle" aria-label="Toggle mobile navigation menu" aria-expanded="false"
+                aria-controls="top-nav-menu">
                 <span></span>
                 <span></span>
                 <span></span>
             </button>
+        </div>
+        <div class="reading-progress" role="progressbar" aria-label="Article reading progress" aria-valuemin="0"
+            aria-valuemax="100" aria-valuenow="0">
+            <div class="reading-progress-bar" id="readingProgressBar"></div>
         </div>
     </nav>
 
@@ -123,7 +151,8 @@
                     <h1 class="post-main-title">Multi-Task Learning in Medical Image Analysis: A Deep Dive</h1>
                     <div class="post-meta-info">
                         <div class="author-info">
-                            <img src="images/profile-compressed.jpg" alt="Aydin Ayanzadeh" class="author-avatar">
+                            <img src="images/profile-400.jpg" alt="Aydin Ayanzadeh" class="author-avatar"
+                                width="48" height="48" decoding="async">
                             <div class="author-details">
                                 <span class="author-name">Aydin Ayanzadeh</span>
                                 <span class="author-title">Ph.D. Student, UMBC</span>
@@ -335,7 +364,8 @@
                             <div class="sidebar-widget author-widget">
                                 <h3>About the Author</h3>
                                 <div class="author-card">
-                                    <img src="images/profile-compressed.jpg" alt="Aydin Ayanzadeh" class="author-image">
+                                    <img src="images/profile-400.jpg" alt="Aydin Ayanzadeh" class="author-image"
+                                        width="80" height="80" loading="lazy" decoding="async">
                                     <h4>Aydin Ayanzadeh</h4>
                                     <p>Ph.D. Student in Computer Science at UMBC, specializing in Computer Vision and
                                         Medical AI.</p>
@@ -440,7 +470,7 @@
     <footer class="footer">
         <div class="container footer-content">
             <div class="footer-social">
-                <a href="mailto:aydina1@umbc.edu" title="Email" aria-label="Send email"><i
+                <a href="mailto:a.ayanzadeh@gmail.com" title="Email" aria-label="Send email"><i
                         class="fas fa-envelope"></i></a>
                 <a href="https://linkedin.com/in/ayanzadeh93" target="_blank" rel="noopener noreferrer" title="LinkedIn"
                     aria-label="LinkedIn profile"><i class="fab fa-linkedin"></i></a>
@@ -456,10 +486,14 @@
                 <span class="footer-separator">|</span>
                 <a href="index.html#accessibility">Accessibility</a>
                 <span class="footer-separator">|</span>
-                <a href="sitemap.xml" target="_blank">Sitemap</a>
+                <a href="sitemap.xml" target="_blank" rel="noopener noreferrer">Sitemap</a>
             </div>
         </div>
     </footer>
+
+    <button type="button" id="backToTop" class="back-to-top" aria-label="Back to top" hidden>
+        <i class="fas fa-arrow-up" aria-hidden="true"></i>
+    </button>
 
     <script src="js/main.js"></script>
     <script src="js/blog.js"></script>
