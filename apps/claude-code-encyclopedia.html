@@ -1452,7 +1452,12 @@ $("#rail").addEventListener("click", e => {
   if(nav){ st.sec = st.sec === nav.dataset.sec ? null : nav.dataset.sec; st.starsOnly = false; render();
     window.scrollTo({top:0, behavior:"smooth"}); closeRail(); return; }
   const jump = e.target.closest("[data-jump]");
-  if(jump){ st.sec = null; render(); document.getElementById(jump.dataset.jump).scrollIntoView({behavior:"smooth"}); closeRail(); }
+  if(jump){
+    /* render() hides the jump target while a search or the starred filter is on,
+       and scrollIntoView on a hidden element is a no-op — so clear them first. */
+    st.sec = null; st.q = ""; st.starsOnly = false; $("#q").value = "";
+    render(); document.getElementById(jump.dataset.jump).scrollIntoView({behavior:"smooth"}); closeRail();
+  }
 });
 $("#starnav").addEventListener("click", () => { st.starsOnly = !st.starsOnly; st.sec = null; render(); closeRail(); });
 $("#ver").addEventListener("change", e => { st.ver = e.target.value; LS.set("ver", st.ver); render(); });
