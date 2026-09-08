@@ -3493,6 +3493,10 @@ body.enhanced-keyboard .top-nav-link:focus {
     background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
 }
 
+.environmental-ai {
+    background: linear-gradient(135deg, #f83600 0%, #f9d423 100%);
+}
+
 .project-badge {
     position: absolute;
     top: 12px;
@@ -4669,6 +4673,12 @@ img[loading="lazy"].loaded {
     display: flex;
     flex-direction: column;
     gap: 15px;
+}
+
+/* Keep the "View Project" pill at its intrinsic width — the column flex
+   container would otherwise stretch it across the whole card */
+.project-details>.pub-link {
+    align-self: flex-start;
 }
 
 .project-technologies {
