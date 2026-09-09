@@ -87,9 +87,56 @@
         }
     }
     </script>
+    <!-- seo-schema -->
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    "name": "Aydin Ayanzadeh Research Blog",
+    "url": "https://www.ayanzadeh.com/blog.html",
+    "description": "Research notes on computer vision, medical imaging, and multimodal AI.",
+    "author": {
+        "@id": "https://www.ayanzadeh.com/#person"
+    },
+    "publisher": {
+        "@id": "https://www.ayanzadeh.com/#person"
+    },
+    "inLanguage": "en"
+}
+    </script>
+
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://www.ayanzadeh.com/"
+        },
+        {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Blog",
+            "item": "https://www.ayanzadeh.com/blog.html"
+        }
+    ]
+}
+    </script>
+    <!-- /seo-schema -->
 </head>
 
 <body>
+    <nav class="schema-breadcrumbs" aria-label="Breadcrumb">
+        <ol>
+            <li><a href="https://www.ayanzadeh.com/">Home</a></li>
+            <li aria-current="page">Blog</li>
+        </ol>
+    </nav>
+
+
     <!-- Skip to content for accessibility -->
     <a href="#main-content" class="skip-to-content">Skip to main content</a>
 
