@@ -155,7 +155,7 @@ Copy checklists from [reference.md](reference.md) when executing these tasks.
 ## SEO & Deployment
 
 - Update `sitemap.xml` `<lastmod>` when adding/removing pages.
-- Canonical URLs use `https://ayanzadeh93.github.io/` (or production domain if CNAME active).
+- Canonical URLs use `https://www.ayanzadeh.com/` (or production domain if CNAME active).
 - Deploy: push to `main` → GitHub Pages auto-deploys. See `DEPLOYMENT.md` for Netlify/custom domain.
 - Verify contact form in Formspree dashboard after deploy.
 
