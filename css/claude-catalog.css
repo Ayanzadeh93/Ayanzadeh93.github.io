@@ -1,0 +1,23 @@
+.catalog-code {
+  margin: 10px 0 0;
+  padding: 12px 14px;
+  overflow-x: auto;
+  border: 1px solid #253044;
+  border-radius: 9px;
+  background: #0f172a;
+  color: #e2e8f0;
+  font: 500 .82rem/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.catalog-code code {
+  font: inherit;
+}
+
+.catalog-note {
+  margin: 12px 0 0;
+  padding-left: 10px;
+  border-left: 3px solid var(--primary-color);
+  color: var(--text-medium);
+  font-size: .86rem;
+  line-height: 1.55;
+}

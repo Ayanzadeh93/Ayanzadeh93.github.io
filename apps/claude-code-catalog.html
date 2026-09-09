@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'; frame-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Claude Code Catalog</title>
+  <meta name="description" content="Data-backed preview of the maintainable Claude Code reference catalog.">
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+  <link rel="stylesheet" href="../css/projects-data.css">
+  <link rel="stylesheet" href="../css/claude-catalog.css">
+</head>
+<body>
+  <header class="data-nav">
+    <a class="data-brand" href="../projects/project.html?id=claude-code-encyclopedia">Claude Code Catalog</a>
+    <nav aria-label="Catalog navigation">
+      <a href="claude-code-encyclopedia.html">Full encyclopedia</a>
+      <a href="../projects/index.html">Projects</a>
+    </nav>
+  </header>
+
+  <main class="data-shell">
+    <section class="data-hero">
+      <p class="data-eyebrow">Versioned local data layer</p>
+      <h1>Claude Code Catalog</h1>
+      <p>This compact page reads the new structured catalog directly. It is intentionally simple: update the data file, and this view updates without editing presentation markup.</p>
+    </section>
+
+    <section class="project-toolbar" aria-label="Catalog filters">
+      <label>
+        <span>Search</span>
+        <input id="catalog-search" type="search" autocomplete="off" placeholder="Search command, type, description, or tag">
+      </label>
+      <label>
+        <span>Section</span>
+        <select id="catalog-section">
+          <option value="">All sections</option>
+        </select>
+      </label>
+      <p id="catalog-status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section id="catalog-results" class="data-grid" aria-label="Claude Code catalog entries"></section>
+  </main>
+
+  <script type="module" src="../js/claude-code-catalog.js"></script>
+</body>
+</html>
