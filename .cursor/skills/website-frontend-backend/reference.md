@@ -42,7 +42,7 @@
 - [ ] File: projects/<slug>.html
 - [ ] Title: "<Project Name> | Aydin Ayanzadeh"
 - [ ] Meta description (1–2 sentences)
-- [ ] Canonical: https://ayanzadeh93.github.io/projects/<slug>.html
+- [ ] Canonical: https://www.ayanzadeh.com/projects/<slug>.html
 - [ ] Hero: badges, h1, tagline, meta items (author, institution, dates)
 - [ ] Action links (paper, code, demo) with rel="noopener noreferrer" on external targets
 - [ ] Card on index.html#projects with matching link
@@ -92,7 +92,7 @@ Dark overrides: `:root[data-theme="dark"]` and `[data-theme="dark"] .component` 
 
 ```xml
 <url>
-    <loc>https://ayanzadeh93.github.io/projects/new-project.html</loc>
+    <loc>https://www.ayanzadeh.com/projects/new-project.html</loc>
     <lastmod>YYYY-MM-DD</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
