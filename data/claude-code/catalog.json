@@ -1,134 +1,4441 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "meta": {
-    "name": "Claude Code Catalog",
-    "updated": "2026-09-08",
-    "completeness": "seed",
+    "name": "Agent & GitHub CLI Catalog",
+    "updated": "2026-09-09",
+    "completeness": "github-complete",
     "sourceApp": "../../apps/claude-code-encyclopedia.html",
-    "notes": "This is the maintainable data layer for gradual migration of the embedded encyclopedia dataset. Add records here without changing rendering code."
+    "notes": "Structured data layer behind apps/claude-code-catalog.html. The GitHub family is complete here; the Claude and Codex families cover the most-used surface, with the full 504-entry set still living in the embedded encyclopedia dataset. Add records here without touching rendering code."
   },
+  "families": [
+    {
+      "id": "claude",
+      "label": "Claude Code",
+      "blurb": "Anthropic's terminal coding agent: CLI, configuration, hooks and extensions.",
+      "source": "https://code.claude.com/docs"
+    },
+    {
+      "id": "codex",
+      "label": "Codex CLI",
+      "blurb": "OpenAI's terminal coding agent, for side-by-side comparison.",
+      "source": "https://developers.openai.com/codex"
+    },
+    {
+      "id": "github",
+      "label": "GitHub CLI",
+      "blurb": "The gh command line and the git workflow it sits on top of.",
+      "source": "https://cli.github.com/manual"
+    }
+  ],
   "sections": [
-    {"id": "install", "family": "claude", "label": "Installation"},
-    {"id": "cli", "family": "claude", "label": "CLI commands"},
-    {"id": "flags", "family": "claude", "label": "CLI flags"},
-    {"id": "settings", "family": "claude", "label": "settings.json"},
-    {"id": "hooks", "family": "claude", "label": "Hooks"},
-    {"id": "mcp", "family": "claude", "label": "MCP"},
-    {"id": "cxcli", "family": "codex", "label": "Codex CLI"},
-    {"id": "cxconf", "family": "codex", "label": "Codex config"}
+    {
+      "id": "install",
+      "family": "claude",
+      "label": "Install & update",
+      "blurb": "Native installer, npm and package managers, plus update channels."
+    },
+    {
+      "id": "cli",
+      "family": "claude",
+      "label": "CLI commands",
+      "blurb": "Everything you can type after `claude` in a shell."
+    },
+    {
+      "id": "flags",
+      "family": "claude",
+      "label": "CLI flags",
+      "blurb": "Options for a single session, headless runs and automation."
+    },
+    {
+      "id": "slash",
+      "family": "claude",
+      "label": "Slash commands",
+      "blurb": "Typed inside a session to drive the client rather than the model."
+    },
+    {
+      "id": "settings",
+      "family": "claude",
+      "label": "settings.json",
+      "blurb": "Configuration keys and the scope each one belongs in."
+    },
+    {
+      "id": "perms",
+      "family": "claude",
+      "label": "Permissions",
+      "blurb": "Rule syntax and modes, enforced by the client rather than the model."
+    },
+    {
+      "id": "hooks",
+      "family": "claude",
+      "label": "Hooks",
+      "blurb": "Shell callbacks fired at lifecycle points."
+    },
+    {
+      "id": "mcp",
+      "family": "claude",
+      "label": "MCP servers",
+      "blurb": "Adding, scoping and authenticating external tool servers."
+    },
+    {
+      "id": "agents",
+      "family": "claude",
+      "label": "Subagents & skills",
+      "blurb": "Delegated agents, packaged skills and plugins."
+    },
+    {
+      "id": "memory",
+      "family": "claude",
+      "label": "Memory & CLAUDE.md",
+      "blurb": "Persistent project and user instructions."
+    },
+    {
+      "id": "env",
+      "family": "claude",
+      "label": "Environment",
+      "blurb": "Variables read from the shell or the settings env block."
+    },
+    {
+      "id": "cxcli",
+      "family": "codex",
+      "label": "Codex CLI",
+      "blurb": "OpenAI's terminal agent: subcommands and flags."
+    },
+    {
+      "id": "cxconf",
+      "family": "codex",
+      "label": "Codex config",
+      "blurb": "config.toml keys, sandbox policies and AGENTS.md."
+    },
+    {
+      "id": "ghauth",
+      "family": "github",
+      "label": "Authentication",
+      "blurb": "Signing in to github.com or GitHub Enterprise, and handing credentials to git."
+    },
+    {
+      "id": "ghrepo",
+      "family": "github",
+      "label": "Repositories",
+      "blurb": "Creating, cloning, forking and configuring repositories from the terminal."
+    },
+    {
+      "id": "ghpr",
+      "family": "github",
+      "label": "Pull requests",
+      "blurb": "The full pull request lifecycle: open, review, check, merge."
+    },
+    {
+      "id": "ghissue",
+      "family": "github",
+      "label": "Issues",
+      "blurb": "Filing, triaging and closing issues, and branching from them."
+    },
+    {
+      "id": "ghrun",
+      "family": "github",
+      "label": "Actions",
+      "blurb": "Workflows, runs, logs, artifacts and the secrets they read."
+    },
+    {
+      "id": "ghrelease",
+      "family": "github",
+      "label": "Releases & gists",
+      "blurb": "Tagged releases, their assets, and one-off gists."
+    },
+    {
+      "id": "ghapi",
+      "family": "github",
+      "label": "API & scripting",
+      "blurb": "Raw REST and GraphQL calls, JSON output, search and extensions."
+    },
+    {
+      "id": "ghconfig",
+      "family": "github",
+      "label": "Config & env",
+      "blurb": "Persistent gh settings and the environment variables that override them."
+    },
+    {
+      "id": "ghgit",
+      "family": "github",
+      "label": "Git for GitHub",
+      "blurb": "The git commands that pair with a GitHub pull request workflow."
+    }
   ],
   "entries": [
+    {
+      "id": "install-native-installer",
+      "section": "install",
+      "name": "Native installer",
+      "type": "Install",
+      "description": "One-line installer that manages its own launcher and updates itself in the background.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "curl -fsSL https://claude.ai/install.sh | bash",
+          "label": "macOS / Linux / WSL"
+        },
+        {
+          "command": "irm https://claude.ai/install.ps1 | iex",
+          "label": "Windows PowerShell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "install",
+        "setup",
+        "bootstrap"
+      ],
+      "note": "On native Windows install Git for Windows too, or the Bash tool is unavailable and Claude Code falls back to PowerShell."
+    },
+    {
+      "id": "install-npm-install-g-at-anthropic-aislash-claude-code",
+      "section": "install",
+      "name": "npm install -g @anthropic-ai/claude-code",
+      "type": "Install",
+      "description": "Install through npm when you already manage Node tooling that way.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "npm install -g @anthropic-ai/claude-code",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "install",
+        "npm",
+        "node"
+      ],
+      "note": null
+    },
+    {
+      "id": "install-claude-update",
+      "section": "install",
+      "name": "claude update",
+      "type": "Updates",
+      "description": "Check for and install a newer version immediately.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "claude update",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "update",
+        "version",
+        "maintenance"
+      ],
+      "note": null
+    },
+    {
+      "id": "install-autoupdateschannel",
+      "section": "install",
+      "name": "autoUpdatesChannel",
+      "type": "Updates",
+      "description": "Choose whether the client tracks the latest or the stable release channel.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "{ \"autoUpdatesChannel\": \"stable\" }",
+          "label": "settings.json"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "updates",
+        "stable",
+        "channel"
+      ],
+      "note": "The channel you install from becomes the default; this key changes it afterwards."
+    },
     {
       "id": "cli-claude",
       "section": "cli",
       "name": "claude",
       "type": "Command",
-      "description": "Start an interactive Claude Code session in the current directory.",
+      "description": "Start an interactive session in the current directory.",
       "aliases": [],
-      "examples": [{"command": "claude", "label": "shell"}],
+      "examples": [
+        {
+          "command": "claude",
+          "label": "shell"
+        },
+        {
+          "command": "claude \"summarise the failing tests\"",
+          "label": "with an opening prompt"
+        }
+      ],
       "introducedVersion": null,
-      "tags": ["interactive", "session"],
+      "tags": [
+        "interactive",
+        "session",
+        "repl"
+      ],
       "note": null
     },
     {
-      "id": "cli-print-mode",
+      "id": "cli-claude-p-query",
       "section": "cli",
       "name": "claude -p \"query\"",
       "type": "Print mode",
-      "description": "Run headlessly, print the result, and exit.",
-      "aliases": [],
-      "examples": [{"command": "claude -p \"explain this function\"", "label": "shell"}],
+      "description": "Run headlessly, print the result, and exit. The basis of every scripted use.",
+      "aliases": [
+        "--print"
+      ],
+      "examples": [
+        {
+          "command": "claude -p \"explain this function\"",
+          "label": "shell"
+        },
+        {
+          "command": "cat error.log | claude -p \"what failed here?\"",
+          "label": "stdin"
+        },
+        {
+          "command": "claude -p \"list TODOs\" --output-format json",
+          "label": "structured"
+        }
+      ],
       "introducedVersion": null,
-      "tags": ["headless", "automation", "stdin"],
+      "tags": [
+        "headless",
+        "automation",
+        "stdin",
+        "ci",
+        "pipe"
+      ],
+      "note": "Combine with --output-format json when a script needs to parse the result rather than display it."
+    },
+    {
+      "id": "cli-claude-c",
+      "section": "cli",
+      "name": "claude -c",
+      "type": "Session",
+      "description": "Continue the most recent conversation in this directory.",
+      "aliases": [
+        "--continue"
+      ],
+      "examples": [
+        {
+          "command": "claude -c",
+          "label": "shell"
+        },
+        {
+          "command": "claude -c -p \"now add tests\"",
+          "label": "headless continue"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "session",
+        "continue",
+        "resume",
+        "history"
+      ],
       "note": null
     },
     {
-      "id": "cli-auth-login",
+      "id": "cli-claude-r",
+      "section": "cli",
+      "name": "claude -r",
+      "type": "Session",
+      "description": "Resume a specific past session, by id or by picking from a list.",
+      "aliases": [
+        "--resume"
+      ],
+      "examples": [
+        {
+          "command": "claude -r",
+          "label": "picker"
+        },
+        {
+          "command": "claude -r abc123ef",
+          "label": "by id"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "session",
+        "resume",
+        "history"
+      ],
+      "note": null
+    },
+    {
+      "id": "cli-claude-auth-login",
       "section": "cli",
       "name": "claude auth login",
       "type": "Auth",
-      "description": "Sign in to an Anthropic account; add --console for a Console account.",
+      "description": "Sign in to an Anthropic account, or add --console for a Console account.",
       "aliases": [],
-      "examples": [{"command": "claude auth login --console", "label": "shell"}],
+      "examples": [
+        {
+          "command": "claude auth login",
+          "label": "shell"
+        },
+        {
+          "command": "claude auth login --console",
+          "label": "console account"
+        }
+      ],
       "introducedVersion": null,
-      "tags": ["authentication", "console"],
+      "tags": [
+        "authentication",
+        "console",
+        "login"
+      ],
       "note": null
     },
     {
-      "id": "cli-auth-status",
+      "id": "cli-claude-auth-status",
       "section": "cli",
       "name": "claude auth status",
       "type": "Auth",
-      "description": "Show authentication status as JSON.",
+      "description": "Report the current authentication state as JSON.",
       "aliases": [],
-      "examples": [{"command": "claude auth status", "label": "shell"}],
+      "examples": [
+        {
+          "command": "claude auth status",
+          "label": "shell"
+        }
+      ],
       "introducedVersion": null,
-      "tags": ["authentication", "ci", "json"],
+      "tags": [
+        "authentication",
+        "ci",
+        "json",
+        "diagnostics"
+      ],
       "note": null
     },
     {
-      "id": "cli-doctor",
+      "id": "cli-claude-doctor",
       "section": "cli",
       "name": "claude doctor",
-      "type": "Command",
-      "description": "Run installation and settings diagnostics.",
+      "type": "Diagnostics",
+      "description": "Run installation, settings and connectivity diagnostics.",
       "aliases": [],
-      "examples": [{"command": "claude doctor", "label": "shell"}],
+      "examples": [
+        {
+          "command": "claude doctor",
+          "label": "shell"
+        }
+      ],
       "introducedVersion": null,
-      "tags": ["diagnostics", "health"],
+      "tags": [
+        "diagnostics",
+        "health",
+        "troubleshooting"
+      ],
+      "note": "Start here when the client launches but behaves oddly; it validates settings files that would otherwise fail silently."
+    },
+    {
+      "id": "cli-claude-mcp",
+      "section": "cli",
+      "name": "claude mcp",
+      "type": "MCP",
+      "description": "Manage Model Context Protocol servers from the shell.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "claude mcp list",
+          "label": "list"
+        },
+        {
+          "command": "claude mcp add --transport http linear https://mcp.linear.app/mcp",
+          "label": "add"
+        },
+        {
+          "command": "claude mcp remove linear",
+          "label": "remove"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "mcp",
+        "servers",
+        "tools"
+      ],
       "note": null
     },
     {
-      "id": "flags-model",
+      "id": "cli-claude-config",
+      "section": "cli",
+      "name": "claude config",
+      "type": "Config",
+      "description": "Read and write settings from the shell instead of editing JSON by hand.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "claude config list",
+          "label": "shell"
+        },
+        {
+          "command": "claude config set model opus",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "config",
+        "settings"
+      ],
+      "note": null
+    },
+    {
+      "id": "flags-flag-model",
       "section": "flags",
       "name": "--model",
       "type": "Model",
       "description": "Choose the model for the session.",
       "aliases": [],
-      "examples": [{"command": "claude --model opus", "label": "shell"}],
+      "examples": [
+        {
+          "command": "claude --model opus",
+          "label": "shell"
+        },
+        {
+          "command": "claude --model claude-sonnet-5",
+          "label": "explicit id"
+        }
+      ],
       "introducedVersion": null,
-      "tags": ["model", "session"],
+      "tags": [
+        "model",
+        "session"
+      ],
       "note": null
     },
     {
-      "id": "flags-permission-mode",
+      "id": "flags-flag-permission-mode",
       "section": "flags",
       "name": "--permission-mode",
       "type": "Permissions",
-      "description": "Start Claude Code using a specified permission mode.",
+      "description": "Start in a specific permission mode.",
       "aliases": [],
-      "examples": [{"command": "claude --permission-mode plan", "label": "shell"}],
+      "examples": [
+        {
+          "command": "claude --permission-mode plan",
+          "label": "plan first"
+        },
+        {
+          "command": "claude --permission-mode acceptEdits",
+          "label": "auto-accept edits"
+        }
+      ],
       "introducedVersion": null,
-      "tags": ["permissions", "plan"],
+      "tags": [
+        "permissions",
+        "plan",
+        "safety"
+      ],
+      "note": "plan mode makes Claude propose an approach and wait for approval before touching anything."
+    },
+    {
+      "id": "flags-flag-output-format",
+      "section": "flags",
+      "name": "--output-format",
+      "type": "Output",
+      "description": "Select text, json or stream-json output in print mode.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "claude -p \"audit deps\" --output-format json",
+          "label": "shell"
+        },
+        {
+          "command": "claude -p \"refactor\" --output-format stream-json",
+          "label": "streaming"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "headless",
+        "json",
+        "automation",
+        "parsing"
+      ],
       "note": null
     },
     {
-      "id": "settings-auto-updates-channel",
+      "id": "flags-flag-allowedtools",
+      "section": "flags",
+      "name": "--allowedTools",
+      "type": "Permissions",
+      "description": "Pre-approve specific tools so a headless run does not stop for prompts.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "claude -p \"run the tests\" --allowedTools \"Bash(npm test:*)\" \"Read\"",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "permissions",
+        "automation",
+        "ci",
+        "tools"
+      ],
+      "note": "Scope Bash rules tightly; Bash(*) hands over the whole shell."
+    },
+    {
+      "id": "flags-flag-add-dir",
+      "section": "flags",
+      "name": "--add-dir",
+      "type": "Workspace",
+      "description": "Give the session access to directories outside the current working directory.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "claude --add-dir ../shared-lib ../docs",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "workspace",
+        "context",
+        "monorepo"
+      ],
+      "note": null
+    },
+    {
+      "id": "flags-flag-append-system-prompt",
+      "section": "flags",
+      "name": "--append-system-prompt",
+      "type": "Prompting",
+      "description": "Append extra standing instructions for one session.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "claude --append-system-prompt \"Prefer TypeScript examples\"",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "prompting",
+        "system prompt",
+        "session"
+      ],
+      "note": null
+    },
+    {
+      "id": "flags-flag-verbose",
+      "section": "flags",
+      "name": "--verbose",
+      "type": "Debugging",
+      "description": "Show full turn-by-turn output instead of the condensed view.",
+      "aliases": [
+        "--debug"
+      ],
+      "examples": [
+        {
+          "command": "claude --verbose",
+          "label": "shell"
+        },
+        {
+          "command": "claude --debug",
+          "label": "protocol-level"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "debugging",
+        "logging",
+        "diagnostics"
+      ],
+      "note": null
+    },
+    {
+      "id": "slash-slash-clear",
+      "section": "slash",
+      "name": "/clear",
+      "type": "Session",
+      "description": "Discard the current conversation context and start fresh in the same session.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "/clear",
+          "label": "session"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "context",
+        "reset",
+        "session"
+      ],
+      "note": "Cheaper and more predictable than letting a long context auto-compact when you are switching tasks."
+    },
+    {
+      "id": "slash-slash-compact",
+      "section": "slash",
+      "name": "/compact",
+      "type": "Session",
+      "description": "Summarise the conversation so far to reclaim context window.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "/compact",
+          "label": "session"
+        },
+        {
+          "command": "/compact focus on the migration work",
+          "label": "with guidance"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "context",
+        "summary",
+        "long session"
+      ],
+      "note": null
+    },
+    {
+      "id": "slash-slash-model",
+      "section": "slash",
+      "name": "/model",
+      "type": "Model",
+      "description": "Switch models mid-session.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "/model opus",
+          "label": "session"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "model",
+        "switch"
+      ],
+      "note": null
+    },
+    {
+      "id": "slash-slash-config",
+      "section": "slash",
+      "name": "/config",
+      "type": "Config",
+      "description": "Open the settings editor, including theme, editor mode and notifications.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "/config",
+          "label": "session"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "config",
+        "settings",
+        "theme",
+        "vim"
+      ],
+      "note": null
+    },
+    {
+      "id": "slash-slash-review",
+      "section": "slash",
+      "name": "/review",
+      "type": "Review",
+      "description": "Review a pull request or the working diff from inside a session.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "/review",
+          "label": "session"
+        },
+        {
+          "command": "/review 42",
+          "label": "a pull request"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "review",
+        "pull request",
+        "diff"
+      ],
+      "note": null
+    },
+    {
+      "id": "slash-slash-init",
+      "section": "slash",
+      "name": "/init",
+      "type": "Project",
+      "description": "Generate a CLAUDE.md that documents the current codebase.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "/init",
+          "label": "session"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "memory",
+        "onboarding",
+        "claude.md"
+      ],
+      "note": null
+    },
+    {
+      "id": "slash-slash-agents",
+      "section": "slash",
+      "name": "/agents",
+      "type": "Agents",
+      "description": "Create, edit and inspect the subagents available to this project.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "/agents",
+          "label": "session"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "subagents",
+        "delegation"
+      ],
+      "note": null
+    },
+    {
+      "id": "slash-slash-mcp",
+      "section": "slash",
+      "name": "/mcp",
+      "type": "MCP",
+      "description": "Inspect MCP server status and authenticate servers that need OAuth.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "/mcp",
+          "label": "session"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "mcp",
+        "oauth",
+        "servers"
+      ],
+      "note": null
+    },
+    {
+      "id": "slash-slash-resume",
+      "section": "slash",
+      "name": "/resume",
+      "type": "Session",
+      "description": "Pick an earlier session to continue.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "/resume",
+          "label": "session"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "session",
+        "history",
+        "resume"
+      ],
+      "note": null
+    },
+    {
+      "id": "slash-slash-help",
+      "section": "slash",
+      "name": "/help",
+      "type": "Help",
+      "description": "List the slash commands available in this session, including project ones.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "/help",
+          "label": "session"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "help",
+        "discovery"
+      ],
+      "note": null
+    },
+    {
+      "id": "settings-settings-json-scopes",
       "section": "settings",
-      "name": "autoUpdatesChannel",
-      "type": "Updates",
-      "description": "Select the latest or stable auto-update channel.",
+      "name": "settings.json scopes",
+      "type": "Paths",
+      "description": "Three files merge into the effective configuration, most specific winning.",
       "aliases": [],
-      "examples": [{"command": "{ \"autoUpdatesChannel\": \"stable\" }", "label": "settings.json"}],
+      "examples": [
+        {
+          "command": "~/.claude/settings.json",
+          "label": "user"
+        },
+        {
+          "command": ".claude/settings.json",
+          "label": "project, committed"
+        },
+        {
+          "command": ".claude/settings.local.json",
+          "label": "project, gitignored"
+        }
+      ],
       "introducedVersion": null,
-      "tags": ["updates", "stable"],
+      "tags": [
+        "settings",
+        "scope",
+        "paths",
+        "precedence"
+      ],
+      "note": "Put anything machine-specific or secret in settings.local.json, which is gitignored by default."
+    },
+    {
+      "id": "settings-permissions",
+      "section": "settings",
+      "name": "permissions",
+      "type": "Permissions",
+      "description": "Allow, ask and deny lists that gate tool use before the model ever runs.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "{ \"permissions\": { \"allow\": [\"Bash(npm test:*)\"], \"deny\": [\"Read(./.env)\"] } }",
+          "label": "settings.json"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "permissions",
+        "security",
+        "allowlist",
+        "deny"
+      ],
+      "note": "deny wins over allow. Denying Read on secret files is worth doing even in a trusted repo."
+    },
+    {
+      "id": "settings-env",
+      "section": "settings",
+      "name": "env",
+      "type": "Environment",
+      "description": "Environment variables injected into every session and tool call.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "{ \"env\": { \"NODE_ENV\": \"development\" } }",
+          "label": "settings.json"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "environment",
+        "variables"
+      ],
+      "note": "Do not put credentials here if the file is committed; use settings.local.json."
+    },
+    {
+      "id": "settings-model",
+      "section": "settings",
+      "name": "model",
+      "type": "Model",
+      "description": "Default model for sessions started in this scope.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "{ \"model\": \"claude-opus-5\" }",
+          "label": "settings.json"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "model",
+        "default"
+      ],
       "note": null
     },
     {
-      "id": "mcp-list",
+      "id": "settings-hooks",
+      "section": "settings",
+      "name": "hooks",
+      "type": "Hooks",
+      "description": "Commands to run at lifecycle events, keyed by event and tool matcher.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "{ \"hooks\": { \"PostToolUse\": [{ \"matcher\": \"Edit|Write\", \"hooks\": [{ \"type\": \"command\", \"command\": \"npm run lint\" }] }] } }",
+          "label": "settings.json"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "hooks",
+        "automation",
+        "lint"
+      ],
+      "note": null
+    },
+    {
+      "id": "settings-statusline",
+      "section": "settings",
+      "name": "statusLine",
+      "type": "Interface",
+      "description": "Command whose output renders as the session status line.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "{ \"statusLine\": { \"type\": \"command\", \"command\": \"~/.claude/statusline.sh\" } }",
+          "label": "settings.json"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "status line",
+        "interface",
+        "customization"
+      ],
+      "note": null
+    },
+    {
+      "id": "perms-rule-syntax",
+      "section": "perms",
+      "name": "Rule syntax",
+      "type": "Syntax",
+      "description": "A rule is Tool or Tool(specifier); the specifier is matched by the client, not the model.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "Bash(git status)",
+          "label": "exact command"
+        },
+        {
+          "command": "Bash(npm run test:*)",
+          "label": "prefix match"
+        },
+        {
+          "command": "Read(./src/**)",
+          "label": "path glob"
+        },
+        {
+          "command": "mcp__github__create_pull_request",
+          "label": "one MCP tool"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "permissions",
+        "syntax",
+        "glob",
+        "matcher"
+      ],
+      "note": "The :* suffix is a prefix match, not a shell glob. Bash(npm test:*) allows any command starting with npm test."
+    },
+    {
+      "id": "perms-permission-modes",
+      "section": "perms",
+      "name": "Permission modes",
+      "type": "Modes",
+      "description": "How much the session may do before asking.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "default",
+          "label": "ask on first use of each tool"
+        },
+        {
+          "command": "plan",
+          "label": "propose a plan, change nothing"
+        },
+        {
+          "command": "acceptEdits",
+          "label": "auto-accept file edits"
+        },
+        {
+          "command": "bypassPermissions",
+          "label": "no prompts at all"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "permissions",
+        "modes",
+        "plan",
+        "safety"
+      ],
+      "note": "bypassPermissions removes the last guardrail; reserve it for throwaway containers."
+    },
+    {
+      "id": "perms-slash-permissions",
+      "section": "perms",
+      "name": "/permissions",
+      "type": "Session",
+      "description": "Review and edit the active rules from inside a session.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "/permissions",
+          "label": "session"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "permissions",
+        "review",
+        "session"
+      ],
+      "note": null
+    },
+    {
+      "id": "hooks-pretooluse",
+      "section": "hooks",
+      "name": "PreToolUse",
+      "type": "Hook event",
+      "description": "Runs before a tool call. A non-zero exit blocks the call.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "{ \"matcher\": \"Bash\", \"hooks\": [{ \"type\": \"command\", \"command\": \"./scripts/audit-bash.sh\" }] }",
+          "label": "settings.json"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "hooks",
+        "gate",
+        "security",
+        "block"
+      ],
+      "note": "The only hook that can veto an action; the rest observe or react."
+    },
+    {
+      "id": "hooks-posttooluse",
+      "section": "hooks",
+      "name": "PostToolUse",
+      "type": "Hook event",
+      "description": "Runs after a tool call succeeds. The usual place for formatters and linters.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "{ \"matcher\": \"Edit|Write\", \"hooks\": [{ \"type\": \"command\", \"command\": \"npx prettier --write $CLAUDE_FILE_PATHS\" }] }",
+          "label": "settings.json"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "hooks",
+        "format",
+        "lint",
+        "post"
+      ],
+      "note": null
+    },
+    {
+      "id": "hooks-sessionstart",
+      "section": "hooks",
+      "name": "SessionStart",
+      "type": "Hook event",
+      "description": "Runs when a session begins. Used to install dependencies or warm a dev server.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "{ \"hooks\": { \"SessionStart\": [{ \"hooks\": [{ \"type\": \"command\", \"command\": \"npm ci\" }] }] } }",
+          "label": "settings.json"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "hooks",
+        "startup",
+        "bootstrap",
+        "ci"
+      ],
+      "note": null
+    },
+    {
+      "id": "hooks-userpromptsubmit",
+      "section": "hooks",
+      "name": "UserPromptSubmit",
+      "type": "Hook event",
+      "description": "Runs when a prompt is submitted; can inject extra context or reject the prompt.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "{ \"hooks\": { \"UserPromptSubmit\": [{ \"hooks\": [{ \"type\": \"command\", \"command\": \"./scripts/add-context.sh\" }] }] } }",
+          "label": "settings.json"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "hooks",
+        "prompt",
+        "context",
+        "guardrail"
+      ],
+      "note": null
+    },
+    {
+      "id": "hooks-stop",
+      "section": "hooks",
+      "name": "Stop",
+      "type": "Hook event",
+      "description": "Runs when the assistant finishes a turn. Useful for notifications.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "{ \"hooks\": { \"Stop\": [{ \"hooks\": [{ \"type\": \"command\", \"command\": \"osascript -e 'display notification \\\"done\\\"'\" }] }] } }",
+          "label": "settings.json"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "hooks",
+        "notification",
+        "finish"
+      ],
+      "note": null
+    },
+    {
+      "id": "mcp-claude-mcp-add",
+      "section": "mcp",
+      "name": "claude mcp add",
+      "type": "MCP",
+      "description": "Register an MCP server over stdio, HTTP or SSE.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "claude mcp add --transport http linear https://mcp.linear.app/mcp",
+          "label": "http"
+        },
+        {
+          "command": "claude mcp add filesystem -- npx -y @modelcontextprotocol/server-filesystem ~/projects",
+          "label": "stdio"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "mcp",
+        "add",
+        "transport",
+        "servers"
+      ],
+      "note": null
+    },
+    {
+      "id": "mcp-claude-mcp-list",
       "section": "mcp",
       "name": "claude mcp list",
       "type": "MCP",
-      "description": "List configured Model Context Protocol servers.",
+      "description": "List configured servers and whether each one is connected.",
       "aliases": [],
-      "examples": [{"command": "claude mcp list", "label": "shell"}],
+      "examples": [
+        {
+          "command": "claude mcp list",
+          "label": "shell"
+        }
+      ],
       "introducedVersion": null,
-      "tags": ["mcp", "servers"],
+      "tags": [
+        "mcp",
+        "servers",
+        "status"
+      ],
       "note": null
+    },
+    {
+      "id": "mcp-mcp-scopes",
+      "section": "mcp",
+      "name": "MCP scopes",
+      "type": "MCP",
+      "description": "Where a server registration lives: local to you, shared with the project, or user-wide.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "claude mcp add --scope project shared-db ...",
+          "label": "committed to .mcp.json"
+        },
+        {
+          "command": "claude mcp add --scope user my-tool ...",
+          "label": "all your projects"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "mcp",
+        "scope",
+        "sharing",
+        "team"
+      ],
+      "note": "project scope writes .mcp.json, which teammates get on checkout — so never put a token in the command."
+    },
+    {
+      "id": "mcp-mcp-tool-naming",
+      "section": "mcp",
+      "name": "MCP tool naming",
+      "type": "MCP",
+      "description": "MCP tools appear as mcp__server__tool in permission rules and hook matchers.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "mcp__github__create_pull_request",
+          "label": "permission rule"
+        },
+        {
+          "command": "{ \"permissions\": { \"allow\": [\"mcp__github__*\"] } }",
+          "label": "settings.json"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "mcp",
+        "permissions",
+        "naming",
+        "matcher"
+      ],
+      "note": null
+    },
+    {
+      "id": "agents-subagents",
+      "section": "agents",
+      "name": "Subagents",
+      "type": "Agents",
+      "description": "Markdown files defining a delegated agent with its own prompt, model and tool access.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": ".claude/agents/code-reviewer.md",
+          "label": "project"
+        },
+        {
+          "command": "~/.claude/agents/researcher.md",
+          "label": "user"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "subagents",
+        "delegation",
+        "context",
+        "parallel"
+      ],
+      "note": "A subagent starts with no memory of the current conversation, so its prompt has to be self-contained."
+    },
+    {
+      "id": "agents-skills",
+      "section": "agents",
+      "name": "Skills",
+      "type": "Agents",
+      "description": "Packaged instructions that load on demand when a task matches their description.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": ".claude/skills/deploy/SKILL.md",
+          "label": "project"
+        },
+        {
+          "command": "/deploy",
+          "label": "invoke by name"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "skills",
+        "instructions",
+        "workflow",
+        "packaged"
+      ],
+      "note": null
+    },
+    {
+      "id": "agents-custom-slash-commands",
+      "section": "agents",
+      "name": "Custom slash commands",
+      "type": "Agents",
+      "description": "Markdown files in a commands directory become slash commands.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": ".claude/commands/changelog.md",
+          "label": "creates /changelog"
+        },
+        {
+          "command": "$ARGUMENTS",
+          "label": "placeholder for the typed arguments"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "commands",
+        "slash",
+        "customization"
+      ],
+      "note": null
+    },
+    {
+      "id": "agents-plugins",
+      "section": "agents",
+      "name": "Plugins",
+      "type": "Agents",
+      "description": "Distributable bundles of commands, agents, skills, hooks and MCP servers.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "/plugin marketplace add owner/repo",
+          "label": "add a source"
+        },
+        {
+          "command": "/plugin install my-plugin",
+          "label": "install"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "plugins",
+        "marketplace",
+        "distribution"
+      ],
+      "note": null
+    },
+    {
+      "id": "memory-claude-md",
+      "section": "memory",
+      "name": "CLAUDE.md",
+      "type": "Memory",
+      "description": "Standing project instructions, read at the start of every session in that directory.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "./CLAUDE.md",
+          "label": "project root, committed"
+        },
+        {
+          "command": "~/.claude/CLAUDE.md",
+          "label": "applies to all your projects"
+        },
+        {
+          "command": "./src/CLAUDE.md",
+          "label": "scoped to a subtree"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "memory",
+        "claude.md",
+        "instructions",
+        "context"
+      ],
+      "note": "Nested files are additive: a subdirectory's CLAUDE.md layers on top of the root one rather than replacing it."
+    },
+    {
+      "id": "memory-at-imports",
+      "section": "memory",
+      "name": "@ imports",
+      "type": "Memory",
+      "description": "Pull another file into CLAUDE.md instead of duplicating its content.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "@docs/architecture.md",
+          "label": "CLAUDE.md"
+        },
+        {
+          "command": "@~/.claude/personal-style.md",
+          "label": "CLAUDE.md"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "memory",
+        "import",
+        "composition"
+      ],
+      "note": null
+    },
+    {
+      "id": "memory-quick-memory",
+      "section": "memory",
+      "name": "# quick memory",
+      "type": "Memory",
+      "description": "Start a message with # to append a note to memory without opening the file.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "# always run the linter before committing",
+          "label": "session"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "memory",
+        "shortcut",
+        "note"
+      ],
+      "note": null
+    },
+    {
+      "id": "env-anthropic-api-key",
+      "section": "env",
+      "name": "ANTHROPIC_API_KEY",
+      "type": "Variable",
+      "description": "API key used when authenticating against the Anthropic API rather than a subscription login.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "export ANTHROPIC_API_KEY=sk-ant-...",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "environment",
+        "api",
+        "authentication",
+        "key"
+      ],
+      "note": "Not needed for a normal Claude or Console account login; setting it changes which billing path is used."
+    },
+    {
+      "id": "env-claude-code-use-bedrock",
+      "section": "env",
+      "name": "CLAUDE_CODE_USE_BEDROCK",
+      "type": "Variable",
+      "description": "Route requests through Amazon Bedrock instead of the Anthropic API.",
+      "aliases": [
+        "CLAUDE_CODE_USE_VERTEX"
+      ],
+      "examples": [
+        {
+          "command": "export CLAUDE_CODE_USE_BEDROCK=1",
+          "label": "shell"
+        },
+        {
+          "command": "export CLAUDE_CODE_USE_VERTEX=1",
+          "label": "Google Vertex AI"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "environment",
+        "bedrock",
+        "vertex",
+        "enterprise"
+      ],
+      "note": null
+    },
+    {
+      "id": "env-max-thinking-tokens",
+      "section": "env",
+      "name": "MAX_THINKING_TOKENS",
+      "type": "Variable",
+      "description": "Raise the budget available for extended thinking.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "export MAX_THINKING_TOKENS=32000",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "environment",
+        "thinking",
+        "budget",
+        "reasoning"
+      ],
+      "note": null
+    },
+    {
+      "id": "env-disable-telemetry",
+      "section": "env",
+      "name": "DISABLE_TELEMETRY",
+      "type": "Variable",
+      "description": "Opt out of usage telemetry and error reporting.",
+      "aliases": [
+        "DISABLE_ERROR_REPORTING"
+      ],
+      "examples": [
+        {
+          "command": "export DISABLE_TELEMETRY=1",
+          "label": "shell"
+        },
+        {
+          "command": "export DISABLE_ERROR_REPORTING=1",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "environment",
+        "telemetry",
+        "privacy"
+      ],
+      "note": null
+    },
+    {
+      "id": "cxcli-codex",
+      "section": "cxcli",
+      "name": "codex",
+      "type": "Command",
+      "description": "Start OpenAI's terminal agent interactively.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "codex",
+          "label": "shell"
+        },
+        {
+          "command": "codex \"add a health check endpoint\"",
+          "label": "with a prompt"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "codex",
+        "interactive",
+        "session"
+      ],
+      "note": null
+    },
+    {
+      "id": "cxcli-codex-exec",
+      "section": "cxcli",
+      "name": "codex exec",
+      "type": "Headless",
+      "description": "Run non-interactively and print the result — the Codex analogue of claude -p.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "codex exec \"summarise the diff\"",
+          "label": "shell"
+        },
+        {
+          "command": "codex exec --json \"list failing tests\"",
+          "label": "structured"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "codex",
+        "headless",
+        "automation",
+        "ci"
+      ],
+      "note": null
+    },
+    {
+      "id": "cxcli-codex-resume",
+      "section": "cxcli",
+      "name": "codex resume",
+      "type": "Session",
+      "description": "Continue a previous Codex session.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "codex resume",
+          "label": "picker"
+        },
+        {
+          "command": "codex resume --last",
+          "label": "most recent"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "codex",
+        "session",
+        "resume"
+      ],
+      "note": null
+    },
+    {
+      "id": "cxcli-codex-flag-sandbox",
+      "section": "cxcli",
+      "name": "codex --sandbox",
+      "type": "Sandbox",
+      "description": "Choose how much filesystem and network access the agent gets.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "codex --sandbox read-only",
+          "label": "safest"
+        },
+        {
+          "command": "codex --sandbox workspace-write",
+          "label": "edit the repo"
+        },
+        {
+          "command": "codex --sandbox danger-full-access",
+          "label": "no sandbox"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "codex",
+        "sandbox",
+        "permissions",
+        "safety"
+      ],
+      "note": "workspace-write confines writes to the working directory; network access stays off unless it is enabled separately."
+    },
+    {
+      "id": "cxcli-codex-mcp",
+      "section": "cxcli",
+      "name": "codex mcp",
+      "type": "MCP",
+      "description": "Manage MCP servers for Codex.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "codex mcp list",
+          "label": "shell"
+        },
+        {
+          "command": "codex mcp add my-server -- npx -y my-mcp-server",
+          "label": "add"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "codex",
+        "mcp",
+        "servers"
+      ],
+      "note": null
+    },
+    {
+      "id": "cxconf-config-toml",
+      "section": "cxconf",
+      "name": "config.toml",
+      "type": "Paths",
+      "description": "Codex configuration file, holding model, sandbox and provider settings.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "~/.codex/config.toml",
+          "label": "macOS / Linux"
+        },
+        {
+          "command": "model = \"gpt-5-codex\"",
+          "label": "config.toml"
+        },
+        {
+          "command": "approval_policy = \"on-request\"",
+          "label": "config.toml"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "codex",
+        "config",
+        "toml",
+        "paths"
+      ],
+      "note": null
+    },
+    {
+      "id": "cxconf-agents-md",
+      "section": "cxconf",
+      "name": "AGENTS.md",
+      "type": "Instructions",
+      "description": "Standing instructions for Codex, the counterpart to CLAUDE.md.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "./AGENTS.md",
+          "label": "project root"
+        },
+        {
+          "command": "~/.codex/AGENTS.md",
+          "label": "global"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "codex",
+        "instructions",
+        "agents.md",
+        "memory"
+      ],
+      "note": "The AGENTS.md convention is shared across several agent tools, so one file can serve more than one of them."
+    },
+    {
+      "id": "cxconf-approval-policy",
+      "section": "cxconf",
+      "name": "approval_policy",
+      "type": "Approvals",
+      "description": "When Codex pauses to ask before acting.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "approval_policy = \"untrusted\"",
+          "label": "ask for anything unrecognised"
+        },
+        {
+          "command": "approval_policy = \"on-failure\"",
+          "label": "ask only after a command fails"
+        },
+        {
+          "command": "approval_policy = \"never\"",
+          "label": "fully autonomous"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "codex",
+        "approvals",
+        "policy",
+        "safety"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghauth-gh-auth-login",
+      "section": "ghauth",
+      "name": "gh auth login",
+      "type": "Auth",
+      "description": "Authenticate with a GitHub host. Interactive by default; reads a token from stdin with --with-token for CI.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh auth login",
+          "label": "shell"
+        },
+        {
+          "command": "gh auth login --hostname github.example.com --scopes 'repo,read:org'",
+          "label": "enterprise"
+        },
+        {
+          "command": "echo $GH_TOKEN | gh auth login --with-token",
+          "label": "ci"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "authentication",
+        "login",
+        "token",
+        "enterprise",
+        "ci"
+      ],
+      "note": "A token supplied through the GH_TOKEN environment variable is used automatically and takes precedence over a stored login."
+    },
+    {
+      "id": "ghauth-gh-auth-status",
+      "section": "ghauth",
+      "name": "gh auth status",
+      "type": "Auth",
+      "description": "Show which account is active on each host, the token source, and the scopes it carries.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh auth status",
+          "label": "shell"
+        },
+        {
+          "command": "gh auth status --active",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "authentication",
+        "diagnostics",
+        "scopes"
+      ],
+      "note": "The first thing to run when a gh command returns 403 — a missing scope looks identical to a permissions problem."
+    },
+    {
+      "id": "ghauth-gh-auth-token",
+      "section": "ghauth",
+      "name": "gh auth token",
+      "type": "Auth",
+      "description": "Print the stored token for a host on stdout so other tools can consume it.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh auth token",
+          "label": "shell"
+        },
+        {
+          "command": "git clone https://x-access-token:$(gh auth token)@github.com/owner/repo.git",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "authentication",
+        "token",
+        "scripting"
+      ],
+      "note": "Never echo this into a log or a committed file; treat the output the same as a password."
+    },
+    {
+      "id": "ghauth-gh-auth-refresh",
+      "section": "ghauth",
+      "name": "gh auth refresh",
+      "type": "Auth",
+      "description": "Add scopes to the existing credential without a full re-login.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh auth refresh --scopes read:project,workflow",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "authentication",
+        "scopes",
+        "permissions"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghauth-gh-auth-setup-git",
+      "section": "ghauth",
+      "name": "gh auth setup-git",
+      "type": "Auth",
+      "description": "Register gh as a git credential helper so plain git push and git clone reuse the gh login.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh auth setup-git",
+          "label": "shell"
+        },
+        {
+          "command": "gh auth setup-git --hostname github.example.com",
+          "label": "enterprise"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "authentication",
+        "git",
+        "credentials"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghauth-gh-auth-switch",
+      "section": "ghauth",
+      "name": "gh auth switch",
+      "type": "Auth",
+      "description": "Change the active account when several are signed in to the same host.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh auth switch",
+          "label": "shell"
+        },
+        {
+          "command": "gh auth switch --user octocat",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "authentication",
+        "accounts",
+        "multi-account"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghauth-gh-auth-logout",
+      "section": "ghauth",
+      "name": "gh auth logout",
+      "type": "Auth",
+      "description": "Remove stored credentials for a host.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh auth logout --hostname github.com",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "authentication",
+        "logout"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghrepo-gh-repo-create",
+      "section": "ghrepo",
+      "name": "gh repo create",
+      "type": "Repository",
+      "description": "Create a repository, either empty on GitHub or from the current directory.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh repo create my-project --public --clone",
+          "label": "new"
+        },
+        {
+          "command": "gh repo create --source=. --private --push",
+          "label": "from existing directory"
+        },
+        {
+          "command": "gh repo create my-app --template owner/starter --public",
+          "label": "from template"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "repository",
+        "create",
+        "template",
+        "scaffold"
+      ],
+      "note": "--source=. reuses the current git repo and adds the remote; without it gh creates an empty repository instead."
+    },
+    {
+      "id": "ghrepo-gh-repo-clone",
+      "section": "ghrepo",
+      "name": "gh repo clone",
+      "type": "Repository",
+      "description": "Clone a repository using the gh credential, accepting OWNER/REPO shorthand.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh repo clone cli/cli",
+          "label": "shell"
+        },
+        {
+          "command": "gh repo clone cli/cli -- --depth=1",
+          "label": "shallow"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "repository",
+        "clone",
+        "git"
+      ],
+      "note": "Arguments after -- are passed straight through to git clone."
+    },
+    {
+      "id": "ghrepo-gh-repo-fork",
+      "section": "ghrepo",
+      "name": "gh repo fork",
+      "type": "Repository",
+      "description": "Fork a repository and optionally clone it, wiring up an upstream remote.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh repo fork cli/cli --clone",
+          "label": "shell"
+        },
+        {
+          "command": "gh repo fork --remote --remote-name upstream",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "repository",
+        "fork",
+        "contributing"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghrepo-gh-repo-view",
+      "section": "ghrepo",
+      "name": "gh repo view",
+      "type": "Repository",
+      "description": "Print a repository's README and metadata, or open it in a browser.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh repo view",
+          "label": "shell"
+        },
+        {
+          "command": "gh repo view cli/cli --web",
+          "label": "browser"
+        },
+        {
+          "command": "gh repo view --json name,description,stargazerCount",
+          "label": "json"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "repository",
+        "view",
+        "json",
+        "metadata"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghrepo-gh-repo-list",
+      "section": "ghrepo",
+      "name": "gh repo list",
+      "type": "Repository",
+      "description": "List repositories owned by a user or organization.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh repo list",
+          "label": "shell"
+        },
+        {
+          "command": "gh repo list my-org --limit 100 --visibility private",
+          "label": "org"
+        },
+        {
+          "command": "gh repo list --no-archived --json name,pushedAt",
+          "label": "json"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "repository",
+        "list",
+        "organization"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghrepo-gh-repo-sync",
+      "section": "ghrepo",
+      "name": "gh repo sync",
+      "type": "Repository",
+      "description": "Bring a fork up to date with its upstream, locally or on GitHub.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh repo sync",
+          "label": "local fork"
+        },
+        {
+          "command": "gh repo sync owner/fork --source upstream/repo",
+          "label": "remote"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "repository",
+        "fork",
+        "sync",
+        "upstream"
+      ],
+      "note": "Refuses to run when the histories have diverged unless you pass --force, which discards local commits."
+    },
+    {
+      "id": "ghrepo-gh-repo-set-default",
+      "section": "ghrepo",
+      "name": "gh repo set-default",
+      "type": "Repository",
+      "description": "Choose which repository gh targets in a clone that has several remotes.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh repo set-default",
+          "label": "shell"
+        },
+        {
+          "command": "gh repo set-default owner/repo",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "repository",
+        "remotes",
+        "fork",
+        "default"
+      ],
+      "note": "Set this in a fork, or gh pr create may open the pull request against the wrong repository."
+    },
+    {
+      "id": "ghrepo-gh-repo-edit",
+      "section": "ghrepo",
+      "name": "gh repo edit",
+      "type": "Repository",
+      "description": "Change description, homepage, topics, visibility or enabled features.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh repo edit --description 'Static portfolio site'",
+          "label": "shell"
+        },
+        {
+          "command": "gh repo edit --add-topic machine-learning --add-topic computer-vision",
+          "label": "topics"
+        },
+        {
+          "command": "gh repo edit --enable-issues=false --enable-wiki=false",
+          "label": "features"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "repository",
+        "settings",
+        "topics",
+        "visibility"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghrepo-gh-repo-rename",
+      "section": "ghrepo",
+      "name": "gh repo rename",
+      "type": "Repository",
+      "description": "Rename a repository and update the local remote to match.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh repo rename new-name",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "repository",
+        "rename"
+      ],
+      "note": "GitHub redirects the old URL, but CI configs and badges that hardcode the name still need updating."
+    },
+    {
+      "id": "ghrepo-gh-repo-archive",
+      "section": "ghrepo",
+      "name": "gh repo archive",
+      "type": "Repository",
+      "description": "Mark a repository read-only without deleting it.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh repo archive owner/repo --yes",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "repository",
+        "archive",
+        "read-only"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghrepo-gh-repo-delete",
+      "section": "ghrepo",
+      "name": "gh repo delete",
+      "type": "Repository",
+      "description": "Permanently delete a repository.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh repo delete owner/repo --yes",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "repository",
+        "delete",
+        "destructive"
+      ],
+      "note": "Irreversible. Needs the delete_repo scope, which gh auth refresh --scopes delete_repo can add."
+    },
+    {
+      "id": "ghrepo-gh-repo-deploy-key",
+      "section": "ghrepo",
+      "name": "gh repo deploy-key",
+      "type": "Repository",
+      "description": "List, add or remove deploy keys for a repository.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh repo deploy-key list",
+          "label": "shell"
+        },
+        {
+          "command": "gh repo deploy-key add ~/.ssh/id_ed25519.pub --title ci --allow-write",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "repository",
+        "deploy-key",
+        "ssh",
+        "ci"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghpr-gh-pr-create",
+      "section": "ghpr",
+      "name": "gh pr create",
+      "type": "Pull request",
+      "description": "Open a pull request from the current branch.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh pr create --fill",
+          "label": "quick"
+        },
+        {
+          "command": "gh pr create --title 'Add citation export' --body-file .github/pr-body.md --draft",
+          "label": "detailed"
+        },
+        {
+          "command": "gh pr create --base main --head feature --reviewer octocat --label enhancement",
+          "label": "targeted"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "pull request",
+        "create",
+        "draft",
+        "review"
+      ],
+      "note": "--fill reuses the commit subject and body, which is why a good commit message pays off twice."
+    },
+    {
+      "id": "ghpr-gh-pr-list",
+      "section": "ghpr",
+      "name": "gh pr list",
+      "type": "Pull request",
+      "description": "List pull requests with filters, or as JSON for scripting.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh pr list --state open --limit 20",
+          "label": "shell"
+        },
+        {
+          "command": "gh pr list --author @me --json number,title,statusCheckRollup",
+          "label": "json"
+        },
+        {
+          "command": "gh pr list --search 'review:required draft:false'",
+          "label": "search"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "pull request",
+        "list",
+        "filter",
+        "json"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghpr-gh-pr-view",
+      "section": "ghpr",
+      "name": "gh pr view",
+      "type": "Pull request",
+      "description": "Show a pull request's description, metadata and optionally its comments.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh pr view 42",
+          "label": "shell"
+        },
+        {
+          "command": "gh pr view --comments",
+          "label": "shell"
+        },
+        {
+          "command": "gh pr view 42 --json title,body,reviews,mergeable",
+          "label": "json"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "pull request",
+        "view",
+        "comments",
+        "json"
+      ],
+      "note": "With no number, gh uses the pull request associated with the current branch."
+    },
+    {
+      "id": "ghpr-gh-pr-checkout",
+      "section": "ghpr",
+      "name": "gh pr checkout",
+      "type": "Pull request",
+      "description": "Check out a pull request's branch locally, including from a fork.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh pr checkout 42",
+          "label": "shell"
+        },
+        {
+          "command": "gh pr checkout 42 --branch review-42",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "pull request",
+        "checkout",
+        "review",
+        "fork"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghpr-gh-pr-diff",
+      "section": "ghpr",
+      "name": "gh pr diff",
+      "type": "Pull request",
+      "description": "Show the diff a pull request would apply.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh pr diff",
+          "label": "shell"
+        },
+        {
+          "command": "gh pr diff 42 --name-only",
+          "label": "file list"
+        },
+        {
+          "command": "gh pr diff --patch > review.patch",
+          "label": "patch"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "pull request",
+        "diff",
+        "review"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghpr-gh-pr-checks",
+      "section": "ghpr",
+      "name": "gh pr checks",
+      "type": "Pull request",
+      "description": "Show CI check results for a pull request, and optionally block until they finish.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh pr checks",
+          "label": "shell"
+        },
+        {
+          "command": "gh pr checks --watch --fail-fast",
+          "label": "wait"
+        },
+        {
+          "command": "gh pr checks --json name,state,link --jq '.[] | select(.state==\"FAILURE\")'",
+          "label": "failures only"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "pull request",
+        "ci",
+        "checks",
+        "watch"
+      ],
+      "note": "--watch exits non-zero when a required check fails, which makes it usable as a gate in a script."
+    },
+    {
+      "id": "ghpr-gh-pr-review",
+      "section": "ghpr",
+      "name": "gh pr review",
+      "type": "Pull request",
+      "description": "Submit a review: approve, request changes, or leave a comment.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh pr review 42 --approve",
+          "label": "approve"
+        },
+        {
+          "command": "gh pr review 42 --request-changes --body 'Needs a test for the empty case'",
+          "label": "changes"
+        },
+        {
+          "command": "gh pr review --comment --body-file notes.md",
+          "label": "comment"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "pull request",
+        "review",
+        "approve",
+        "changes"
+      ],
+      "note": "GitHub does not let you approve your own pull request; the command fails rather than silently doing nothing."
+    },
+    {
+      "id": "ghpr-gh-pr-merge",
+      "section": "ghpr",
+      "name": "gh pr merge",
+      "type": "Pull request",
+      "description": "Merge a pull request with the strategy the repository allows.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh pr merge 42 --squash --delete-branch",
+          "label": "squash"
+        },
+        {
+          "command": "gh pr merge --auto --merge",
+          "label": "auto-merge when checks pass"
+        },
+        {
+          "command": "gh pr merge 42 --rebase --admin",
+          "label": "bypass required checks"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "pull request",
+        "merge",
+        "squash",
+        "rebase",
+        "auto-merge"
+      ],
+      "note": "--auto queues the merge for when checks pass instead of failing immediately; --admin bypasses branch protection and should be rare."
+    },
+    {
+      "id": "ghpr-gh-pr-ready",
+      "section": "ghpr",
+      "name": "gh pr ready",
+      "type": "Pull request",
+      "description": "Flip a draft pull request to ready for review, or back to draft.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh pr ready 42",
+          "label": "shell"
+        },
+        {
+          "command": "gh pr ready 42 --undo",
+          "label": "back to draft"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "pull request",
+        "draft",
+        "ready"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghpr-gh-pr-comment",
+      "section": "ghpr",
+      "name": "gh pr comment",
+      "type": "Pull request",
+      "description": "Add a comment to a pull request thread.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh pr comment 42 --body 'Rebased onto main'",
+          "label": "shell"
+        },
+        {
+          "command": "gh pr comment --body-file summary.md",
+          "label": "from file"
+        },
+        {
+          "command": "gh pr comment 42 --edit-last --body 'Updated status'",
+          "label": "edit"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "pull request",
+        "comment"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghpr-gh-pr-edit",
+      "section": "ghpr",
+      "name": "gh pr edit",
+      "type": "Pull request",
+      "description": "Change a pull request's metadata after it is open.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh pr edit 42 --add-reviewer octocat --add-label needs-docs",
+          "label": "shell"
+        },
+        {
+          "command": "gh pr edit 42 --base develop",
+          "label": "retarget"
+        },
+        {
+          "command": "gh pr edit 42 --title 'Clearer title' --milestone v2",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "pull request",
+        "edit",
+        "reviewers",
+        "labels"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghpr-gh-pr-close",
+      "section": "ghpr",
+      "name": "gh pr close",
+      "type": "Pull request",
+      "description": "Close a pull request without merging it.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh pr close 42 --delete-branch --comment 'Superseded by #45'",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "pull request",
+        "close"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghpr-gh-pr-reopen",
+      "section": "ghpr",
+      "name": "gh pr reopen",
+      "type": "Pull request",
+      "description": "Reopen a closed pull request.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh pr reopen 42",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "pull request",
+        "reopen"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghpr-gh-pr-status",
+      "section": "ghpr",
+      "name": "gh pr status",
+      "type": "Pull request",
+      "description": "Summarise the pull requests that involve you: yours, assigned, and awaiting your review.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh pr status",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "pull request",
+        "status",
+        "dashboard",
+        "review queue"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghissue-gh-issue-create",
+      "section": "ghissue",
+      "name": "gh issue create",
+      "type": "Issue",
+      "description": "File a new issue.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh issue create --title 'Dark mode contrast on cards' --body-file report.md",
+          "label": "shell"
+        },
+        {
+          "command": "gh issue create --label bug --assignee @me --milestone v2",
+          "label": "triaged"
+        },
+        {
+          "command": "gh issue create --web",
+          "label": "browser form"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "issue",
+        "create",
+        "bug",
+        "triage"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghissue-gh-issue-list",
+      "section": "ghissue",
+      "name": "gh issue list",
+      "type": "Issue",
+      "description": "List issues with filters, or as JSON.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh issue list --state open --label bug",
+          "label": "shell"
+        },
+        {
+          "command": "gh issue list --assignee @me --json number,title,labels",
+          "label": "json"
+        },
+        {
+          "command": "gh issue list --search 'sort:comments-desc no:assignee'",
+          "label": "search"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "issue",
+        "list",
+        "filter",
+        "json"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghissue-gh-issue-view",
+      "section": "ghissue",
+      "name": "gh issue view",
+      "type": "Issue",
+      "description": "Read an issue and its discussion.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh issue view 17",
+          "label": "shell"
+        },
+        {
+          "command": "gh issue view 17 --comments",
+          "label": "shell"
+        },
+        {
+          "command": "gh issue view 17 --json title,body,comments",
+          "label": "json"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "issue",
+        "view",
+        "comments"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghissue-gh-issue-comment",
+      "section": "ghissue",
+      "name": "gh issue comment",
+      "type": "Issue",
+      "description": "Add a comment to an issue.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh issue comment 17 --body 'Reproduced on Safari 18'",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "issue",
+        "comment"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghissue-gh-issue-edit",
+      "section": "ghissue",
+      "name": "gh issue edit",
+      "type": "Issue",
+      "description": "Change an issue's labels, assignees, milestone, title or body.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh issue edit 17 --add-label needs-repro --remove-label triage",
+          "label": "shell"
+        },
+        {
+          "command": "gh issue edit 17 --add-assignee @me",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "issue",
+        "edit",
+        "labels",
+        "assignees"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghissue-gh-issue-close",
+      "section": "ghissue",
+      "name": "gh issue close",
+      "type": "Issue",
+      "description": "Close an issue, optionally recording why.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh issue close 17",
+          "label": "shell"
+        },
+        {
+          "command": "gh issue close 17 --reason 'not planned' --comment 'Out of scope'",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "issue",
+        "close",
+        "reason"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghissue-gh-issue-reopen",
+      "section": "ghissue",
+      "name": "gh issue reopen",
+      "type": "Issue",
+      "description": "Reopen a closed issue.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh issue reopen 17",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "issue",
+        "reopen"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghissue-gh-issue-develop",
+      "section": "ghissue",
+      "name": "gh issue develop",
+      "type": "Issue",
+      "description": "Create a branch linked to an issue so the pull request closes it automatically.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh issue develop 17 --checkout",
+          "label": "shell"
+        },
+        {
+          "command": "gh issue develop 17 --name fix/card-contrast --base main",
+          "label": "named"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "issue",
+        "branch",
+        "workflow",
+        "linked"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghissue-gh-issue-transfer",
+      "section": "ghissue",
+      "name": "gh issue transfer",
+      "type": "Issue",
+      "description": "Move an issue to another repository.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh issue transfer 17 owner/other-repo",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "issue",
+        "transfer"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghissue-gh-issue-pin",
+      "section": "ghissue",
+      "name": "gh issue pin",
+      "type": "Issue",
+      "description": "Pin an issue to the top of the repository's issue list.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh issue pin 17",
+          "label": "shell"
+        },
+        {
+          "command": "gh issue unpin 17",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "issue",
+        "pin"
+      ],
+      "note": "A repository can have at most three pinned issues."
+    },
+    {
+      "id": "ghissue-gh-issue-status",
+      "section": "ghissue",
+      "name": "gh issue status",
+      "type": "Issue",
+      "description": "Show the issues assigned to you, opened by you, or mentioning you.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh issue status",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "issue",
+        "status",
+        "dashboard"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghrun-gh-workflow-list",
+      "section": "ghrun",
+      "name": "gh workflow list",
+      "type": "Workflow",
+      "description": "List the workflows defined in a repository.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh workflow list",
+          "label": "shell"
+        },
+        {
+          "command": "gh workflow list --all --json name,state,id",
+          "label": "json"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "actions",
+        "workflow",
+        "ci"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghrun-gh-workflow-view",
+      "section": "ghrun",
+      "name": "gh workflow view",
+      "type": "Workflow",
+      "description": "Show a workflow's recent runs, or print its YAML.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh workflow view content-validation.yml",
+          "label": "shell"
+        },
+        {
+          "command": "gh workflow view content-validation.yml --yaml",
+          "label": "source"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "actions",
+        "workflow",
+        "yaml"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghrun-gh-workflow-run",
+      "section": "ghrun",
+      "name": "gh workflow run",
+      "type": "Workflow",
+      "description": "Trigger a workflow_dispatch run, passing any declared inputs.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh workflow run deploy.yml --ref main",
+          "label": "shell"
+        },
+        {
+          "command": "gh workflow run deploy.yml -f environment=staging -f dry_run=true",
+          "label": "with inputs"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "actions",
+        "workflow",
+        "dispatch",
+        "trigger"
+      ],
+      "note": "Only works if the workflow declares a workflow_dispatch trigger, and only on a ref where that file already exists."
+    },
+    {
+      "id": "ghrun-gh-workflow-enable",
+      "section": "ghrun",
+      "name": "gh workflow enable",
+      "type": "Workflow",
+      "description": "Re-enable a workflow that was disabled manually or by inactivity.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh workflow enable content-validation.yml",
+          "label": "shell"
+        },
+        {
+          "command": "gh workflow disable content-validation.yml",
+          "label": "disable"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "actions",
+        "workflow",
+        "enable",
+        "disable"
+      ],
+      "note": "GitHub disables scheduled workflows in public repositories after 60 days without activity."
+    },
+    {
+      "id": "ghrun-gh-run-list",
+      "section": "ghrun",
+      "name": "gh run list",
+      "type": "Run",
+      "description": "List recent workflow runs, filtered by workflow, branch or status.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh run list --limit 10",
+          "label": "shell"
+        },
+        {
+          "command": "gh run list --workflow content-validation.yml --status failure",
+          "label": "failures"
+        },
+        {
+          "command": "gh run list --branch main --json databaseId,conclusion,headSha",
+          "label": "json"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "actions",
+        "runs",
+        "ci",
+        "history"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghrun-gh-run-view",
+      "section": "ghrun",
+      "name": "gh run view",
+      "type": "Run",
+      "description": "Inspect one run, including step results and logs.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh run view",
+          "label": "latest"
+        },
+        {
+          "command": "gh run view 1234567890 --log-failed",
+          "label": "failing logs only"
+        },
+        {
+          "command": "gh run view --job 987654321 --log",
+          "label": "one job"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "actions",
+        "runs",
+        "logs",
+        "debugging"
+      ],
+      "note": "--log-failed is the fastest path to a CI failure; it skips the passing steps entirely."
+    },
+    {
+      "id": "ghrun-gh-run-watch",
+      "section": "ghrun",
+      "name": "gh run watch",
+      "type": "Run",
+      "description": "Follow a run live and exit when it finishes.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh run watch",
+          "label": "shell"
+        },
+        {
+          "command": "gh run watch 1234567890 --exit-status",
+          "label": "gate"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "actions",
+        "runs",
+        "watch",
+        "ci"
+      ],
+      "note": "--exit-status makes the command return non-zero on failure, so it can gate a deploy script."
+    },
+    {
+      "id": "ghrun-gh-run-rerun",
+      "section": "ghrun",
+      "name": "gh run rerun",
+      "type": "Run",
+      "description": "Re-run a workflow run, all of it or just what failed.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh run rerun 1234567890 --failed",
+          "label": "failed jobs"
+        },
+        {
+          "command": "gh run rerun 1234567890 --job 987654321",
+          "label": "one job"
+        },
+        {
+          "command": "gh run rerun 1234567890 --debug",
+          "label": "with debug logging"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "actions",
+        "runs",
+        "rerun",
+        "flake"
+      ],
+      "note": "Re-running is for a confirmed infrastructure flake. A test that fails twice is a real failure, not a flake."
+    },
+    {
+      "id": "ghrun-gh-run-cancel",
+      "section": "ghrun",
+      "name": "gh run cancel",
+      "type": "Run",
+      "description": "Stop a run that is still in progress.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh run cancel 1234567890",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "actions",
+        "runs",
+        "cancel"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghrun-gh-run-download",
+      "section": "ghrun",
+      "name": "gh run download",
+      "type": "Run",
+      "description": "Download the artifacts a run produced.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh run download 1234567890",
+          "label": "all"
+        },
+        {
+          "command": "gh run download 1234567890 --name coverage --dir ./artifacts",
+          "label": "one artifact"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "actions",
+        "artifacts",
+        "download"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghrun-gh-cache-list",
+      "section": "ghrun",
+      "name": "gh cache list",
+      "type": "Cache",
+      "description": "List and prune the Actions caches a repository is holding.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh cache list --limit 30",
+          "label": "shell"
+        },
+        {
+          "command": "gh cache delete --all",
+          "label": "prune"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "actions",
+        "cache",
+        "storage"
+      ],
+      "note": "Caches count against a repository storage limit, and a stale cache is a common cause of a green local build going red in CI."
+    },
+    {
+      "id": "ghrun-gh-secret-set",
+      "section": "ghrun",
+      "name": "gh secret set",
+      "type": "Secrets",
+      "description": "Store an encrypted secret for Actions, an environment, or an organization.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh secret set DEPLOY_TOKEN",
+          "label": "prompt"
+        },
+        {
+          "command": "gh secret set DEPLOY_TOKEN --body \"$TOKEN\" --env production",
+          "label": "environment"
+        },
+        {
+          "command": "gh secret set NPM_TOKEN --org my-org --visibility selected --repos web,api",
+          "label": "org"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "actions",
+        "secrets",
+        "encryption",
+        "deploy"
+      ],
+      "note": "Prefer the interactive prompt or --body-file over --body, which puts the secret into your shell history."
+    },
+    {
+      "id": "ghrun-gh-secret-list",
+      "section": "ghrun",
+      "name": "gh secret list",
+      "type": "Secrets",
+      "description": "List secret names and when they were last updated. Values are never readable.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh secret list",
+          "label": "shell"
+        },
+        {
+          "command": "gh secret delete DEPLOY_TOKEN",
+          "label": "remove"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "actions",
+        "secrets",
+        "audit"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghrun-gh-variable-set",
+      "section": "ghrun",
+      "name": "gh variable set",
+      "type": "Variables",
+      "description": "Store a non-secret configuration value that workflows read through vars.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh variable set NODE_VERSION --body 22",
+          "label": "shell"
+        },
+        {
+          "command": "gh variable list",
+          "label": "list"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "actions",
+        "variables",
+        "configuration"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghrelease-gh-release-create",
+      "section": "ghrelease",
+      "name": "gh release create",
+      "type": "Release",
+      "description": "Create a tagged release and attach build artifacts to it.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh release create v1.2.0 --generate-notes",
+          "label": "auto notes"
+        },
+        {
+          "command": "gh release create v1.2.0 ./dist/*.zip --title 'v1.2.0' --notes-file CHANGELOG.md",
+          "label": "with assets"
+        },
+        {
+          "command": "gh release create v1.3.0-rc.1 --prerelease --draft",
+          "label": "prerelease"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "release",
+        "tag",
+        "artifacts",
+        "changelog"
+      ],
+      "note": "--generate-notes builds the changelog from merged pull request titles, which rewards descriptive PR titles."
+    },
+    {
+      "id": "ghrelease-gh-release-list",
+      "section": "ghrelease",
+      "name": "gh release list",
+      "type": "Release",
+      "description": "List a repository's releases.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh release list --limit 10",
+          "label": "shell"
+        },
+        {
+          "command": "gh release view --json tagName,publishedAt",
+          "label": "json"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "release",
+        "list"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghrelease-gh-release-view",
+      "section": "ghrelease",
+      "name": "gh release view",
+      "type": "Release",
+      "description": "Show a release's notes and asset list.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh release view v1.2.0",
+          "label": "shell"
+        },
+        {
+          "command": "gh release view --web",
+          "label": "browser"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "release",
+        "view",
+        "notes"
+      ],
+      "note": "With no tag, gh shows the latest release."
+    },
+    {
+      "id": "ghrelease-gh-release-download",
+      "section": "ghrelease",
+      "name": "gh release download",
+      "type": "Release",
+      "description": "Download assets from a release.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh release download v1.2.0",
+          "label": "all assets"
+        },
+        {
+          "command": "gh release download --pattern '*-linux-amd64.tar.gz'",
+          "label": "filtered"
+        },
+        {
+          "command": "gh release download v1.2.0 --archive=tar.gz",
+          "label": "source archive"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "release",
+        "download",
+        "assets"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghrelease-gh-release-upload",
+      "section": "ghrelease",
+      "name": "gh release upload",
+      "type": "Release",
+      "description": "Attach more files to an existing release.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh release upload v1.2.0 ./dist/checksums.txt",
+          "label": "shell"
+        },
+        {
+          "command": "gh release upload v1.2.0 ./dist/app.zip --clobber",
+          "label": "replace"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "release",
+        "upload",
+        "assets"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghrelease-gh-release-edit",
+      "section": "ghrelease",
+      "name": "gh release edit",
+      "type": "Release",
+      "description": "Change a release's notes, tag, or draft and prerelease flags.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh release edit v1.2.0 --draft=false --latest",
+          "label": "publish"
+        },
+        {
+          "command": "gh release edit v1.2.0 --notes-file NOTES.md",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "release",
+        "edit",
+        "publish"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghrelease-gh-release-delete",
+      "section": "ghrelease",
+      "name": "gh release delete",
+      "type": "Release",
+      "description": "Delete a release, optionally removing its git tag too.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh release delete v1.2.0 --yes --cleanup-tag",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "release",
+        "delete",
+        "tag"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghrelease-gh-gist-create",
+      "section": "ghrelease",
+      "name": "gh gist create",
+      "type": "Gist",
+      "description": "Publish files as a gist.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh gist create notes.md --public --desc 'Benchmark notes'",
+          "label": "shell"
+        },
+        {
+          "command": "cat results.json | gh gist create --filename results.json",
+          "label": "from stdin"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "gist",
+        "create",
+        "share",
+        "snippet"
+      ],
+      "note": "Gists default to secret, which means unlisted rather than private — anyone with the URL can read one."
+    },
+    {
+      "id": "ghrelease-gh-gist-list",
+      "section": "ghrelease",
+      "name": "gh gist list",
+      "type": "Gist",
+      "description": "List, view, edit or clone your gists.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh gist list --limit 20",
+          "label": "shell"
+        },
+        {
+          "command": "gh gist view abc123 --files",
+          "label": "view"
+        },
+        {
+          "command": "gh gist edit abc123",
+          "label": "edit"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "gist",
+        "list",
+        "edit"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghapi-gh-api",
+      "section": "ghapi",
+      "name": "gh api",
+      "type": "API",
+      "description": "Call any REST endpoint with authentication and pagination handled for you.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh api repos/{owner}/{repo}/pulls --paginate",
+          "label": "rest"
+        },
+        {
+          "command": "gh api -X PATCH repos/{owner}/{repo} -f description='New description'",
+          "label": "write"
+        },
+        {
+          "command": "gh api repos/{owner}/{repo}/issues --jq '.[] | \"\\(.number) \\(.title)\"'",
+          "label": "jq"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "api",
+        "rest",
+        "scripting",
+        "pagination",
+        "jq"
+      ],
+      "note": "{owner} and {repo} are substituted from the current repository. Use -f for string fields and -F to read a value from a file or interpret it as a number or boolean."
+    },
+    {
+      "id": "ghapi-gh-api-graphql",
+      "section": "ghapi",
+      "name": "gh api graphql",
+      "type": "API",
+      "description": "Run a GraphQL query, which is the only way to reach some data such as Projects v2.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh api graphql -f query='{ viewer { login } }'",
+          "label": "query"
+        },
+        {
+          "command": "gh api graphql --paginate -F owner=cli -F name=cli -f query=@query.graphql",
+          "label": "from file"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "api",
+        "graphql",
+        "scripting",
+        "projects"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghapi-flag-json-slash-flag-jq-slash-flag-template",
+      "section": "ghapi",
+      "name": "--json / --jq / --template",
+      "type": "Output",
+      "description": "The scripting triad shared by most gh commands: select fields, filter them, then format.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh pr list --json number,title,author --jq '.[] | select(.author.login==\"octocat\")'",
+          "label": "filter"
+        },
+        {
+          "command": "gh run list --json conclusion,headBranch --template '{{range .}}{{.headBranch}}: {{.conclusion}}{{\"\\n\"}}{{end}}'",
+          "label": "template"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "json",
+        "jq",
+        "template",
+        "scripting",
+        "output"
+      ],
+      "note": "Run a command with --json and no field list to print every field that command supports."
+    },
+    {
+      "id": "ghapi-gh-search",
+      "section": "ghapi",
+      "name": "gh search",
+      "type": "Search",
+      "description": "Search repositories, issues, pull requests, code or commits across GitHub.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh search repos --language python --stars '>1000' --limit 20",
+          "label": "repos"
+        },
+        {
+          "command": "gh search prs --author @me --state merged --json title,url",
+          "label": "prs"
+        },
+        {
+          "command": "gh search code 'startViewTransition' --language javascript",
+          "label": "code"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "search",
+        "discovery",
+        "repos",
+        "code"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghapi-gh-browse",
+      "section": "ghapi",
+      "name": "gh browse",
+      "type": "Navigation",
+      "description": "Open the current repository, a file, or a line range in a browser.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh browse",
+          "label": "repo"
+        },
+        {
+          "command": "gh browse js/lib/search.js",
+          "label": "file"
+        },
+        {
+          "command": "gh browse js/lib/search.js:42 --branch main",
+          "label": "line"
+        },
+        {
+          "command": "gh browse --settings",
+          "label": "settings"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "browser",
+        "navigation",
+        "permalink"
+      ],
+      "note": "Add --no-browser to print the URL instead of opening it, which makes it a permalink generator."
+    },
+    {
+      "id": "ghapi-gh-status",
+      "section": "ghapi",
+      "name": "gh status",
+      "type": "Dashboard",
+      "description": "Show your notifications, review requests and mentions across repositories.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh status",
+          "label": "shell"
+        },
+        {
+          "command": "gh status --org my-org",
+          "label": "scoped"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "dashboard",
+        "notifications",
+        "mentions"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghapi-gh-extension-install",
+      "section": "ghapi",
+      "name": "gh extension install",
+      "type": "Extensions",
+      "description": "Install, list, upgrade or author gh extensions.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh extension install dlvhdr/gh-dash",
+          "label": "install"
+        },
+        {
+          "command": "gh extension list",
+          "label": "list"
+        },
+        {
+          "command": "gh extension upgrade --all",
+          "label": "upgrade"
+        },
+        {
+          "command": "gh extension create my-tool",
+          "label": "scaffold"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "extensions",
+        "plugins",
+        "customization"
+      ],
+      "note": "An extension is any executable named gh-something on your PATH, so a shell script is enough to make one."
+    },
+    {
+      "id": "ghapi-gh-alias-set",
+      "section": "ghapi",
+      "name": "gh alias set",
+      "type": "Aliases",
+      "description": "Save a long gh invocation under a short name.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh alias set prs 'pr list --author @me'",
+          "label": "simple"
+        },
+        {
+          "command": "gh alias set bugs 'issue list --label bug --state open'",
+          "label": "shell"
+        },
+        {
+          "command": "gh alias set --shell review 'gh pr checkout $1 && gh pr diff'",
+          "label": "shell alias"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "alias",
+        "shortcut",
+        "productivity"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghapi-gh-label",
+      "section": "ghapi",
+      "name": "gh label",
+      "type": "Labels",
+      "description": "Manage a repository's labels, including copying a set between repositories.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh label list",
+          "label": "shell"
+        },
+        {
+          "command": "gh label create needs-repro --color FBCA04 --description 'Cannot reproduce yet'",
+          "label": "create"
+        },
+        {
+          "command": "gh label clone owner/template-repo",
+          "label": "copy from another repo"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "labels",
+        "triage",
+        "setup"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghapi-gh-project",
+      "section": "ghapi",
+      "name": "gh project",
+      "type": "Projects",
+      "description": "Work with Projects v2 boards: list projects, add items, and read fields.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh project list --owner my-org",
+          "label": "shell"
+        },
+        {
+          "command": "gh project item-add 3 --owner my-org --url https://github.com/owner/repo/issues/17",
+          "label": "add item"
+        },
+        {
+          "command": "gh project field-list 3 --owner my-org",
+          "label": "fields"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "projects",
+        "planning",
+        "board"
+      ],
+      "note": "Needs the project scope; add it with gh auth refresh --scopes read:project,project."
+    },
+    {
+      "id": "ghapi-gh-codespace",
+      "section": "ghapi",
+      "name": "gh codespace",
+      "type": "Codespaces",
+      "description": "Create, list, connect to and stop codespaces.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh codespace list",
+          "label": "shell"
+        },
+        {
+          "command": "gh codespace create --repo owner/repo --machine standardLinux32gb",
+          "label": "create"
+        },
+        {
+          "command": "gh codespace ssh",
+          "label": "connect"
+        },
+        {
+          "command": "gh codespace cp -e ./local.json remote:/workspaces/repo/",
+          "label": "copy files"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "codespaces",
+        "remote",
+        "development"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghapi-gh-ruleset",
+      "section": "ghapi",
+      "name": "gh ruleset",
+      "type": "Governance",
+      "description": "Inspect the rulesets that protect branches and tags, and see which ones apply to a branch.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh ruleset list",
+          "label": "shell"
+        },
+        {
+          "command": "gh ruleset check main",
+          "label": "what applies here"
+        },
+        {
+          "command": "gh ruleset view 12345",
+          "label": "detail"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "rulesets",
+        "branch protection",
+        "governance"
+      ],
+      "note": "gh ruleset check explains why a push was rejected far faster than reading settings in the browser."
+    },
+    {
+      "id": "ghapi-gh-attestation-verify",
+      "section": "ghapi",
+      "name": "gh attestation verify",
+      "type": "Supply chain",
+      "description": "Verify the build provenance attestation attached to an artifact.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh attestation verify ./dist/app.tar.gz --owner my-org",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "supply chain",
+        "provenance",
+        "security",
+        "attestation"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghconfig-gh-config-set",
+      "section": "ghconfig",
+      "name": "gh config set",
+      "type": "Config",
+      "description": "Persist a gh preference such as editor, pager or git protocol.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh config set editor \"code --wait\"",
+          "label": "editor"
+        },
+        {
+          "command": "gh config set git_protocol ssh",
+          "label": "protocol"
+        },
+        {
+          "command": "gh config set prompt disabled",
+          "label": "non-interactive"
+        },
+        {
+          "command": "gh config list",
+          "label": "show all"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "config",
+        "preferences",
+        "editor",
+        "ssh"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghconfig-gh-token",
+      "section": "ghconfig",
+      "name": "GH_TOKEN",
+      "type": "Environment",
+      "description": "The token gh authenticates with, overriding any stored login. GITHUB_TOKEN is accepted as a fallback.",
+      "aliases": [
+        "GITHUB_TOKEN"
+      ],
+      "examples": [
+        {
+          "command": "GH_TOKEN=$MY_PAT gh pr list",
+          "label": "one command"
+        },
+        {
+          "command": "export GH_TOKEN=${{ secrets.GITHUB_TOKEN }}",
+          "label": "actions"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "environment",
+        "token",
+        "ci",
+        "authentication"
+      ],
+      "note": "Inside GitHub Actions the built-in GITHUB_TOKEN is scoped to that repository and expires when the job ends."
+    },
+    {
+      "id": "ghconfig-gh-host",
+      "section": "ghconfig",
+      "name": "GH_HOST",
+      "type": "Environment",
+      "description": "Target a GitHub Enterprise Server host when the current directory gives no clue.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "GH_HOST=github.example.com gh repo list",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "environment",
+        "enterprise",
+        "host"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghconfig-gh-repo",
+      "section": "ghconfig",
+      "name": "GH_REPO",
+      "type": "Environment",
+      "description": "Run a command against a repository without being inside its clone.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "GH_REPO=cli/cli gh issue list",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "environment",
+        "repository",
+        "scripting"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghconfig-gh-force-tty",
+      "section": "ghconfig",
+      "name": "GH_FORCE_TTY",
+      "type": "Environment",
+      "description": "Force the rich terminal rendering when gh output is piped or captured.",
+      "aliases": [
+        "NO_COLOR"
+      ],
+      "examples": [
+        {
+          "command": "GH_FORCE_TTY=100% gh pr list | less -R",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "environment",
+        "output",
+        "formatting"
+      ],
+      "note": "Without this gh strips colour and layout as soon as stdout is not a terminal."
+    },
+    {
+      "id": "ghconfig-gh-config-dir",
+      "section": "ghconfig",
+      "name": "GH_CONFIG_DIR",
+      "type": "Paths",
+      "description": "Where gh keeps config.yml and hosts.yml, and how to relocate them.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "~/.config/gh/config.yml",
+          "label": "macOS / Linux"
+        },
+        {
+          "command": "%APPDATA%\\GitHub CLI\\config.yml",
+          "label": "Windows"
+        },
+        {
+          "command": "GH_CONFIG_DIR=/etc/gh gh auth status",
+          "label": "override"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "paths",
+        "config",
+        "hosts",
+        "credentials"
+      ],
+      "note": "hosts.yml holds the OAuth tokens; back it up like a credential file, not like a config file."
+    },
+    {
+      "id": "ghconfig-gh-flag-version",
+      "section": "ghconfig",
+      "name": "gh --version",
+      "type": "Diagnostics",
+      "description": "Print the installed gh version and check whether a newer one exists.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "gh --version",
+          "label": "shell"
+        },
+        {
+          "command": "gh extension upgrade --all && gh --version",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "version",
+        "diagnostics",
+        "upgrade"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghgit-git-push-u-origin-branch",
+      "section": "ghgit",
+      "name": "git push -u origin <branch>",
+      "type": "Git",
+      "description": "Push a new branch and set its upstream so later pushes and pulls need no arguments.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "git push -u origin feature/citation-export",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "git",
+        "push",
+        "upstream",
+        "branch"
+      ],
+      "note": "The -u only matters on the first push; afterwards plain git push is enough."
+    },
+    {
+      "id": "ghgit-git-fetch-origin-pullslash-idslash-head",
+      "section": "ghgit",
+      "name": "git fetch origin pull/ID/head",
+      "type": "Git",
+      "description": "Fetch a pull request's head commit directly, without the gh CLI.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "git fetch origin pull/42/head:pr-42 && git switch pr-42",
+          "label": "shell"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "git",
+        "pull request",
+        "review",
+        "fetch"
+      ],
+      "note": "Useful on a machine with no gh installed; gh pr checkout does the same thing and also configures the push remote."
+    },
+    {
+      "id": "ghgit-git-diff-base-head",
+      "section": "ghgit",
+      "name": "git diff base...HEAD",
+      "type": "Git",
+      "description": "Show what a pull request actually changes, using the three-dot form.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "git diff main...HEAD",
+          "label": "pr diff"
+        },
+        {
+          "command": "git diff main...HEAD --stat",
+          "label": "summary"
+        },
+        {
+          "command": "git log --oneline main..HEAD",
+          "label": "commits only"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "git",
+        "diff",
+        "review",
+        "three-dot"
+      ],
+      "note": "Three dots compare against the merge base, so unrelated commits landing on main do not pollute the diff. Two dots do not."
+    },
+    {
+      "id": "ghgit-git-switch-c",
+      "section": "ghgit",
+      "name": "git switch -c",
+      "type": "Git",
+      "description": "Create and check out a branch. The modern replacement for git checkout -b.",
+      "aliases": [
+        "git checkout -b"
+      ],
+      "examples": [
+        {
+          "command": "git switch -c feature/dark-mode",
+          "label": "new branch"
+        },
+        {
+          "command": "git switch main",
+          "label": "existing branch"
+        },
+        {
+          "command": "git switch -",
+          "label": "previous branch"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "git",
+        "branch",
+        "switch",
+        "checkout"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghgit-git-worktree-add",
+      "section": "ghgit",
+      "name": "git worktree add",
+      "type": "Git",
+      "description": "Check out a second branch into its own directory, without stashing the current one.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "git worktree add ../repo-review pr-42",
+          "label": "review a PR"
+        },
+        {
+          "command": "git worktree list",
+          "label": "list"
+        },
+        {
+          "command": "git worktree remove ../repo-review",
+          "label": "clean up"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "git",
+        "worktree",
+        "parallel",
+        "review"
+      ],
+      "note": "Far safer than stashing when you need to look at another branch mid-task; both checkouts stay live."
+    },
+    {
+      "id": "ghgit-git-rebase-originslash-main",
+      "section": "ghgit",
+      "name": "git rebase origin/main",
+      "type": "Git",
+      "description": "Replay your commits on top of the latest base branch.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "git fetch origin && git rebase origin/main",
+          "label": "update a branch"
+        },
+        {
+          "command": "git rebase --abort",
+          "label": "back out"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "git",
+        "rebase",
+        "history",
+        "update"
+      ],
+      "note": "Rewrites commit hashes, so never rebase a branch someone else has checked out. Merge instead on shared branches."
+    },
+    {
+      "id": "ghgit-git-merge-originslash-main",
+      "section": "ghgit",
+      "name": "git merge origin/main",
+      "type": "Git",
+      "description": "Bring the base branch into your pull request branch, keeping everyone's checkout valid.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "git fetch origin && git merge origin/main",
+          "label": "resolve a conflict"
+        },
+        {
+          "command": "git merge --abort",
+          "label": "back out"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "git",
+        "merge",
+        "conflict",
+        "shared branch"
+      ],
+      "note": "Preferred over rebase when the branch is already pushed and under review."
+    },
+    {
+      "id": "ghgit-git-restore",
+      "section": "ghgit",
+      "name": "git restore",
+      "type": "Git",
+      "description": "Discard working-tree changes or unstage a file, without the overloaded checkout verb.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "git restore css/style.css",
+          "label": "discard edits"
+        },
+        {
+          "command": "git restore --staged css/style.css",
+          "label": "unstage"
+        },
+        {
+          "command": "git restore --source=HEAD~1 index.html",
+          "label": "from an older commit"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "git",
+        "restore",
+        "unstage",
+        "undo"
+      ],
+      "note": "git restore without --staged throws away uncommitted work irreversibly. Check git status first."
+    },
+    {
+      "id": "ghgit-git-stash-u",
+      "section": "ghgit",
+      "name": "git stash -u",
+      "type": "Git",
+      "description": "Set aside work in progress, including untracked files.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "git stash -u",
+          "label": "save"
+        },
+        {
+          "command": "git stash list",
+          "label": "list"
+        },
+        {
+          "command": "git stash pop",
+          "label": "restore"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "git",
+        "stash",
+        "untracked",
+        "wip"
+      ],
+      "note": "Plain git stash leaves untracked files behind, which is how new files get lost during a branch switch."
+    },
+    {
+      "id": "ghgit-git-cherry-pick",
+      "section": "ghgit",
+      "name": "git cherry-pick",
+      "type": "Git",
+      "description": "Copy one commit onto the current branch, for backports and hotfixes.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "git cherry-pick 4783bb7",
+          "label": "one commit"
+        },
+        {
+          "command": "git cherry-pick main~3..main",
+          "label": "a range"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "git",
+        "cherry-pick",
+        "backport",
+        "hotfix"
+      ],
+      "note": null
+    },
+    {
+      "id": "ghgit-git-blame-l",
+      "section": "ghgit",
+      "name": "git blame -L",
+      "type": "Git",
+      "description": "Find which commit last touched a specific range of lines.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": "git blame -L 40,60 js/main.js",
+          "label": "line range"
+        },
+        {
+          "command": "git log -S 'startViewTransition' --oneline",
+          "label": "when a string appeared"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "git",
+        "blame",
+        "history",
+        "archaeology"
+      ],
+      "note": "git log -S searches for when a string was added or removed, which usually beats blame for finding the origin of a behaviour."
+    },
+    {
+      "id": "ghgit-githubslash-conventions",
+      "section": "ghgit",
+      "name": ".github/ conventions",
+      "type": "Repository files",
+      "description": "The files GitHub reads from a repository to shape its interface and automation.",
+      "aliases": [],
+      "examples": [
+        {
+          "command": ".github/workflows/*.yml",
+          "label": "Actions workflows"
+        },
+        {
+          "command": ".github/PULL_REQUEST_TEMPLATE.md",
+          "label": "PR body template"
+        },
+        {
+          "command": ".github/ISSUE_TEMPLATE/bug.yml",
+          "label": "issue forms"
+        },
+        {
+          "command": "CODEOWNERS",
+          "label": "automatic reviewers"
+        }
+      ],
+      "introducedVersion": null,
+      "tags": [
+        "repository",
+        "templates",
+        "codeowners",
+        "conventions"
+      ],
+      "note": "CODEOWNERS is read from .github/, the repository root, or docs/ — the first match wins."
     }
   ],
   "changelog": [
-    {"version": "2.1.263", "date": "2026-09-06", "items": ["Bug fixes and reliability improvements"]},
-    {"version": "2.1.243", "date": "2026-08-25", "items": ["Usage-loop breakdown", "modelPicker setting", "Keyless Console sign-in"]}
+    {
+      "version": "2.1.263",
+      "date": "2026-09-06",
+      "items": [
+        "Bug fixes and reliability improvements"
+      ]
+    },
+    {
+      "version": "2.1.243",
+      "date": "2026-08-25",
+      "items": [
+        "Usage-loop breakdown",
+        "modelPicker setting",
+        "Keyless Console sign-in"
+      ]
+    }
   ]
 }

@@ -144,6 +144,9 @@
                         <a href="../apps/claude-code-encyclopedia.html" class="btn btn-primary">
                             <i class="fas fa-terminal"></i> Launch the Encyclopedia
                         </a>
+                        <a href="../apps/claude-code-catalog.html?family=github" class="btn btn-secondary">
+                            <i class="fab fa-github"></i> GitHub CLI Catalog
+                        </a>
                         <a href="../index.html#projects" class="btn btn-secondary">
                             <i class="fas fa-th"></i> All Projects
                         </a>
@@ -244,7 +247,44 @@
                         <strong>OpenAI Codex CLI:</strong> subcommands and global flags, slash commands, and <code>config.toml</code> keys including sandbox policies and <code>AGENTS.md</code>.
                     </p>
                     <p>
+                        <strong>GitHub CLI:</strong> the <code>gh</code> command line end to end &mdash; authentication,
+                        repositories, the full pull request lifecycle, issues, Actions workflows and their secrets,
+                        releases and gists, raw REST and GraphQL calls, configuration and environment variables,
+                        plus the git commands that a GitHub review workflow actually rests on.
+                    </p>
+                    <p>
                         <strong>History:</strong> a timeline of the last 20 releases and what each one changed.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Data layer -->
+        <section class="project-section">
+            <div class="container">
+                <h2><i class="fas fa-database"></i> Two Surfaces, One Reference</h2>
+                <div class="overview-content">
+                    <p class="lead">
+                        The project ships in two forms, and they are built the opposite way round on purpose.
+                    </p>
+                    <p>
+                        The <a href="../apps/claude-code-encyclopedia.html">encyclopedia</a> is one self-contained
+                        HTML file with its 504 entries embedded &mdash; nothing to fetch, works offline after first
+                        load. That is what makes it fast, and also what makes it awkward to extend: adding an entry
+                        means editing a JavaScript array inside a 1,600-line document.
+                    </p>
+                    <p>
+                        The <a href="../apps/claude-code-catalog.html">catalog</a> answers that. Its entries live in
+                        <code>data/claude-code/catalog.json</code> and the page renders whatever it finds there, so
+                        adding a command is a data edit and never a code edit. The GitHub CLI family was written
+                        directly into that file &mdash; 99 entries across nine sections, without a line of rendering
+                        code changing. A CI check validates the schema on every push: unknown section references,
+                        duplicate ids, untagged entries and malformed examples all fail the build.
+                    </p>
+                    <p>
+                        Both surfaces share the same search engine. Scoring, diacritic folding and match highlighting
+                        come from <code>js/lib/search.js</code>, the module that also powers the publication explorer
+                        on the home page &mdash; one implementation, three consumers.
                     </p>
                 </div>
             </div>
@@ -271,7 +311,7 @@
         <section class="project-cta">
             <div class="container">
                 <h2>Try the Encyclopedia</h2>
-                <p>Search 504 commands, flags and config paths for Claude Code and Codex CLI.</p>
+                <p>Search 504 commands, flags and config paths for Claude Code and Codex CLI &mdash; or browse the data-backed catalog for the GitHub CLI.</p>
                 <a href="../apps/claude-code-encyclopedia.html" class="btn btn-primary btn-lg">
                     <i class="fas fa-terminal"></i> Launch the Encyclopedia
                 </a>

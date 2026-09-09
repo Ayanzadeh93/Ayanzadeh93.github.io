@@ -1,23 +1,318 @@
-.catalog-code {
-  margin: 10px 0 0;
-  padding: 12px 14px;
-  overflow-x: auto;
+/* ============================================================
+   claude-catalog.css — styles specific to the CLI catalog app.
+
+   Layers on top of projects-data.css, which supplies .data-card,
+   .data-pill, .data-grid and the surrounding shell. Only what the
+   catalog adds lives here.
+   ============================================================ */
+
+/* ---------- toolbar ---------- */
+
+/* .project-toolbar is a two-column grid; the catalog needs three stacked rows
+   (search + section, family tabs, status), so collapse it to one column. */
+.catalog-toolbar {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+}
+
+.catalog-toolbar > * {
+  grid-column: 1 / -1;
+}
+
+.catalog-toolbar #catalog-status {
+  margin: 0;
+  color: var(--text-light, #64748b);
+  font-size: .85rem;
+}
+
+.catalog-toolbar-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: flex-end;
+}
+
+.catalog-search-field {
+  flex: 1 1 280px;
+  min-width: 0;
+}
+
+/* ---------- family tabs ---------- */
+
+.catalog-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.catalog-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+  font: inherit;
+  font-size: .82rem;
+  font-weight: 500;
+  color: var(--primary-color, #2563eb);
+  background: rgba(37, 99, 235, .1);
+  border: 1px solid transparent;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background-color .2s ease, color .2s ease, border-color .2s ease;
+}
+
+.catalog-tab:hover {
+  border-color: var(--primary-color, #2563eb);
+}
+
+.catalog-tab:focus-visible {
+  outline: 2px solid var(--primary-color, #2563eb);
+  outline-offset: 2px;
+}
+
+.catalog-tab[aria-pressed="true"] {
+  color: #fff;
+  background: var(--primary-color, #2563eb);
+  border-color: var(--primary-color, #2563eb);
+}
+
+.catalog-tab-count {
+  padding: 1px 7px;
+  font-size: .72rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.5;
+  background: rgba(255, 255, 255, .55);
+  border-radius: 10px;
+}
+
+.catalog-tab[aria-pressed="true"] .catalog-tab-count {
+  background: rgba(255, 255, 255, .25);
+}
+
+/* ---------- section groups ---------- */
+
+.catalog-group-head {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: baseline;
+  gap: 10px;
+  margin: 34px 0 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+}
+
+.catalog-group-head h2 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -.01em;
+  color: var(--text-dark, #0f172a);
+}
+
+.catalog-group-count {
+  padding: 2px 9px;
+  font-size: .72rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-light, #64748b);
+  background: var(--background-alt, #f1f5f9);
+  border-radius: 10px;
+}
+
+.catalog-group-head p {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: .84rem;
+  line-height: 1.5;
+  color: var(--text-light, #64748b);
+}
+
+.catalog-grid {
+  align-items: start;
+}
+
+/* ---------- cards ---------- */
+
+.catalog-card {
+  scroll-margin-top: 24px;
+}
+
+.catalog-card:focus-visible {
+  outline: 2px solid var(--primary-color, #2563eb);
+  outline-offset: 3px;
+}
+
+/* Deep-linked card, so a shared #entry-id URL points somewhere obvious. */
+.catalog-card.is-linked {
+  border-color: var(--primary-color, #2563eb);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, .18);
+}
+
+.catalog-name {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: .98rem !important;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.catalog-alias {
+  margin: 8px 0 0;
+  font-size: .8rem;
+  color: var(--text-light, #64748b);
+}
+
+.catalog-alias code {
+  padding: 1px 5px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: .78rem;
+  background: var(--background-alt, #f1f5f9);
+  border-radius: 4px;
+}
+
+/* ---------- examples ---------- */
+
+.catalog-example {
+  margin: 12px 0 0;
   border: 1px solid #253044;
   border-radius: 9px;
+  overflow: hidden;
   background: #0f172a;
+}
+
+.catalog-example-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 8px 6px 12px;
+  border-bottom: 1px solid #253044;
+}
+
+.catalog-example-label {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: .68rem;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.catalog-copy {
+  padding: 3px 10px;
+  font: inherit;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: .7rem;
+  color: #94a3b8;
+  background: transparent;
+  border: 1px solid #253044;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: color .18s ease, border-color .18s ease;
+}
+
+.catalog-copy:hover {
   color: #e2e8f0;
-  font: 500 .82rem/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  border-color: #3b4a63;
+}
+
+.catalog-copy:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 1px;
+}
+
+.catalog-copy.is-copied {
+  color: #4ade80;
+  border-color: #4ade80;
+}
+
+.catalog-code {
+  margin: 0;
+  padding: 11px 13px;
+  overflow-x: auto;
+  color: #e2e8f0;
+  font: 500 .8rem/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
 .catalog-code code {
   font: inherit;
 }
 
+/* ---------- note & highlighting ---------- */
+
 .catalog-note {
   margin: 12px 0 0;
   padding-left: 10px;
-  border-left: 3px solid var(--primary-color);
-  color: var(--text-medium);
-  font-size: .86rem;
+  border-left: 3px solid var(--primary-color, #2563eb);
+  color: var(--text-medium, #475569);
+  font-size: .84rem;
   line-height: 1.55;
+}
+
+.catalog-mark {
+  padding: 0 2px;
+  color: inherit;
+  background: rgba(37, 99, 235, .16);
+  border-radius: 2px;
+}
+
+/* ---------- empty state ---------- */
+
+.catalog-empty {
+  padding: 44px 24px;
+  text-align: center;
+  color: var(--text-light, #64748b);
+  border: 1px dashed var(--border-color, #e2e8f0);
+  border-radius: 14px;
+}
+
+.catalog-empty p {
+  margin: 0 0 16px;
+}
+
+.catalog-reset {
+  padding: 9px 20px;
+  font: inherit;
+  font-size: .85rem;
+  font-weight: 500;
+  color: #fff;
+  background: var(--primary-color, #2563eb);
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.catalog-reset:focus-visible {
+  outline: 2px solid var(--primary-color, #2563eb);
+  outline-offset: 2px;
+}
+
+/* ---------- dark theme ---------- */
+
+@media (prefers-color-scheme: dark) {
+  .catalog-tab-count {
+    background: rgba(15, 23, 41, .45);
+  }
+
+  .catalog-mark {
+    background: rgba(96, 165, 250, .3);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .catalog-tab,
+  .catalog-copy {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .catalog-tab,
+  .catalog-copy,
+  .catalog-example {
+    border: 1px solid CanvasText;
+  }
+
+  .catalog-tab[aria-pressed="true"],
+  .catalog-mark {
+    background: Highlight;
+    color: HighlightText;
+  }
 }
