@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'; frame-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Project | Aydin Ayanzadeh</title>
+  <meta name="description" content="Project details from Aydin Ayanzadeh's research portfolio.">
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/projects-data.css">
+</head>
+<body>
+  <header class="data-nav">
+    <a class="data-brand" href="../index.html">Aydin Ayanzadeh</a>
+    <nav aria-label="Project navigation">
+      <a href="index.html">All projects</a>
+      <a href="../index.html#publications">Publications</a>
+      <a href="../index.html#contact">Contact</a>
+    </nav>
+  </header>
+
+  <main id="project-detail" class="data-shell" tabindex="-1">
+    <section class="data-hero data-hero-detail" aria-labelledby="project-title">
+      <div class="detail-badges" id="project-badges"></div>
+      <h1 id="project-title">Loading project…</h1>
+      <p id="project-subtitle" class="detail-subtitle"></p>
+      <p id="project-summary" class="detail-summary"></p>
+      <div id="project-links" class="detail-actions"></div>
+    </section>
+
+    <div id="project-content" hidden>
+      <section class="detail-section" aria-labelledby="outcomes-title">
+        <h2 id="outcomes-title">Key outcomes</h2>
+        <ul id="project-highlights" class="detail-list"></ul>
+      </section>
+
+      <section class="detail-section detail-section-alt" aria-labelledby="methods-title">
+        <h2 id="methods-title">Methods & stack</h2>
+        <ul id="project-methods" class="data-tags detail-tags"></ul>
+      </section>
+
+      <section class="detail-section" aria-labelledby="related-title">
+        <h2 id="related-title">Related projects</h2>
+        <div id="related-projects" class="related-grid"></div>
+      </section>
+    </div>
+
+    <section id="project-error" class="data-error" hidden>
+      <h1>Project not found</h1>
+      <p>The project identifier is missing or invalid.</p>
+      <a class="data-link" href="index.html">Browse all projects</a>
+    </section>
+  </main>
+
+  <script type="module" src="../js/project-detail.js"></script>
+</body>
+</html>

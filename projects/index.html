@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'; frame-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Projects | Aydin Ayanzadeh</title>
+  <meta name="description" content="Selected research and engineering projects by Aydin Ayanzadeh.">
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/projects-data.css">
+</head>
+<body>
+  <header class="data-nav">
+    <a class="data-brand" href="../index.html">Aydin Ayanzadeh</a>
+    <nav aria-label="Project navigation">
+      <a href="../index.html#research-projects">Research</a>
+      <a href="../index.html#publications">Publications</a>
+      <a href="../index.html#contact">Contact</a>
+    </nav>
+  </header>
+
+  <main class="data-shell">
+    <section class="data-hero" aria-labelledby="projects-title">
+      <p class="data-eyebrow">Research & engineering</p>
+      <h1 id="projects-title">Projects</h1>
+      <p>A lightweight, data-driven index. Project metadata lives in one JSON file, so adding or updating a project does not require duplicating card markup.</p>
+    </section>
+
+    <section aria-label="Project filters" class="project-toolbar">
+      <label>
+        <span>Search projects</span>
+        <input id="project-search" type="search" autocomplete="off" placeholder="Search title, topic, or method">
+      </label>
+      <label>
+        <span>Category</span>
+        <select id="project-category">
+          <option value="">All categories</option>
+        </select>
+      </label>
+      <p id="project-status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section id="project-grid" class="data-grid" aria-label="Project list"></section>
+
+    <noscript>
+      <section class="noscript-list">
+        <h2>Selected projects</h2>
+        <ul>
+          <li><a href="indoor-navigation.html">Assistive Indoor Navigation</a></li>
+          <li><a href="wildfire-vlm.html">WildfireVLM</a></li>
+          <li><a href="claude-code-encyclopedia.html">Claude Code Encyclopedia</a></li>
+          <li><a href="medical-segmentation.html">Medical Image Segmentation</a></li>
+          <li><a href="vision-language-medical.html">Vision-Language Medical AI</a></li>
+        </ul>
+      </section>
+    </noscript>
+  </main>
+
+  <script type="module" src="../js/projects-index.js"></script>
+</body>
+</html>

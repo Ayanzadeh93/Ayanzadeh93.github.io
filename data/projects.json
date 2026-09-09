@@ -1,0 +1,176 @@
+{
+  "schemaVersion": 1,
+  "updated": "2026-09-08",
+  "projects": [
+    {
+      "id": "indoor-navigation",
+      "title": "Assistive Indoor Navigation",
+      "subtitle": "Vision-language indoor navigation for blind and low-vision users",
+      "category": "Accessible AI",
+      "status": "Research",
+      "featured": true,
+      "year": 2026,
+      "summary": "AI-powered indoor navigation using vision-language reasoning to support blind and low-vision users.",
+      "highlights": [
+        "Combines scene understanding, floor-plan reasoning, and navigation guidance.",
+        "Designed around accessibility and practical indoor mobility workflows."
+      ],
+      "methods": ["Vision-language models", "Computer vision", "Graph reasoning", "Assistive AI"],
+      "tags": ["VLM", "Accessibility", "Indoor Navigation", "Computer Vision"],
+      "legacyPage": "indoor-navigation.html",
+      "links": [
+        {"label": "Existing project page", "href": "indoor-navigation.html", "kind": "page"}
+      ],
+      "related": ["claude-code-encyclopedia", "vision-language-medical"]
+    },
+    {
+      "id": "wildfire-vlm",
+      "title": "WildfireVLM",
+      "subtitle": "Vision-language wildfire detection and risk assessment",
+      "category": "Environmental AI",
+      "status": "Published",
+      "featured": true,
+      "year": 2026,
+      "summary": "Vision-language system for early wildfire detection and risk assessment from satellite imagery; accepted at IGARSS 2026.",
+      "highlights": [
+        "Connects visual wildfire evidence with language-based risk interpretation.",
+        "Targets remote-sensing and environmental decision-support settings."
+      ],
+      "methods": ["Vision-language models", "Remote sensing", "Satellite imagery", "Risk assessment"],
+      "tags": ["Wildfire", "VLM", "Remote Sensing", "IGARSS 2026"],
+      "legacyPage": "wildfire-vlm.html",
+      "links": [
+        {"label": "Existing project page", "href": "wildfire-vlm.html", "kind": "page"}
+      ],
+      "related": ["indoor-navigation", "vision-language-medical"]
+    },
+    {
+      "id": "claude-code-encyclopedia",
+      "title": "Claude Code Encyclopedia",
+      "subtitle": "Searchable Claude Code and Codex CLI reference",
+      "category": "Developer Tools",
+      "status": "Live",
+      "featured": true,
+      "year": 2026,
+      "summary": "A searchable, offline-capable reference covering 504 commands, flags, settings keys, hooks, and configuration paths across Claude Code and OpenAI Codex CLI.",
+      "highlights": [
+        "504 reference entries across 18 sections.",
+        "OS-aware examples, version awareness, keyboard navigation, and local favorites."
+      ],
+      "methods": ["Vanilla JavaScript", "Static data", "Client-side search", "Progressive enhancement"],
+      "tags": ["Claude Code", "Codex CLI", "Developer Tools", "Offline"],
+      "legacyPage": "claude-code-encyclopedia.html",
+      "links": [
+        {"label": "Project page", "href": "claude-code-encyclopedia.html", "kind": "page"},
+        {"label": "Launch encyclopedia", "href": "../apps/claude-code-encyclopedia.html", "kind": "app"},
+        {"label": "Data-backed catalog preview", "href": "../apps/claude-code-catalog.html", "kind": "app"}
+      ],
+      "related": ["indoor-navigation", "ml-data-pipeline"]
+    },
+    {
+      "id": "medical-segmentation",
+      "title": "Medical Image Segmentation",
+      "subtitle": "Multi-task medical image analysis",
+      "category": "Medical AI",
+      "status": "Project",
+      "featured": false,
+      "year": null,
+      "summary": "Multi-task deep-learning platform for automated medical image analysis with explicit handling of imbalanced datasets.",
+      "highlights": [
+        "Focuses on segmentation and classification workflows.",
+        "Designed for imbalanced medical-imaging datasets."
+      ],
+      "methods": ["Deep learning", "Image segmentation", "Medical imaging", "Class imbalance"],
+      "tags": ["Medical AI", "Segmentation", "Deep Learning"],
+      "legacyPage": "medical-segmentation.html",
+      "links": [
+        {"label": "Existing project page", "href": "medical-segmentation.html", "kind": "page"}
+      ],
+      "related": ["vision-language-medical", "knowledge-distillation"]
+    },
+    {
+      "id": "vision-language-medical",
+      "title": "Vision-Language Medical AI",
+      "subtitle": "CLIP-based medical vision-language research",
+      "category": "Medical AI",
+      "status": "Project",
+      "featured": false,
+      "year": null,
+      "summary": "Custom CLIP-based architecture for medical imaging with zero-shot classification and report-generation capabilities.",
+      "highlights": [
+        "Explores zero-shot medical-image classification.",
+        "Connects medical visual features with language representations."
+      ],
+      "methods": ["CLIP", "Vision-language learning", "Medical imaging", "Zero-shot learning"],
+      "tags": ["Medical AI", "CLIP", "VLM", "Zero-shot"],
+      "legacyPage": "vision-language-medical.html",
+      "links": [
+        {"label": "Existing project page", "href": "vision-language-medical.html", "kind": "page"}
+      ],
+      "related": ["medical-segmentation", "indoor-navigation"]
+    },
+    {
+      "id": "knowledge-distillation",
+      "title": "Knowledge Distillation",
+      "subtitle": "Hint-based model compression",
+      "category": "Efficient AI",
+      "status": "Project",
+      "featured": false,
+      "year": null,
+      "summary": "Hint-based knowledge-distillation framework reported on the existing project page as achieving 2.5× model compression with minimal accuracy loss.",
+      "highlights": [
+        "Focuses on efficient transfer from larger teacher models to smaller students.",
+        "Targets reduced deployment cost while retaining predictive quality."
+      ],
+      "methods": ["Knowledge distillation", "Model compression", "Deep learning"],
+      "tags": ["Efficient AI", "Distillation", "Compression"],
+      "legacyPage": "knowledge-distillation.html",
+      "links": [
+        {"label": "Existing project page", "href": "knowledge-distillation.html", "kind": "page"}
+      ],
+      "related": ["medical-segmentation", "graph-autoencoder"]
+    },
+    {
+      "id": "graph-autoencoder",
+      "title": "Graph Autoencoder",
+      "subtitle": "Residual GNN representation learning",
+      "category": "Graph ML",
+      "status": "Project",
+      "featured": false,
+      "year": null,
+      "summary": "Graph neural-network implementation using residual connections for representation learning on graph-structured data.",
+      "highlights": [
+        "Uses graph autoencoding for representation learning.",
+        "Explores residual connections in graph neural networks."
+      ],
+      "methods": ["Graph neural networks", "Autoencoders", "Representation learning", "Residual connections"],
+      "tags": ["GNN", "Graph ML", "Autoencoder"],
+      "legacyPage": "graph-autoencoder.html",
+      "links": [
+        {"label": "Existing project page", "href": "graph-autoencoder.html", "kind": "page"}
+      ],
+      "related": ["knowledge-distillation", "ml-data-pipeline"]
+    },
+    {
+      "id": "ml-data-pipeline",
+      "title": "ML Data Pipeline",
+      "subtitle": "Scalable preprocessing and feature engineering",
+      "category": "ML Systems",
+      "status": "Project",
+      "featured": false,
+      "year": null,
+      "summary": "Scalable data-processing pipeline described on the existing project page as handling 10 TB+ daily with automated preprocessing and feature engineering.",
+      "highlights": [
+        "Automates preprocessing and feature-engineering stages.",
+        "Designed around high-volume machine-learning data workflows."
+      ],
+      "methods": ["Data engineering", "ML pipelines", "Feature engineering", "Automation"],
+      "tags": ["ML Systems", "Data Pipeline", "Automation"],
+      "legacyPage": "ml-data-pipeline.html",
+      "links": [
+        {"label": "Existing project page", "href": "ml-data-pipeline.html", "kind": "page"}
+      ],
+      "related": ["claude-code-encyclopedia", "graph-autoencoder"]
+    }
+  ]
+}

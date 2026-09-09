@@ -1,0 +1,38 @@
+name: Validate portfolio content
+
+on:
+  pull_request:
+    paths:
+      - 'data/**'
+      - 'projects/**'
+      - 'apps/claude-code-catalog.html'
+      - 'js/projects-index.js'
+      - 'js/project-detail.js'
+      - 'js/lib/project-data.js'
+      - 'js/claude-code-catalog.js'
+      - 'css/projects-data.css'
+      - 'tests/validate_content.py'
+      - '.github/workflows/content-validation.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'data/**'
+      - 'projects/**'
+      - 'apps/claude-code-catalog.html'
+      - 'js/**'
+      - 'css/projects-data.css'
+      - 'tests/validate_content.py'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate project and Claude data
+        run: python tests/validate_content.py

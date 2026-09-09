@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 1,
+  "meta": {
+    "name": "Claude Code Catalog",
+    "updated": "2026-09-08",
+    "completeness": "seed",
+    "sourceApp": "../../apps/claude-code-encyclopedia.html",
+    "notes": "This is the maintainable data layer for gradual migration of the embedded encyclopedia dataset. Add records here without changing rendering code."
+  },
+  "sections": [
+    {"id": "install", "family": "claude", "label": "Installation"},
+    {"id": "cli", "family": "claude", "label": "CLI commands"},
+    {"id": "flags", "family": "claude", "label": "CLI flags"},
+    {"id": "settings", "family": "claude", "label": "settings.json"},
+    {"id": "hooks", "family": "claude", "label": "Hooks"},
+    {"id": "mcp", "family": "claude", "label": "MCP"},
+    {"id": "cxcli", "family": "codex", "label": "Codex CLI"},
+    {"id": "cxconf", "family": "codex", "label": "Codex config"}
+  ],
+  "entries": [
+    {
+      "id": "cli-claude",
+      "section": "cli",
+      "name": "claude",
+      "type": "Command",
+      "description": "Start an interactive Claude Code session in the current directory.",
+      "aliases": [],
+      "examples": [{"command": "claude", "label": "shell"}],
+      "introducedVersion": null,
+      "tags": ["interactive", "session"],
+      "note": null
+    },
+    {
+      "id": "cli-print-mode",
+      "section": "cli",
+      "name": "claude -p \"query\"",
+      "type": "Print mode",
+      "description": "Run headlessly, print the result, and exit.",
+      "aliases": [],
+      "examples": [{"command": "claude -p \"explain this function\"", "label": "shell"}],
+      "introducedVersion": null,
+      "tags": ["headless", "automation", "stdin"],
+      "note": null
+    },
+    {
+      "id": "cli-auth-login",
+      "section": "cli",
+      "name": "claude auth login",
+      "type": "Auth",
+      "description": "Sign in to an Anthropic account; add --console for a Console account.",
+      "aliases": [],
+      "examples": [{"command": "claude auth login --console", "label": "shell"}],
+      "introducedVersion": null,
+      "tags": ["authentication", "console"],
+      "note": null
+    },
+    {
+      "id": "cli-auth-status",
+      "section": "cli",
+      "name": "claude auth status",
+      "type": "Auth",
+      "description": "Show authentication status as JSON.",
+      "aliases": [],
+      "examples": [{"command": "claude auth status", "label": "shell"}],
+      "introducedVersion": null,
+      "tags": ["authentication", "ci", "json"],
+      "note": null
+    },
+    {
+      "id": "cli-doctor",
+      "section": "cli",
+      "name": "claude doctor",
+      "type": "Command",
+      "description": "Run installation and settings diagnostics.",
+      "aliases": [],
+      "examples": [{"command": "claude doctor", "label": "shell"}],
+      "introducedVersion": null,
+      "tags": ["diagnostics", "health"],
+      "note": null
+    },
+    {
+      "id": "flags-model",
+      "section": "flags",
+      "name": "--model",
+      "type": "Model",
+      "description": "Choose the model for the session.",
+      "aliases": [],
+      "examples": [{"command": "claude --model opus", "label": "shell"}],
+      "introducedVersion": null,
+      "tags": ["model", "session"],
+      "note": null
+    },
+    {
+      "id": "flags-permission-mode",
+      "section": "flags",
+      "name": "--permission-mode",
+      "type": "Permissions",
+      "description": "Start Claude Code using a specified permission mode.",
+      "aliases": [],
+      "examples": [{"command": "claude --permission-mode plan", "label": "shell"}],
+      "introducedVersion": null,
+      "tags": ["permissions", "plan"],
+      "note": null
+    },
+    {
+      "id": "settings-auto-updates-channel",
+      "section": "settings",
+      "name": "autoUpdatesChannel",
+      "type": "Updates",
+      "description": "Select the latest or stable auto-update channel.",
+      "aliases": [],
+      "examples": [{"command": "{ \"autoUpdatesChannel\": \"stable\" }", "label": "settings.json"}],
+      "introducedVersion": null,
+      "tags": ["updates", "stable"],
+      "note": null
+    },
+    {
+      "id": "mcp-list",
+      "section": "mcp",
+      "name": "claude mcp list",
+      "type": "MCP",
+      "description": "List configured Model Context Protocol servers.",
+      "aliases": [],
+      "examples": [{"command": "claude mcp list", "label": "shell"}],
+      "introducedVersion": null,
+      "tags": ["mcp", "servers"],
+      "note": null
+    }
+  ],
+  "changelog": [
+    {"version": "2.1.263", "date": "2026-09-06", "items": ["Bug fixes and reliability improvements"]},
+    {"version": "2.1.243", "date": "2026-08-25", "items": ["Usage-loop breakdown", "modelPicker setting", "Keyless Console sign-in"]}
+  ]
+}
