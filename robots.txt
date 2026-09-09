@@ -1,12 +1,12 @@
 # robots.txt for Aydin Ayanzadeh Research Portfolio
-# https://ayanzadeh93.github.io/
+# https://www.ayanzadeh.com/
 
 User-agent: *
 Allow: /
 Crawl-delay: 1
 
 # Sitemaps
-Sitemap: https://ayanzadeh93.github.io/sitemap.xml
+Sitemap: https://www.ayanzadeh.com/sitemap.xml
 
 # Allow important resources for proper rendering
 Allow: /css/
