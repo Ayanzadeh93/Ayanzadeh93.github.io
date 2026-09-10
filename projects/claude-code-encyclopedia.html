@@ -6,7 +6,7 @@
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://formspree.io; form-action 'self' https://formspree.io; frame-src 'none'; manifest-src 'self'">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>Claude Code Encyclopedia | Aydin Ayanzadeh</title>
-    <meta name="description" content="A searchable, offline-capable reference for Claude Code and OpenAI Codex CLI covering 504 commands, flags, settings keys, hooks and config paths across macOS, Windows and Linux.">
+    <meta name="description" content="A searchable, offline-capable reference for Claude Code, OpenAI Codex CLI and GitHub CLI covering commands, flags, settings keys, hooks and config paths across macOS, Windows and Linux.">
     <link rel="canonical" href="https://www.ayanzadeh.com/projects/claude-code-encyclopedia.html">
     <link rel="icon" type="image/svg+xml" href="../favicon.svg">
 
@@ -14,7 +14,7 @@
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://www.ayanzadeh.com/projects/claude-code-encyclopedia.html">
     <meta property="og:title" content="Claude Code Encyclopedia">
-    <meta property="og:description" content="A searchable, offline-capable reference for Claude Code and OpenAI Codex CLI covering 504 commands, flags, settings keys, hooks and config paths across macOS, Windows and Linux.">
+    <meta property="og:description" content="A searchable, offline-capable reference for Claude Code, OpenAI Codex CLI and GitHub CLI covering commands, flags, settings keys, hooks and config paths across macOS, Windows and Linux.">
     <meta property="og:image" content="https://www.ayanzadeh.com/images/profile-compressed.jpg">
     <meta property="og:site_name" content="Aydin Ayanzadeh - Research Portfolio">
     <meta property="og:locale" content="en_US">
@@ -23,7 +23,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://www.ayanzadeh.com/projects/claude-code-encyclopedia.html">
     <meta name="twitter:title" content="Claude Code Encyclopedia">
-    <meta name="twitter:description" content="A searchable, offline-capable reference for Claude Code and OpenAI Codex CLI covering 504 commands, flags, settings keys, hooks and config paths across macOS, Windows and Linux.">
+    <meta name="twitter:description" content="A searchable, offline-capable reference for Claude Code, OpenAI Codex CLI and GitHub CLI covering commands, flags, settings keys, hooks and config paths across macOS, Windows and Linux.">
     <meta name="twitter:image" content="https://www.ayanzadeh.com/images/profile-compressed.jpg">
     <meta name="twitter:creator" content="@ayanzadeh93">
     <meta name="twitter:site" content="@ayanzadeh93">
@@ -53,7 +53,7 @@
     "@type": "WebApplication",
     "name": "Claude Code Encyclopedia",
     "url": "https://www.ayanzadeh.com/projects/claude-code-encyclopedia.html",
-    "description": "Searchable reference for Claude Code and OpenAI Codex CLI commands, flags, and config paths.",
+    "description": "Searchable reference for Claude Code, OpenAI Codex CLI and GitHub CLI commands, flags, and config paths.",
     "author": {
         "@id": "https://www.ayanzadeh.com/#person"
     },
@@ -125,7 +125,7 @@
                         <span class="badge status">Live</span>
                     </div>
                     <h1>Claude Code Encyclopedia</h1>
-                    <p class="project-tagline">A Searchable Reference for Claude Code and OpenAI Codex CLI</p>
+                    <p class="project-tagline">A Searchable Reference for Claude Code, Codex CLI and GitHub CLI</p>
                     <div class="project-meta-info">
                         <div class="meta-item">
                             <i class="fas fa-user"></i>
@@ -133,7 +133,7 @@
                         </div>
                         <div class="meta-item">
                             <i class="fas fa-database"></i>
-                            <span>504 entries across 18 sections</span>
+                            <span>Claude, Codex and GitHub CLI in one page</span>
                         </div>
                         <div class="meta-item">
                             <i class="fas fa-calendar"></i>
@@ -144,8 +144,8 @@
                         <a href="../apps/claude-code-encyclopedia.html" class="btn btn-primary">
                             <i class="fas fa-terminal"></i> Launch the Encyclopedia
                         </a>
-                        <a href="../apps/claude-code-catalog.html?family=github" class="btn btn-secondary">
-                            <i class="fab fa-github"></i> GitHub CLI Catalog
+                        <a href="../apps/claude-code-encyclopedia.html?family=github" class="btn btn-secondary">
+                            <i class="fab fa-github"></i> GitHub CLI
                         </a>
                         <a href="../index.html#projects" class="btn btn-secondary">
                             <i class="fas fa-th"></i> All Projects
@@ -161,13 +161,13 @@
                 <h2><i class="fas fa-eye"></i> Overview</h2>
                 <div class="overview-content">
                     <p class="lead">
-                        Terminal coding agents move fast enough that their documentation is hard to hold in your head. The Claude Code Encyclopedia collapses two toolchains &mdash; Claude Code and OpenAI&rsquo;s Codex CLI &mdash; into one searchable page: 504 entries covering every command, flag, slash command, settings key, hook event, permission rule and config path.
+                        Terminal coding agents move fast enough that their documentation is hard to hold in your head. The Claude Code Encyclopedia collapses three toolchains &mdash; Claude Code, OpenAI&rsquo;s Codex CLI, and the GitHub CLI &mdash; into one searchable page: every command, flag, slash command, settings key, hook event, permission rule, <code>gh</code> workflow and config path.
                     </p>
                     <p>
                         Each entry ships with a runnable example and resolves to the path that actually applies on your machine, because a reference that shows you the macOS path while you are on Windows has not answered the question. An OS switch rewrites every path and example in place, and a version selector marks the entries that did not exist yet in the release you are running.
                     </p>
                     <p>
-                        The whole thing is a single self-contained HTML file with no build step, no framework and no backend. It loads once and then works entirely offline &mdash; the search index, the 504 entries and the release history all ship inside the page.
+                        Claude Code and Codex ship inside the page, so that half of the reference works offline after the first load. GitHub CLI entries are read from a structured JSON file on the same site, which is how a new <code>gh</code> command can be added as a data edit rather than a rewrite of the interface.
                     </p>
                 </div>
             </div>
@@ -217,7 +217,7 @@
                 <div class="approach-content">
                     <div class="approach-item">
                         <h3>1. A Single Static File</h3>
-                        <p>Everything &mdash; markup, styles, search logic and all 504 entries &mdash; lives in one HTML document. There is no bundler, no dependency tree and nothing to install; the browser runs the source exactly as written, and the page keeps working with no network after first load.</p>
+                        <p>Claude Code and Codex entries live in the encyclopedia document so that half of the reference works offline. GitHub CLI entries are fetched from <code>catalog.json</code> and rendered with the same layout, so a new <code>gh</code> command is a data edit.</p>
                     </div>
                     <div class="approach-item">
                         <h3>2. Data-Driven Rendering</h3>
@@ -262,29 +262,24 @@
         <!-- Data layer -->
         <section class="project-section">
             <div class="container">
-                <h2><i class="fas fa-database"></i> Two Surfaces, One Reference</h2>
+                <h2><i class="fas fa-database"></i> One Interface, Structured Data</h2>
                 <div class="overview-content">
                     <p class="lead">
-                        The project ships in two forms, and they are built the opposite way round on purpose.
+                        There is one UI. The encyclopedia design is the product; GitHub CLI is a family inside it, not a second app.
                     </p>
                     <p>
-                        The <a href="../apps/claude-code-encyclopedia.html">encyclopedia</a> is one self-contained
-                        HTML file with its 504 entries embedded &mdash; nothing to fetch, works offline after first
-                        load. That is what makes it fast, and also what makes it awkward to extend: adding an entry
-                        means editing a JavaScript array inside a 1,600-line document.
+                        Claude Code and Codex remain embedded in
+                        <a href="../apps/claude-code-encyclopedia.html">the encyclopedia</a>
+                        so the agent reference stays fast and works offline after first load. The GitHub CLI family
+                        is ingested at runtime from <code>data/claude-code/catalog.json</code> &mdash; 99 entries
+                        across nine sections &mdash; and rendered with the same rows, search, starring and OS switch.
+                        Adding a <code>gh</code> command is a data edit; the page does not change.
                     </p>
                     <p>
-                        The <a href="../apps/claude-code-catalog.html">catalog</a> answers that. Its entries live in
-                        <code>data/claude-code/catalog.json</code> and the page renders whatever it finds there, so
-                        adding a command is a data edit and never a code edit. The GitHub CLI family was written
-                        directly into that file &mdash; 99 entries across nine sections, without a line of rendering
-                        code changing. A CI check validates the schema on every push: unknown section references,
-                        duplicate ids, untagged entries and malformed examples all fail the build.
-                    </p>
-                    <p>
-                        Both surfaces share the same search engine. Scoring, diacritic folding and match highlighting
-                        come from <code>js/lib/search.js</code>, the module that also powers the publication explorer
-                        on the home page &mdash; one implementation, three consumers.
+                        Older <code>/apps/claude-code-catalog.html</code> links redirect here and keep
+                        <code>?family=github</code>, search and hash so bookmarks still land on the right family.
+                        A CI check validates the JSON schema on every push: unknown section references, duplicate
+                        ids, untagged entries and malformed examples all fail the build.
                     </p>
                 </div>
             </div>
@@ -311,7 +306,7 @@
         <section class="project-cta">
             <div class="container">
                 <h2>Try the Encyclopedia</h2>
-                <p>Search 504 commands, flags and config paths for Claude Code and Codex CLI &mdash; or browse the data-backed catalog for the GitHub CLI.</p>
+                <p>Search Claude Code, Codex CLI and GitHub CLI in one page &mdash; commands, flags, settings and the <code>gh</code> workflows that sit beside them.</p>
                 <a href="../apps/claude-code-encyclopedia.html" class="btn btn-primary btn-lg">
                     <i class="fas fa-terminal"></i> Launch the Encyclopedia
                 </a>

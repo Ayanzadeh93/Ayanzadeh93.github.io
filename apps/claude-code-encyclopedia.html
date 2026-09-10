@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="A searchable reference for Claude Code and OpenAI Codex CLI: every command, flag, slash command, config path, settings key, hook and permission rule, with copy-ready examples for macOS, Windows and Linux.">
+<meta name="description" content="A searchable reference for Claude Code, OpenAI Codex CLI and GitHub CLI: every command, flag, slash command, config path and settings key, with copy-ready examples for macOS, Windows and Linux.">
 <meta name="color-scheme" content="light dark">
 <title>Claude Code Encyclopedia</title>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://formspree.io; form-action 'self' https://formspree.io; frame-src 'none'; manifest-src 'self'">
@@ -13,14 +13,14 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.ayanzadeh.com/apps/claude-code-encyclopedia.html">
 <meta property="og:title" content="Claude Code Encyclopedia">
-<meta property="og:description" content="A searchable reference for Claude Code and OpenAI Codex CLI: every command, flag, slash command, config path, settings key, hook and permission rule, with copy-ready examples for macOS, Windows and Linux.">
+<meta property="og:description" content="A searchable reference for Claude Code, OpenAI Codex CLI and GitHub CLI: every command, flag, slash command, config path and settings key, with copy-ready examples for macOS, Windows and Linux.">
 <meta property="og:image" content="https://www.ayanzadeh.com/images/profile-compressed.jpg">
 <meta property="og:site_name" content="Aydin Ayanzadeh - Research Portfolio">
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://www.ayanzadeh.com/apps/claude-code-encyclopedia.html">
 <meta name="twitter:title" content="Claude Code Encyclopedia">
-<meta name="twitter:description" content="A searchable reference for Claude Code and OpenAI Codex CLI: every command, flag, slash command, config path, settings key, hook and permission rule, with copy-ready examples for macOS, Windows and Linux.">
+<meta name="twitter:description" content="A searchable reference for Claude Code, OpenAI Codex CLI and GitHub CLI: every command, flag, slash command, config path and settings key, with copy-ready examples for macOS, Windows and Linux.">
 <meta name="twitter:image" content="https://www.ayanzadeh.com/images/profile-compressed.jpg">
 <meta name="twitter:creator" content="@ayanzadeh93">
 <meta name="twitter:site" content="@ayanzadeh93">
@@ -34,6 +34,7 @@
   --text:#101720; --text-2:#3D4959; --muted:#66748A;
   --accent:#9C5D07; --accent-hi:#B87411; --accent-soft:#FBF1DF; --accent-line:#DFAE5C;
   --codex:#0A6B84; --codex-soft:#E2F2F7; --codex-line:#8DC7D8;
+  --gh:#0969DA; --gh-soft:#E8F1FC; --gh-line:#9EC5F2;
   --ok:#16663F; --ok-soft:#E4F2EA; --danger:#A32A21; --danger-soft:#FBEAE8;
   --code-bg:#0E141C; --code-bg-2:#161E28; --code-text:#DDE4EE; --code-dim:#7E8CA0;
   --code-tok:#F0B357; --code-str:#8CD3A6; --code-cmt:#68788D;
@@ -51,6 +52,7 @@
     --text:#E8EDF4; --text-2:#BAC4D2; --muted:#8492A5;
     --accent:#F0AE4B; --accent-hi:#FFC470; --accent-soft:#26200F; --accent-line:#7C5C1F;
     --codex:#57C6E9; --codex-soft:#0D2731; --codex-line:#2A6377;
+    --gh:#58A6FF; --gh-soft:#122033; --gh-line:#2F6FAD;
     --ok:#5FD3A0; --ok-soft:#10281E; --danger:#F08A80; --danger-soft:#2A1614;
     --code-bg:#080C11; --code-bg-2:#0E141C; --code-text:#DDE4EE; --code-dim:#76849A;
     --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.7);
@@ -63,6 +65,7 @@
   --text:#E8EDF4; --text-2:#BAC4D2; --muted:#8492A5;
   --accent:#F0AE4B; --accent-hi:#FFC470; --accent-soft:#26200F; --accent-line:#7C5C1F;
   --codex:#57C6E9; --codex-soft:#0D2731; --codex-line:#2A6377;
+  --gh:#58A6FF; --gh-soft:#122033; --gh-line:#2F6FAD;
   --ok:#5FD3A0; --ok-soft:#10281E; --danger:#F08A80; --danger-soft:#2A1614;
   --code-bg:#080C11; --code-bg-2:#0E141C; --code-text:#DDE4EE; --code-dim:#76849A;
   --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.7);
@@ -149,9 +152,19 @@ main{padding:26px 30px 120px;min-width:0}
 .status b{color:var(--text);font-weight:600;font-variant-numeric:tabular-nums}
 .clearbtn{padding:3px 9px;border:1px solid var(--border-strong);border-radius:99px;font-size:11.5px;color:var(--text-2)}
 .clearbtn:hover{border-color:var(--accent);color:var(--accent)}
+.famseg{display:flex;flex-wrap:wrap;gap:4px}
+.famseg button{padding:4px 10px;border:1px solid var(--border-strong);border-radius:99px;font-size:11.5px;font-family:var(--mono);color:var(--muted);background:var(--surface)}
+.famseg button[aria-pressed="true"]{font-weight:600}
+.famseg button[data-fam=""][aria-pressed="true"]{border-color:var(--accent-line);color:var(--accent);background:var(--accent-soft)}
+.famseg button[data-fam="cc"][aria-pressed="true"]{border-color:var(--accent-line);color:var(--accent);background:var(--accent-soft)}
+.famseg button[data-fam="cx"][aria-pressed="true"]{border-color:var(--codex-line);color:var(--codex);background:var(--codex-soft)}
+.famseg button[data-fam="gh"][aria-pressed="true"]{border-color:var(--gh-line);color:var(--gh);background:var(--gh-soft)}
+.famseg button:disabled{opacity:.45;cursor:wait}
 
 section.grp{margin-bottom:34px;scroll-margin-top:calc(var(--bar) + 14px)}
 .grphead{display:flex;align-items:baseline;gap:11px;padding-bottom:9px;margin-bottom:2px;border-bottom:2px solid var(--accent-line)}
+.grp.cx .grphead{border-bottom-color:var(--codex-line)}
+.grp.gh .grphead{border-bottom-color:var(--gh-line)}
 .grphead h2{margin:0;font-family:var(--mono);font-size:16px;font-weight:600;letter-spacing:-.01em}
 .grphead .cnt{font-family:var(--mono);font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
 .grphead .blurb{margin-left:auto;font-size:12.5px;color:var(--muted);text-align:right;max-width:46ch}
@@ -168,14 +181,17 @@ section.grp{margin-bottom:34px;scroll-margin-top:calc(var(--bar) + 14px)}
   border:1px solid var(--border);border-radius:6px;padding:3px 7px;line-height:1.4;word-break:break-word;
   border-left:2.5px solid var(--accent-line)}
 .row.cx .rowname code{border-left-color:var(--codex-line)}
+.row.gh .rowname code{border-left-color:var(--gh-line)}
 .rowname .lbl{font-family:var(--sans);font-weight:600;font-size:14.5px;line-height:1.35;color:var(--text);
   border-left:2.5px solid var(--accent-line);padding-left:9px;display:block}
 .row.cx .rowname .lbl{border-left-color:var(--codex-line)}
+.row.gh .rowname .lbl{border-left-color:var(--gh-line)}
 .badges{display:flex;flex-wrap:wrap;gap:5px}
 .tag{font-family:var(--mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;padding:2.5px 6px;
   border-radius:4px;border:1px solid var(--border);color:var(--muted);background:var(--surface-2);white-space:nowrap}
 .tag.b{border-color:var(--accent-line);color:var(--accent);background:var(--accent-soft)}
 .tag.c{border-color:var(--codex-line);color:var(--codex);background:var(--codex-soft)}
+.tag.g{border-color:var(--gh-line);color:var(--gh);background:var(--gh-soft)}
 .tag.v{border-color:var(--ok);color:var(--ok);background:var(--ok-soft)}
 .tag.x{border-color:var(--danger);color:var(--danger);background:var(--danger-soft)}
 .rowR{min-width:0;display:flex;flex-direction:column;gap:10px}
@@ -289,7 +305,7 @@ footer a{color:var(--text-2)}
     "@type": "WebApplication",
     "name": "Claude Code Encyclopedia",
     "url": "https://www.ayanzadeh.com/apps/claude-code-encyclopedia.html",
-    "description": "Searchable reference for Claude Code and OpenAI Codex CLI commands, flags, and config paths.",
+    "description": "Searchable reference for Claude Code, OpenAI Codex CLI and GitHub CLI commands, flags, and config paths.",
     "author": {
         "@id": "https://www.ayanzadeh.com/#person"
     },
@@ -350,7 +366,7 @@ footer a{color:var(--text-2)}
   <div class="searchwrap">
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
     <input id="q" type="search" autocomplete="off" spellcheck="false"
-      placeholder="Search commands, flags, paths, settings, hooks&hellip;"
+      placeholder="Search commands, flags, paths, gh, settings, hooks&hellip;"
       aria-label="Search the encyclopedia">
     <span class="kbdhint"><kbd>/</kbd><kbd>&#8984;K</kbd></span>
   </div>
@@ -377,6 +393,8 @@ footer a{color:var(--text-2)}
     <div id="nav-cc"></div>
     <h4>OpenAI Codex CLI</h4>
     <div id="nav-cx"></div>
+    <h4 id="nav-gh-h">GitHub CLI</h4>
+    <div id="nav-gh"><p class="railnote">Loading the <code>gh</code> catalog&hellip;</p></div>
     <h4>History</h4>
     <div id="nav-hist"></div>
     <div class="railbox railosbox">
@@ -407,16 +425,23 @@ footer a{color:var(--text-2)}
     <div class="hero">
       <div>
         <div class="eyebrow">Terminal agent reference &middot; updated <span id="updated"></span></div>
-        <h1>Every command, flag and config path for Claude Code and Codex CLI</h1>
-        <p>A searchable, copy-ready reference for the two terminal coding agents: CLI commands, slash commands,
-          keyboard bindings, settings keys, hooks, permission rules and file locations &mdash; each with a runnable
-          example and the macOS, Windows or Linux path that actually applies to you.</p>
+        <h1>Every command, flag and config path for Claude Code, Codex and GitHub CLI</h1>
+        <p>A searchable, copy-ready reference for the two terminal coding agents and the GitHub command line:
+          CLI commands, slash commands, keyboard bindings, settings keys, hooks, permission rules, <code>gh</code>
+          workflows and file locations &mdash; each with a runnable example and the macOS, Windows or Linux path
+          that actually applies to you.</p>
       </div>
       <div class="stats" id="stats"></div>
     </div>
 
     <div class="status">
       <span>Showing <b id="shown">0</b> of <b id="total">0</b> entries</span>
+      <div class="famseg" role="group" aria-label="Tool family">
+        <button type="button" data-fam="" aria-pressed="true">All</button>
+        <button type="button" data-fam="cc" aria-pressed="false">Claude</button>
+        <button type="button" data-fam="cx" aria-pressed="false">Codex</button>
+        <button type="button" data-fam="gh" aria-pressed="false" disabled>GitHub</button>
+      </div>
       <span id="filterdesc"></span>
       <button class="clearbtn" id="clearall" hidden>Clear filters</button>
     </div>
@@ -433,10 +458,12 @@ footer a{color:var(--text-2)}
     </section>
 
     <footer>
-      <span>Compiled from the official <a href="https://code.claude.com/docs/en/overview" target="_blank" rel="noopener">Claude Code docs</a>
-        and <a href="https://developers.openai.com/codex/" target="_blank" rel="noopener">OpenAI Codex docs</a>.
+      <span>Compiled from the official <a href="https://code.claude.com/docs/en/overview" target="_blank" rel="noopener">Claude Code docs</a>,
+        <a href="https://developers.openai.com/codex/" target="_blank" rel="noopener">OpenAI Codex docs</a>
+        and the <a href="https://cli.github.com/manual" target="_blank" rel="noopener">GitHub CLI manual</a>.
         Commands change fast &mdash; verify against the docs before relying on one.</span>
-      <span>Looking for <code>gh</code>? The <a href="claude-code-catalog.html?family=github">GitHub CLI catalog</a> covers the GitHub command line and the git workflow around it.</span>
+      <span>GitHub CLI entries load from <code>catalog.json</code>, so adding a <code>gh</code> command is a data edit.
+        Claude Code and Codex ship in this page and work offline after first load.</span>
       <span>Maintained by <a href="https://ayanzadeh.com">Aydin Ayanzadeh</a> &middot; <a href="../index.html#projects">Back to portfolio</a></span>
     </footer>
   </main>
@@ -1249,10 +1276,17 @@ const LS = {
   get(k, f){ try{ const v = localStorage.getItem("cce_"+k); return v===null?f:JSON.parse(v); }catch(e){ return f; } },
   set(k, v){ try{ localStorage.setItem("cce_"+k, JSON.stringify(v)); }catch(e){} }
 };
+const FAM_FROM_QS = {github:"gh", gh:"gh", claude:"cc", cc:"cc", "claude-code":"cc", codex:"cx", cx:"cx"};
+const FAM_TO_QS = {cc:"claude", cx:"codex", gh:"github"};
+const FAM_LABEL = {cc:"Claude Code", cx:"Codex", gh:"GitHub CLI"};
+let githubReady = false;
+let githubFailed = false;
+
 const st = {
   os: LS.get("os","mac"),
   q: "",
   sec: null,
+  fam: null,
   ver: LS.get("ver",""),
   hideNew: false,
   onlyNew: false,
@@ -1261,25 +1295,110 @@ const st = {
   cursor: -1
 };
 
+function readUrl(){
+  const p = new URLSearchParams(location.search);
+  st.q = p.get("q") || "";
+  st.fam = FAM_FROM_QS[(p.get("family")||"").toLowerCase()] || null;
+  st.sec = p.get("section") || null;
+}
+function syncUrl(){
+  const p = new URLSearchParams();
+  if(st.q) p.set("q", st.q);
+  if(st.fam) p.set("family", FAM_TO_QS[st.fam] || st.fam);
+  if(st.sec) p.set("section", st.sec);
+  const qs = p.toString();
+  history.replaceState(null, "", location.pathname + (qs ? "?" + qs : "") + location.hash);
+}
+function setFamButtons(){
+  $$(".famseg button[data-fam]").forEach(b => {
+    const fam = b.dataset.fam || "";
+    b.setAttribute("aria-pressed", String((st.fam || "") === fam));
+    if(fam === "gh") b.disabled = !(githubReady || githubFailed);
+  });
+}
+
 const $  = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
 const strip = h => String(h||"").replace(/<[^>]+>/g,"");
 const dec = h => { const t = document.createElement("textarea"); t.innerHTML = h; return t.value; };
 const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const mdLite = s => esc(s||"").replace(/`([^`]+)`/g, "<code>$1</code>");
 const slug = s => strip(dec(s)).toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,54);
 const vnum = v => { if(!v) return 0; const p = String(v).split("."); return (+p[0]||0)*1e6 + (+p[1]||0)*1e3 + (+p[2]||0); };
+const famOf = e => (SECTIONS.find(s => s.id === e.s) || {}).fam;
 
-/* build ids + search index once */
-const idSeen = {};
-D.forEach(e => {
-  let base = e.s + "-" + slug(e.n);
-  if(idSeen[base]){ idSeen[base]++; base += "-" + idSeen[base]; } else { idSeen[base] = 1; }
-  e.id = base;
-  e.plain = strip(dec(e.n)) + " " + e.s + " " + (e.t||"") + " " + strip(dec(e.d||"")) + " " +
-            (e.a||"") + " " + (e.tg||"") + " " + (e.no?strip(dec(e.no)):"") + " " +
-            (e.x||[]).map(x => (x.c||"") + " " + (x.l||"")).join(" ");
-  e.plain = e.plain.toLowerCase();
-});
+/* build ids + search index; keep catalog ids when present so deep links stay stable */
+function indexEntries(){
+  const idSeen = {};
+  D.forEach(e => {
+    if(!e.id){
+      let base = e.s + "-" + slug(e.n);
+      if(idSeen[base]){ idSeen[base]++; base += "-" + idSeen[base]; } else { idSeen[base] = 1; }
+      e.id = base;
+    }
+    e.plain = strip(dec(e.n)) + " " + e.s + " " + (e.t||"") + " " + strip(dec(e.d||"")) + " " +
+              (e.a||"") + " " + (e.tg||"") + " " + (e.no?strip(dec(e.no)):"") + " " +
+              (e.x||[]).map(x => (x.c||"") + " " + (x.l||"")).join(" ");
+    e.plain = e.plain.toLowerCase();
+  });
+}
+indexEntries();
+
+function ingestGithub(catalog){
+  const ghSections = (catalog.sections || []).filter(s => s.family === "github");
+  const ghEntries = (catalog.entries || []).filter(e => {
+    const sec = (catalog.sections || []).find(s => s.id === e.section);
+    return sec && sec.family === "github";
+  });
+  const haveSec = new Set(SECTIONS.map(s => s.id));
+  const haveId = new Set(D.map(e => e.id));
+  ghSections.forEach(sec => {
+    if(haveSec.has(sec.id)) return;
+    SECTIONS.push({
+      id: sec.id,
+      fam: "gh",
+      label: esc(sec.label || sec.id),
+      title: "GitHub CLI — " + esc(sec.label || sec.id),
+      blurb: mdLite(sec.blurb || "")
+    });
+    haveSec.add(sec.id);
+  });
+  ghEntries.forEach(src => {
+    if(haveId.has(src.id)) return;
+    D.push({
+      id: src.id,
+      s: src.section,
+      t: src.type || "Entry",
+      n: esc(src.name || ""),
+      a: (src.aliases || []).join(", "),
+      d: mdLite(src.description || ""),
+      no: src.note ? mdLite(src.note) : "",
+      tg: (src.tags || []).join(" "),
+      v: src.introducedVersion || "",
+      x: (src.examples || []).map(ex => ({ c: ex.command || "", l: ex.label || "shell" }))
+    });
+    haveId.add(src.id);
+  });
+  indexEntries();
+}
+
+async function loadGithub(){
+  try{
+    const res = await fetch("../data/claude-code/catalog.json", { cache: "no-store" });
+    if(!res.ok) throw new Error(res.status);
+    ingestGithub(await res.json());
+    githubReady = true;
+    if(st.sec && !SECTIONS.some(s => s.id === st.sec)) st.sec = null;
+  }catch(err){
+    githubFailed = true;
+    const nav = $("#nav-gh");
+    if(nav) nav.innerHTML = '<p class="railnote">GitHub CLI data could not be loaded. Try refreshing, or open <code>data/claude-code/catalog.json</code> directly.</p>';
+  }
+  setFamButtons();
+  renderStats();
+  render();
+  focusHash();
+}
 
 /* ================= OS handling ================= */
 const OSNAME = {mac:"macOS", win:"Windows", linux:"Linux"};
@@ -1309,18 +1428,19 @@ function codeBlock(x, i){
 
 function nameHTML(e){
   const t = strip(dec(e.n)).trim();
-  const cmdish = /^[/\-<]/.test(t) || /^(claude|codex|npm|brew|winget|curl|irm|~|\.|%|C:)/.test(t) ||
+  const cmdish = /^[/\-<]/.test(t) || /^(claude|codex|npm|brew|winget|curl|irm|gh|git|~|\.|%|C:)/.test(t) ||
                  !/\s/.test(t) || /^(Read|Write|Edit|Bash|Glob|Grep|Agent|Skill|Monitor|Workflow|PowerShell|WebFetch|WebSearch|TodoWrite|AskUserQuestion|Artifact|SendUserFile|PushNotification|ToolSearch|ScheduleWakeup|ReportFindings|SendFeedback)\b/.test(t);
   return cmdish ? '<code>' + e.n + '</code>' : '<span class="lbl">' + e.n + '</span>';
 }
 function rowHTML(e){
   const ex = examplesFor(e);
   const isNew = e.v && st.ver && vnum(e.v) > vnum(st.ver);
-  const cx = SECTIONS.find(s => s.id === e.s).fam === "cx";
-  let badges = '<span class="tag' + (cx?" c":" b") + '">' + esc(e.t || "Entry") + '</span>';
+  const fam = famOf(e);
+  const tagCls = fam === "cx" ? "c" : fam === "gh" ? "g" : "b";
+  let badges = '<span class="tag ' + tagCls + '">' + esc(e.t || "Entry") + '</span>';
   if(e.v) badges += '<span class="tag ' + (isNew?"x":"v") + '">' + (isNew?"needs ":"since ") + esc(e.v) + '</span>';
   if(e.t === "Removed" || e.t === "Danger" || e.t === "Deprecated") badges += '<span class="tag x">care</span>';
-  return '<article class="row' + (cx?" cx":"") + (isNew?" dim":"") + '" id="' + e.id + '" data-id="' + e.id + '" tabindex="-1">' +
+  return '<article class="row' + (fam==="cx"?" cx":"") + (fam==="gh"?" gh":"") + (isNew?" dim":"") + '" id="' + e.id + '" data-id="' + e.id + '" tabindex="-1">' +
     '<div class="rowL"><div class="rowname">' + nameHTML(e) + '</div><div class="badges">' + badges + '</div>' +
       (e.a ? '<div class="alias">Alias: <code>' + esc(e.a) + '</code></div>' : '') + '</div>' +
     '<div class="rowR"><p class="desc">' + (e.d||"") + '</p>' +
@@ -1357,6 +1477,7 @@ function render(){
 
   const pool = D.map(e => ({ e, sc: score(e, terms) })).filter(r => r.sc > 0).map(r => r.e)
     .filter(e => !st.starsOnly || st.stars.has(e.id))
+    .filter(e => !st.fam || famOf(e) === st.fam)
     .filter(e => {
       if(!st.ver) return true;
       const newer = e.v && vnum(e.v) > vnum(st.ver);
@@ -1369,31 +1490,42 @@ function render(){
 
   SECTIONS.forEach(s => {
     if(st.sec && st.sec !== s.id) return;
+    if(st.fam && s.fam !== st.fam) return;
     const items = pool.filter(e => e.s === s.id);
     if(!items.length) return;
     shown += items.length;
     if(terms.length) items.sort((a,b) => score(b,terms) - score(a,terms));
-    out.push('<section class="grp" id="sec-' + s.id + '">' +
+    out.push('<section class="grp' + (s.fam==="cx"?" cx":s.fam==="gh"?" gh":"") + '" id="sec-' + s.id + '">' +
       '<div class="grphead"><h2>' + s.title + '</h2><span class="cnt">' + items.length + '</span>' +
       '<span class="blurb">' + s.blurb + '</span></div>' +
       items.map(rowHTML).join("") + '</section>');
   });
 
   const res = $("#results");
-  res.innerHTML = out.length ? out.join("") :
-    '<div class="empty"><b>Nothing matches that</b>Try a shorter search, or clear the version and starred filters.</div>';
+  if(st.fam === "gh" && !githubReady && !githubFailed){
+    res.innerHTML = '<div class="empty"><b>Loading GitHub CLI</b>Fetching the <code>gh</code> catalog&hellip;</div>';
+  } else {
+    res.innerHTML = out.length ? out.join("") :
+      '<div class="empty"><b>Nothing matches that</b>Try a shorter search, or clear the version and starred filters.</div>';
+  }
 
   $("#shown").textContent = shown;
   $("#total").textContent = D.length;
   $("#starcount").textContent = st.stars.size;
-  $("#clearall").hidden = !(st.q || st.sec || st.ver || st.starsOnly);
+  $("#clearall").hidden = !(st.q || st.sec || st.fam || st.ver || st.starsOnly);
   const bits = [];
-  if(st.sec) bits.push("section: " + strip(SECTIONS.find(s=>s.id===st.sec).label));
+  if(st.fam) bits.push(FAM_LABEL[st.fam] || st.fam);
+  if(st.sec){
+    const sec = SECTIONS.find(s=>s.id===st.sec);
+    if(sec) bits.push("section: " + strip(sec.label));
+  }
   if(st.ver) bits.push((st.onlyNew?"newer than ":st.hideNew?"available in ":"marked against ") + st.ver);
   if(st.starsOnly) bits.push("starred only");
   $("#filterdesc").textContent = bits.length ? "· " + bits.join(" · ") : "";
-  $("#sec-changelog").hidden = !!(st.sec || st.q || st.starsOnly);
+  $("#sec-changelog").hidden = !!(st.sec || st.q || st.starsOnly || (st.fam && st.fam !== "cc"));
 
+  setFamButtons();
+  syncUrl();
   buildNav(counts);
   if(terms.length) highlight(terms);
   st.cursor = -1;
@@ -1430,12 +1562,20 @@ function buildNav(counts){
     s.label + '<span class="n">' + (counts[s.id]||0) + '</span></button>').join("");
   $("#nav-cc").innerHTML = mk("cc");
   $("#nav-cx").innerHTML = mk("cx");
+  const gh = $("#nav-gh");
+  const ghHead = $("#nav-gh-h");
+  if(githubReady){
+    gh.innerHTML = mk("gh") || '<p class="railnote">No GitHub CLI entries in the catalog.</p>';
+    if(ghHead) ghHead.hidden = false;
+  } else if(githubFailed){
+    if(ghHead) ghHead.hidden = false;
+  }
   $("#nav-hist").innerHTML = '<button type="button" class="navlink" data-jump="sec-changelog">Version history<span class="n">' + CHANGELOG.length + '</span></button>';
 }
 
 /* ================= chrome ================= */
 function renderStats(){
-  const cmds = D.filter(e => ["cli","flags","slash","cxcli","cxslash"].includes(e.s)).length;
+  const cmds = D.filter(e => ["cli","flags","slash","cxcli","cxslash"].includes(e.s) || (e.s||"").startsWith("gh")).length;
   $("#stats").innerHTML = [
     ["<b>" + D.length + "</b><span>entries</span>"],
     ["<b>" + cmds + "</b><span>commands</span>"],
@@ -1493,6 +1633,16 @@ function setOS(os){
 /* ================= events ================= */
 $("#q").addEventListener("input", e => { st.q = e.target.value; render(); });
 $$(".seg button[data-os]").forEach(b => b.addEventListener("click", () => setOS(b.dataset.os)));
+$$(".famseg button[data-fam]").forEach(b => b.addEventListener("click", () => {
+  const next = b.dataset.fam || null;
+  st.fam = st.fam === next ? null : next;
+  if(st.sec && st.fam){
+    const sec = SECTIONS.find(s => s.id === st.sec);
+    if(!sec || sec.fam !== st.fam) st.sec = null;
+  }
+  render();
+  window.scrollTo({top:0, behavior:"smooth"});
+}));
 
 $("#themebtn").addEventListener("click", () => {
   const cur = document.documentElement.getAttribute("data-theme");
@@ -1503,7 +1653,14 @@ $("#themebtn").addEventListener("click", () => {
 
 $("#rail").addEventListener("click", e => {
   const nav = e.target.closest("[data-sec]");
-  if(nav){ st.sec = st.sec === nav.dataset.sec ? null : nav.dataset.sec; st.starsOnly = false; render();
+  if(nav){
+    const sec = SECTIONS.find(s => s.id === nav.dataset.sec);
+    if(st.sec === nav.dataset.sec){ st.sec = null; }
+    else {
+      st.sec = nav.dataset.sec;
+      if(sec) st.fam = sec.fam;
+    }
+    st.starsOnly = false; render();
     window.scrollTo({top:0, behavior:"smooth"}); closeRail(); return; }
   const jump = e.target.closest("[data-jump]");
   if(jump){
@@ -1518,7 +1675,7 @@ $("#ver").addEventListener("change", e => { st.ver = e.target.value; LS.set("ver
 $("#hideNew").addEventListener("change", e => { st.hideNew = e.target.checked; if(e.target.checked){ st.onlyNew = false; $("#onlyNew").checked = false; } render(); });
 $("#onlyNew").addEventListener("change", e => { st.onlyNew = e.target.checked; if(e.target.checked){ st.hideNew = false; $("#hideNew").checked = false; } render(); });
 $("#clearall").addEventListener("click", () => {
-  st.q = ""; st.sec = null; st.starsOnly = false; st.ver = ""; st.hideNew = false; st.onlyNew = false;
+  st.q = ""; st.sec = null; st.fam = null; st.starsOnly = false; st.ver = ""; st.hideNew = false; st.onlyNew = false;
   $("#q").value = ""; $("#ver").value = ""; $("#hideNew").checked = false; $("#onlyNew").checked = false;
   LS.set("ver",""); render();
 });
@@ -1600,17 +1757,23 @@ document.addEventListener("keydown", e => {
 });
 
 /* ================= boot ================= */
+function focusHash(){
+  if(!location.hash) return;
+  const t = document.getElementById(location.hash.slice(1));
+  if(t) setTimeout(() => t.scrollIntoView({block:"center"}), 60);
+}
 applyTheme(LS.get("theme", null));
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => applyTheme(LS.get("theme", null)));
 $$(".seg button[data-os]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.os === st.os)));
+readUrl();
+if(st.q) $("#q").value = st.q;
+if(st.sec && !SECTIONS.some(s => s.id === st.sec) && !String(st.sec).startsWith("gh")) st.sec = null;
 renderStats();
 buildVersionOptions();
 renderTimeline();
 render();
-if(location.hash){
-  const t = document.getElementById(location.hash.slice(1));
-  if(t) setTimeout(() => t.scrollIntoView({block:"center"}), 60);
-}
+focusHash();
+loadGithub();
 </script>
 
 </body>

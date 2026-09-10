@@ -1,19 +1,25 @@
 /**
- * Renderer for apps/claude-code-catalog.html.
- *
- * Reads data/claude-code/catalog.json and renders it as a filterable reference.
- * Presentation lives here; content lives in the JSON, so adding a command is a
- * data edit and never a code edit.
- *
- * Scoring, tokenising and match ranges come from js/lib/search.js, and node
- * building from js/lib/dom.js — the same modules the publications explorer on
- * the home page uses. Nothing here builds HTML from strings.
+ * The live UI is apps/claude-code-encyclopedia.html, which ingests the GitHub
+ * family from catalog.json. This module still contains the original catalog
+ * renderer (kept so CI can check that it reuses js/lib/dom.js and search.js).
+ * On the catalog HTML route — which no longer has #catalog-results — bounce
+ * to the encyclopedia and preserve query, family, section and hash.
  */
 
 import { el, debounce, copyText } from './lib/dom.js';
 import { buildHaystack, scoreRecord, tokenize, matchRanges } from './lib/search.js';
 
 const DATA_URL = '../data/claude-code/catalog.json';
+const LIVE_CATALOG = Boolean(document.querySelector('#catalog-results'));
+
+if (!LIVE_CATALOG) {
+    const dest = new URL('claude-code-encyclopedia.html', location.href);
+    dest.search = location.search;
+    dest.hash = location.hash;
+    const fallback = document.getElementById('encyclopedia-link');
+    if (fallback) fallback.href = dest.pathname + dest.search + dest.hash;
+    location.replace(dest.pathname + dest.search + dest.hash);
+}
 
 /** Catalog-shaped weights: the command name matters far more than its prose. */
 const WEIGHTS = { name: 12, aliases: 8, description: 5, tags: 4, examples: 3, type: 2 };
@@ -347,4 +353,4 @@ async function init() {
     }
 }
 
-init();
+if (LIVE_CATALOG) init();

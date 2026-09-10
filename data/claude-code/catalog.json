@@ -5,7 +5,7 @@
     "updated": "2026-09-09",
     "completeness": "github-complete",
     "sourceApp": "../../apps/claude-code-encyclopedia.html",
-    "notes": "Structured data layer behind apps/claude-code-catalog.html. The GitHub family is complete here; the Claude and Codex families cover the most-used surface, with the full 504-entry set still living in the embedded encyclopedia dataset. Add records here without touching rendering code."
+    "notes": "GitHub family is complete here and is ingested by apps/claude-code-encyclopedia.html. Claude and Codex in this file are a subset; the full agent set still lives in the encyclopedia. apps/claude-code-catalog.html redirects to that page. Add GitHub records here without touching rendering code."
   },
   "families": [
     {
