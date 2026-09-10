@@ -4999,6 +4999,71 @@ img[loading="lazy"].loaded {
 }
 
 /* Teaching mentoring strip (course appointments reuse .experience-timeline) */
+.teaching-course-list {
+    list-style: none;
+    margin: 14px 0 0;
+    padding: 0;
+    display: grid;
+    gap: 10px;
+}
+
+.teaching-course-list > li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 12px;
+    align-items: start;
+    padding: 10px 12px;
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--background-alt) 55%, transparent);
+}
+
+.teaching-course-code {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 5.6rem;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: rgba(37, 99, 235, 0.08);
+    border: 1px solid rgba(37, 99, 235, 0.16);
+    color: var(--primary-dark);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+}
+
+.teaching-course-body {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+}
+
+.teaching-course-name {
+    color: var(--text-dark);
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+.teaching-course-terms {
+    color: var(--text-light);
+    font-size: 0.78rem;
+    line-height: 1.4;
+}
+
+[data-theme="dark"] .teaching-course-list > li {
+    background: color-mix(in srgb, var(--background-white) 55%, transparent);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .teaching-course-code {
+    color: var(--primary-light);
+    background: rgba(96, 165, 250, 0.12);
+    border-color: rgba(96, 165, 250, 0.28);
+}
+
 .teaching-mentoring {
     max-width: 760px;
     margin: 40px auto 0;
