@@ -125,13 +125,10 @@
 [data-theme="dark"] .focus-item,
 [data-theme="dark"] .current-focus,
 [data-theme="dark"] .research-approach,
-[data-theme="dark"] .teaching-item,
-[data-theme="dark"] .teaching-philosophy,
-[data-theme="dark"] .course-item,
-[data-theme="dark"] .mentoring-item,
 [data-theme="dark"] .achievement-item,
 [data-theme="dark"] .featured-paper-card,
-[data-theme="dark"] .reviewer-section {
+[data-theme="dark"] .reviewer-section,
+[data-theme="dark"] .mentoring-list li {
     background: var(--background-alt) !important;
     color: var(--text-dark);
     border-color: var(--border-color);
@@ -1303,11 +1300,10 @@ body.high-contrast .section-title {
 .js-enabled .project-card,
 .js-enabled .project-item,
 .js-enabled .news-card,
-.js-enabled .teaching-item,
-.js-enabled .course-item,
 .js-enabled .journal-item,
 .js-enabled .reviewer-category,
-.js-enabled .focus-item {
+.js-enabled .focus-item,
+.js-enabled .mentoring-list > li {
     /* Hidden until the IntersectionObserver adds .animate-in; the reveal itself
        runs as a one-shot animation so hover transitions stay independent */
     opacity: 0;
@@ -1319,18 +1315,18 @@ body.high-contrast .section-title {
 }
 
 /* Stagger sibling cards that enter the viewport together */
-.js-enabled :is(.experience-timeline, .projects-grid, .news-grid, .courses-grid,
-        .mentoring-grid, .skills-grid, .awards-grid, .focus-items) > .animate-in:nth-child(2) {
+.js-enabled :is(.experience-timeline, .projects-grid, .news-grid, .skills-grid,
+        .awards-grid, .focus-items, .mentoring-list) > .animate-in:nth-child(2) {
     animation-delay: 80ms;
 }
 
-.js-enabled :is(.experience-timeline, .projects-grid, .news-grid, .courses-grid,
-        .mentoring-grid, .skills-grid, .awards-grid, .focus-items) > .animate-in:nth-child(3) {
+.js-enabled :is(.experience-timeline, .projects-grid, .news-grid, .skills-grid,
+        .awards-grid, .focus-items, .mentoring-list) > .animate-in:nth-child(3) {
     animation-delay: 160ms;
 }
 
-.js-enabled :is(.experience-timeline, .projects-grid, .news-grid, .courses-grid,
-        .mentoring-grid, .skills-grid, .awards-grid, .focus-items) > .animate-in:nth-child(n+4) {
+.js-enabled :is(.experience-timeline, .projects-grid, .news-grid, .skills-grid,
+        .awards-grid, .focus-items, .mentoring-list) > .animate-in:nth-child(n+4) {
     animation-delay: 240ms;
 }
 
@@ -1343,11 +1339,10 @@ html.js-enabled body.reduce-motion .award-item,
 html.js-enabled body.reduce-motion .project-card,
 html.js-enabled body.reduce-motion .project-item,
 html.js-enabled body.reduce-motion .news-card,
-html.js-enabled body.reduce-motion .teaching-item,
-html.js-enabled body.reduce-motion .course-item,
 html.js-enabled body.reduce-motion .journal-item,
 html.js-enabled body.reduce-motion .reviewer-category,
-html.js-enabled body.reduce-motion .focus-item {
+html.js-enabled body.reduce-motion .focus-item,
+html.js-enabled body.reduce-motion .mentoring-list > li {
     opacity: 1;
     transform: none;
     transition: none;
@@ -1375,11 +1370,10 @@ html.js-enabled body.reduce-motion .experience-timeline::before {
     html.js-enabled .project-card,
     html.js-enabled .project-item,
     html.js-enabled .news-card,
-    html.js-enabled .teaching-item,
-    html.js-enabled .course-item,
     html.js-enabled .journal-item,
     html.js-enabled .reviewer-category,
-    html.js-enabled .focus-item {
+    html.js-enabled .focus-item,
+    html.js-enabled .mentoring-list > li {
         opacity: 1;
         transform: none;
         transition: none;
@@ -1617,7 +1611,8 @@ html.js-enabled body.reduce-motion .experience-timeline::before {
     transition: transform 0.9s var(--ease-out-expo);
 }
 
-#experience.animate-in .experience-timeline::before {
+#experience.animate-in .experience-timeline::before,
+#teaching.animate-in .experience-timeline::before {
     transform: scaleY(1);
 }
 
@@ -1629,7 +1624,8 @@ html.js-enabled body.reduce-motion .experience-timeline::before {
         transition: none;
     }
 
-    #experience.animate-in .experience-timeline::before {
+    #experience.animate-in .experience-timeline::before,
+    #teaching.animate-in .experience-timeline::before {
         transform: none;
     }
 }
@@ -1869,55 +1865,6 @@ html.js-enabled body.reduce-motion .experience-timeline::before {
         overflow: visible;
         text-align: right;
     }
-}
-
-/* Teaching */
-.teaching-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
-    gap: 20px;
-}
-
-@media (max-width: 400px) {
-    .teaching-grid {
-        grid-template-columns: 1fr;
-        gap: 15px;
-    }
-}
-
-.teaching-item {
-    background-color: var(--background-light);
-    padding: 25px;
-    border-radius: 10px;
-    border-left: 4px solid var(--primary-color);
-    transition: all 0.3s ease;
-    position: relative;
-}
-
-.teaching-item::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 4px;
-    height: 0;
-    background: linear-gradient(180deg, var(--primary-color), #4a90e2);
-    transition: height 0.3s ease;
-}
-
-.teaching-item:hover::before {
-    height: 100%;
-}
-
-.teaching-item h4 {
-    font-size: 1.1rem;
-    margin-bottom: 10px;
-    color: var(--text-dark);
-}
-
-.teaching-item p {
-    color: var(--text-light);
-    font-size: 0.95rem;
 }
 
 /* Enhanced Publications */
@@ -5051,145 +4998,68 @@ img[loading="lazy"].loaded {
     margin: 0;
 }
 
-/* Teaching & Mentoring Section */
-.teaching-content {
-    display: grid;
-    gap: 50px;
+/* Teaching mentoring strip (course appointments reuse .experience-timeline) */
+.teaching-mentoring {
+    max-width: 760px;
+    margin: 40px auto 0;
 }
 
-.teaching-philosophy {
-    background: linear-gradient(135deg, #f8fafb 0%, #ffffff 100%);
-    padding: 30px;
-    border-radius: 12px;
-    border-left: 4px solid var(--primary-color);
-}
-
-.teaching-philosophy h3 {
-    color: var(--primary-color);
-    font-size: 1.4rem;
-    margin-bottom: 15px;
-    font-weight: 600;
-}
-
-.teaching-philosophy p {
-    color: var(--text-light);
-    line-height: 1.7;
-    font-size: 1rem;
-}
-
-.courses-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
-    gap: 25px;
-    margin-top: 25px;
-}
-
-.course-item {
-    background: var(--card-surface);
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: var(--shadow);
-    transition: all 0.3s ease;
-    border: 1px solid var(--surface-border);
-    border-left: 4px solid transparent;
-}
-
-.course-item:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 30px rgba(26, 115, 232, 0.15);
-    border-left-color: var(--primary-color);
-}
-
-.course-header {
+.teaching-mentoring h3 {
+    font-size: clamp(1.15rem, 2vw, 1.35rem);
+    color: var(--text-dark);
+    margin: 0 0 16px;
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 15px;
-    gap: 15px;
+    align-items: center;
+    gap: 10px;
 }
 
-.course-header h4 {
-    color: var(--text-dark);
-    font-size: 1.1rem;
-    font-weight: 600;
-    line-height: 1.4;
-    flex: 1;
+.teaching-mentoring h3::before {
+    content: '';
+    width: 32px;
+    height: 2px;
+    background: var(--primary-color);
+    flex-shrink: 0;
 }
 
-.course-semester {
-    background: rgba(26, 115, 232, 0.1);
-    color: var(--primary-color);
-    padding: 4px 12px;
-    border-radius: 15px;
-    font-size: 0.8rem;
-    font-weight: 500;
-    white-space: nowrap;
-}
-
-.course-description {
-    color: var(--text-light);
-    line-height: 1.6;
-    margin-bottom: 15px;
-    font-size: 0.95rem;
-}
-
-.course-details {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-
-.course-role,
-.course-students {
-    background: rgba(26, 115, 232, 0.05);
-    color: var(--text-dark);
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 0.85rem;
-    font-weight: 500;
-}
-
-.mentoring-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
-    gap: 25px;
-    margin-top: 25px;
-}
-
-.mentoring-item {
-    text-align: center;
-    padding: 25px;
-    background: var(--background-white);
-    border-radius: 12px;
-    box-shadow: var(--shadow-sm);
-    transition: all 0.3s ease;
-    border: 1px solid rgba(26, 115, 232, 0.1);
-}
-
-.mentoring-item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(26, 115, 232, 0.15);
-    border-color: var(--primary-color);
-}
-
-.mentoring-item i {
-    color: var(--primary-color);
-    font-size: 2rem;
-    margin-bottom: 15px;
-}
-
-.mentoring-item h4 {
-    color: var(--text-dark);
-    font-size: 1.1rem;
-    margin-bottom: 10px;
-    font-weight: 600;
-}
-
-.mentoring-item p {
-    color: var(--text-light);
-    font-size: 0.9rem;
-    line-height: 1.5;
+.mentoring-list {
+    list-style: none;
     margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.mentoring-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--card-surface);
+    border: 1px solid var(--surface-border);
+    border-radius: 10px;
+    border-left: 3px solid var(--primary-color);
+    color: var(--text-medium);
+    font-size: 0.88rem;
+    line-height: 1.5;
+}
+
+.mentoring-list li i {
+    color: var(--primary-color);
+    font-size: 1rem;
+    margin-top: 0.2em;
+    flex-shrink: 0;
+}
+
+.mentoring-list li strong {
+    color: var(--text-dark);
+    font-weight: 600;
+}
+
+@media (max-width: 640px) {
+    .mentoring-list {
+        grid-template-columns: 1fr;
+    }
 }
 
 .achievements-list {
@@ -5370,41 +5240,13 @@ img[loading="lazy"].loaded {
 
 /* Responsive Teaching Section */
 @media (max-width: 768px) {
-    .teaching-content {
-        gap: 30px;
-    }
-
-    .courses-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-
-    .course-item {
-        padding: 20px;
-    }
-
-    .course-header {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .course-details {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .mentoring-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
+    .teaching-mentoring {
+        margin-top: 32px;
     }
 
     .achievements-list {
         grid-template-columns: 1fr;
         gap: 15px;
-    }
-
-    .teaching-philosophy {
-        padding: 20px;
     }
 }
 
@@ -5418,14 +5260,6 @@ img[loading="lazy"].loaded {
     }
 
     .approach-item {
-        padding: 20px;
-    }
-
-    .course-item {
-        padding: 15px;
-    }
-
-    .mentoring-item {
         padding: 20px;
     }
 
@@ -6106,7 +5940,7 @@ html[data-view-transition="theme"]::view-transition-new(root) {
     .mobile-menu-toggle { display: flex; }
 }
 
-.experience-intro, .research-projects-intro { margin-bottom: 34px; }
+.experience-intro, .teaching-intro, .research-projects-intro { margin-bottom: 34px; }
 
 #research-projects .project-category { margin-bottom: 34px; }
 #research-projects .category-title { margin-bottom: 16px; font-size: 1.15rem; }
