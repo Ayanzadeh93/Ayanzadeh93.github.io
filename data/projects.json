@@ -47,23 +47,25 @@
     {
       "id": "claude-code-encyclopedia",
       "title": "Claude Code Encyclopedia",
-      "subtitle": "Searchable Claude Code and Codex CLI reference",
+      "subtitle": "Searchable Claude Code, Codex and GitHub CLI reference",
       "category": "Developer Tools",
       "status": "Live",
       "featured": true,
       "year": 2026,
-      "summary": "A searchable, offline-capable reference covering 504 commands, flags, settings keys, hooks, and configuration paths across Claude Code and OpenAI Codex CLI.",
+      "summary": "A searchable, offline-capable reference covering 504 commands, flags, settings keys, hooks, and configuration paths across Claude Code and OpenAI Codex CLI, plus a data-backed catalog whose GitHub CLI family documents the gh command line end to end.",
       "highlights": [
-        "504 reference entries across 18 sections.",
+        "504 reference entries across 18 sections in the offline encyclopedia.",
+        "A JSON-backed catalog of 166 entries where adding a command is a data edit, not a code edit.",
+        "99 GitHub CLI entries across nine sections, validated against a schema in CI.",
         "OS-aware examples, version awareness, keyboard navigation, and local favorites."
       ],
-      "methods": ["Vanilla JavaScript", "Static data", "Client-side search", "Progressive enhancement"],
-      "tags": ["Claude Code", "Codex CLI", "Developer Tools", "Offline"],
+      "methods": ["Vanilla JavaScript", "ES modules", "Structured JSON data layer", "Client-side ranked search", "Progressive enhancement"],
+      "tags": ["Claude Code", "Codex CLI", "GitHub CLI", "Developer Tools", "Offline"],
       "legacyPage": "claude-code-encyclopedia.html",
       "links": [
         {"label": "Project page", "href": "claude-code-encyclopedia.html", "kind": "page"},
         {"label": "Launch encyclopedia", "href": "../apps/claude-code-encyclopedia.html", "kind": "app"},
-        {"label": "Data-backed catalog preview", "href": "../apps/claude-code-catalog.html", "kind": "app"}
+        {"label": "GitHub CLI catalog", "href": "../apps/claude-code-catalog.html", "kind": "app"}
       ],
       "related": ["indoor-navigation", "ml-data-pipeline"]
     },

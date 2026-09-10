@@ -5,15 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'; frame-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <title>Claude Code Catalog</title>
-  <meta name="description" content="Data-backed preview of the maintainable Claude Code reference catalog.">
+  <title>Agent &amp; GitHub CLI Catalog</title>
+  <meta name="description" content="Searchable reference for the GitHub CLI, Claude Code and Codex CLI, rendered from a single structured data file.">
   <link rel="icon" type="image/svg+xml" href="../favicon.svg">
   <link rel="stylesheet" href="../css/projects-data.css">
   <link rel="stylesheet" href="../css/claude-catalog.css">
 </head>
 <body>
   <header class="data-nav">
-    <a class="data-brand" href="../projects/project.html?id=claude-code-encyclopedia">Claude Code Catalog</a>
+    <a class="data-brand" href="../projects/project.html?id=claude-code-encyclopedia">CLI Catalog</a>
     <nav aria-label="Catalog navigation">
       <a href="claude-code-encyclopedia.html">Full encyclopedia</a>
       <a href="../projects/index.html">Projects</a>
@@ -22,26 +22,47 @@
 
   <main class="data-shell">
     <section class="data-hero">
-      <p class="data-eyebrow">Versioned local data layer</p>
-      <h1>Claude Code Catalog</h1>
-      <p>This compact page reads the new structured catalog directly. It is intentionally simple: update the data file, and this view updates without editing presentation markup.</p>
+      <p class="data-eyebrow">Structured data layer</p>
+      <h1>Agent &amp; GitHub CLI Catalog</h1>
+      <p>
+        A searchable reference for the <code>gh</code> command line, the git workflow it sits on,
+        and the two terminal coding agents alongside it. Every entry on this page is rendered from
+        one JSON file &mdash; adding a command is a data edit, never a code edit.
+      </p>
     </section>
 
-    <section class="project-toolbar" aria-label="Catalog filters">
-      <label>
-        <span>Search</span>
-        <input id="catalog-search" type="search" autocomplete="off" placeholder="Search command, type, description, or tag">
-      </label>
-      <label>
-        <span>Section</span>
-        <select id="catalog-section">
-          <option value="">All sections</option>
-        </select>
-      </label>
+    <section class="project-toolbar catalog-toolbar" aria-label="Catalog filters">
+      <div class="catalog-toolbar-row">
+        <label class="catalog-search-field">
+          <span>Search</span>
+          <input id="catalog-search" type="search" autocomplete="off" spellcheck="false"
+                 placeholder="Search a command, flag, description or tag&hellip;">
+        </label>
+        <label>
+          <span>Section</span>
+          <select id="catalog-section">
+            <option value="">All sections</option>
+          </select>
+        </label>
+      </div>
+      <div id="catalog-families" class="catalog-tabs" role="group" aria-label="Filter by tool"></div>
       <p id="catalog-status" role="status" aria-live="polite"></p>
     </section>
 
-    <section id="catalog-results" class="data-grid" aria-label="Claude Code catalog entries"></section>
+    <div id="catalog-empty" class="catalog-empty" hidden>
+      <p>No entries match those filters.</p>
+      <button id="catalog-reset" type="button" class="catalog-reset">Clear filters</button>
+    </div>
+
+    <div id="catalog-results" aria-label="Catalog entries"></div>
+
+    <noscript>
+      <p class="data-error">
+        This catalog renders from a JSON file in the browser, so it needs JavaScript.
+        The underlying data is readable directly at
+        <a href="../data/claude-code/catalog.json">data/claude-code/catalog.json</a>.
+      </p>
+    </noscript>
   </main>
 
   <script type="module" src="../js/claude-code-catalog.js"></script>

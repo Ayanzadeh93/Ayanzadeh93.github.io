@@ -181,3 +181,55 @@ title 10 / authors 6 / venue 4 / tags 3 / year 2.
 5. Enhance markup that is already in the page. If the element renders content
    that is not in the HTML, the no-JS and crawler view loses it.
 6. Ship JS-only controls as `hidden` in the markup and unhide them on upgrade.
+
+## CLI Catalog Entry Template
+
+Records live in `data/claude-code/catalog.json` and are rendered by
+`js/claude-code-catalog.js`. Adding a command is a data edit; the renderer never
+needs to change.
+
+```json
+{
+  "id": "ghpr-gh-pr-merge",
+  "section": "ghpr",
+  "name": "gh pr merge",
+  "type": "Pull request",
+  "description": "One sentence, present tense, saying what the command does.",
+  "aliases": [],
+  "examples": [
+    { "command": "gh pr merge 42 --squash --delete-branch", "label": "squash" }
+  ],
+  "introducedVersion": null,
+  "tags": ["pull request", "merge", "squash"],
+  "note": "The caveat a reader would otherwise learn the hard way, or null."
+}
+```
+
+| Field | Rule |
+|-------|------|
+| `id` | `<section>-<slugified name>`, unique across the file. Also the deep-link anchor, so keep it stable. |
+| `section` | Must exist in `sections`; that section's `family` must exist in `families`. |
+| `name` | Rendered in monospace as the card heading. Unique within its section. |
+| `description` | One sentence. The card summary, and a mid-weight search field. |
+| `examples` | Each needs `command` and `label`. The label captions the code block — name the surface (`shell`, `json`, `settings.json`, `enterprise`). |
+| `tags` | At least one. Searchable, and the first six render as chips. |
+| `note` | Use it for the caveat, not for restating the description. `null` when there isn't one. |
+
+Search weights are set in `js/claude-code-catalog.js`: name 12, aliases 8,
+description 5, tags 4, examples 3, type 2. Tokens are AND-ed and
+diacritic-folded by `js/lib/search.js`.
+
+Two rendering modes, chosen by whether a query is active:
+
+- **No query** — entries are grouped under section headings in the catalog's
+  authored order, so the page reads as a document.
+- **With a query** — a flat list in relevance order. Grouping here would re-sort
+  the results and bury the best match under whichever section sorts first.
+
+### Adding a family
+
+1. Append to `families` with `id`, `label`, `blurb` and `source`.
+2. Add its sections to `sections`, each carrying that `family` id.
+3. Add entries. The validator rejects an empty family or an empty section, so a
+   new family must ship with content.
+4. Run `python tests/validate_content.py`.

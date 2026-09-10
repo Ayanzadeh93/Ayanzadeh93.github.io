@@ -32,10 +32,36 @@ Transitions) are fair game, because the browser runs the source files as written
 ├── js/blog.js              # Blog-only features (classic script)
 ├── js/lib/                 # Pure helpers: dom.js, citations.js, search.js
 ├── js/components/          # <pub-explorer>, <cite-dialog>, index.js entry
+├── apps/                   # Standalone reference apps
+├── data/                   # JSON content: projects.json, claude-code/catalog.json
+├── tests/validate_content.py  # Schema + route validation, run in CI
 ├── projects/*.html         # One page per project
 ├── sitemap.xml / robots.txt
 └── manifest.json           # PWA manifest
 ```
+
+## Data-Backed Pages
+
+Two areas render from JSON rather than hand-written markup. For these, **content
+changes are data edits and must never require touching rendering code**:
+
+| Data file | Rendered by | Covers |
+|-----------|-------------|--------|
+| `data/projects.json` | `js/projects-index.js`, `js/project-detail.js` | The projects index and detail routes |
+| `data/claude-code/catalog.json` | `js/claude-code-catalog.js` | The CLI catalog: Claude Code, Codex and GitHub CLI |
+
+`tests/validate_content.py` validates both on every push and pull request via
+`.github/workflows/content-validation.yml`. It enforces unique ids, resolvable
+cross-references, populated families and sections, well-formed examples, and
+size budgets on the route assets. **Run it before committing a data change** —
+it is faster than a CI round trip:
+
+```bash
+python tests/validate_content.py
+```
+
+When you add a validation rule, check it actually fails on bad input. A rule
+that cannot fail is worse than no rule, because it reads like coverage.
 
 ## Core Principles
 
@@ -139,6 +165,19 @@ Copy checklists from [reference.md](reference.md) when executing these tasks.
 2. Give it the structured `data-*` attributes — see the checklist in [reference.md](reference.md). `<pub-explorer>` reads them; nothing is duplicated into JavaScript.
 3. Ship the Cite control as `<button type="button" class="pub-link" data-cite hidden>`. The component unhides it, so no-JS readers never see a dead button.
 4. Verify DOIs before adding them (`https://doi.org/<doi>` or the Crossref API). A wrong identifier in a citation is worse than a missing one.
+
+### Add a CLI catalog entry
+
+1. Add the record to `data/claude-code/catalog.json` — nothing else.
+2. Required fields: `id`, `section`, `name`, `type`, `description`, `aliases`,
+   `examples`, `introducedVersion`, `tags`, `note`. Ids are `<section>-<slug>`.
+3. `section` must exist in `sections`, and that section's `family` must exist in
+   `families`. Every example needs both a `command` and a `label`; the label is
+   rendered as the code block's caption, so name the surface (`shell`, `json`,
+   `settings.json`).
+4. Run `python tests/validate_content.py`.
+5. Verify any external identifier — a DOI, a documented flag — before adding it.
+   A confidently wrong reference entry is worse than a missing one.
 
 ### Add a custom element
 
