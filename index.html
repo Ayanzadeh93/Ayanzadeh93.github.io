@@ -422,25 +422,11 @@
                 <h2 class="section-title">About Me</h2>
                 <div class="about-content">
                     <div class="about-intro">
-                        <p>I am a Ph.D. student in Computer Science at the University of Maryland, Baltimore County,
-                            with an M.S. in Computer Science from the same institution. I have a strong focus on
-                            Computer Vision, Medical Image Analysis, and Multimodal Learning. My research interests span
-                            across developing innovative solutions for medical imaging challenges, particularly in
-                            segmentation and classification tasks.</p>
-
-                        <div class="research-statement">
-                            <h3>Research Philosophy</h3>
-                            <p>My research is driven by the belief that artificial intelligence should serve humanity by
-                                solving real-world problems. I focus on developing <strong>accessible AI
-                                    solutions</strong> that can make a meaningful impact in healthcare, environmental
-                                protection, and assistive technologies. Through interdisciplinary collaboration and
-                                cutting-edge research, I aim to bridge the gap between theoretical advances and
-                                practical applications.</p>
-                            <p class="accessibility-focus"><i class="fas fa-universal-access"></i> <strong>Special Focus
-                                    on Accessibility:</strong> I am passionate about creating inclusive technologies,
-                                particularly AI-powered navigation systems for individuals with blindness or low vision,
-                                ensuring that technological advances benefit everyone.</p>
-                        </div>
+                        <p>I am a Ph.D. student in Computer Science at UMBC (M.S. 2025). I work on computer vision,
+                            medical image analysis, and multimodal learning — with a focus on AI that is useful in
+                            clinics, the field, and assistive technology.</p>
+                        <p>That includes navigation systems for people with blindness or low vision, vision-language
+                            models for wildfire detection, and medical image segmentation under real data constraints.</p>
                     </div>
 
                     <div class="about-details">
@@ -541,130 +527,155 @@
         </section>
 
         <!-- Experience Section -->
-        <section id="experience" class="section">
+        <section id="experience" class="section" aria-label="Research experience">
             <div class="container">
                 <h2 class="section-title">Research Experience</h2>
                 <p class="section-description experience-intro">Research roles spanning accessible AI, medical imaging, computer vision, and efficient machine learning.</p>
 
-                <div class="experience-category">
-                    <h3>Research Experience</h3>
-                    <div class="experience-grid">
-                        <div class="experience-card">
-                            <div class="experience-header">
-                                <h4>CORAL LAB</h4>
+                <ol class="experience-timeline" aria-label="Research roles, newest first">
+                    <li class="experience-item experience-item--current">
+                        <time class="experience-year" aria-hidden="true" datetime="2022-12">2022</time>
+                        <article class="experience-card">
+                            <header class="experience-header">
+                                <h3>CORAL LAB</h3>
                                 <span class="experience-date">Dec 2022 - Present</span>
-                            </div>
-                            <p class="experience-role">Researcher - Advisor: Tim Oates</p>
+                            </header>
+                            <p class="experience-role">Researcher — Advisor: Tim Oates</p>
                             <p class="experience-location">Baltimore, MD</p>
-                            <ul class="experience-details">
-                                <li>Developing a Multi-Task Network for Segmenting and Classifying Medical Images on
-                                    Imbalanced Datasets</li>
-                            </ul>
-                        </div>
+                            <details class="experience-notes" open>
+                                <summary>Role notes <span class="sr-only">at CORAL LAB</span></summary>
+                                <ul class="experience-details">
+                                    <li>Developing a multi-task network for segmenting and classifying medical images on
+                                        imbalanced datasets</li>
+                                </ul>
+                            </details>
+                        </article>
+                    </li>
 
-                        <div class="experience-card">
-                            <div class="experience-header">
-                                <h4>SP4CING Lab</h4>
+                    <li class="experience-item">
+                        <time class="experience-year" aria-hidden="true" datetime="2018-09">2018</time>
+                        <article class="experience-card">
+                            <header class="experience-header">
+                                <h3>SP4CING Lab</h3>
                                 <span class="experience-date">Sept 2018 - Dec 2021</span>
-                            </div>
-                            <p class="experience-role">Research Assistant - Co-Advisors: Behcet Ugur Toreyin and Devrim
+                            </header>
+                            <p class="experience-role">Research Assistant — Co-Advisors: Behcet Ugur Toreyin and Devrim
                                 Unay</p>
                             <p class="experience-location">Istanbul, Turkey</p>
-                            <ul class="experience-details">
-                                <li>Introduced a novel auto-encoder architecture by applying the modified ResNet-18 as
-                                    an encoding module</li>
-                            </ul>
-                        </div>
+                            <details class="experience-notes">
+                                <summary>Role notes <span class="sr-only">at SP4CING Lab</span></summary>
+                                <ul class="experience-details">
+                                    <li>Introduced an auto-encoder with a modified ResNet-18 encoder</li>
+                                </ul>
+                            </details>
+                        </article>
+                    </li>
 
-                        <div class="experience-card">
-                            <div class="experience-header">
-                                <h4>Vodafone FutureLab</h4>
+                    <li class="experience-item">
+                        <time class="experience-year" aria-hidden="true" datetime="2019-05">2019</time>
+                        <article class="experience-card">
+                            <header class="experience-header">
+                                <h3>Vodafone FutureLab</h3>
                                 <span class="experience-date">May 2019 - Jan 2022</span>
-                            </div>
-                            <p class="experience-role">Research Fellowship - Supervisor: Mehmet Basaran</p>
+                            </header>
+                            <p class="experience-role">Research Fellowship — Supervisor: Mehmet Basaran</p>
                             <p class="experience-location">Istanbul, Turkey</p>
-                            <ul class="experience-details">
-                                <li>Introduced Res-VGAE, a variational graph auto-encoder with residual connections</li>
-                                <li>Proposed dynamic Word2Vec to examine social structure of Vodafone customers</li>
-                            </ul>
-                        </div>
+                            <details class="experience-notes">
+                                <summary>Role notes <span class="sr-only">at Vodafone FutureLab</span></summary>
+                                <ul class="experience-details">
+                                    <li>Introduced Res-VGAE, a variational graph auto-encoder with residual connections</li>
+                                    <li>Proposed dynamic Word2Vec to examine social structure of Vodafone customers</li>
+                                </ul>
+                            </details>
+                        </article>
+                    </li>
 
-                        <div class="experience-card">
-                            <div class="experience-header">
-                                <h4>Tubitak 1001 (Grant #119E578)</h4>
+                    <li class="experience-item">
+                        <time class="experience-year" aria-hidden="true" datetime="2020-10">2020</time>
+                        <article class="experience-card">
+                            <header class="experience-header">
+                                <h3>Tubitak 1001 (Grant #119E578)</h3>
                                 <span class="experience-date">Oct 2020 - Jan 2022</span>
-                            </div>
-                            <p class="experience-role">Research Assistant - Supervisor: Devrim Unay</p>
+                            </header>
+                            <p class="experience-role">Research Assistant — Supervisor: Devrim Unay</p>
                             <p class="experience-location">Izmir, Turkey</p>
-                            <p class="project-title"><strong>Project:</strong> Development of Image Processing and
-                                Machine Learning based Tools for Analysis of Phase-Contrast Optical Microscopy Time
-                                Series Images</p>
-                            <ul class="experience-details">
-                                <li>Perform qualitative and quantitative analysis of morphology and movement of cells
-                                    from phase-contrast optical microscopy time series</li>
-                                <li>Improved cell tracking with enhanced training efficiency by designing a novel
-                                    auto-encoder architecture to elevate training time, resiliency of results in the
-                                    prediction step, and avoiding overfitting on segmentation and tracking tasks</li>
-                            </ul>
-                        </div>
+                            <details class="experience-notes">
+                                <summary>Role notes <span class="sr-only">on Tubitak 1001</span></summary>
+                                <p class="project-title"><strong>Project:</strong> Image processing and machine learning
+                                    tools for phase-contrast optical microscopy time series</p>
+                                <ul class="experience-details">
+                                    <li>Analyzed cell morphology and movement in phase-contrast optical microscopy time
+                                        series</li>
+                                    <li>Designed an auto-encoder that sped up training, improved tracking robustness,
+                                        and reduced overfitting on segmentation and tracking</li>
+                                </ul>
+                            </details>
+                        </article>
+                    </li>
 
-                        <div class="experience-card">
-                            <div class="experience-header">
-                                <h4>Arcelik Global Co.</h4>
+                    <li class="experience-item">
+                        <time class="experience-year" aria-hidden="true" datetime="2019-12">2019</time>
+                        <article class="experience-card">
+                            <header class="experience-header">
+                                <h3>Arcelik Global Co.</h3>
                                 <span class="experience-date">Dec 2019 - Dec 2020</span>
-                            </div>
-                            <p class="experience-role">Researcher - Supervisor: Nazim Kemal Ure</p>
+                            </header>
+                            <p class="experience-role">Researcher — Supervisor: Nazim Kemal Ure</p>
                             <p class="experience-location">Istanbul, Turkey</p>
-                            <div class="project-section">
-                                <p class="project-title"><strong>Project:</strong> Optimization of Multi-Task Network on
-                                    Surveillance Cameras</p>
-                                <ul class="experience-details">
-                                    <li>Proposed an optimized multi-task model compatible with edge devices and
-                                        accelerated the original architecture by applying quantization in the cores of
-                                        the architecture</li>
-                                    <li>Accelerated the total inference time of the model from 2 fps to 18 fps</li>
-                                </ul>
-                            </div>
-                            <div class="project-section">
-                                <p class="project-title"><strong>Project:</strong> Model Compression for Efficient Video
-                                    Processing on Edge Devices</p>
-                                <ul class="experience-details">
-                                    <li>Designed and developed multi-task network enterprise to perform people
-                                        monitoring with surveillance cameras on edge devices</li>
-                                    <li>Optimized the employed networks by quantization approach, especially with Intel
-                                        OpenVINO toolkit</li>
-                                </ul>
-                            </div>
-                        </div>
+                            <details class="experience-notes">
+                                <summary>Role notes <span class="sr-only">at Arcelik Global Co.</span></summary>
+                                <div class="project-section">
+                                    <p class="project-title"><strong>Project:</strong> Optimization of Multi-Task Network on
+                                        Surveillance Cameras</p>
+                                    <ul class="experience-details">
+                                        <li>Quantized a multi-task model for edge devices, raising inference from 2 fps
+                                            to 18 fps</li>
+                                    </ul>
+                                </div>
+                                <div class="project-section">
+                                    <p class="project-title"><strong>Project:</strong> Model Compression for Efficient Video
+                                        Processing on Edge Devices</p>
+                                    <ul class="experience-details">
+                                        <li>Built a multi-task people-monitoring network for surveillance cameras on
+                                            edge devices</li>
+                                        <li>Compressed the models with quantization, using Intel OpenVINO</li>
+                                    </ul>
+                                </div>
+                            </details>
+                        </article>
+                    </li>
 
-                        <div class="experience-card">
-                            <div class="experience-header">
-                                <h4>SiMiT Lab</h4>
+                    <li class="experience-item">
+                        <time class="experience-year" aria-hidden="true" datetime="2017-04">2017</time>
+                        <article class="experience-card">
+                            <header class="experience-header">
+                                <h3>SiMiT Lab</h3>
                                 <span class="experience-date">Apr 2017 - June 2018</span>
-                            </div>
-                            <p class="experience-role">Researcher (Unpaid) - Supervisor: Hazim Kemal Ekenel</p>
+                            </header>
+                            <p class="experience-role">Researcher (Unpaid) — Supervisor: Hazim Kemal Ekenel</p>
                             <p class="experience-location">Istanbul, Turkey</p>
-                            <div class="project-section">
-                                <p class="project-title"><strong>Project:</strong> Kaggle Dog Breeds Identification with
-                                    the transfer learning approach</p>
-                                <ul class="experience-details">
-                                    <li>Leveraged state-of-the-art models on Imagenet data sets, and employed the
-                                        pre-trained model and learned weights to extract the feature from the Kaggle Dog
-                                        breed identification dataset</li>
-                                </ul>
-                            </div>
-                            <div class="project-section">
-                                <p class="project-title"><strong>Project:</strong> Google Cloud YouTube-8M Video
-                                    Understanding Challenge</p>
-                                <ul class="experience-details">
-                                    <li>Examined Deep Neural Networks with skip connections for Video Understanding
-                                        Challenge on Kaggle</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
+                            <details class="experience-notes">
+                                <summary>Role notes <span class="sr-only">at SiMiT Lab</span></summary>
+                                <div class="project-section">
+                                    <p class="project-title"><strong>Project:</strong> Kaggle Dog Breeds Identification with
+                                        transfer learning</p>
+                                    <ul class="experience-details">
+                                        <li>Fine-tuned ImageNet-pretrained models for the Kaggle dog-breed identification
+                                            dataset</li>
+                                    </ul>
+                                </div>
+                                <div class="project-section">
+                                    <p class="project-title"><strong>Project:</strong> Google Cloud YouTube-8M Video
+                                        Understanding Challenge</p>
+                                    <ul class="experience-details">
+                                        <li>Examined deep neural networks with skip connections for the Kaggle video
+                                            understanding challenge</li>
+                                    </ul>
+                                </div>
+                            </details>
+                        </article>
+                    </li>
+                </ol>
             </div>
         </section>
 
