@@ -14,7 +14,14 @@
  *
  * @type {null | {apiKey: string, authDomain: string, projectId: string, appId: string}}
  */
-export const firebaseConfig = null;
+export const firebaseConfig = {
+    apiKey: 'AIzaSyDT2DP02bxPfIAXmO95D2b2HRiAWr4ggTk',
+    authDomain: 'adhdrelief-bdbea.firebaseapp.com',
+    projectId: 'adhdrelief-bdbea',
+    storageBucket: 'adhdrelief-bdbea.firebasestorage.app',
+    messagingSenderId: '17412743359',
+    appId: '1:17412743359:web:358e6fcd0ecf6ae8a9260a'
+};
 
 /**
  * Show "sign in with your phone" (SMS one-time code) next to Google.

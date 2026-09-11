@@ -64,11 +64,16 @@ choose **Websites** and add:
 https://www.ayanzadeh.com/*
 https://ayanzadeh.com/*
 https://<project-id>.firebaseapp.com/*
-http://localhost:*/*
+http://localhost:8000/*
 ```
 
 The `firebaseapp.com` entry is required. The Google sign-in popup runs on that
-domain and uses the same key.
+domain and uses the same key. Google rejects a wildcard port such as
+`localhost:*`, so list the exact port you test on (8000 matches step 9).
+
+**Current setup:** project `adhdrelief-bdbea` (ADHDRelief). Google sign-in is on,
+the two domains are authorized, Firestore `(default)` is in `nam5` with the rules
+published, and the key is restricted to the four sites above.
 
 ## 7. Make the Google popup look right (optional)
 
