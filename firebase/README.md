@@ -1,28 +1,30 @@
 # Firebase setup for the ADHD Study Pack
 
-"Continue with Google" on `apps/adhd-study-pack.html`, plus optional phone sign-in
-with a texted code, signs in with Firebase Authentication and syncs the pack
-through Cloud Firestore. The code is already in the repo. It stays switched off
-(button disabled, no third-party code loaded) until `js/firebase-config.js` holds
-a real config.
+"Continue with Google" on `apps/adhd-study-pack.html` signs in with Firebase
+Authentication and syncs the workspace through Cloud Firestore. People who do not
+want an account can use a local profile instead, which never leaves the browser.
+If `js/firebase-config.js` is set to `null`, the page runs with local profiles
+only and loads no third-party code.
 
-For Google sign-in, the free Spark plan is enough: 50k reads, 20k writes and
-1 GiB storage per day. Phone sign-in needs the paid Blaze plan (step 8).
+The free Spark plan is enough: 50k reads, 20k writes and 1 GiB storage per day.
+
+**Current setup:** project `adhdrelief-bdbea` (ADHDRelief). Google sign-in is on,
+`ayanzadeh.com` and `www.ayanzadeh.com` are authorized, Firestore `(default)` is
+in `nam5`, and the browser key is restricted to the sites in step 6. Whenever
+`firestore.rules` changes, publish it again (step 5).
 
 ## 1. Create the project
 
 1. Go to <https://console.firebase.google.com> → **Create a project**.
-2. Name it, for example `adhd-study-pack`. Note the **project ID** it shows.
-3. **Turn Google Analytics off.** The page's CSP would block it anyway, and the
-   privacy note on the page promises no tracking.
+2. Name it and note the **project ID** it shows.
+3. **Turn Google Analytics off.** The page's CSP would block it anyway.
 
 ## 2. Register the web app and paste the config
 
 1. Project overview → **Add app** → the web icon `</>`.
 2. Nickname `ADHD Study Pack`. Leave **Firebase Hosting unchecked**, because the
    site stays on GitHub Pages.
-3. Copy the `firebaseConfig` object it shows into `js/firebase-config.js`,
-   replacing `null`.
+3. Copy the `firebaseConfig` object it shows into `js/firebase-config.js`.
 
 The config is **not secret**. Every Firebase web app ships it to the browser.
 The data is protected by the Firestore rules (step 5) and the API-key
@@ -31,7 +33,11 @@ restriction (step 6).
 ## 3. Turn on Google sign-in
 
 Authentication → **Get started** → Sign-in method → **Google** → Enable →
-choose the support email → **Save**.
+set the public-facing name ("ADHD Study Pack") and the support email → **Save**.
+
+Email and password sign-in is supported by the app but hidden on this site
+(`"emailSignIn": false` in the page's config block). To offer it, enable the
+Email/Password provider first, then set that flag to `true`.
 
 ## 4. Authorize the site's domains
 
@@ -51,8 +57,10 @@ Authentication → **Settings** → **Authorized domains** → add both:
 4. **Rules** tab → replace the contents with [`firestore.rules`](firestore.rules)
    → **Publish**.
 
-With those rules, a signed-in user can reach only `users/{their uid}/pack/*`.
-Nobody can list or read anyone else's pack.
+With those rules, a signed-in user can reach only their own
+`users/{uid}/workspace/state`. The first version of the page stored
+`users/{uid}/pack/*`; the rules keep that readable by its owner so the app can
+offer a one-time import. Nobody can list or read anyone else's data.
 
 ## 6. Restrict the API key (recommended)
 
@@ -69,59 +77,17 @@ http://localhost:8000/*
 
 The `firebaseapp.com` entry is required. The Google sign-in popup runs on that
 domain and uses the same key. Google rejects a wildcard port such as
-`localhost:*`, so list the exact port you test on (8000 matches step 9).
-
-**Current setup:** project `adhdrelief-bdbea` (ADHDRelief). Google sign-in is on,
-the two domains are authorized, Firestore `(default)` is in `nam5` with the rules
-published, and the key is restricted to the four sites above.
+`localhost:*`, so list the exact port you test on (8000 matches step 8).
 
 ## 7. Make the Google popup look right (optional)
 
-Out of the box, the consent popup says *"Continue to &lt;project-id&gt;.firebaseapp.com"*.
+The consent popup may say *"Continue to &lt;project-id&gt;.firebaseapp.com"*.
 To change that, go to Google Cloud Console → **Google Auth Platform → Branding**
-and set the app name to "ADHD Study Pack", the support email, and the home page
+and set the app name, the support email, and the home page
 `https://www.ayanzadeh.com/apps/adhd-study-pack.html`. The app only asks for the
 basic `openid email profile` scopes, so Google does not need to verify it.
 
-## 8. Phone sign-in with a texted code (optional, paid)
-
-The page can also sign people in with a one-time code sent by SMS. It stays
-hidden until you set `enablePhoneSignIn = true` in `js/firebase-config.js`.
-
-**Cost.** Phone auth is **not available on the free Spark plan**. The project
-must be on **Blaze** (pay as you go), and every text is billed per message.
-Rates run from about $0.01 (US/Canada) to much more in some countries; see
-[Identity Platform pricing](https://cloud.google.com/identity-platform/pricing).
-Google sign-in stays free on either plan.
-
-1. Upgrade the project: Firebase Console → ⚙ → **Usage and billing** → **Blaze**.
-   Right away, set a **budget alert** (Google Cloud → Billing → Budgets &
-   alerts), for example $5 a month. Bots that trigger texts to premium numbers
-   ("SMS pumping") are the main way a phone login runs up a bill.
-2. Authentication → Sign-in method → **Phone** → Enable.
-3. Authentication → Settings → **SMS region policy** → **Allow** only the
-   countries you expect, for example United States. New projects allow **no**
-   regions by default, so until you do this every send fails with
-   "not enabled … for this country".
-4. Authentication → Sign-in method → Phone → **Phone numbers for testing**: add
-   a fictional number with a fixed code, for example `+1 650-555-3434` → `123456`.
-   Test numbers never send a real text and cost nothing.
-5. Set `enablePhoneSignIn = true` and deploy.
-
-Firebase requires a reCAPTCHA check before it sends a code. The page runs it
-invisibly, and it only shows a challenge when Google is unsure about the
-visitor. Firebase provides the reCAPTCHA keys itself, so there is nothing to
-register. The page's CSP already allows `www.google.com` and
-`recaptcha.google.com` for it.
-
-**Google and phone are separate accounts.** Someone who signs in both ways gets
-two Firebase users and therefore two packs. Linking them (`linkWithPhoneNumber`
-/ `linkWithPopup`) could be added later if people ask for it.
-
-**Testing phone sign-in:** Firebase does not allow `localhost` for phone auth,
-so test it on the deployed site with the fictional test number from step 4.
-
-## 9. Test locally, then deploy
+## 8. Test locally, then deploy
 
 ES modules do not run from `file://`, so serve the repo from its root:
 
@@ -131,37 +97,45 @@ python -m http.server 8000
 
 Open <http://localhost:8000/apps/adhd-study-pack.html> and check these:
 
-- [ ] The Google button is enabled and its note describes syncing.
+- [ ] The sign-in card shows **Continue with Google** and **Use a local profile instead**.
 - [ ] Sign in, add a task, and reload. You stay signed in and the task is still there.
 - [ ] Open the page in a second browser or on a phone. The same task appears, and edits show up live in the other one.
-- [ ] Sign out. The screen returns to profiles and the header no longer says "synced".
+- [ ] Sign out. The sign-in card comes back.
 - [ ] DevTools console has no CSP violations.
 
-Then commit and push. GitHub Pages deploys `main` on its own.
+Then open a pull request. `main` only accepts changes through one, and GitHub
+Pages deploys `main` on its own. When the app changes, bump `VERSION` in
+`js/adhd-study-pack.js` and the matching `?v=` on the page's CSS and JS links,
+so browsers do not mix a cached old script with the new page.
 
 ## How it is wired
 
 | File | Role |
 |---|---|
-| `js/firebase-config.js` | The config. `null` means the feature is off. `enablePhoneSignIn` switches the phone form on. |
-| `js/lib/cloud-store.js` | Loads Firebase SDK 12.19.0 from gstatic, handles Google popup and phone-code sign-in, and provides the Firestore store. |
-| `js/adhd-study-pack.js` | Swaps `store` between the localStorage and Firestore backends. Offers a one-time copy of the local pack on first sign-in and applies live changes from other devices. |
-| `apps/adhd-study-pack.html` | The CSP allows gstatic, apis.google.com, the Firestore and Auth APIs, the `*.firebaseapp.com` auth iframe, and reCAPTCHA (`www.google.com`, `recaptcha.google.com`). |
+| `js/firebase-config.js` | The Firebase config. `null` runs the app with local profiles only. |
+| `apps/adhd-study-pack.html` | Markup, the CSP, and the JSON config block (app name, storage key, which sign-in options appear). |
+| `js/adhd-study-pack.js` | The whole app. Its storage adapter writes to localStorage for local profiles and to Firestore for Google users, and it loads Firebase SDK 12.19.0 from gstatic only when configured. |
+| `css/adhd-study-pack.css` | Styles, light and dark. |
 | `firebase/firestore.rules` | Access rules. Keep them in sync with the Console. |
 
-Data layout: `users/{uid}/pack/{tasks|parked|sessions|activeTaskId}` → `{ value, updatedAt }`.
+Data layout: `users/{uid}/workspace/state` → `{ json: <whole workspace>, updated: <ms>, app: <version> }`.
 
 ## Known limits
 
-- **Last write wins, per slice.** Live sync keeps open tabs current. If two
-  devices edit the task list within the same second, the later save wins.
-- **1 MiB per document.** The `sessions` slice grows by about 110 bytes per
-  focus block, so the limit is roughly 9,000 blocks away. When that gets close,
-  trimming old sessions or giving each session its own document fixes it.
-- **Offline cache.** The synced pack is cached in the browser's IndexedDB so it
-  works offline. Like local profiles, it stays on that browser after sign-out.
+- **Last write wins, per workspace.** Live sync keeps open tabs and devices
+  current, and a local edit waiting to save is never overwritten by an incoming
+  one. But if two devices edit within the same second, the later save wins.
+- **1 MiB per document.** The whole workspace is one document, and the rules cap
+  its JSON at a million characters. Sessions are the part that grows (about 250
+  bytes each), so the limit is years of daily use away. When it gets close,
+  moving sessions into their own collection fixes it.
+- **Offline cache.** The synced workspace is cached in the browser's IndexedDB so
+  it works offline. Like local profiles, it stays on that browser after sign-out.
   Treat shared computers accordingly.
 - **Popup, not redirect.** Redirect sign-in breaks in browsers that partition
   third-party storage when the site and the `authDomain` differ, as they do on
   GitHub Pages. If the popup is blocked, the page asks the visitor to allow
   pop-ups.
+- **Live Google Calendar** only works when the app is opened inside claude.ai,
+  because it reads through a claude.ai connector. On the site, the `.ics` import
+  and export do that job.
