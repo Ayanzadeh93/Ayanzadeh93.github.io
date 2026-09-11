@@ -13,24 +13,31 @@
  *   - The timer is adjustable. A fixed 25 minutes is someone else's attention
  *     span; starting at whatever is survivable today is the point.
  *
- * Storage goes through one adapter (see `store`). It writes localStorage
- * today; swapping in Firestore later means replacing that object and nothing
- * else — no call site knows where the data lives.
+ * Storage goes through one adapter (see `store`). A local profile uses
+ * localStorage; signing in with Google or a phone code swaps in the Firestore
+ * store from lib/cloud-store.js, keyed by the Firebase uid. No call site knows
+ * which one is active.
  */
 
-import { el, clear, debounce } from './lib/dom.js';
+import { el, clear } from './lib/dom.js';
+import { firebaseConfig, enablePhoneSignIn } from './firebase-config.js';
 
 const STORAGE_PREFIX = 'adhd-study-pack';
 const SESSION_KEY = `${STORAGE_PREFIX}:active-profile`;
+const LAST_PROFILE_KEY = `${STORAGE_PREFIX}:last-profile`;
+
+/** The pieces of a pack that get stored. Each is read and written on its own. */
+const SLICES = ['tasks', 'parked', 'sessions', 'activeTaskId'];
+/** A fresh empty pack. A factory, because the arrays get mutated in place. */
+const emptyPack = () => ({ tasks: [], parked: [], sessions: [], activeTaskId: null });
 
 /* ============================================================ storage */
 
 /**
- * The single seam between the app and where data lives.
- * Every method is async so a network-backed implementation can drop in
- * without any caller changing shape.
+ * localStorage backend: one browser, named profiles, no account.
+ * Every method is async so the Firestore backend can share its shape.
  */
-const store = {
+const localStore = {
     backend: 'local',
 
     key(profile, name) {
@@ -82,6 +89,17 @@ const store = {
     }
 };
 
+/** The backend in use. Switches to the Firestore store on Google or phone sign-in. */
+let store = localStore;
+
+/** Firebase wrapper from lib/cloud-store.js; null when not configured or not loaded. */
+let cloud = null;
+
+/** Live-sync listeners for the signed-in Google or phone account. */
+let cloudUnsubscribers = [];
+
+const usingCloud = () => cloud !== null && store === cloud.store;
+
 /* ============================================================== state */
 
 const state = {
@@ -113,14 +131,32 @@ function formatClock(totalSeconds) {
     return `${minutes}:${seconds}`;
 }
 
-/** Persist whichever slice changed. Debounced: typing a step is one keystroke at a time. */
-const persist = debounce(async () => {
-    if (!state.profile) return;
-    await store.write(state.profile, 'tasks', state.tasks);
-    await store.write(state.profile, 'parked', state.parked);
-    await store.write(state.profile, 'sessions', state.sessions);
-    await store.write(state.profile, 'activeTaskId', state.activeTaskId);
-}, 250);
+let saveTimer = null;
+
+/**
+ * Write every slice to the active store. The profile, store and values are
+ * captured synchronously, so a sign-out that lands mid-save cannot redirect
+ * the tail of it into a different backend or profile.
+ */
+function savePack() {
+    clearTimeout(saveTimer);
+    saveTimer = null;
+    const profile = state.profile;
+    const target = store;
+    if (!profile) return Promise.resolve();
+    return Promise.all(SLICES.map((name) => target.write(profile, name, state[name])));
+}
+
+/** Schedule a save. Debounced: typing a step is one keystroke at a time. */
+function persist() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(savePack, 250);
+}
+
+/** Save now if a save is waiting, e.g. before signing out or leaving the page. */
+function flushSave() {
+    return saveTimer === null ? Promise.resolve() : savePack();
+}
 
 function announce(message) {
     if (!dom.live) return;
@@ -130,34 +166,139 @@ function announce(message) {
 
 /* =============================================================== auth */
 
+/** Read every slice of a pack from `source` (defaults to the active store). */
+async function readPack(profile, source = store) {
+    const pack = emptyPack();
+    for (const name of SLICES) pack[name] = await source.read(profile, name, pack[name]);
+    return pack;
+}
+
+const isEmptyPack = (pack) => !pack.tasks.length && !pack.parked.length && !pack.sessions.length;
+
+function showApp(label) {
+    dom.auth.hidden = true;
+    dom.app.hidden = false;
+    dom.profileName.textContent = label;
+    dom.profileBar.dataset.backend = store.backend;
+    dom.profileBar.hidden = false;
+
+    renderAll();
+    dom.taskInput.focus();
+}
+
+/** Open a local, this-browser-only profile. */
 async function signIn(name) {
     const profile = name.trim();
     if (!profile) return;
 
+    store = localStore;
     state.profile = profile;
     await store.addProfile(profile);
     try {
         localStorage.setItem(SESSION_KEY, profile);
+        localStorage.setItem(LAST_PROFILE_KEY, profile);
     } catch (error) { /* session just will not survive a reload */ }
 
-    state.tasks = await store.read(profile, 'tasks', []);
-    state.parked = await store.read(profile, 'parked', []);
-    state.sessions = await store.read(profile, 'sessions', []);
-    state.activeTaskId = await store.read(profile, 'activeTaskId', null);
-
-    dom.auth.hidden = true;
-    dom.app.hidden = false;
-    dom.profileName.textContent = profile;
-    dom.profileBar.hidden = false;
-
-    renderAll();
+    Object.assign(state, await readPack(profile));
+    showApp(profile);
     announce(`Signed in as ${profile}`);
-    dom.taskInput.focus();
 }
 
-function signOut() {
+/** Open the pack stored in Firestore for a user signed in with Google or a phone code. */
+async function enterCloud(user) {
+    // The sign-in result and the auth listener can both deliver the same user.
+    if (usingCloud() && state.profile === user.uid) return;
+
+    store = cloud.store;
+    state.profile = user.uid;
+    // A Google or phone session is restored by Firebase itself, not by the local key.
+    try { localStorage.removeItem(SESSION_KEY); } catch (error) { /* fine */ }
+
+    setCloudNote('Opening your synced pack…');
+    let pack;
+    try {
+        pack = await readPack(user.uid);
+    } catch (error) {
+        console.warn('Study pack: could not load the synced pack', error);
+        if (state.profile === user.uid) {
+            store = localStore;
+            state.profile = null;
+        }
+        await cloud.signOut().catch(() => {});
+        setCloudNote('Signed in, but your synced pack could not be loaded. '
+            + 'Check the connection and try again.', true);
+        return;
+    }
+    // A local profile was opened while the cloud pack was loading; it wins.
+    if (state.profile !== user.uid) {
+        setCloudNote();
+        return;
+    }
+    Object.assign(state, pack);
+
+    await offerLocalImport();
+    watchCloud(user.uid);
+    setCloudNote(); // clear any error left from an earlier attempt
+
+    // Phone accounts have no name or email, only the number.
+    const label = user.displayName || user.email || user.phoneNumber || 'Synced account';
+    showApp(label);
+    announce(`Signed in as ${label}. Your pack syncs across devices.`);
+}
+
+/**
+ * The first time a synced account opens with an empty pack, offer to copy in
+ * the pack this browser already has, so switching to sync does not mean
+ * starting over. The local copy is left where it is.
+ */
+async function offerLocalImport() {
+    if (!isEmptyPack(state)) return;
+
+    const profiles = await localStore.listProfiles();
+    let last = null;
+    try { last = localStorage.getItem(LAST_PROFILE_KEY); } catch (error) { /* none */ }
+    const source = profiles.includes(last) ? last : profiles[profiles.length - 1];
+    if (!source) return;
+
+    const local = await readPack(source, localStore);
+    if (isEmptyPack(local)) return;
+
+    const ok = window.confirm(`Copy the pack saved in this browser as "${source}" into the `
+        + 'account you just signed in with? It will stay in this browser too.');
+    if (!ok) return;
+
+    Object.assign(state, local);
+    await savePack();
+}
+
+/** Apply changes made on another device or tab while this one is open. */
+function watchCloud(uid) {
+    const redraw = {
+        tasks: () => { renderTasks(); renderNow(); },
+        activeTaskId: () => { renderTasks(); renderNow(); },
+        parked: () => renderParked(),
+        sessions: () => renderStats()
+    };
+
+    cloudUnsubscribers = SLICES.map((name) => store.subscribe(uid, name, (value) => {
+        // A local edit waiting to save wins; it is about to overwrite this anyway.
+        if (saveTimer !== null || state.profile !== uid) return;
+        state[name] = value;
+        redraw[name]();
+    }));
+}
+
+async function signOut() {
     stopTimer({ log: false });
+    await flushSave();
+
+    const wasCloud = usingCloud();
+    cloudUnsubscribers.forEach((unsubscribe) => unsubscribe());
+    cloudUnsubscribers = [];
+
     state.profile = null;
+    Object.assign(state, emptyPack());
+    store = localStore;
     try {
         localStorage.removeItem(SESSION_KEY);
     } catch (error) { /* nothing to clear */ }
@@ -167,7 +308,15 @@ function signOut() {
     dom.auth.hidden = false;
     dom.profileInput.value = '';
     dom.profileInput.focus();
-    announce('Signed out. Your pack stays on this device.');
+    await renderProfileChoices();
+
+    if (wasCloud) {
+        await cloud.signOut().catch((error) => console.warn('Study pack: sign-out failed', error));
+        showPhoneStep('number');
+        announce('Signed out. Your synced pack stays in your account.');
+    } else {
+        announce('Signed out. Your pack stays on this device.');
+    }
 }
 
 /* ============================================================== tasks */
@@ -562,7 +711,9 @@ function cacheDom() {
         'profileList', 'signOut', 'nowBody', 'timerCard', 'timerClock', 'timerRange',
         'timerRangeLabel', 'timerStart', 'timerPause', 'timerReset', 'taskForm', 'taskInput',
         'taskList', 'doneWrap', 'doneList', 'doneCount', 'parkForm', 'parkInput', 'parkedList',
-        'statBlocks', 'statMinutes', 'statStreak'
+        'statBlocks', 'statMinutes', 'statStreak', 'googleSignIn', 'cloudNote',
+        'phoneForm', 'phoneInput', 'phoneSend', 'otpForm', 'otpInput', 'otpVerify', 'otpBack',
+        'otpTarget', 'recaptchaBox'
     ];
     ids.forEach((id) => { dom[id] = document.getElementById(id); });
 }
@@ -599,8 +750,147 @@ function bind() {
         dom.parkInput.focus();
     });
 
-    window.addEventListener('beforeunload', () => {
+    // Saves are debounced, so an edit (or the session logged by stopping a
+    // running timer) in the last 250ms would otherwise be lost on close.
+    window.addEventListener('pagehide', () => {
         if (state.timer.running) stopTimer();
+        flushSave();
+    });
+}
+
+function defaultCloudNote() {
+    return enablePhoneSignIn
+        ? 'Signing in with Google or a texted code keeps your pack in this site\'s Firebase '
+            + 'database, readable only by that account, so it follows you to any device. '
+            + 'Google and phone sign-ins are separate accounts with separate packs. '
+            + 'Local profiles stay in this browser only.'
+        : 'Signing in with Google keeps your pack in this site\'s Firebase database, '
+            + 'readable only by your account, so it follows you to any device. '
+            + 'Local profiles stay in this browser only.';
+}
+
+function setCloudNote(message = defaultCloudNote(), isError = false) {
+    dom.cloudNote.textContent = message;
+    dom.cloudNote.classList.toggle('is-error', isError);
+}
+
+/** Pending phone sign-in: set once a code is texted, used to check it. */
+let phoneConfirmation = null;
+
+/** Switch phone sign-in between asking for the number and asking for the code. */
+function showPhoneStep(step) {
+    if (!enablePhoneSignIn || !cloud) return;
+    dom.phoneForm.hidden = step !== 'number';
+    dom.otpForm.hidden = step !== 'code';
+    if (step === 'number') {
+        phoneConfirmation = null;
+        dom.otpInput.value = '';
+    }
+}
+
+function bindPhoneSignIn(cloudModule) {
+    const fail = (what, error) => {
+        console.warn(`Study pack: ${what}`, error);
+        setCloudNote(cloudModule.describeAuthError(error), true);
+    };
+
+    showPhoneStep('number');
+
+    dom.phoneForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const number = cloudModule.normalizePhone(dom.phoneInput.value);
+        if (!number) {
+            setCloudNote(cloudModule.describeAuthError({ code: 'auth/invalid-phone-number' }), true);
+            dom.phoneInput.focus();
+            return;
+        }
+
+        dom.phoneSend.disabled = true;
+        setCloudNote('Sending a code…');
+        try {
+            phoneConfirmation = await cloud.sendPhoneCode(number, dom.recaptchaBox);
+            dom.otpTarget.textContent = number;
+            showPhoneStep('code');
+            setCloudNote('Code sent. A text can take a minute to arrive.');
+            dom.otpInput.focus();
+        } catch (error) {
+            fail('could not send the phone code', error);
+        } finally {
+            dom.phoneSend.disabled = false;
+        }
+    });
+
+    dom.otpForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const code = dom.otpInput.value.replace(/\D/g, '');
+        if (code.length !== 6 || !phoneConfirmation) {
+            setCloudNote(cloudModule.describeAuthError({ code: 'auth/invalid-verification-code' }), true);
+            return;
+        }
+
+        dom.otpVerify.disabled = true;
+        try {
+            const user = await phoneConfirmation.confirm(code);
+            showPhoneStep('number');
+            dom.phoneInput.value = '';
+            await enterCloud(user);
+        } catch (error) {
+            fail('phone code was not accepted', error);
+            dom.otpInput.select();
+        } finally {
+            dom.otpVerify.disabled = false;
+        }
+    });
+
+    dom.otpBack.addEventListener('click', () => {
+        showPhoneStep('number');
+        setCloudNote();
+        dom.phoneInput.focus();
+    });
+}
+
+/**
+ * Enable "Continue with Google" (and phone sign-in, if switched on) when
+ * js/firebase-config.js is filled in. Without a config nothing third-party
+ * loads and the button stays disabled.
+ */
+async function initCloud() {
+    if (!firebaseConfig) return;
+
+    let cloudModule;
+    try {
+        cloudModule = await import('./lib/cloud-store.js');
+        cloud = await cloudModule.connectCloud(firebaseConfig);
+    } catch (error) {
+        console.warn('Study pack: could not load account sign-in', error);
+        setCloudNote('Account sign-in could not load right now. Local profiles still work.', true);
+        return;
+    }
+
+    dom.googleSignIn.disabled = false;
+    setCloudNote();
+    if (enablePhoneSignIn) bindPhoneSignIn(cloudModule);
+
+    dom.googleSignIn.addEventListener('click', async () => {
+        dom.googleSignIn.disabled = true;
+        try {
+            // First await in the handler, so pop-up blockers see a user click.
+            const user = await cloud.signIn();
+            await enterCloud(user);
+        } catch (error) {
+            if (!cloudModule.isUserCancel(error)) {
+                console.warn('Study pack: Google sign-in failed', error);
+                setCloudNote(cloudModule.describeAuthError(error), true);
+            }
+        } finally {
+            dom.googleSignIn.disabled = false;
+        }
+    });
+
+    // Restores a Google or phone session from an earlier visit. Ignored when a local
+    // profile is already open, so the two never fight over the screen.
+    cloud.onUserChange((user) => {
+        if (user && !state.profile) enterCloud(user);
     });
 }
 
@@ -632,6 +922,9 @@ async function init() {
 
     if (saved) await signIn(saved);
     else dom.profileInput.focus();
+
+    // After the local restore, so a saved local session keeps priority.
+    await initCloud();
 }
 
 init();

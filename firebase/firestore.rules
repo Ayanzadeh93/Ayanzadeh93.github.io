@@ -1,0 +1,33 @@
+rules_version = '2';
+
+// ADHD Study Pack — paste into Firebase Console → Firestore Database → Rules.
+//
+// Layout written by js/lib/cloud-store.js:
+//   users/{uid}/pack/{tasks | parked | sessions | activeTaskId}
+//     { value: <slice>, updatedAt: <server timestamp> }
+//
+// A signed-in user can read and write only their own four documents.
+// Everything else — other users, other paths, unauthenticated requests — is denied.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    function isValidSlice() {
+      return request.resource.data.keys().hasOnly(['value', 'updatedAt'])
+          && request.resource.data.updatedAt == request.time;
+    }
+
+    match /users/{uid}/pack/{slice} {
+      allow read:   if isOwner(uid);
+      allow create, update: if isOwner(uid)
+                            && slice in ['tasks', 'parked', 'sessions', 'activeTaskId']
+                            && isValidSlice();
+      // Lets a user wipe their own synced pack (e.g. from a future "delete my data").
+      allow delete: if isOwner(uid);
+    }
+  }
+}
