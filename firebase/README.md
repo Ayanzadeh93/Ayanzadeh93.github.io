@@ -77,7 +77,7 @@ http://localhost:8000/*
 
 The `firebaseapp.com` entry is required. The Google sign-in popup runs on that
 domain and uses the same key. Google rejects a wildcard port such as
-`localhost:*`, so list the exact port you test on (8000 matches step 8).
+`localhost:*`, so list the exact port you test on (8000 matches step 9).
 
 ## 7. Make the Google popup look right (optional)
 
@@ -87,7 +87,39 @@ and set the app name, the support email, and the home page
 `https://www.ayanzadeh.com/apps/adhd-study-pack.html`. The app only asks for the
 basic `openid email profile` scopes, so Google does not need to verify it.
 
-## 8. Test locally, then deploy
+## 8. Google Calendar sync
+
+The planner's **Google Calendar** card syncs both ways, straight from the browser.
+Google Identity Services shows a consent popup and returns an access token that
+lasts about an hour. The page keeps it in memory and in the tab's
+sessionStorage, never on a server.
+
+- **In:** events from the ticked calendars show read-only in the planner, and
+  the auto-scheduler treats them as busy.
+- **Out:** blocks made in the planner go to the chosen Google calendar. Edits
+  and deletions follow them. `S.gcal.links` maps each block to its Google event,
+  and each pushed event carries `extendedProperties.private.studyPackId`, so it
+  is never shown twice. Blocks imported from `.ics` are never pushed back.
+
+Setup in Google Cloud Console (project `adhdrelief-bdbea`):
+
+1. APIs & Services → Library → **Google Calendar API** → **Enable**.
+2. APIs & Services → Credentials → the *Web client (auto created by Google
+   Service)* OAuth client → **Authorized JavaScript origins** → add
+   `https://ayanzadeh.com`, `https://www.ayanzadeh.com`, `http://localhost:8000`.
+3. Put that client's ID in the page's config block as `"googleClientId"`.
+
+Scopes requested: `calendar.events` (see and edit events) and
+`calendar.calendarlist.readonly` (list calendars to pick from). Both are
+*sensitive*, so until the app passes Google's OAuth verification, Google shows an
+"unverified app" screen (**Advanced → continue**), and at most 100 people can
+ever grant access. Verification needs a privacy policy page and a short review;
+it is only worth doing if other people start using the sync.
+
+The page's CSP allows `accounts.google.com` (script, style, frame, connect) for
+this; the Calendar API itself is on `www.googleapis.com`.
+
+## 9. Test locally, then deploy
 
 ES modules do not run from `file://`, so serve the repo from its root:
 
@@ -136,6 +168,7 @@ Data layout: `users/{uid}/workspace/state` → `{ json: <whole workspace>, updat
   third-party storage when the site and the `authDomain` differ, as they do on
   GitHub Pages. If the popup is blocked, the page asks the visitor to allow
   pop-ups.
-- **Live Google Calendar** only works when the app is opened inside claude.ai,
-  because it reads through a claude.ai connector. On the site, the `.ics` import
-  and export do that job.
+- **Google Calendar access lasts about an hour.** After that, changes wait
+  until you press **Sync now**, which reopens Google's popup (usually one click)
+  and sends everything that changed in the meantime. Pushed blocks are owned by
+  the planner: an edit made to one in Google is replaced on the next sync.

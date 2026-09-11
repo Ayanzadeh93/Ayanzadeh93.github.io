@@ -34,7 +34,7 @@ const DOW = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
    defaults, then a <script type="application/json" id="focus-dial-config">
    block, then window.FOCUS_DIAL_CONFIG.
    ===================================================================== */
-const VERSION = '3.0.0';
+const VERSION = '3.1.0';
 const DEFAULT_CONFIG = {
   storageKey: 'focusdial.v3',
   storage:    'local',            // 'local' | 'session' | 'memory' | 'rest'
@@ -51,6 +51,7 @@ const DEFAULT_CONFIG = {
   firebase:   null,               // the config object from the Firebase console
   emailSignIn:true,               // firebase mode: offer email + password (needs that provider enabled)
   embedDocs:  true,               // show the "embedding this on your own site" card in Setup
+  googleClientId: null,           // OAuth web client id: turns on two-way Google Calendar sync
   seedAdmin:  true                // first run on a device with no accounts creates admin / admin
 };
 function readConfig() {
@@ -93,7 +94,7 @@ const DEFAULTS = () => ({
   lists: Object.assign(clone(DEFAULT_LISTS), CFG.lists || {}),
   tasks: [], events: [], notes: [], sessions: [], checkins: [], subjects: [], links: [],
   sound: { master:60, layers:{}, beat:10, carrier:180 },
-  gcal: { on:false, cals:[], hideDeclined:true },
+  gcal: { on:false, cals:[], hideDeclined:true, push:true, target:'primary', links:{} },
   timer: { phase:'focus', cycle:1, taskId:null, intent:'', activation:null },
   meta: { sample:false, created:Date.now(), notice:null }
 });
@@ -171,6 +172,7 @@ function save() {
   clearTimeout(saveT);
   if (STORE.blocked) return;           // the workspace never loaded: saving would overwrite it
   if (STORE.status !== 'loading') setStoreStatus('pending');
+  gcalQueuePush();                     // planner changes follow to Google Calendar when connected
   saveT = setTimeout(() => {
     saveT = null;
     const snap = clone(S);
@@ -1427,7 +1429,7 @@ function parseICS(text) {
     const rrule = get(/RRULE:([^\n\r]+)/);
     const kind = /class|lecture|seminar|meeting|lab|office hour/i.test(title) ? 'class' : 'other';
     const base = { title, kind, dur: +end - +start };
-    const push = st => out.push({ id:uid(), title:base.title, kind:base.kind, subjectId:null,
+    const push = st => out.push({ id:uid(), title:base.title, kind:base.kind, subjectId:null, origin:'ics',   // never sent back to Google
       start:new Date(st).toISOString(), end:new Date(+st + base.dur).toISOString() });
     push(start);
     if (rrule && /FREQ=WEEKLY/i.test(rrule)) {          // expand 8 weeks out — enough for a term view
@@ -1955,29 +1957,100 @@ $('#exportCsv').onclick = () => {
 
 
 /* =====================================================================
-   GOOGLE CALENDAR — live, through the viewer's own claude.ai connector.
-   The page never sees a token: claude.use("mcp") calls the connector
-   with the viewer's credentials. Read-only; events are held in memory
-   only and never written to localStorage.
+   GOOGLE CALENDAR — two-way sync straight from the browser.
+
+   Google Identity Services asks the viewer for calendar access in a popup
+   and hands back a short-lived access token (about an hour). The page then
+   talks to the Calendar API directly; no server, no connector, and the token
+   is only ever held in memory and in this tab's sessionStorage.
+
+   In:  events from the calendars ticked in the card show up read-only in the
+        planner and count as busy time for the auto-scheduler.
+   Out: blocks made here (by hand or by the auto-scheduler) are created in
+        the chosen Google calendar, updated when edited here, and deleted
+        when deleted here. S.gcal.links maps each local block id to its
+        Google event; every pushed event also carries the block id in
+        extendedProperties.private.studyPackId, so it is never shown twice
+        and another device can adopt it. Blocks imported from an .ics file
+        came from a calendar already and are never pushed back.
+
+   Scopes: calendar.events (see and edit events) and
+   calendar.calendarlist.readonly (list the calendars to pick from).
    ===================================================================== */
-const GCAL = { mcp:null, state:'boot', cals:[], events:{}, subs:[], error:null, lastAt:null, busy:false };
-const GSERVER = 'Google Calendar';
-const GCAL_ERRORS = {
-  needs_reauth:        ['Google Calendar needs reconnecting', 'Its access token lapsed. Reconnect it in claude.ai → Settings → Connectors, then hit Sync now.'],
-  server_not_connected:['No Google Calendar connector', 'Add Google Calendar in claude.ai → Settings → Connectors and reload this page.'],
-  selection_required:  ['More than one Google Calendar connector', 'claude.ai will ask which one to use — pick it, then hit Sync now.'],
-  not_in_manifest:     ['This view is not allowed to read your calendar', 'Either the connector was switched off for this page, or the permission prompt was declined. Turn it back on from the artifact menu.'],
-  blocked_by_policy:   ['Blocked by your organisation', 'A UMBC workspace policy blocks this tool for your account. The .ics bridge below still works.'],
-  approval_required:   ['Needs a per-call approval', 'Your policy wants each call approved, which artifacts cannot request yet. Use the .ics bridge below.'],
-  server_not_found:    ['That connector no longer exists', 'Re-add Google Calendar in claude.ai → Settings → Connectors.'],
-  server_unavailable:  ['Google did not answer just now', 'Showing the last copy that arrived. It retries on its own every few minutes.'],
-  tool_error:          ['Google refused that request', ''],
-  cancelled:           ['The request was cancelled', 'Hit Sync now to try again.']
-};
-const RETRACTING = ['needs_reauth','server_not_connected','not_in_manifest','blocked_by_policy','approval_required','server_not_found','selection_required'];
-async function useCap(name) {
-  try { return (window.claude && typeof window.claude.use === 'function') ? await window.claude.use(name) : null; }
-  catch (e) { return null; }
+const GCAL_SCOPES = ['https://www.googleapis.com/auth/calendar.events',
+                     'https://www.googleapis.com/auth/calendar.calendarlist.readonly'];
+const GCAL_API = 'https://www.googleapis.com/calendar/v3';
+const GCAL_TOKEN_KEY = CFG.storageKey + '.gcal-token';
+const GCAL_COLORS = { study:'6', break:'2', class:'9' };          // Google's tangerine, sage, blueberry
+const GCAL = { state:'idle', cals:[], events:{}, error:null, lastAt:null, lastPushAt:null, busy:false,
+               token:null, exp:0, canList:false, pushing:false, pushT:null, planSig:null };
+const enc = encodeURIComponent;
+const gcalReady = () => !!CFG.googleClientId;
+const gcalTokenValid = () => !!GCAL.token && Date.now() < GCAL.exp - 60000;
+
+function gcalLoadToken() {
+  try {
+    const t = JSON.parse(sessionStorage.getItem(GCAL_TOKEN_KEY) || 'null');
+    if (t && t.exp > Date.now() + 60000) { GCAL.token = t.token; GCAL.exp = t.exp; GCAL.canList = !!t.canList; }
+  } catch (e) {}
+}
+function gcalStoreToken() {
+  try {
+    if (GCAL.token) sessionStorage.setItem(GCAL_TOKEN_KEY, JSON.stringify({ token:GCAL.token, exp:GCAL.exp, canList:GCAL.canList }));
+    else sessionStorage.removeItem(GCAL_TOKEN_KEY);
+  } catch (e) {}
+}
+
+/* The Google Identity Services script, loaded ahead of time so the click
+   that opens the consent popup is not spent waiting on the network. */
+let gisLoading = null;
+function loadGis() {
+  if (window.google && google.accounts && google.accounts.oauth2) return Promise.resolve();
+  return gisLoading || (gisLoading = new Promise((ok, no) => {
+    const s = document.createElement('script');
+    s.src = 'https://accounts.google.com/gsi/client'; s.async = true;
+    s.onload = ok; s.onerror = () => { gisLoading = null; no(new Error('Google sign-in did not load')); };
+    document.head.appendChild(s);
+  }));
+}
+const gErr = (message, extra) => Object.assign(new Error(message), extra || {});
+
+/* Opens Google's consent popup. Call it straight from a click. */
+function gcalAuthorize() {
+  return new Promise((ok, no) => {
+    if (!(window.google && google.accounts && google.accounts.oauth2)) { no(gErr('Google sign-in is still loading — press the button again.', { code:'gis_loading' })); return; }
+    const client = google.accounts.oauth2.initTokenClient({
+      client_id: CFG.googleClientId,
+      scope: GCAL_SCOPES.join(' '),
+      include_granted_scopes: true,
+      prompt: '',
+      login_hint: (AUTH.user && AUTH.user.email) || undefined,
+      callback: r => {
+        if (r.error) { no(gErr(r.error_description || r.error, { code:r.error })); return; }
+        if (!google.accounts.oauth2.hasGrantedAllScopes(r, GCAL_SCOPES[0])) {
+          no(gErr('Calendar access was not granted. Try again and tick the calendar box on Google’s screen.', { code:'scope_denied' })); return;
+        }
+        GCAL.token = r.access_token;
+        GCAL.exp = Date.now() + (+r.expires_in || 3600) * 1000;
+        GCAL.canList = google.accounts.oauth2.hasGrantedAllScopes(r, GCAL_SCOPES[1]);
+        gcalStoreToken(); ok();
+      },
+      error_callback: e => no(gErr(e && e.message || 'The Google window closed', { code:e && e.type }))
+    });
+    client.requestAccessToken();
+  });
+}
+async function gFetch(path, opts) {
+  if (!gcalTokenValid()) throw gErr('Google access has expired.', { code:'expired' });
+  const o = opts || {};
+  const r = await fetch(GCAL_API + path, Object.assign({}, o, {
+    headers: Object.assign({ Authorization:'Bearer ' + GCAL.token }, o.body ? { 'Content-Type':'application/json' } : {})
+  }));
+  if (r.status === 401) { GCAL.token = null; gcalStoreToken(); throw gErr('Google access has expired.', { code:'expired' }); }
+  if (r.status === 204) return null;
+  const data = await r.json().catch(() => null);
+  if (!r.ok) throw gErr((data && data.error && data.error.message) || ('Google answered ' + r.status), { status:r.status });
+  return data;
 }
 function gcalEventsFor(k) {
   if (!S.gcal.on) return [];
@@ -2005,78 +2078,184 @@ function normaliseGoogle(payload, calId) {
       id: 'g:' + calId + ':' + e.id, source:'google', calId,
       title: e.summary || '(no title)', allDay,
       start: start.toISOString(), end: end.toISOString(), dayKey: dayKey(start),
-      free: e.availability === 'AVAILABILITY_FREE' || e.transparency === 'transparent' || allDay,
-      kind: e.eventType === 'FOCUS_TIME' ? 'gfocus' : 'gcal',
+      free: e.transparency === 'transparent' || allDay,
+      kind: e.eventType === 'focusTime' ? 'gfocus' : 'gcal',
       link: e.htmlLink || '', location: e.location || ''
     });
   });
   return out;
 }
-function gcalUnsub() { GCAL.subs.forEach(u => { try { u(); } catch (e) {} }); GCAL.subs = []; }
-function gcalSubscribe() {
-  gcalUnsub();
-  if (!GCAL.mcp || !S.gcal.on || !S.gcal.cals.length) return;
-  const from = new Date(weekAnchor), to = new Date(+weekAnchor + 7 * DAY);
-  S.gcal.cals.forEach(id => {
-    const input = { calendarId:id, startTime:from.toISOString(), endTime:to.toISOString(), orderBy:'startTime', pageSize:100 };
-    const un = GCAL.mcp.watchTool(GSERVER, 'list_events', input, ev => {
-      if (ev.type === 'data') {
-        GCAL.error = null; GCAL.state = 'live';
-        GCAL.events[id] = normaliseGoogle(ev.result && ev.result.payload, id);
-        GCAL.lastAt = (ev.result && ev.result.cache) ? ev.result.cache.storedAt : Date.now();
-        if (view === 'plan') renderCalendar();
-        renderFocusSide(); renderGcal();
-      } else {
-        gcalFail(ev.error, id);
-      }
-    }, { refetchInterval: 300000 });
-    GCAL.subs.push(un);
-  });
+const pushedId = e => e && e.extendedProperties && e.extendedProperties.private && e.extendedProperties.private.studyPackId;
+
+async function gcalLoadCalendars() {
+  if (GCAL.canList) {
+    const d = await gFetch('/users/me/calendarList?minAccessRole=reader&maxResults=100');
+    GCAL.cals = (d.items || []).map(c => ({ id:c.id, summary:c.summaryOverride || c.summary || c.id, primary:!!c.primary,
+      color:c.backgroundColor || '', writable:c.accessRole === 'owner' || c.accessRole === 'writer' }));
+  } else {
+    GCAL.cals = [{ id:'primary', summary:'Your main calendar', primary:true, color:'', writable:true }];
+  }
+  const main = GCAL.cals.find(c => c.primary) || GCAL.cals[0];
+  const known = id => GCAL.cals.some(c => c.id === id);
+  S.gcal.cals = S.gcal.cals.filter(known);
+  if (!S.gcal.cals.length && main) S.gcal.cals = [main.id];
+  if (!GCAL.cals.some(c => c.id === S.gcal.target && c.writable) && main) S.gcal.target = main.id;
 }
-function gcalFail(err, calId) {
-  GCAL.error = err || { code:'upstream_error', message:'Unknown failure' };
-  if (RETRACTING.includes(GCAL.error.code)) { GCAL.events = {}; GCAL.state = 'blocked'; }
-  else GCAL.state = 'stale';
+/* Pull the visible week from every ticked calendar. Events this planner
+   pushed are skipped (the local block already shows), and adopted into
+   S.gcal.links if this device did not know about them. */
+async function gcalFetchWeek() {
+  const from = new Date(weekAnchor), to = new Date(+weekAnchor + 7 * DAY);
+  const q = `timeMin=${enc(from.toISOString())}&timeMax=${enc(to.toISOString())}&singleEvents=true&orderBy=startTime&maxResults=250`;
+  const next = {};
+  let adopted = false;
+  for (const id of S.gcal.cals) {
+    const d = await gFetch(`/calendars/${enc(id)}/events?${q}`);
+    const items = (d && d.items) || [];
+    items.forEach(e => {
+      const lid = pushedId(e);
+      if (lid && !S.gcal.links[lid] && S.events.some(x => x.id === lid)) { S.gcal.links[lid] = { id:e.id, cal:id, sig:null }; adopted = true; }
+    });
+    next[id] = normaliseGoogle({ events: items.filter(e => !pushedId(e)) }, id);
+  }
+  GCAL.events = next; GCAL.lastAt = Date.now(); GCAL.state = 'live'; GCAL.error = null;
+  if (adopted) save();
+}
+
+const gcalSig = ev => [ev.title, ev.start, ev.end, ev.kind, ev.subjectId || ''].join('|');
+const gcalPushable = ev => ev.origin !== 'ics' && new Date(ev.end) > new Date(Date.now() - 7 * DAY);
+function gcalBody(ev) {
+  const sub = S.subjects.find(s => s.id === ev.subjectId);
+  return {
+    summary: ev.title,
+    description: `Planned in ${CFG.appName}` + (sub ? ` · ${sub.name}` : '') + ` · ${EV_KINDS[ev.kind] || 'Block'}. Edit it in the planner — changes made here are replaced on the next sync.`,
+    start: { dateTime: ev.start }, end: { dateTime: ev.end },
+    colorId: GCAL_COLORS[ev.kind],
+    extendedProperties: { private: { studyPackId: ev.id } }
+  };
+}
+/* Make Google match the planner: create, update and delete linked events. */
+async function gcalPush() {
+  if (GCAL.pushing || !S.gcal.on || !S.gcal.push || S.meta.sample || !gcalTokenValid()) return null;
+  GCAL.pushing = true; renderGcal();
+  const n = { made:0, changed:0, removed:0 };
+  const links = S.gcal.links;
+  const planSig = gcalPlanSig();
+  try {
+    const live = new Set(S.events.map(e => e.id));
+    for (const [lid, l] of Object.entries(links)) {
+      if (live.has(lid)) continue;
+      try { await gFetch(`/calendars/${enc(l.cal)}/events/${enc(l.id)}`, { method:'DELETE' }); }
+      catch (e) { if (![404, 410].includes(e.status)) throw e; }
+      delete links[lid]; n.removed++;
+    }
+    for (const ev of S.events) {
+      if (!gcalPushable(ev)) continue;
+      const sig = gcalSig(ev), l = links[ev.id];
+      if (l && l.sig === sig) continue;
+      if (l) {
+        try {
+          await gFetch(`/calendars/${enc(l.cal)}/events/${enc(l.id)}`, { method:'PATCH', body:JSON.stringify(gcalBody(ev)) });
+          l.sig = sig; n.changed++; continue;
+        } catch (e) { if (![404, 410].includes(e.status)) throw e; delete links[ev.id]; }   // gone in Google: make it again
+      }
+      const cal = S.gcal.target || 'primary';
+      const g = await gFetch(`/calendars/${enc(cal)}/events`, { method:'POST', body:JSON.stringify(gcalBody(ev)) });
+      links[ev.id] = { id:g.id, cal, sig }; n.made++;
+    }
+    GCAL.planSig = planSig; GCAL.lastPushAt = Date.now(); GCAL.error = null;
+  } catch (e) { gcalFail(e); }
+  finally {
+    GCAL.pushing = false;
+    if (n.made || n.changed || n.removed) save();
+    renderGcal();
+  }
+  return n;
+}
+function gcalPlanSig() { return JSON.stringify(S.events.map(e => [e.id, gcalSig(e)])); }
+/* Called from save(): send planner changes a moment after they settle. */
+function gcalQueuePush() {
+  if (!S.gcal || !S.gcal.on || !S.gcal.push || !gcalTokenValid()) return;
+  clearTimeout(GCAL.pushT);
+  GCAL.pushT = setTimeout(() => { if (gcalPlanSig() !== GCAL.planSig) gcalPush(); }, 1500);
+}
+function gcalFail(err) {
+  GCAL.error = err || gErr('Unknown failure');
+  GCAL.state = err && err.code === 'expired' ? 'expired' : 'stale';
   if (view === 'plan') renderCalendar();
   renderFocusSide(); renderGcal();
 }
-async function gcalLoadCalendars(retried) {
-  if (!GCAL.mcp) return false;
+async function gcalRefresh() {
+  if (!S.gcal.on || !gcalTokenValid()) { renderGcal(); return; }
   GCAL.busy = true; renderGcal();
   try {
-    const res = await GCAL.mcp.callTool(GSERVER, 'list_calendars', { pageSize: 50 });
-    const payload = res && res.payload;
-    GCAL.cals = (payload && payload.calendars) || [];
-    GCAL.error = null; GCAL.busy = false;
-    if (!S.gcal.cals.length && GCAL.cals.length) S.gcal.cals = [GCAL.cals[0].id];
-    save(); return true;
-  } catch (err) {
-    GCAL.busy = false;
-    if (err && err.retryable && !retried) {
-      await new Promise(r => setTimeout(r, Math.min(err.retryAfterMs || 1200, 4000) + Math.random() * 400));
-      return gcalLoadCalendars(true);
-    }
-    gcalFail(err); return false;
-  }
+    if (!GCAL.cals.length) await gcalLoadCalendars();
+    await gcalFetchWeek();
+  } catch (e) { gcalFail(e); }
+  GCAL.busy = false;
+  if (view === 'plan') renderCalendar();
+  renderFocusSide(); renderGcal();
+}
+/* Week navigation and demo loading call this; it refreshes when it can. */
+function gcalSubscribe() { if (S.gcal.on && gcalTokenValid()) gcalRefresh(); }
+
+function gcalAuthFailed(e) {
+  const code = e && e.code;
+  if (code === 'popup_closed' || code === 'access_denied') return;        // the viewer changed their mind
+  toast(code === 'popup_failed_to_open'
+    ? 'Your browser blocked the Google window. Allow pop-ups for this site, then press the button again.'
+    : (e && e.message) || 'Google did not grant calendar access.', 5000);
 }
 async function gcalConnect() {
-  if (!GCAL.mcp) return;
-  const ok = await gcalLoadCalendars();
-  if (!ok) return;
-  S.gcal.on = true; save();
-  gcalSubscribe(); renderGcal();
-  toast('Google Calendar linked');
+  try { await gcalAuthorize(); } catch (e) { gcalAuthFailed(e); return; }
+  GCAL.busy = true; renderGcal();
+  try {
+    await gcalLoadCalendars();
+    S.gcal.on = true; S.gcal.push = S.gcal.push !== false;
+    save();
+    await gcalFetchWeek();
+    GCAL.busy = false;
+    const n = await gcalPush();
+    toast('Google Calendar connected' + (n && n.made ? ` — ${plural(n.made, 'block')} sent to Google` : ''));
+  } catch (e) { gcalFail(e); }
+  GCAL.busy = false;
+  renderCalendar(); renderFocusSide(); renderGcal();
+}
+async function gcalSyncNow() {
+  if (!S.gcal.on) return;
+  if (!gcalTokenValid()) { try { await gcalAuthorize(); } catch (e) { gcalAuthFailed(e); return; } }
+  await gcalRefresh();
+  const n = await gcalPush();
+  if (GCAL.state === 'live') toast(n && (n.made || n.changed || n.removed)
+    ? `Synced — ${[n.made && n.made + ' sent', n.changed && n.changed + ' updated', n.removed && n.removed + ' removed'].filter(Boolean).join(', ')}`
+    : 'Up to date with Google');
 }
 function gcalDisconnect() {
-  S.gcal.on = false; GCAL.events = {}; GCAL.error = null; GCAL.state = 'idle'; save();
-  gcalUnsub(); renderGcal(); renderCalendar(); renderFocusSide();
-  toast('Unlinked — your local blocks are untouched');
+  try { if (GCAL.token && window.google && google.accounts) google.accounts.oauth2.revoke(GCAL.token, () => {}); } catch (e) {}
+  GCAL.token = null; gcalStoreToken();
+  S.gcal.on = false; GCAL.events = {}; GCAL.cals = []; GCAL.error = null; GCAL.state = 'idle'; save();
+  renderGcal(); renderCalendar(); renderFocusSide();
+  toast('Disconnected — blocks already in Google stay there, and your planner is untouched');
 }
-function gcalSyncNow() {
-  if (!GCAL.mcp || !S.gcal.on) return;
-  GCAL.error = null;
-  try { GCAL.mcp.invalidate(GSERVER, 'list_events'); } catch (e) {}
-  gcalSubscribe(); toast('Refreshing from Google');
+/* Delete every event this planner put in Google, and stop sending new ones. */
+async function gcalRemoveAll() {
+  if (!gcalTokenValid()) { try { await gcalAuthorize(); } catch (e) { gcalAuthFailed(e); return; } }
+  let n = 0;
+  try {
+    for (const [lid, l] of Object.entries(S.gcal.links)) {
+      try { await gFetch(`/calendars/${enc(l.cal)}/events/${enc(l.id)}`, { method:'DELETE' }); }
+      catch (e) { if (![404, 410].includes(e.status)) throw e; }
+      delete S.gcal.links[lid]; n++;
+    }
+    S.gcal.push = false; save();
+    toast(`Removed ${plural(n, 'block')} from Google. Sending is off until you turn it back on.`);
+  } catch (e) { save(); gcalFail(e); }
+  renderGcal();
+}
+function gcalReset() {
+  clearTimeout(GCAL.pushT);
+  GCAL.token = null; GCAL.exp = 0; gcalStoreToken();
+  Object.assign(GCAL, { state:'idle', cals:[], events:{}, error:null, lastAt:null, lastPushAt:null, busy:false, planSig:null });
 }
 function agoLabel(ts) {
   if (!ts) return 'never';
@@ -2085,51 +2264,74 @@ function agoLabel(ts) {
 }
 function renderGcal() {
   const box = $('#gcalCard'); if (!box) return;
+  const valid = gcalTokenValid();
   const head = '<div class="panel-head"><h3>Google Calendar</h3>' +
-    (S.gcal.on ? '<button class="btn sm ghost" id="gSync">Sync now</button>' : '<span class="eyebrow">live</span>') + '</div>';
+    (S.gcal.on ? `<button class="btn sm ghost" id="gSync" ${GCAL.busy || GCAL.pushing ? 'disabled' : ''}>${GCAL.busy || GCAL.pushing ? 'Syncing…' : 'Sync now'}</button>`
+               : '<span class="eyebrow">two-way</span>') + '</div>';
   let body = '';
-  const err = GCAL.error ? (GCAL_ERRORS[GCAL.error.code] || ['Google Calendar could not be reached', GCAL.error.message || '']) : null;
-  if (GCAL.state === 'boot') {
-    body = '<div class="gstat"><span class="dot"></span>Looking for your connector…</div>';
-  } else if (GCAL.state === 'unavailable') {
-    body = `<p style="font-size:12px;color:var(--muted);margin:0 0 8px">Live sync reads your calendar through a claude.ai connector, so it only works when this app is opened inside claude.ai. Here, bring your week in with the .ics bridge below — export it from Google Calendar and import it in one step.</p>`;
+  if (!gcalReady()) {
+    body = `<p style="font-size:12px;color:var(--muted);margin:0">Google Calendar sync is not set up on this copy of the app. The .ics bridge below still brings your week in and out.</p>`;
   } else if (!S.gcal.on) {
-    body = `<p style="font-size:12px;color:var(--muted);margin:0 0 10px">Read your real schedule straight into this planner. Calls run with your own claude.ai credentials — the page never sees a password or token, and nothing from Google is written to this browser's storage.</p>
-      <button class="btn primary" id="gConnect" style="width:100%;justify-content:center">${GCAL.busy ? 'Connecting…' : 'Link my Google Calendar'}</button>`;
+    body = `<p style="font-size:12px;color:var(--muted);margin:0 0 10px">Your Google events appear in the planner and the auto-scheduler works around them. Blocks you plan here are added to your Google Calendar, and edits and deletions follow them.</p>
+      <button class="btn primary" id="gConnect" style="width:100%;justify-content:center">${GCAL.busy ? 'Connecting…' : 'Connect Google Calendar'}</button>
+      <p style="font-size:11px;color:var(--muted);line-height:1.5;margin:9px 0 0">Google asks you to allow calendar access in a popup. Until Google finishes reviewing this app it also says the app is <em>unverified</em>: choose <strong>Advanced</strong>, then continue. Access lasts about an hour at a time and is never stored on a server.</p>`;
   } else {
-    const colour = GCAL.state === 'live' ? 'var(--good)' : GCAL.state === 'stale' ? 'var(--alert)' : 'var(--crit)';
+    const pushed = Object.keys(S.gcal.links).length;
     const count = S.gcal.cals.reduce((a, id) => a + (GCAL.events[id] || []).length, 0);
-    body = `<div class="gstat"><span class="dot" style="background:${colour}"></span>
-        <span>${GCAL.state === 'blocked' ? 'Not syncing' : `${count} events this week · updated ${agoLabel(GCAL.lastAt)}`}</span></div>`;
-    if (err) body += `<div class="gerr"><strong>${esc(err[0])}</strong>${esc(err[1] || GCAL.error.message || '')}</div>`;
-    body += '<div class="callist">' + GCAL.cals.map(c => `<label><input type="checkbox" data-cal="${esc(c.id)}" ${S.gcal.cals.includes(c.id) ? 'checked' : ''}>
-        <span class="swatch"></span><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.summary || c.id)}</span></label>`).join('') + '</div>';
+    const colour = !valid ? 'var(--alert)' : GCAL.state === 'live' ? 'var(--good)' : 'var(--alert)';
+    const status = !valid ? 'Connected — press Sync now to refresh (Google’s access lasts about an hour)'
+      : GCAL.busy && !GCAL.lastAt ? 'Reading your calendar…'
+      : `${plural(count, 'Google event')} this week · ${plural(pushed, 'block')} in Google · updated ${agoLabel(GCAL.lastAt)}`;
+    body = `<div class="gstat"><span class="dot" style="background:${colour}"></span><span>${esc(status)}</span></div>`;
+    if (GCAL.error && GCAL.error.code !== 'expired') body += `<div class="gerr"><strong>Google Calendar did not answer as expected</strong>${esc(GCAL.error.message || String(GCAL.error))}</div>`;
+    if (valid && GCAL.cals.length) {
+      body += '<div class="eyebrow" style="margin:4px 0 2px">Show in the planner</div>';
+      body += '<div class="callist">' + GCAL.cals.map(c => `<label><input type="checkbox" data-cal="${esc(c.id)}" ${S.gcal.cals.includes(c.id) ? 'checked' : ''}>
+          <span class="swatch" style="background:${esc(c.color || 'var(--muted)')}"></span><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.summary)}</span></label>`).join('') + '</div>';
+      const writable = GCAL.cals.filter(c => c.writable);
+      body += `<div class="field" style="margin:4px 0 8px"><label for="gTarget">Send my blocks to</label><select id="gTarget">${writable.map(c =>
+          `<option value="${esc(c.id)}" ${c.id === S.gcal.target ? 'selected' : ''}>${esc(c.summary)}</option>`).join('')}</select></div>`;
+    }
+    body += `<div class="switch-row" style="padding:6px 0"><div><div class="lbl" style="font-size:12.5px">Send my blocks to Google</div>
+        <div class="hint">New, edited and deleted blocks follow automatically. Blocks imported from .ics stay here.</div></div>
+        <input type="checkbox" id="gPush" ${S.gcal.push ? 'checked' : ''}></div>`;
     body += `<div class="switch-row" style="padding:6px 0"><div class="lbl" style="font-size:12.5px">Hide events I declined</div>
         <input type="checkbox" id="gDeclined" ${S.gcal.hideDeclined ? 'checked' : ''}></div>`;
-    body += `<p style="font-size:11.5px;color:var(--muted);margin:8px 0 10px">Google events are read-only here and never leave your session — edit them in Google, and they refresh within five minutes. Your own study blocks stay local.</p>`;
-    body += `<button class="btn" id="gOff" style="width:100%;justify-content:center">Unlink</button>`;
+    body += `<p style="font-size:11.5px;color:var(--muted);margin:8px 0 10px">Google events are read-only here — change them in Google. Blocks from this planner are managed here; edit them in the planner, not in Google.</p>`;
+    body += `<div style="display:flex;gap:8px"><button class="btn sm" id="gOff" style="flex:1;justify-content:center">Disconnect</button>`
+      + (pushed ? `<button class="btn sm ghost" id="gWipe" style="flex:1;justify-content:center" data-tip="Deletes the ${pushed} events this planner created in Google">Remove my blocks</button>` : '') + '</div>';
   }
   box.innerHTML = head + body;
   const c = $('#gConnect'); if (c) c.onclick = gcalConnect;
   const sy = $('#gSync'); if (sy) sy.onclick = gcalSyncNow;
   const off = $('#gOff'); if (off) off.onclick = gcalDisconnect;
-  const dec = $('#gDeclined'); if (dec) dec.onchange = e => {
-    S.gcal.hideDeclined = e.target.checked; save();
-    Object.keys(GCAL.events).forEach(k => delete GCAL.events[k]);
-    gcalSyncNow();
-  };
+  const wipe = $('#gWipe'); if (wipe) wipe.onclick = () => openModal('Remove your blocks from Google?',
+    `<p style="font-size:12.5px;margin:0">This deletes the ${plural(Object.keys(S.gcal.links).length, 'event')} this planner created in Google Calendar and turns sending off. Your blocks in the planner and every other Google event stay as they are.</p>`,
+    [{ label:'Keep them' }, { label:'Remove from Google', onClick: () => { gcalRemoveAll(); } }]);
+  const tg = $('#gTarget'); if (tg) tg.onchange = e => { S.gcal.target = e.target.value; save(); toast('New blocks will go to ' + e.target.selectedOptions[0].textContent); };
+  const ps = $('#gPush'); if (ps) ps.onchange = e => { S.gcal.push = e.target.checked; GCAL.planSig = null; save(); if (S.gcal.push) gcalPush(); };
+  const dec = $('#gDeclined'); if (dec) dec.onchange = e => { S.gcal.hideDeclined = e.target.checked; save(); gcalRefresh(); };
   $$('#gcalCard [data-cal]').forEach(cb => cb.onchange = () => {
     const id = cb.dataset.cal;
     S.gcal.cals = cb.checked ? S.gcal.cals.concat([id]) : S.gcal.cals.filter(x => x !== id);
     if (!cb.checked) delete GCAL.events[id];
-    save(); gcalSubscribe(); renderGcal(); renderCalendar(); renderFocusSide();
+    save(); gcalRefresh(); renderCalendar(); renderFocusSide();
   });
 }
-async function gcalBoot() {
-  const mcp = await useCap('mcp');
-  if (!mcp) { GCAL.state = 'unavailable'; renderGcal(); return; }
-  GCAL.mcp = mcp; GCAL.state = 'idle'; renderGcal();
-  if (S.gcal.on) { const ok = await gcalLoadCalendars(); renderGcal(); if (ok) gcalSubscribe(); }
+/* After a workspace loads: pick up a token from earlier in this tab, pull
+   the week, and send anything planned while access had lapsed. */
+function gcalAfterLoad() {
+  if (!gcalReady()) { renderGcal(); return; }
+  loadGis().catch(() => {});
+  gcalLoadToken();
+  if (S.gcal.on && gcalTokenValid()) gcalRefresh().then(() => gcalPush());
+  else renderGcal();
+}
+function gcalBoot() {
+  if (!gcalReady()) { renderGcal(); return; }
+  loadGis().catch(() => {});
+  setInterval(() => { if (S.gcal.on && gcalTokenValid() && !GCAL.busy && !GCAL.pushing) gcalRefresh(); }, 300000);
+  renderGcal();
 }
 
 /* =====================================================================
@@ -2220,13 +2422,18 @@ $('#resetBtn2').onclick = () => openModal('Erase everything?', `
   [{ label:'Keep my data' }, { label:'Erase it all', onClick: () => {
     window.FocusDial.wipe().then(() => { applyTheme(); toast('Cleared'); });
   } }]);
+/* Demo blocks are never sent to Google (gcalPush skips a sample workspace),
+   and loading or clearing the demo forgets existing Google links rather than
+   letting the next sync delete the real events they point to. */
 function clearDemo() {
+  S.gcal.links = {};
   S.sessions = []; S.checkins = []; S.notes = []; S.tasks = []; S.events = []; S.subjects = [];
   S.meta.sample = false; S.meta.notice = null; S.timer.taskId = null; S.timer.intent = ''; S.timer.activation = null;
   save(); renderAll(); if (S.gcal.on) gcalSubscribe();
   toast('Clean slate — your Google link and settings are untouched');
 }
 function loadDemo() {
+  S.gcal.links = {};
   seedDemo(); S.meta.notice = null;
   setPhase(S.timer.phase || 'focus', false);
   renderAll(); if (S.gcal.on) gcalSubscribe();
@@ -2686,6 +2893,7 @@ async function enterApp(user) {
   renderAll();
   go(CFG.startView || 'focus');
   if (STORE.mode === 'cloud') fbWatch();
+  gcalAfterLoad();
   emit('signin', { id:user.id, name:user.name, email:user.email, provider:user.provider });
   if (user.mustChange) setTimeout(changePwModal, 700);
   else offerLegacyImport();
@@ -2773,6 +2981,7 @@ async function signOut() {
   clearTimeout(saveT); saveT = null;
   if (!STORE.blocked) STORE.writeSync(S);
   fbUnwatchNow(); fbKnown = null;
+  gcalReset();                                        // the calendar token belongs to whoever just left
   sessionClear();                                     // before Firebase's own sign-out event fires
   AUTH.user = null;
   if (AUTH.mode === 'firebase' && FB.auth) { try { await FB.auth.signOut(); } catch (e) {} }
