@@ -2,12 +2,13 @@ rules_version = '2';
 
 // ADHD Study Pack — paste into Firebase Console → Firestore Database → Rules.
 //
-// Layout written by js/lib/cloud-store.js:
+// Written by js/adhd-study-pack.js:
+//   users/{uid}/workspace/state   { json: <whole workspace as JSON>, updated: <ms>, app: <version> }
+// Read once for the one-time import from the first version of the page:
 //   users/{uid}/pack/{tasks | parked | sessions | activeTaskId}
-//     { value: <slice>, updatedAt: <server timestamp> }
 //
-// A signed-in user can read and write only their own four documents.
-// Everything else — other users, other paths, unauthenticated requests — is denied.
+// A signed-in user can reach only their own documents. Everything else —
+// other users, other paths, unauthenticated requests — is denied.
 
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -16,18 +17,20 @@ service cloud.firestore {
       return request.auth != null && request.auth.uid == uid;
     }
 
-    function isValidSlice() {
-      return request.resource.data.keys().hasOnly(['value', 'updatedAt'])
-          && request.resource.data.updatedAt == request.time;
-    }
-
-    match /users/{uid}/pack/{slice} {
+    match /users/{uid}/workspace/{doc} {
       allow read:   if isOwner(uid);
       allow create, update: if isOwner(uid)
-                            && slice in ['tasks', 'parked', 'sessions', 'activeTaskId']
-                            && isValidSlice();
-      // Lets a user wipe their own synced pack (e.g. from a future "delete my data").
+                            && doc == 'state'
+                            && request.resource.data.keys().hasOnly(['json', 'updated', 'app'])
+                            && request.resource.data.json is string
+                            && request.resource.data.json.size() < 1000000;
       allow delete: if isOwner(uid);
+    }
+
+    // First version of the page. Kept readable (and deletable) so its data
+    // can be imported; nothing writes here any more.
+    match /users/{uid}/pack/{slice} {
+      allow read, delete: if isOwner(uid);
     }
   }
 }

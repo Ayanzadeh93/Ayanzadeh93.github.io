@@ -72,20 +72,20 @@
     {
       "id": "adhd-study-pack",
       "title": "ADHD Study Pack",
-      "subtitle": "Local-first focus tool for study sessions",
+      "subtitle": "Pomodoro workspace for an ADHD attention system",
       "category": "Assistive Tooling",
       "status": "Live",
       "featured": true,
       "year": 2026,
-      "summary": "A browser-based focus tool built around the three ways an ADHD study session actually falls apart: one visible task at a time, step-by-step breakdown so there is always a first move, an adjustable focus block, and one keystroke to park an intrusive thought before it becomes a new tab.",
+      "summary": "A browser-based Pomodoro workspace built around how an ADHD study session actually falls apart: a focus dial with intervals you can shrink to a two-minute start, an Eisenhower matrix that separates loud from important, a week planner that auto-schedules study blocks into your free hours, one keystroke to park a distracting thought, and statistics that show when you actually focus well.",
       "highlights": [
-        "One task in the foreground with its next unfinished step surfaced automatically.",
-        "Adjustable focus blocks that log partial sessions instead of discarding them.",
-        "Alt+P parks an intrusive thought from anywhere and returns focus to the task.",
-        "Runs entirely in the browser \u2014 no account, no server, nothing leaves the device."
+        "Eisenhower priority matrix with drag-and-drop, one-at-a-time triage and a check on where focus time really went.",
+        "Week planner with courses, weekly targets and an auto-scheduler that favours your historically best hours; .ics import and export.",
+        "Focus dial with interval presets, activation rating, distraction tally, brain dump and a body-double mode.",
+        "Synthesised focus sounds, breathing and grounding tools, and Google sign-in that syncs the workspace across devices."
       ],
-      "methods": ["Vanilla JavaScript", "ES modules", "Web Storage API", "ARIA live regions", "Progressive enhancement"],
-      "tags": ["Accessibility", "Assistive Tooling", "Executive Function", "Local-first"],
+      "methods": ["Vanilla JavaScript", "ES modules", "Web Audio API", "Firebase Authentication", "Cloud Firestore"],
+      "tags": ["Accessibility", "Assistive Tooling", "Executive Function", "Productivity"],
       "legacyPage": "adhd-study-pack.html",
       "links": [
         {"label": "Project page", "href": "adhd-study-pack.html", "kind": "page"},
