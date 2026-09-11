@@ -70,6 +70,30 @@
       "related": ["indoor-navigation", "ml-data-pipeline"]
     },
     {
+      "id": "adhd-study-pack",
+      "title": "ADHD Study Pack",
+      "subtitle": "Local-first focus tool for study sessions",
+      "category": "Assistive Tooling",
+      "status": "Live",
+      "featured": true,
+      "year": 2026,
+      "summary": "A browser-based focus tool built around the three ways an ADHD study session actually falls apart: one visible task at a time, step-by-step breakdown so there is always a first move, an adjustable focus block, and one keystroke to park an intrusive thought before it becomes a new tab.",
+      "highlights": [
+        "One task in the foreground with its next unfinished step surfaced automatically.",
+        "Adjustable focus blocks that log partial sessions instead of discarding them.",
+        "Alt+P parks an intrusive thought from anywhere and returns focus to the task.",
+        "Runs entirely in the browser \u2014 no account, no server, nothing leaves the device."
+      ],
+      "methods": ["Vanilla JavaScript", "ES modules", "Web Storage API", "ARIA live regions", "Progressive enhancement"],
+      "tags": ["Accessibility", "Assistive Tooling", "Executive Function", "Local-first"],
+      "legacyPage": "adhd-study-pack.html",
+      "links": [
+        {"label": "Project page", "href": "adhd-study-pack.html", "kind": "page"},
+        {"label": "Open the Study Pack", "href": "../apps/adhd-study-pack.html", "kind": "app"}
+      ],
+      "related": ["indoor-navigation", "claude-code-encyclopedia"]
+    },
+    {
       "id": "medical-segmentation",
       "title": "Medical Image Segmentation",
       "subtitle": "Multi-task medical image analysis",

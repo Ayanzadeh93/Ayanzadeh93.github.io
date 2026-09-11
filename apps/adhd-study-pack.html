@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'; form-action 'self'; frame-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="color-scheme" content="light dark">
+  <title>ADHD Study Pack</title>
+  <meta name="description" content="A focus and executive-function tool for study sessions: one task at a time, an adjustable timer, step breakdown and a place to park intrusive thoughts.">
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+  <link rel="stylesheet" href="../css/adhd-study-pack.css">
+</head>
+<body>
+  <p id="live" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
+
+  <header class="pack-nav">
+    <a class="pack-brand" href="../projects/adhd-study-pack.html">
+      <span class="pack-mark" aria-hidden="true">◐</span>
+      <span>ADHD Study Pack</span>
+    </a>
+    <nav aria-label="Site">
+      <a href="../index.html">Home</a>
+      <a href="../projects/index.html">Projects</a>
+      <span id="profileBar" class="pack-profile" hidden>
+        <span class="pack-profile-name">Signed in as <b id="profileName"></b></span>
+        <button id="signOut" type="button" class="pack-signout">Sign out</button>
+      </span>
+    </nav>
+  </header>
+
+  <main class="pack-shell">
+
+    <!-- ---------------------------------------------------- sign in -->
+    <section id="auth" class="auth" aria-labelledby="auth-title">
+      <h1 id="auth-title">Start a study session</h1>
+      <p class="auth-lead">
+        A focus tool built around what actually derails an ADHD study session —
+        one visible task, a timer you set to whatever is survivable today, and
+        somewhere to put the thought that would otherwise become a new tab.
+      </p>
+
+      <form id="profileForm" class="auth-form">
+        <label for="profileInput">Profile name</label>
+        <input id="profileInput" type="text" autocomplete="nickname" required
+               maxlength="40" placeholder="Aydin" spellcheck="false">
+        <button type="submit" class="auth-submit">Open my pack</button>
+      </form>
+
+      <div id="profileList" class="profile-list"></div>
+
+      <div class="auth-note">
+        <p>
+          <b>Everything stays in this browser.</b> A profile is a local name for your
+          own data &mdash; there is no account, no password and no server. Nothing you
+          type here leaves the device, which also means it does not follow you to
+          another one.
+        </p>
+      </div>
+
+      <div class="auth-future">
+        <button type="button" class="auth-google" disabled aria-describedby="google-note">
+          <span aria-hidden="true">G</span> Continue with Google
+        </button>
+        <p id="google-note" class="auth-future-note">
+          Account sync is not wired up yet. When a Firebase project is configured,
+          this button signs in for real and the same pack follows you across devices.
+          Until then it stays disabled rather than pretending to work.
+        </p>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------------- app -->
+    <section id="app" class="pack" hidden>
+
+      <div class="pack-top">
+        <article class="now-card" aria-labelledby="now-heading">
+          <h2 id="now-heading" class="sr-only">Current task</h2>
+          <div id="nowBody"></div>
+        </article>
+
+        <article id="timerCard" class="timer-card" aria-labelledby="timer-heading">
+          <h2 id="timer-heading" class="card-title">Focus block</h2>
+          <p id="timerClock" class="timer-clock" role="timer">15:00</p>
+
+          <div class="timer-range-row">
+            <label for="timerRange" class="sr-only">Focus block length in minutes</label>
+            <input id="timerRange" type="range" min="1" max="90" step="1" value="15">
+            <span id="timerRangeLabel" class="timer-range-label">15 min</span>
+          </div>
+
+          <div class="timer-actions">
+            <button id="timerStart" type="button" class="btn-primary">Start</button>
+            <button id="timerPause" type="button" class="btn-secondary" hidden>Pause</button>
+            <button id="timerReset" type="button" class="btn-ghost">Reset</button>
+          </div>
+
+          <p class="timer-hint">Short blocks count. A finished 10 minutes beats an abandoned 45.</p>
+        </article>
+      </div>
+
+      <div class="pack-grid">
+
+        <section class="panel" aria-labelledby="tasks-heading">
+          <h2 id="tasks-heading" class="card-title">Tasks</h2>
+
+          <form id="taskForm" class="panel-form">
+            <label for="taskInput" class="sr-only">Add a task</label>
+            <input id="taskInput" type="text" placeholder="What are you avoiding?"
+                   autocomplete="off" maxlength="160">
+            <button type="submit" class="btn-primary">Add</button>
+          </form>
+
+          <ul id="taskList" class="task-list"></ul>
+
+          <details id="doneWrap" class="done-wrap" hidden>
+            <summary>Completed <span id="doneCount" class="done-count"></span></summary>
+            <ul id="doneList" class="task-list"></ul>
+          </details>
+        </section>
+
+        <section class="panel" aria-labelledby="parked-heading">
+          <h2 id="parked-heading" class="card-title">Parked thoughts</h2>
+
+          <form id="parkForm" class="panel-form">
+            <label for="parkInput" class="sr-only">Park a thought</label>
+            <input id="parkInput" type="text" placeholder="Park it and keep going…"
+                   autocomplete="off" maxlength="200">
+            <button type="submit" class="btn-secondary">Park</button>
+          </form>
+
+          <p class="panel-hint"><kbd>Alt</kbd> + <kbd>P</kbd> jumps here from anywhere.</p>
+
+          <ul id="parkedList" class="parked-list"></ul>
+        </section>
+
+      </div>
+
+      <section class="stats" aria-labelledby="stats-heading">
+        <h2 id="stats-heading" class="sr-only">Today</h2>
+        <div class="stat"><b id="statBlocks">0</b><span>blocks today</span></div>
+        <div class="stat"><b id="statMinutes">0</b><span>minutes focused</span></div>
+        <div class="stat"><b id="statStreak">0</b><span>day streak</span></div>
+      </section>
+
+    </section>
+
+    <noscript>
+      <p class="noscript-note">
+        This tool runs entirely in the browser, so it needs JavaScript enabled.
+        Nothing is sent anywhere &mdash; the requirement is the app itself, not tracking.
+      </p>
+    </noscript>
+  </main>
+
+  <script type="module" src="../js/adhd-study-pack.js"></script>
+</body>
+</html>
