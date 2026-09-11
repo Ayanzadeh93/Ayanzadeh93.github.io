@@ -82,7 +82,8 @@
         "Eisenhower priority matrix with drag-and-drop, one-at-a-time triage and a check on where focus time really went.",
         "Week planner with courses, weekly targets and an auto-scheduler that favours your historically best hours; .ics import and export.",
         "Focus dial with interval presets, activation rating, distraction tally, brain dump and a body-double mode.",
-        "Synthesised focus sounds, breathing and grounding tools, and Google sign-in that syncs the workspace across devices."
+        "Synthesised focus sounds, breathing and grounding tools, and Google sign-in that syncs the workspace across devices.",
+        "Comfort profiles for conflicting needs — ADHD by default, with Calm and predictable, Low vision, Easier reading and Screen reader as starting points, then every setting adjustable: WCAG 2.2 AA, NVDA, JAWS, Narrator, VoiceOver and TalkBack, and a built-in voice for reading aloud."
       ],
       "methods": ["Vanilla JavaScript", "ES modules", "Web Audio API", "Firebase Authentication", "Cloud Firestore"],
       "tags": ["Accessibility", "Assistive Tooling", "Executive Function", "Productivity"],
