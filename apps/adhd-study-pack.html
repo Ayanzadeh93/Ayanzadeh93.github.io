@@ -7,8 +7,10 @@
        script  www.gstatic.com = SDK, apis.google.com = Google sign-in helper
        connect firestore / identitytoolkit / securetoken = data and auth APIs
        frame   *.firebaseapp.com = the auth handler iframe on the authDomain
+       Google Calendar sync: accounts.google.com = Google Identity Services (the
+       consent popup, its script and styles); the Calendar API is www.googleapis.com.
        Fonts come from Google Fonts; every sound is synthesised in the page. -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com; form-action 'self'; frame-src https://*.firebaseapp.com">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' https://www.gstatic.com https://apis.google.com https://accounts.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://accounts.google.com; form-action 'self'; frame-src https://*.firebaseapp.com https://accounts.google.com">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="color-scheme" content="light dark">
   <title>ADHD Study Pack</title>
@@ -18,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
   <!-- ?v= busts GitHub Pages' 10-minute cache when the app changes; bump it with VERSION in the script. -->
-  <link rel="stylesheet" href="../css/adhd-study-pack.css?v=3.0.0">
+  <link rel="stylesheet" href="../css/adhd-study-pack.css?v=3.1.0">
   <!-- Read by js/adhd-study-pack.js (never executed). The Firebase project
        comes from js/firebase-config.js, so it is not repeated here. -->
   <script type="application/json" id="focus-dial-config">
@@ -33,7 +35,8 @@
     "emailSignIn": false,
     "seedAdmin":   false,
     "demo":        true,
-    "embedDocs":   false
+    "embedDocs":   false,
+    "googleClientId": "17412743359-f5vndcgpgg295e9iughsprkgm94jv273.apps.googleusercontent.com"
   }
   </script>
 </head>
@@ -496,6 +499,6 @@
     Nothing is sent anywhere unless you choose to sign in with Google.
   </p>
 </noscript>
-<script type="module" src="../js/adhd-study-pack.js?v=3.0.0"></script>
+<script type="module" src="../js/adhd-study-pack.js?v=3.1.0"></script>
 </body>
 </html>
