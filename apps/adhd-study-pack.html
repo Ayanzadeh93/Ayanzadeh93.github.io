@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
   <!-- ?v= busts GitHub Pages' 10-minute cache when the app changes; bump it with VERSION in the script. -->
-  <link rel="stylesheet" href="../css/adhd-study-pack.css?v=3.1.0">
+  <link rel="stylesheet" href="../css/adhd-study-pack.css?v=3.2.0">
   <!-- Read by js/adhd-study-pack.js (never executed). The Firebase project
        comes from js/firebase-config.js, so it is not repeated here. -->
   <script type="application/json" id="focus-dial-config">
@@ -67,6 +67,7 @@
         <span class="num" id="miniTime">25:00</span>
         <span style="font-size:11.5px;color:var(--muted)" id="miniPhase">Focus</span>
       </div>
+      <div class="chip track-chip" id="trackChip" hidden role="timer" aria-label="Stopwatch"></div>
       <div class="chip" id="streakChip" title="Consecutive days with at least one finished focus session"><span class="dot" style="background:var(--alert)"></span><span><span id="streakVal">0</span>-day streak</span></div>
       <div class="chip" id="todayChip"><span class="dot" style="background:var(--focus)"></span><span><span id="todayMin">0</span> min today</span></div>
       <div class="chip" id="storeChip" hidden></div>
@@ -499,6 +500,6 @@
     Nothing is sent anywhere unless you choose to sign in with Google.
   </p>
 </noscript>
-<script type="module" src="../js/adhd-study-pack.js?v=3.1.0"></script>
+<script type="module" src="../js/adhd-study-pack.js?v=3.2.0"></script>
 </body>
 </html>
