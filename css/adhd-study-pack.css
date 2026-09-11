@@ -546,3 +546,14 @@ svg.chart .lbl{fill:var(--ink-2); font-weight:600}
   .topbar .sep,.topbar .top-sp{display:none}
   .topnav{margin-left:auto}
 }
+/* ---------- stopwatch (site addition) ---------- */
+.track-chip{gap:7px; padding:3px 4px 3px 10px; background:var(--focus-wash); border-color:color-mix(in srgb, var(--focus) 40%, transparent); color:var(--ink); max-width:340px}
+.track-chip .dot{background:var(--focus); animation:breathe 2.2s ease-in-out infinite}
+.track-chip .tt{overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; max-width:170px}
+.track-chip .num{font-weight:700; color:var(--focus)}
+.track-chip .btn{padding:3px 8px}
+.task.tracking{background:var(--focus-wash); border-color:color-mix(in srgb, var(--focus) 45%, transparent)}
+.task.tracking .t-actions{opacity:1}
+.ev.tracking{box-shadow:0 0 0 2px var(--focus), var(--shadow-1)}
+@media (prefers-reduced-motion:reduce){ .track-chip .dot{animation:none} }
+@media (max-width:760px){ .track-chip{max-width:100%} .track-chip .tt{max-width:120px} }

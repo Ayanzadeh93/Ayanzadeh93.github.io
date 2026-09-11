@@ -34,7 +34,7 @@ const DOW = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
    defaults, then a <script type="application/json" id="focus-dial-config">
    block, then window.FOCUS_DIAL_CONFIG.
    ===================================================================== */
-const VERSION = '3.1.0';
+const VERSION = '3.2.0';
 const DEFAULT_CONFIG = {
   storageKey: 'focusdial.v3',
   storage:    'local',            // 'local' | 'session' | 'memory' | 'rest'
@@ -96,6 +96,7 @@ const DEFAULTS = () => ({
   sound: { master:60, layers:{}, beat:10, carrier:180 },
   gcal: { on:false, cals:[], hideDeclined:true, push:true, target:'primary', links:{} },
   timer: { phase:'focus', cycle:1, taskId:null, intent:'', activation:null },
+  track: null,                     // the running stopwatch: { taskId, eventId, subjectId, title, startedAt }
   meta: { sample:false, created:Date.now(), notice:null }
 });
 
@@ -534,6 +535,7 @@ function renderDial() {
   $('#dialTask').textContent = task ? task.title : 'No task selected — pick one, it doubles the odds you start';
   $('#cycleLbl').textContent = `Cycle ${S.timer.cycle} of ${S.settings.cycles}`;
   if (S.settings.titleClock && T.running) document.title = `${txt} · ${PHASES[T.phase].label}`;
+  else if (S.settings.titleClock && S.track) document.title = trackTitle();
   else document.title = CFG.appName;
 }
 function renderPips() {
@@ -553,6 +555,8 @@ function renderTicks() {
 function start() {
   ensureAudio();
   if (!T.running) {
+    // One clock at a time, so no minute is counted twice.
+    if (T.phase === 'focus' && S.track) stopTracking({ because:'The stopwatch was stopped and logged — the pomodoro takes over' });
     T.running = true;
     T.endsAt = Date.now() + (T.remain || phaseMs(T.phase));
     if (!T.startedAt) T.startedAt = Date.now();
@@ -603,6 +607,100 @@ setInterval(() => {
   tickRemain(); renderDial();
   if (T.remain <= 0) completePhase(false);
 }, 250);
+
+/* =====================================================================
+   STOPWATCH — time a task or a calendar block by just starting it.
+   The pomodoro only logs an interval that reaches the bell; this counts
+   up for as long as the work actually runs and logs it when stopped, as a
+   session marked `tracked`, so it lands in minutes today, the streak, the
+   charts, time by course and the matrix split like any other session.
+   S.track lives in the workspace, so a reload or another device keeps the
+   same clock running. Only one thing is ever timed at once, and starting
+   the pomodoro stops it (and vice versa) so no minute is counted twice.
+   ===================================================================== */
+const TRACK_CONFIRM_MIN = 180;          // this long, and the stop asks "really?" — a forgotten stopwatch is common
+const trackElapsed = () => S.track ? Math.max(0, Date.now() - S.track.startedAt) : 0;
+function fmtElapsed(ms) {
+  const s = Math.floor(ms / 1000), h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), r = s % 60;
+  return h ? `${h}:${pad2(m)}:${pad2(r)}` : `${pad2(m)}:${pad2(r)}`;
+}
+const trackTitle = () => `⏱ ${fmtElapsed(trackElapsed())} · ${S.track ? S.track.title : ''}`;
+const isTracking = (kind, id) => !!S.track && S.track[kind] === id;
+/* target: { taskId?, eventId?, subjectId?, title } */
+function startTracking(target) {
+  if (!target || !target.title) return;
+  if (S.track && (S.track.taskId || null) === (target.taskId || null) && (S.track.eventId || null) === (target.eventId || null)) return;
+  if (S.track) stopTracking({ quiet:true });
+  if (T.running && T.phase === 'focus') { pause(); toast('Pomodoro paused — the stopwatch is timing this now'); }
+  S.track = { taskId:target.taskId || null, eventId:target.eventId || null, subjectId:target.subjectId || null,
+              title:String(target.title).slice(0, 120), startedAt:Date.now() };
+  save(); renderTrackingEverywhere();
+  toast('Timing “' + S.track.title.slice(0, 40) + '” — press T or ■ to stop');
+}
+function stopTracking(opts) {
+  const o = opts || {}, tr = S.track; if (!tr) return;
+  const mins = Math.round(trackElapsed() / 60000);
+  const finish = m => {
+    logTracked(tr, m, o);
+    S.track = null; save(); renderTrackingEverywhere(); renderTopStats();
+    if (view === 'stats') renderStats();
+  };
+  if (!o.quiet && mins >= TRACK_CONFIRM_MIN) {
+    openModal('Log this time?', `
+      <p style="font-size:12.5px;color:var(--ink-2);margin:0">The stopwatch on <strong>${esc(tr.title)}</strong> has run for <strong>${minsToHM(mins)}</strong>, since ${hhmm(new Date(tr.startedAt))}${new Date(tr.startedAt).toDateString() !== new Date().toDateString() ? ' on ' + new Date(tr.startedAt).toLocaleDateString(undefined, { weekday:'short', month:'short', day:'numeric' }) : ''}. If it kept going after you stopped, correct it here.</p>
+      <div class="field"><label for="trMins">Minutes to log</label><input type="number" id="trMins" min="0" max="1440" value="${mins}"></div>`,
+      [{ label:'Keep it running' },
+       { label:'Discard', onClick: () => { S.track = null; save(); renderTrackingEverywhere(); toast('Discarded — nothing logged'); } },
+       { label:'Log it', primary:true, onClick: () => finish(clamp(Math.round(+$('#trMins').value || 0), 0, 1440)) }]);
+    return;
+  }
+  finish(mins);
+}
+function logTracked(tr, minutes, o) {
+  if (minutes < 1) { if (!o.quiet) toast('Under a minute — not logged'); return; }
+  const task = S.tasks.find(t => t.id === tr.taskId), ev = S.events.find(e => e.id === tr.eventId);
+  const sess = {
+    id:uid(), start:new Date(tr.startedAt).toISOString(), end:new Date(tr.startedAt + minutes * 60000).toISOString(),
+    minutes, taskId:tr.taskId || null, eventId:tr.eventId || null, title:tr.title,
+    subjectId:tr.subjectId || (task && task.subjectId) || (ev && ev.subjectId) || null,
+    intent:'', activation:null, quality:null, distractions:[], partial:false, tracked:true
+  };
+  S.sessions.push(sess);
+  S.sessions.sort((a, b) => new Date(a.start) - new Date(b.start));     // it began earlier than sessions logged since
+  if (task) task.tracked_min = (task.tracked_min || 0) + minutes;
+  toast(o.because || `Logged ${minsToHM(minutes)} on “${tr.title.slice(0, 32)}”`);
+  emit('session', clone(sess));
+}
+/* T key / command: stop the stopwatch, or start it on the session task. */
+function toggleTracking() {
+  if (S.track) { stopTracking(); return; }
+  const t = S.tasks.find(x => x.id === S.timer.taskId && !x.done);
+  if (t) startTracking({ taskId:t.id, subjectId:t.subjectId, title:t.title });
+  else toast('Pick a session task first, or press ▶ Time on any task');
+}
+function renderTracking() {
+  const chip = $('#trackChip'); if (!chip) return;
+  const tr = S.track;
+  chip.hidden = !tr;
+  if (tr) {
+    chip.innerHTML = `<span class="dot"></span><span class="tt">${esc(tr.title)}</span><span class="num" data-track-clock>${fmtElapsed(trackElapsed())}</span>
+      <button class="btn sm ghost" id="trackStopBtn" aria-label="Stop the stopwatch and log the time">■ Stop</button>`;
+    chip.dataset.tip = 'Stopwatch running since ' + hhmm(new Date(tr.startedAt)) + ' — stop it to log the time';
+    $('#trackStopBtn').onclick = () => stopTracking();
+  }
+  if (!T.running) document.title = S.settings.titleClock && tr ? trackTitle() : CFG.appName;
+}
+/* Every ▶ / ■ button reflects which one thing is being timed. */
+function renderTrackingEverywhere() {
+  renderTracking(); renderTasks();                   // task lists, and through them the focus panels
+  if (view === 'plan') renderCalendar();
+}
+setInterval(() => {
+  if (!S.track) return;
+  const txt = fmtElapsed(trackElapsed());
+  $$('[data-track-clock]').forEach(el => { el.textContent = txt; });
+  if (S.settings.titleClock && !T.running) document.title = trackTitle();
+}, 1000);
 
 /* ---------- distraction tally + parking ---------- */
 $('#tallyBtn').onclick = () => {
@@ -1065,7 +1163,8 @@ const ENERGY_LABEL = { low:'Low activation', med:'Medium', high:'High activation
 function taskRow(t, opts) {
   const o = opts || {};
   const sub = S.subjects.find(s => s.id === t.subjectId);
-  return `<div class="task ${t.done ? 'done' : ''} ${S.timer.taskId === t.id ? 'active' : ''}" data-task="${t.id}">
+  const timing = isTracking('taskId', t.id);
+  return `<div class="task ${t.done ? 'done' : ''} ${S.timer.taskId === t.id ? 'active' : ''} ${timing ? 'tracking' : ''}" data-task="${t.id}">
     <div class="energy ${t.energy}" data-tip="${ENERGY_LABEL[t.energy]} — how hard it is to start"></div>
     <button class="box" data-done="${t.id}" aria-label="Mark done"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
     <div class="t-body">
@@ -1075,17 +1174,30 @@ function taskRow(t, opts) {
         ${qOf(t) ? `<span class="qtag" style="color:${QUADS[qOf(t)].color}" data-tip="${QUADS[qOf(t)].n} · ${QUADS[qOf(t)].name} — ${QUADS[qOf(t)].axis}">${QUADS[qOf(t)].n}</span>`
                  : `<span class="qtag" style="color:var(--muted)" data-tip="Not placed on the matrix yet">?</span>`}
         <span class="m">${t.done_pomos || 0}/${t.est} pomos</span>
+        ${t.tracked_min ? `<span class="m" data-tip="Time logged on this task with the stopwatch">⏱ ${minsToHM(t.tracked_min)}</span>` : ''}
         ${t.due ? `<span class="m">due ${esc(t.due)}</span>` : ''}
       </div>
     </div>
     <div class="t-actions">
+      ${timing ? `<button class="btn sm primary" data-trackstop data-tip="Stop and log the time">■ <span class="num" data-track-clock>${fmtElapsed(trackElapsed())}</span></button>`
+        : t.done || o.noFocus ? '' : `<button class="btn sm ghost" data-track="${t.id}" data-tip="Start a stopwatch on this task — the time counts as study time">▶ Time</button>`}
       ${o.noFocus ? '' : `<button class="btn sm ghost" data-focus="${t.id}" data-tip="Make this the session task">Focus</button>`}
       <button class="btn sm ghost" data-deltask="${t.id}" aria-label="Delete">✕</button>
     </div></div>`;
 }
 function wireTasks(root) {
-  $$('[data-done]', root).forEach(b => b.onclick = () => { const t = S.tasks.find(x => x.id === b.dataset.done); t.done = !t.done; save(); renderTasks(); renderFocusSide(); });
+  $$('[data-done]', root).forEach(b => b.onclick = () => {
+    const t = S.tasks.find(x => x.id === b.dataset.done); t.done = !t.done;
+    if (t.done && isTracking('taskId', t.id)) stopTracking();          // finishing it is when you would forget the clock
+    save(); renderTasks(); renderFocusSide();
+  });
   $$('[data-focus]', root).forEach(b => b.onclick = () => setActiveTask(b.dataset.focus));
+  $$('[data-track]', root).forEach(b => b.onclick = e => {
+    e.stopPropagation();
+    const t = S.tasks.find(x => x.id === b.dataset.track);
+    if (t) startTracking({ taskId:t.id, subjectId:t.subjectId, title:t.title });
+  });
+  $$('[data-trackstop]', root).forEach(b => b.onclick = e => { e.stopPropagation(); stopTracking(); });
   $$('.qtag[data-tip]', root).forEach(el => { const row = el.closest('[data-task]'); if (row) el.onclick = () => taskQuadModal(row.dataset.task); el.style.cursor = 'pointer'; });
   $$('[data-deltask]', root).forEach(b => b.onclick = () => { S.tasks = S.tasks.filter(x => x.id !== b.dataset.deltask); if (S.timer.taskId === b.dataset.deltask) S.timer.taskId = null; save(); renderTasks(); renderFocusSide(); });
 }
@@ -1148,8 +1260,12 @@ function renderFocusSide() {
     ? `<div class="t-title" style="font-size:14px;margin-bottom:6px">${esc(t.title)}</div>
        <div class="t-meta"><span class="m">${t.done_pomos || 0}/${t.est} pomos</span><span class="m">${ENERGY_LABEL[t.energy]}</span></div>
        <div style="height:6px;border-radius:99px;background:var(--surface-3);margin-top:9px;overflow:hidden">
-         <div style="height:100%;width:${clamp((t.done_pomos || 0) / t.est * 100, 0, 100)}%;background:var(--accent);border-radius:99px"></div></div>`
+         <div style="height:100%;width:${clamp((t.done_pomos || 0) / t.est * 100, 0, 100)}%;background:var(--accent);border-radius:99px"></div></div>
+       ${isTracking('taskId', t.id)
+         ? `<button class="btn sm primary" data-trackstop style="width:100%;justify-content:center;margin-top:10px">■ Stop stopwatch · <span class="num" data-track-clock>${fmtElapsed(trackElapsed())}</span></button>`
+         : `<button class="btn sm" data-track="${t.id}" style="width:100%;justify-content:center;margin-top:10px" data-tip="Count up instead of down: no interval, just the time you actually put in">▶ Time it with a stopwatch instead</button>`}`
     : `<div class="empty">Nothing selected. A named task beats "study" — pick one below.</div>`;
+  wireTasks($('#activeTaskBox'));
   const queue = S.tasks.filter(x => !x.done && x.id !== S.timer.taskId)
     .sort((a, b) => qRank(a) - qRank(b)).slice(0, 4);   // Q1 then Q2 float to the top of the queue
   $('#focusQueue').innerHTML = queue.length ? queue.map(x => taskRow(x)).join('') : '<div class="empty">Queue is empty.</div>';
@@ -1161,13 +1277,21 @@ function renderFocusSide() {
   $('#todayBlocks').innerHTML = today.length ? today.map(e => {
     const s = new Date(e.start), en = new Date(e.end), live = now >= s && now <= en;
     const hue = e.source === 'google' ? (e.free ? 'muted' : 'ink-2') : (e.kind === 'class' ? 'long' : e.kind === 'break' ? 'rest' : 'focus');
+    const timing = isTracking('eventId', e.id);
     return `<div style="display:flex;gap:9px;align-items:flex-start;padding:6px 0;border-bottom:1px solid var(--line)">
       <span class="dot" style="margin-top:6px;background:var(--${hue})"></span>
       <div style="flex:1;min-width:0">
         <div style="font-size:12.5px;font-weight:${live ? 700 : 500}">${esc(e.title)}${live ? ' <span class="eyebrow" style="color:var(--focus)">now</span>' : ''}</div>
         <div class="m num" style="font-size:10.5px;color:var(--muted)">${e.allDay ? 'all day' : hhmm(s) + '–' + hhmm(en)}${e.source === 'google' ? ' · google' : ''}</div>
-      </div></div>`;
+      </div>
+      ${timing ? `<button class="btn sm primary" data-trackstop data-tip="Stop and log the time">■ <span class="num" data-track-clock>${fmtElapsed(trackElapsed())}</span></button>`
+               : `<button class="btn sm ghost" data-trackev="${esc(e.id)}" data-tip="Start timing this block">▶</button>`}</div>`;
   }).join('') : '<div class="empty">Nothing scheduled today. The plan view can fill it in.</div>';
+  $$('#todayBlocks [data-trackev]').forEach(b => b.onclick = () => {
+    const e = today.find(x => x.id === b.dataset.trackev);
+    if (e) startTracking({ eventId:e.id, subjectId:e.subjectId || null, title:e.title });
+  });
+  wireTasks($('#todayBlocks'));                        // the ■ stop buttons
 
   const parked = S.notes.filter(n => n.tag === 'parked').slice(-5).reverse();
   $('#parkedCount').textContent = parked.length ? parked.length + ' waiting' : '';
@@ -1322,8 +1446,9 @@ function renderCalendar() {
       /* Two abreast still reads; beyond that, indent and stack like Google's
          own grid rather than slicing the column into unreadable slivers. */
       const w = lanes <= 2 ? 100 / lanes : 100 - lane * 17, left = lanes <= 2 ? lane * (100 / lanes) : lane * 17;
-      const cls = e.source === 'google' ? (e.kind === 'gfocus' ? 'gfocus' : 'gcal') + (e.free ? ' free' : '') : (e.kind || 'other');
-      const attr = e.source === 'google' ? `data-glink="${esc(e.link || '')}"` : `data-ev="${e.id}"`;
+      const cls = (e.source === 'google' ? (e.kind === 'gfocus' ? 'gfocus' : 'gcal') + (e.free ? ' free' : '') : (e.kind || 'other'))
+        + (isTracking('eventId', e.id) ? ' tracking' : '');
+      const attr = e.source === 'google' ? `data-glink="${esc(e.link || '')}" data-gid="${esc(e.id)}"` : `data-ev="${e.id}"`;
       inner += `<div class="ev ${cls}" ${attr} style="top:${Math.max(0, top)}px;height:${h}px;left:calc(${left}% + 3px);width:calc(${w}% - 6px);z-index:${2 + lane}"
           data-tip="${esc(e.title)} · ${hhmm(s0)}–${hhmm(en)}${e.source === 'google' ? ' · from Google Calendar' + (e.free ? ', marked free' : '') : ''}">
         <div class="ttl">${esc(e.title)}</div><div class="tm">${hhmm(s0)}–${hhmm(en)}</div>
@@ -1337,10 +1462,18 @@ function renderCalendar() {
   });
   $('#calGrid').innerHTML = html;
   $$('#calGrid .ev[data-ev]').forEach(el => el.onclick = ev => { ev.stopPropagation(); editEvent(el.dataset.ev); });
+  /* A Google event (a lecture, a meeting) can be timed too; editing it stays in Google. */
   $$('#calGrid .ev[data-glink]').forEach(el => el.onclick = ev => {
     ev.stopPropagation();
-    if (el.dataset.glink) window.open(el.dataset.glink, '_blank', 'noopener');
-    else toast('This one came from Google — edit it there');
+    const g = Object.values(GCAL.events).flat().find(x => x.id === el.dataset.gid);
+    if (!g) return;
+    const s0 = new Date(g.start), e0 = new Date(g.end), timing = isTracking('eventId', g.id);
+    openModal(g.title, `<p style="font-size:12.5px;color:var(--ink-2);margin:0">${g.allDay ? 'All day' : hhmm(s0) + '–' + hhmm(e0)} · ${s0.toLocaleDateString(undefined, { weekday:'long', month:'short', day:'numeric' })} · from Google Calendar</p>
+      <p style="font-size:12px;color:var(--muted);margin:0">Timing it logs the minutes you actually spend as study time, like any focus session.</p>`,
+      [{ label:'Close' }]
+        .concat(g.link ? [{ label:'Open in Google', onClick: () => { window.open(g.link, '_blank', 'noopener'); } }] : [])
+        .concat([timing ? { label:'■ Stop timing', primary:true, onClick: () => stopTracking() }
+                        : { label:'▶ Start timing', primary:true, onClick: () => startTracking({ eventId:g.id, title:g.title }) }]));
   });
   $$('#calGrid .cal-body').forEach(el => el.onclick = ev => {
     if (ev.target.closest('.ev')) return;
@@ -1384,9 +1517,13 @@ function newEvent(dateKeyStr, timeStr) {
 function editEvent(id) {
   const ev = S.events.find(x => x.id === id); if (!ev) return;
   const s = new Date(ev.start), e = new Date(ev.end);
+  const timing = isTracking('eventId', id);
   openModal('Edit block', eventForm({ title:ev.title, date:dayKey(s), s:hhmm(s), e:hhmm(e), kind:ev.kind, subjectId:ev.subjectId }),
     [{ label:'Delete', onClick: () => { S.events = S.events.filter(x => x.id !== id); save(); renderCalendar(); renderFocusSide(); } },
-     { label:'Add to Google', onClick: () => { gcalLink(ev); return false; } },
+     // With live sync on, blocks already reach Google on their own; the template link is for when it is off.
+     ...(S.gcal.on ? [] : [{ label:'Add to Google', onClick: () => { gcalLink(ev); return false; } }]),
+     timing ? { label:'■ Stop timing', onClick: () => stopTracking() }
+            : { label:'▶ Start timing', onClick: () => startTracking({ eventId:ev.id, subjectId:ev.subjectId, title:ev.title }) },
      { label:'Save', primary:true, onClick: () => { const v = readEventForm(); if (!v) return false; Object.assign(ev, v); save(); renderCalendar(); renderFocusSide(); } }]);
 }
 const icsStamp = d => new Date(d).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
@@ -1761,12 +1898,13 @@ function renderStats() {
   const distr = sess.reduce((a, s) => a + (s.distractions ? s.distractions.length : 0), 0);
   const activeDays = new Set(sess.map(s => dayKey(new Date(s.start)))).size;
   $('#kpis').innerHTML = [
-    ['Focus time', minsToHM(mins), `${sess.length} intervals across ${activeDays} days`],
+    ['Focus time', minsToHM(mins), `${sess.filter(s => !s.tracked).length} intervals${sess.some(s => s.tracked) ? ` + ${sess.filter(s => s.tracked).length} timed` : ''} across ${activeDays} days`],
     ['Median active day', minsToHM(median(keys.map(k => byDayMap[k] || 0).filter(v => v > 0))), `${activeDays} days with any focus`],
     ['Current streak', streakDays() + 'd', 'days in a row with at least one interval'],
     ['Session quality', quality.length ? (quality.reduce((a, b) => a + b, 0) / quality.length).toFixed(1) + '/5' : '—', quality.length ? quality.length + ' rated' : 'rate a few to see this'],
     ['Distractions', distr ? (distr / Math.max(1, sess.length)).toFixed(1) : '0', 'logged per interval'],
-    ['Finished', sess.length ? Math.round(sess.filter(s => !s.partial).length / sess.length * 100) + '%' : '—', 'intervals run to the bell']
+    // Stopwatch sessions have no bell to run to, so they stay out of this one.
+    ['Finished', sess.some(s => !s.tracked) ? Math.round(sess.filter(s => !s.tracked && !s.partial).length / sess.filter(s => !s.tracked).length * 100) + '%' : '—', 'intervals run to the bell']
   ].map(([k, v, d]) => `<div class="kpi"><div class="v">${v}</div><div class="k">${k}</div><div class="d">${d}</div></div>`).join('');
   drawDaily(keys); drawHours(sess); drawHeat(); drawDistract(sess); drawSparks(); drawSubjects(sess); drawLog(sess); drawInsights(sess);
 }
@@ -1915,8 +2053,8 @@ function drawLog(sess) {
       const t = S.tasks.find(x => x.id === s.taskId);
       const d = new Date(s.start);
       return `<tr><td class="num">${d.toLocaleDateString(undefined, { month:'short', day:'numeric' })} ${hhmm(d)}</td>
-        <td>${esc(t ? t.title.slice(0, 40) : (s.intent ? s.intent.slice(0, 40) : '—'))}</td>
-        <td class="num">${s.minutes}${s.partial ? '*' : ''}</td>
+        <td>${esc(t ? t.title.slice(0, 40) : s.title ? s.title.slice(0, 40) : (s.intent ? s.intent.slice(0, 40) : '—'))}</td>
+        <td class="num"${s.tracked ? ' data-tip="Timed with the stopwatch"' : ''}>${s.minutes}${s.partial ? '*' : ''}${s.tracked ? ' ⏱' : ''}</td>
         <td class="num">${s.quality ? '★'.repeat(s.quality) : '—'}</td>
         <td class="num">${(s.distractions || []).length}</td></tr>`;
     }).join('') : '<tr><td colspan="5" style="color:var(--muted);padding:16px">No sessions in this range.</td></tr>'}</tbody>`;
@@ -1946,10 +2084,10 @@ function drawInsights(sess) {
       : '<div class="empty">Run a few sessions and the patterns show up here.</div>');
 }
 $('#exportCsv').onclick = () => {
-  const rows = [['start','end','minutes','task','course','quality','activation','distractions','intent']];
+  const rows = [['start','end','minutes','task','course','quality','activation','distractions','intent','timed']];
   S.sessions.forEach(s => {
     const t = S.tasks.find(x => x.id === s.taskId), sub = S.subjects.find(x => x.id === s.subjectId);
-    rows.push([s.start, s.end, s.minutes, t ? t.title : '', sub ? sub.name : '', s.quality || '', s.activation || '', (s.distractions || []).join('|'), s.intent || '']);
+    rows.push([s.start, s.end, s.minutes, t ? t.title : (s.title || ''), sub ? sub.name : '', s.quality || '', s.activation || '', (s.distractions || []).join('|'), s.intent || '', s.tracked ? 'stopwatch' : 'pomodoro']);
   });
   const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
   offerText('focus-sessions.csv', csv, 'Every session you have logged, ready for a spreadsheet or pandas.');
@@ -2447,6 +2585,7 @@ const COMMANDS = () => [
   { k:'Start / pause timer', s:'Space', run:toggleRun },
   { k:'Skip to next interval', s:'N', run:skipPhase },
   { k:'Reset this interval', s:'R', run:resetInterval },
+  { k:'Start / stop the stopwatch on the session task', s:'T', run:toggleTracking },
   { k:'Park a thought', s:'B', run:brainDump },
   { k:'Log a distraction', s:'D', run:() => $('#tallyBtn').click() },
   { k:'Toggle the sound mix', s:'M', run:() => $('#soundBtn').click() },
@@ -2505,6 +2644,7 @@ document.addEventListener('keydown', e => {
   else if (k === 'd') $('#tallyBtn').click();
   else if (k === 'm') $('#soundBtn').click();
   else if (k === 'p') triage();
+  else if (k === 't') toggleTracking();
 });
 $('#runBtn').onclick = toggleRun;
 $('#skipBtn').onclick = skipPhase;
@@ -3043,7 +3183,7 @@ function wireGate() {
 function renderAll() {
   applyTheme(); renderPips(); renderDial(); renderFocusSide(); renderTasks();
   renderCalendar(); renderBoard(); renderSound(); renderCalm(); renderSettings(); renderStats(); renderGcal();
-  renderBanner(); renderQuickStart(); renderStoreChip(); renderWho();
+  renderBanner(); renderQuickStart(); renderStoreChip(); renderWho(); renderTracking();
   $('#dayStart').value = S.settings.dayStart; $('#dayEnd').value = S.settings.dayEnd;
 }
 window.FocusDial = {
