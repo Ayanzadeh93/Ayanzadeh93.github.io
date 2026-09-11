@@ -3,7 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'; form-action 'self'; frame-src 'none'">
+  <!-- Firebase (only loaded once js/firebase-config.js is filled in):
+       script  www.gstatic.com = SDK + reCAPTCHA, apis.google.com = Google sign-in helper,
+               www.google.com = reCAPTCHA loader for phone sign-in
+       connect firestore / identitytoolkit / securetoken = data and auth APIs
+       frame   *.firebaseapp.com = the auth handler iframe on the authDomain,
+               www.google.com + recaptcha.google.com = reCAPTCHA widget/challenge -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' https://www.gstatic.com https://apis.google.com https://www.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://www.google.com; form-action 'self'; frame-src https://*.firebaseapp.com https://www.google.com https://recaptcha.google.com">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="color-scheme" content="light dark">
   <title>ADHD Study Pack</title>
@@ -51,18 +57,42 @@
 
       <div class="auth-note">
         <p>
-          <b>Everything stays in this browser.</b> A profile is a local name for your
+          <b>Local profiles stay in this browser.</b> A profile is a local name for your
           own data &mdash; there is no account, no password and no server. Nothing you
-          type here leaves the device, which also means it does not follow you to
+          type into one leaves the device, which also means it does not follow you to
           another one.
         </p>
       </div>
 
       <div class="auth-future">
-        <button type="button" class="auth-google" disabled aria-describedby="google-note">
+        <button id="googleSignIn" type="button" class="auth-google" disabled aria-describedby="cloudNote">
           <span aria-hidden="true">G</span> Continue with Google
         </button>
-        <p id="google-note" class="auth-future-note">
+
+        <!-- Phone sign-in: shown only when enablePhoneSignIn is on in js/firebase-config.js -->
+        <form id="phoneForm" class="auth-phone" hidden>
+          <label for="phoneInput">Or get a sign-in code by text message</label>
+          <div class="panel-form">
+            <input id="phoneInput" type="tel" inputmode="tel" autocomplete="tel"
+                   placeholder="+1 410 555 0123" maxlength="24" required>
+            <button id="phoneSend" type="submit" class="btn-secondary">Text me a code</button>
+          </div>
+        </form>
+
+        <form id="otpForm" class="auth-phone" hidden>
+          <label for="otpInput">Enter the 6-digit code sent to <b id="otpTarget"></b></label>
+          <div class="panel-form">
+            <input id="otpInput" type="text" inputmode="numeric" autocomplete="one-time-code"
+                   pattern="[0-9]{6}" maxlength="6" placeholder="123456" required>
+            <button id="otpVerify" type="submit" class="btn-primary">Verify</button>
+          </div>
+          <button id="otpBack" type="button" class="btn-ghost">Use a different number</button>
+        </form>
+
+        <!-- Firebase mounts its invisible reCAPTCHA here for phone sign-in. -->
+        <div id="recaptchaBox"></div>
+
+        <p id="cloudNote" class="auth-future-note" aria-live="polite">
           Account sync is not wired up yet. When a Firebase project is configured,
           this button signs in for real and the same pack follows you across devices.
           Until then it stays disabled rather than pretending to work.

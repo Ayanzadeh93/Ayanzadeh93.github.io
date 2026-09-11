@@ -282,7 +282,50 @@ body {
   font-weight: 700;
 }
 
+.auth-google:not(:disabled) {
+  color: var(--text);
+  cursor: pointer;
+}
+
+.auth-google:not(:disabled):hover { border-color: var(--accent); }
+
+.auth-google:not(:disabled) span {
+  color: var(--accent-ink);
+  background: var(--accent);
+}
+
+.auth-phone {
+  display: grid;
+  gap: 6px;
+  margin: 4px 0 12px;
+}
+
+.auth-phone label {
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.auth-phone .panel-form { margin-bottom: 0; }
+
+.auth-phone .btn-ghost {
+  justify-self: start;
+  padding: 5px 12px;
+  font-size: .8rem;
+}
+
 .auth-future-note { font-size: .8rem; }
+
+.auth-future-note.is-error { color: #b42318; }
+
+@media (prefers-color-scheme: dark) {
+  .auth-future-note.is-error { color: #f97066; }
+}
+
+.pack-profile[data-backend="cloud"] .pack-profile-name::after {
+  content: " · synced";
+  color: var(--accent);
+}
 
 /* ---------------------------------------------------------- app */
 
