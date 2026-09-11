@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://formspree.io; form-action 'self' https://formspree.io; frame-src 'none'; manifest-src 'self'">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>ADHD Study Pack: Focus Tool for Study Sessions | Aydin Ayanzadeh</title>
+    <meta name="description" content="A browser-based focus tool for ADHD study sessions: one visible task, an adjustable timer, step-by-step task breakdown, and a place to park intrusive thoughts.">
+    <link rel="canonical" href="https://www.ayanzadeh.com/projects/adhd-study-pack.html">
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://www.ayanzadeh.com/projects/adhd-study-pack.html">
+    <meta property="og:title" content="ADHD Study Pack: Focus Tool for Study Sessions">
+    <meta property="og:description" content="A browser-based focus tool for ADHD study sessions: one visible task, an adjustable timer, step-by-step task breakdown, and a place to park intrusive thoughts.">
+    <meta property="og:image" content="https://www.ayanzadeh.com/images/profile-compressed.jpg">
+    <meta property="og:site_name" content="Aydin Ayanzadeh - Research Portfolio">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://www.ayanzadeh.com/projects/adhd-study-pack.html">
+    <meta name="twitter:title" content="ADHD Study Pack: Focus Tool for Study Sessions">
+    <meta name="twitter:description" content="A browser-based focus tool for ADHD study sessions: one visible task, an adjustable timer, step-by-step task breakdown, and a place to park intrusive thoughts.">
+    <meta name="twitter:image" content="https://www.ayanzadeh.com/images/profile-compressed.jpg">
+    <meta name="twitter:creator" content="@ayanzadeh93">
+    <meta name="twitter:site" content="@ayanzadeh93">
+
+    <!-- Apply the saved (or system) theme before first paint to avoid a light-mode flash -->
+    <script>
+        (function () {
+            var saved = null;
+            try { saved = localStorage.getItem('theme'); } catch (e) { /* storage unavailable */ }
+            var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            var dark = saved === 'dark' || (!saved && prefersDark);
+            document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+        })();
+    </script>
+
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/project.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer"></noscript>
+    <!-- seo-schema -->
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "ADHD Study Pack",
+    "url": "https://www.ayanzadeh.com/projects/adhd-study-pack.html",
+    "description": "Browser-based focus and executive-function tool for ADHD study sessions.",
+    "author": {
+        "@id": "https://www.ayanzadeh.com/#person"
+    },
+    "creator": {
+        "@id": "https://www.ayanzadeh.com/#person"
+    },
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "Web",
+    "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+    }
+}
+    </script>
+
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://www.ayanzadeh.com/"
+        },
+        {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Projects",
+            "item": "https://www.ayanzadeh.com/#projects"
+        },
+        {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "ADHD Study Pack",
+            "item": "https://www.ayanzadeh.com/projects/adhd-study-pack.html"
+        }
+    ]
+}
+    </script>
+    <!-- /seo-schema -->
+</head>
+<body class="project-page">
+    <!-- Navigation -->
+    <nav class="project-nav">
+        <div class="container">
+            <a href="../index.html" class="back-link">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Portfolio</span>
+            </a>
+            <div class="nav-links">
+                <a href="../index.html#projects">All Projects</a>
+                <a href="../index.html#contact">Contact</a>
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Switch to dark theme">
+                    <i class="fas fa-moon" aria-hidden="true"></i> <span>Theme</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+    <nav class="schema-breadcrumbs" aria-label="Breadcrumb">
+        <ol>
+            <li><a href="https://www.ayanzadeh.com/">Home</a></li>
+            <li><a href="https://www.ayanzadeh.com/#projects">Projects</a></li>
+            <li aria-current="page">ADHD Study Pack</li>
+        </ol>
+    </nav>
+    <main class="project-main">
+        <!-- Project Hero -->
+        <section class="project-hero">
+            <div class="container">
+                <div class="project-hero-content">
+                    <div class="project-badges">
+                        <span class="badge featured">Assistive Tooling</span>
+                        <span class="badge status">Live &mdash; local-first</span>
+                    </div>
+                    <h1>ADHD Study Pack</h1>
+                    <p class="project-tagline">A Focus Tool Built Around How a Study Session Actually Falls Apart</p>
+                    <div class="project-meta-info">
+                        <div class="meta-item">
+                            <i class="fas fa-user"></i>
+                            <span><strong>Aydin Ayanzadeh</strong></span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-shield-halved"></i>
+                            <span>Runs entirely in the browser</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-calendar"></i>
+                            <span>2026</span>
+                        </div>
+                    </div>
+                    <div class="project-actions">
+                        <a href="../apps/adhd-study-pack.html" class="btn btn-primary">
+                            <i class="fas fa-circle-half-stroke"></i> Open the Study Pack
+                        </a>
+                        <a href="../index.html#projects" class="btn btn-secondary">
+                            <i class="fas fa-th"></i> All Projects
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Overview -->
+        <section class="project-section">
+            <div class="container">
+                <h2><i class="fas fa-eye"></i> Overview</h2>
+                <div class="overview-content">
+                    <p class="lead">
+                        Most study tools assume the hard part is knowing what to do. For an ADHD
+                        working session it usually is not &mdash; the hard part is starting, and then
+                        staying started.
+                    </p>
+                    <p>
+                        The Study Pack is built around the three specific ways a session tends to
+                        come apart. A full task list on screen produces the freeze, so only one task
+                        is ever in the foreground. A task phrased as &ldquo;write the chapter&rdquo;
+                        has no first move, so tasks break into steps and the next unfinished step is
+                        surfaced automatically. And an unrelated thought arriving mid-paragraph
+                        becomes a new tab and then the end of the session, so there is one keystroke
+                        that parks it and returns you to the task.
+                    </p>
+                    <p>
+                        The timer is deliberately adjustable rather than fixed at twenty-five
+                        minutes. A block length that is someone else&rsquo;s attention span is a
+                        block you abandon; one you set to what is survivable today is one you
+                        finish. Partial sessions are logged rather than discarded for the same
+                        reason &mdash; erasing a twelve-minute effort because it was not twenty-five
+                        teaches exactly the wrong lesson.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features -->
+        <section class="project-section alt-bg">
+            <div class="container">
+                <h2><i class="fas fa-star"></i> What It Does</h2>
+                <div class="overview-content">
+                    <p>
+                        <strong>One task in the foreground.</strong> A single card shows the current
+                        task and its next unfinished step. Everything else stays in the list below,
+                        and the active task is pinned to the top so the two views never disagree.
+                    </p>
+                    <p>
+                        <strong>Step breakdown.</strong> Any task expands into small steps.
+                        Completing every step completes the task, which makes the closure visible
+                        rather than something you have to decide about.
+                    </p>
+                    <p>
+                        <strong>An adjustable focus block.</strong> One to ninety minutes, with a
+                        quiet progress line along the card edge rather than anything that flashes.
+                        The countdown tracks the wall clock, not interval ticks, so a backgrounded
+                        tab does not silently run the timer slow.
+                    </p>
+                    <p>
+                        <strong>Thought parking.</strong> <kbd>Alt</kbd> + <kbd>P</kbd> from
+                        anywhere drops an intrusive thought into a list and returns focus. Anything
+                        parked that turns out to be real work converts to a task in one click.
+                    </p>
+                    <p>
+                        <strong>Today, not forever.</strong> Blocks completed, minutes focused and a
+                        day streak. Enough to notice a good run; not so much that the statistics
+                        become the activity.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Privacy -->
+        <section class="project-section">
+            <div class="container">
+                <h2><i class="fas fa-lock"></i> Where the Data Lives</h2>
+                <div class="overview-content">
+                    <p class="lead">
+                        Everything stays in your browser. There is no account, no password and no
+                        server.
+                    </p>
+                    <p>
+                        A &ldquo;profile&rdquo; is a local label for one set of data in
+                        <code>localStorage</code> &mdash; it separates two people sharing a laptop,
+                        and that is all it claims to do. It is not authentication, and the page says
+                        so rather than presenting a login box that implies protection it does not
+                        provide. Nothing typed into the Study Pack leaves the device, which also
+                        means it does not follow you to another one.
+                    </p>
+                    <p>
+                        Storage sits behind a single adapter in
+                        <code>js/adhd-study-pack.js</code>, and every method on it is already async.
+                        Adding Firebase later means replacing that one object &mdash; no call site
+                        changes shape, because none of them know where the data lives. The
+                        &ldquo;Continue with Google&rdquo; button on the sign-in screen is present
+                        but disabled until that is configured; a control that silently does nothing
+                        is worse than one that says it is not ready.
+                    </p>
+                    <p>
+                        <strong>To enable accounts and sync:</strong> create a Firebase project,
+                        add the web config and swap the adapter&rsquo;s
+                        <code>read</code>/<code>write</code> to Firestore, then extend the
+                        <code>connect-src</code> directive in the app&rsquo;s Content Security
+                        Policy to the Firebase origins. The CSP is intentionally strict
+                        (<code>script-src 'self'</code>, no inline scripts), so that last step is
+                        required &mdash; requests will be blocked until it is done.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Design notes -->
+        <section class="project-section alt-bg">
+            <div class="container">
+                <h2><i class="fas fa-universal-access"></i> Design &amp; Accessibility</h2>
+                <div class="overview-content">
+                    <p>
+                        The interface is deliberately quiet: one accent colour, no animation that
+                        starts on its own, and no notification the reader did not ask for. Under
+                        <code>prefers-reduced-motion</code> the remaining transitions drop out
+                        entirely.
+                    </p>
+                    <p>
+                        Every control is reachable and operable from the keyboard, state changes are
+                        announced through a polite live region, checkboxes carry labels naming the
+                        task they belong to rather than a bare &ldquo;done&rdquo;, and the layout
+                        holds up in forced-colours mode. Light and dark both follow the system
+                        setting.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technologies -->
+        <section class="project-section">
+            <div class="container">
+                <h2><i class="fas fa-code"></i> Technologies Used</h2>
+                <div class="tech-stack">
+                    <span class="tech-item">Vanilla JavaScript</span>
+                    <span class="tech-item">ES Modules</span>
+                    <span class="tech-item">Web Storage API</span>
+                    <span class="tech-item">CSS Custom Properties</span>
+                    <span class="tech-item">ARIA Live Regions</span>
+                    <span class="tech-item">Progressive Enhancement</span>
+                </div>
+                <div class="overview-content">
+                    <p>
+                        No framework, no bundler and no build step &mdash; the browser runs the
+                        source exactly as committed. The app shares
+                        <code>js/lib/dom.js</code> with the rest of the site, so node building and
+                        debouncing have one implementation here too.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="project-cta">
+            <div class="container">
+                <h2>Try the Study Pack</h2>
+                <p>Opens instantly, keeps everything on your device, and needs no account.</p>
+                <a href="../apps/adhd-study-pack.html" class="btn btn-primary btn-lg">
+                    <i class="fas fa-circle-half-stroke"></i> Open the Study Pack
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="project-footer">
+        <div class="container">
+            <p>&copy; 2026 Aydin Ayanzadeh. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="../index.html">Home</a>
+                <a href="../index.html#projects">Projects</a>
+                <a href="../index.html#publications">Publications</a>
+            </div>
+        </div>
+    </footer>
+
+    <button type="button" id="backToTop" class="back-to-top" aria-label="Back to top" hidden>
+        <i class="fas fa-arrow-up" aria-hidden="true"></i>
+    </button>
+
+    <script src="../js/main.js"></script>
+</body>
+</html>
