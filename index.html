@@ -431,46 +431,76 @@
 
                     <div class="about-details">
                         <div class="research-interests">
-                            <h3>Research Interests</h3>
-                            <div class="interest-tags" role="list" aria-label="Research interest areas">
-                                <span class="tag" role="listitem">Computer Vision</span>
-                                <span class="tag" role="listitem">Medical Image Analysis</span>
-                                <span class="tag" role="listitem">Multimodal Learning</span>
-                                <span class="tag" role="listitem">Large Language Models</span>
-                                <span class="tag" role="listitem">Vision-Language Models</span>
-                                <span class="tag" role="listitem">Accessibility Technology</span>
-                                <span class="tag" role="listitem">Environmental AI</span>
-                                <span class="tag" role="listitem">Knowledge Distillation</span>
+                            <header class="about-block-head">
+                                <span class="about-kicker">Where the work sits</span>
+                                <h3>Research Interests</h3>
+                            </header>
+                            <div class="interest-groups">
+                                <section class="interest-group" aria-labelledby="interest-perception">
+                                    <h4 id="interest-perception" class="interest-group-label">Perception &amp; models</h4>
+                                    <ul class="interest-mosaic">
+                                        <li class="interest-chip" data-tone="vision">Computer Vision</li>
+                                        <li class="interest-chip" data-tone="vision">Medical Image Analysis</li>
+                                        <li class="interest-chip" data-tone="language">Multimodal Learning</li>
+                                        <li class="interest-chip" data-tone="language">Large Language Models</li>
+                                        <li class="interest-chip" data-tone="vision">Vision-Language Models</li>
+                                    </ul>
+                                </section>
+                                <section class="interest-group" aria-labelledby="interest-applied">
+                                    <h4 id="interest-applied" class="interest-group-label">People &amp; planet</h4>
+                                    <ul class="interest-mosaic">
+                                        <li class="interest-chip" data-tone="access">Accessibility Technology</li>
+                                        <li class="interest-chip" data-tone="earth">Environmental AI</li>
+                                    </ul>
+                                </section>
+                                <section class="interest-group" aria-labelledby="interest-methods">
+                                    <h4 id="interest-methods" class="interest-group-label">Methods</h4>
+                                    <ul class="interest-mosaic">
+                                        <li class="interest-chip" data-tone="method">Knowledge Distillation</li>
+                                    </ul>
+                                </section>
                             </div>
                         </div>
 
                         <div class="current-focus">
-                            <h3>Current Focus</h3>
+                            <header class="about-block-head">
+                                <span class="about-kicker">Active threads</span>
+                                <h3>Current Focus</h3>
+                            </header>
                             <div class="focus-items">
-                                <div class="focus-item">
-                                    <i class="fas fa-eye"></i>
-                                    <div>
-                                        <h4>Accessibility AI</h4>
-                                        <p>Developing LLM-based navigation systems for individuals with visual
-                                            impairments</p>
+                                <article class="focus-item focus-panel focus-panel--access">
+                                    <div class="focus-panel-top">
+                                        <span class="focus-index" aria-hidden="true">01</span>
+                                        <span class="focus-icon" aria-hidden="true">
+                                            <i class="fas fa-universal-access"></i>
+                                        </span>
                                     </div>
-                                </div>
-                                <div class="focus-item">
-                                    <i class="fas fa-fire"></i>
-                                    <div>
-                                        <h4>Environmental AI</h4>
-                                        <p>Creating Vision-Language Models for early wildfire detection and
-                                            environmental monitoring</p>
+                                    <h4>Accessibility AI</h4>
+                                    <p>Developing LLM-based navigation systems for individuals with visual
+                                        impairments</p>
+                                </article>
+                                <article class="focus-item focus-panel focus-panel--earth">
+                                    <div class="focus-panel-top">
+                                        <span class="focus-index" aria-hidden="true">02</span>
+                                        <span class="focus-icon" aria-hidden="true">
+                                            <i class="fas fa-fire"></i>
+                                        </span>
                                     </div>
-                                </div>
-                                <div class="focus-item">
-                                    <i class="fas fa-microscope"></i>
-                                    <div>
-                                        <h4>Medical AI</h4>
-                                        <p>Advancing deep learning techniques for medical image analysis and diagnosis
-                                        </p>
+                                    <h4>Environmental AI</h4>
+                                    <p>Creating Vision-Language Models for early wildfire detection and
+                                        environmental monitoring</p>
+                                </article>
+                                <article class="focus-item focus-panel focus-panel--medical">
+                                    <div class="focus-panel-top">
+                                        <span class="focus-index" aria-hidden="true">03</span>
+                                        <span class="focus-icon" aria-hidden="true">
+                                            <i class="fas fa-notes-medical"></i>
+                                        </span>
                                     </div>
-                                </div>
+                                    <h4>Medical AI</h4>
+                                    <p>Advancing deep learning techniques for medical image analysis and diagnosis
+                                    </p>
+                                </article>
                             </div>
                         </div>
 
@@ -1537,12 +1567,12 @@
                         </div>
                         <div class="project-card-body">
                             <h3>Claude Code Encyclopedia</h3>
-                            <p>Searchable, offline-capable reference for Claude Code and Codex CLI &mdash; 504 commands,
-                                flags, settings keys and config paths across three platforms.</p>
+                            <p>Searchable reference for Claude Code, Codex CLI and GitHub CLI &mdash; commands, flags,
+                                settings and config paths in one page, with OS-aware examples.</p>
                             <div class="project-tags">
                                 <span>Vanilla JS</span>
+                                <span>GitHub CLI</span>
                                 <span>Developer Tools</span>
-                                <span>Zero Dependencies</span>
                             </div>
                             <a href="projects/claude-code-encyclopedia.html" class="btn-read-more">
                                 Read More <i class="fas fa-arrow-right"></i>

@@ -198,12 +198,12 @@ PROJECTS = {
     },
     "projects/claude-code-encyclopedia.html": {
         "name": "Claude Code Encyclopedia",
-        "desc": "Searchable reference for Claude Code and OpenAI Codex CLI commands, flags, and config paths.",
+        "desc": "Searchable reference for Claude Code, OpenAI Codex CLI and GitHub CLI commands, flags, and config paths.",
         "type": "webapp",
     },
     "apps/claude-code-encyclopedia.html": {
         "name": "Claude Code Encyclopedia",
-        "desc": "Searchable reference for Claude Code and OpenAI Codex CLI commands, flags, and config paths.",
+        "desc": "Searchable reference for Claude Code, OpenAI Codex CLI and GitHub CLI commands, flags, and config paths.",
         "type": "webapp",
     },
 }

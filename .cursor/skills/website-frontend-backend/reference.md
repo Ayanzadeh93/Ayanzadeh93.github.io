@@ -184,9 +184,11 @@ title 10 / authors 6 / venue 4 / tags 3 / year 2.
 
 ## CLI Catalog Entry Template
 
-Records live in `data/claude-code/catalog.json` and are rendered by
-`js/claude-code-catalog.js`. Adding a command is a data edit; the renderer never
-needs to change.
+Records live in `data/claude-code/catalog.json`. The encyclopedia at
+`apps/claude-code-encyclopedia.html` ingests the **GitHub** family from that
+file and renders it with the same UI as Claude Code and Codex. Adding a `gh`
+command is a data edit; the renderer never needs to change. Older
+`apps/claude-code-catalog.html` URLs redirect into the encyclopedia.
 
 ```json
 {
@@ -215,9 +217,10 @@ needs to change.
 | `tags` | At least one. Searchable, and the first six render as chips. |
 | `note` | Use it for the caveat, not for restating the description. `null` when there isn't one. |
 
-Search weights are set in `js/claude-code-catalog.js`: name 12, aliases 8,
-description 5, tags 4, examples 3, type 2. Tokens are AND-ed and
-diacritic-folded by `js/lib/search.js`.
+Search in the live encyclopedia is name-first and token AND-ed. The legacy
+catalog renderer in `js/claude-code-catalog.js` (still imported so CI can check
+shared modules) used weights name 12, aliases 8, description 5, tags 4,
+examples 3, type 2. Tokens are AND-ed and diacritic-folded by `js/lib/search.js`.
 
 Two rendering modes, chosen by whether a query is active:
 

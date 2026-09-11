@@ -48,7 +48,7 @@ changes are data edits and must never require touching rendering code**:
 | Data file | Rendered by | Covers |
 |-----------|-------------|--------|
 | `data/projects.json` | `js/projects-index.js`, `js/project-detail.js` | The projects index and detail routes |
-| `data/claude-code/catalog.json` | `js/claude-code-catalog.js` | The CLI catalog: Claude Code, Codex and GitHub CLI |
+| `data/claude-code/catalog.json` | `apps/claude-code-encyclopedia.html` (GitHub family) | GitHub CLI entries in the encyclopedia. Claude Code and Codex remain embedded in that page. `apps/claude-code-catalog.html` redirects there. |
 
 `tests/validate_content.py` validates both on every push and pull request via
 `.github/workflows/content-validation.yml`. It enforces unique ids, resolvable
