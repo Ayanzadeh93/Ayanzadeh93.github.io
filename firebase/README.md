@@ -147,10 +147,16 @@ so browsers do not mix a cached old script with the new page.
 | `js/firebase-config.js` | The Firebase config. `null` runs the app with local profiles only. |
 | `apps/adhd-study-pack.html` | Markup, the CSP, and the JSON config block (app name, storage key, which sign-in options appear). |
 | `js/adhd-study-pack.js` | The whole app. Its storage adapter writes to localStorage for local profiles and to Firestore for Google users, and it loads Firebase SDK 12.19.0 from gstatic only when configured. |
-| `css/adhd-study-pack.css` | Styles, light and dark. |
+| `js/lib/comfort.js` | Accessibility and comfort settings: the defaults and the starting profiles, `applyComfort()` (reflects them onto `<html>`), the screen-reader live-region announcer, and the built-in voice. Imported with `?v=` like the page's other assets. |
+| `css/adhd-study-pack.css` | Styles, light and dark, plus the comfort variants (text scale, spacing, typeface, high contrast, muted and grey colour, strong focus ring, reduced motion). |
 | `firebase/firestore.rules` | Access rules. Keep them in sync with the Console. |
 
 Data layout: `users/{uid}/workspace/state` → `{ json: <whole workspace>, updated: <ms>, app: <version> }`.
+
+The comfort settings travel inside that workspace at `settings.comfort`, so they follow the
+account to every device. They are also mirrored per device in
+`localStorage['adhd-study-pack.v1.comfort']` so the sign-in screen already looks right before
+anyone is signed in.
 
 ## Known limits
 

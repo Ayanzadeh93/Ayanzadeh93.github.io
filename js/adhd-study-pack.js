@@ -11,6 +11,8 @@
    the page.
    ===================================================================== */
 import { firebaseConfig } from './firebase-config.js';
+import { COMFORT_PRESETS, COMFORT_DEFAULTS, presetComfort, changesFromProfile, normaliseComfort,
+         applyComfort, announce, speech } from './lib/comfort.js?v=3.3.0';   // versioned like the page's own assets: GitHub Pages caches for ten minutes
 const $  = (s, r) => (r || document).querySelector(s);
 const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
 const uid = () => Math.random().toString(36).slice(2, 10);
@@ -34,7 +36,7 @@ const DOW = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
    defaults, then a <script type="application/json" id="focus-dial-config">
    block, then window.FOCUS_DIAL_CONFIG.
    ===================================================================== */
-const VERSION = '3.2.0';
+const VERSION = '3.3.0';
 const DEFAULT_CONFIG = {
   storageKey: 'focusdial.v3',
   storage:    'local',            // 'local' | 'session' | 'memory' | 'rest'
@@ -86,11 +88,23 @@ const DEFAULT_LISTS = {
 const LIST = k => (S.lists && Array.isArray(S.lists[k]) && S.lists[k].length) ? S.lists[k] : DEFAULT_LISTS[k];
 const clone = v => JSON.parse(JSON.stringify(v));
 
+/* Comfort settings (accessibility and sensory preferences, js/lib/comfort.js)
+   live in the workspace so they follow the account, and are mirrored per
+   device so the sign-in screen, before any workspace opens, already has the
+   reader's text size, contrast, motion and theme. */
+const COMFORT_KEY = CFG.storageKey + '.comfort';
+function deviceRecord() { try { return JSON.parse(localStorage.getItem(COMFORT_KEY) || 'null') || {}; } catch (e) { return {}; } }
+const deviceComfort = () => normaliseComfort(deviceRecord().comfort);
+function rememberComfort(settings) {
+  try { localStorage.setItem(COMFORT_KEY, JSON.stringify({ comfort:settings.comfort, theme:settings.theme, accent:settings.accent })); } catch (e) {}
+}
+
 const DEFAULTS = () => ({
   schema: 3,
   settings: Object.assign({ focus:25, short:5, long:15, cycles:4, autoBreak:true, autoFocus:false, titleClock:true,
               chime:true, chimeVol:70, notify:false, checkinAfter:true, moveBreak:true, hideSeconds:false,
-              theme:'auto', accent:'focus', dayStart:'08:00', dayEnd:'21:00' }, CFG.settings || {}),
+              theme:deviceRecord().theme || 'auto', accent:deviceRecord().accent || 'focus', dayStart:'08:00', dayEnd:'21:00',
+              comfort:deviceComfort() }, CFG.settings || {}),
   lists: Object.assign(clone(DEFAULT_LISTS), CFG.lists || {}),
   tasks: [], events: [], notes: [], sessions: [], checkins: [], subjects: [], links: [],
   sound: { master:60, layers:{}, beat:10, carrier:180 },
@@ -190,6 +204,7 @@ function migrate(raw) {
   if (!raw || typeof raw !== 'object') return null;
   const d = DEFAULTS(), out = Object.assign(d, raw);
   ['settings','lists','sound','gcal','timer','meta'].forEach(k => out[k] = Object.assign(DEFAULTS()[k], raw[k] || {}));
+  out.settings.comfort = normaliseComfort(out.settings.comfort);      // keys added since it was saved
   ['tasks','events','notes','sessions','checkins','subjects','links'].forEach(k => { if (!Array.isArray(out[k])) out[k] = []; });
   out.tasks.forEach(t => { if (!('quad' in t)) t.quad = null; if (!t.id) t.id = uid(); });
   out.schema = 3;
@@ -412,61 +427,133 @@ const FB_ERRORS = {
 };
 const fbMsg = e => (e && FB_ERRORS[e.code]) || (e && e.message) || 'Something went wrong.';
 
-/* ---------- toast + tooltip + modal ---------- */
-function toast(msg, ms) {
-  const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
-  $('#toasts').appendChild(t); setTimeout(() => t.remove(), ms || 2600);
+/* ---------- messages, tooltips, dialogs ----------
+   A message always reaches screen readers through the live region, whatever
+   the visual setting. The comfort settings decide what appears on screen, for
+   how long, and whether the built-in voice says it.
+   level: 'info' (default), 'important' (errors and warnings), 'coach'
+   (encouragement — dropped when coaching is off), 'alert' (interrupts). */
+const CF = () => S.settings.comfort;
+const IMPORTANT = /could not|couldn|failed|not saved|blocked|expired|refused|error|did not|no longer|denied|left in this|warning/i;
+const MESSAGE_MS = { short:3200, long:8000 };
+function say(text, interrupt = true) {
+  const c = CF(); if (c.speech && text) speech.say(text, { voice:c.voice, rate:c.rate, interrupt });
 }
+function toast(msg, ms, level) {
+  const c = CF();
+  const lvl = level || (IMPORTANT.test(msg) ? 'important' : 'info');
+  if (lvl === 'coach' && !c.coaching) return;
+  announce(msg, lvl === 'alert');
+  if (c.speakMessages) say(msg, false);
+  const shown = c.messages === 'all' || (c.messages === 'important' && lvl !== 'info' && lvl !== 'coach');
+  if (!shown) return;
+  const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
+  if (c.messageTime === 'stay') {
+    const x = document.createElement('button'); x.type = 'button'; x.className = 'toast-x'; x.textContent = '✕';
+    x.setAttribute('aria-label', 'Dismiss message'); x.onclick = () => t.remove();
+    t.appendChild(x); $('#toasts').removeAttribute('aria-hidden');
+  } else setTimeout(() => t.remove(), Math.max(ms || 0, MESSAGE_MS[c.messageTime] || MESSAGE_MS.short));
+  $('#toasts').appendChild(t);
+}
+/* Tooltips: shown for the mouse and for keyboard focus, and exposed to screen
+   readers as the element's description. */
 const tipEl = () => $('#tip');
+function showTip(host, x, y) {
+  const t = tipEl(); t.textContent = host.dataset.tip; t.classList.add('on');
+  const r = t.getBoundingClientRect();
+  t.style.left = clamp(x + 12, 8, innerWidth - r.width - 8) + 'px';
+  t.style.top = clamp(y - r.height - 10, 8, innerHeight - r.height - 8) + 'px';
+}
 document.addEventListener('mouseover', e => {
   const host = e.target.closest && e.target.closest('[data-tip]');
   if (!host) return;
-  const t = tipEl(); t.textContent = host.dataset.tip; t.classList.add('on');
-  const move = ev => { const r = t.getBoundingClientRect();
-    t.style.left = clamp(ev.clientX + 12, 8, innerWidth - r.width - 8) + 'px';
-    t.style.top = clamp(ev.clientY - r.height - 10, 8, innerHeight - r.height - 8) + 'px'; };
+  const move = ev => showTip(host, ev.clientX, ev.clientY);
   move(e); host.addEventListener('mousemove', move);
-  host.addEventListener('mouseleave', () => { t.classList.remove('on'); host.removeEventListener('mousemove', move); }, { once:true });
+  host.addEventListener('mouseleave', () => { tipEl().classList.remove('on'); host.removeEventListener('mousemove', move); }, { once:true });
 });
-let modalDone = null;
+document.addEventListener('focusin', e => {
+  const host = e.target.closest && e.target.closest('[data-tip]');
+  if (!host || !host.matches(':focus-visible')) return;
+  const r = host.getBoundingClientRect(); showTip(host, r.left, r.top);
+});
+document.addEventListener('focusout', () => tipEl().classList.remove('on'));
+new MutationObserver(() => {
+  $$('[data-tip]:not([aria-description])').forEach(el => {
+    if (el.getAttribute('aria-label') !== el.dataset.tip) el.setAttribute('aria-description', el.dataset.tip);
+  });
+}).observe(document.body, { childList:true, subtree:true });
+/* Anything clickable that is not a real button still works from the keyboard. */
+document.addEventListener('keydown', e => {
+  if ((e.key !== 'Enter' && e.key !== ' ') || e.repeat) return;
+  const el = e.target;
+  if (!el.matches || !el.matches('[role="button"]:not(button), [role="option"]')) return;
+  e.preventDefault(); el.click();
+});
+
+/* Dialogs: the page behind is made inert (unreachable by Tab and by screen
+   readers), focus moves inside, and returns where it was on close. */
+let modalDone = null, modalOpener = null;
+function syncInert() {
+  const overlay = $('#scrim').classList.contains('on') || $('#cmdScrim').classList.contains('on');
+  const gate = $('#gate').classList.contains('on');
+  $('.app').inert = overlay || gate;
+  $('#gate').inert = overlay;
+}
 function openModal(title, bodyHTML, actions, onMount) {
+  if (!$('#scrim').classList.contains('on')) modalOpener = document.activeElement;
   $('#modalTitle').textContent = title;
   $('#modalBody').innerHTML = bodyHTML;
   const foot = $('#modalFoot'); foot.innerHTML = '';
   (actions || [{ label:'Close' }]).forEach(a => {
     const b = document.createElement('button');
-    b.className = 'btn' + (a.primary ? ' primary' : '') ; b.textContent = a.label;
+    b.type = 'button'; b.className = 'btn' + (a.primary ? ' primary' : ''); b.textContent = a.label;
     b.onclick = () => { if (!a.onClick || a.onClick() !== false) closeModal(); };
     foot.appendChild(b);
   });
-  $('#scrim').classList.add('on');
+  $('#scrim').classList.add('on'); syncInert();
   if (onMount) onMount($('#modalBody'));
-  const f = $('#modalBody').querySelector('input,textarea,select'); if (f) setTimeout(() => f.focus(), 40);
+  const f = $('#modalBody').querySelector('input,textarea,select,button,[tabindex="0"]') || foot.querySelector('.primary') || foot.querySelector('button');
+  setTimeout(() => { if (f) f.focus(); }, 40);
 }
-function closeModal() { $('#scrim').classList.remove('on'); if (modalDone) { modalDone(); modalDone = null; } }
+function closeModal() {
+  if (!$('#scrim').classList.contains('on')) return;
+  $('#scrim').classList.remove('on'); syncInert();
+  if (modalDone) { modalDone(); modalDone = null; }
+  const back = modalOpener; modalOpener = null;
+  if (back && document.contains(back) && !back.closest('[inert],[hidden]')) back.focus();
+}
 $('#modalX').onclick = closeModal;
 $('#scrim').addEventListener('click', e => { if (e.target.id === 'scrim') closeModal(); });
 
-/* ---------- theme ---------- */
+/* ---------- theme and comfort ---------- */
 function applyTheme() {
   const t = S.settings.theme;
   if (t === 'auto') document.documentElement.removeAttribute('data-theme');
   else document.documentElement.setAttribute('data-theme', t);
   document.documentElement.setAttribute('data-accent', S.settings.accent);
-  $('#themeLbl').textContent = t === 'auto' ? 'Auto' : (t === 'dark' ? 'Dark' : 'Light');
+  const label = t === 'auto' ? 'Auto' : (t === 'dark' ? 'Dark' : 'Light');
+  $('#themeLbl').textContent = label;
+  $('#themeBtn').setAttribute('aria-label', `Theme: ${label}. Press to switch`);
+  applyComfort(CF());
+  $$('.rail-btn[data-view]').forEach(b => { b.hidden = CF().hiddenViews.includes(b.dataset.view); });
+  rememberComfort(S.settings);
 }
 $('#themeBtn').onclick = () => {
   const order = ['auto','light','dark'];
   S.settings.theme = order[(order.indexOf(S.settings.theme) + 1) % 3];
   applyTheme(); save(); renderSettings();
+  announce('Theme: ' + $('#themeLbl').textContent);
 };
 
-/* ---------- router ---------- */
+/* ---------- router ----------
+   Changing view moves focus to its heading, so screen readers announce where
+   you are and Tab starts from the top of the new view. */
 let view = 'focus';
-function go(v) {
+function go(v, opts) {
+  const moved = view !== v;
   view = v;
   $$('.view').forEach(s => s.classList.toggle('on', s.id === 'view-' + v));
-  $$('.rail-btn[data-view]').forEach(b => b.setAttribute('aria-current', String(b.dataset.view === v)));
+  $$('.rail-btn[data-view]').forEach(b => { if (b.dataset.view === v) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
   $('#miniTimer').hidden = (v === 'focus');
   if (v === 'stats') renderStats();
   if (v === 'plan') renderCalendar();
@@ -476,6 +563,11 @@ function go(v) {
   if (v === 'sound') renderSound();
   if (v === 'tasks') renderTasks();
   if (v === 'matrix') renderMatrix();
+  if (moved && !(opts && opts.quiet)) {
+    const h = $('#view-' + v + ' .view-head h2') || $('#view-' + v + ' h2');
+    if (h) { h.tabIndex = -1; h.focus({ preventScroll:true }); }
+    else { const m = $('#main'); if (m) m.focus({ preventScroll:true }); }
+  }
 }
 $$('.rail-btn[data-view]').forEach(b => b.onclick = () => go(b.dataset.view));
 document.addEventListener('click', e => { const g = e.target.closest('[data-goto]'); if (g) go(g.dataset.goto); });
@@ -500,6 +592,7 @@ function setPhase(p, keepRun) {
   T.endsAt = T.running ? Date.now() + T.remain : 0;
   T.startedAt = T.running ? Date.now() : null;
   T.distractions = [];
+  T.warned = false; T.srBucket = null;
   paintPhase(); renderDial(); renderPips();
   emit('phase', { phase:p, running:T.running, minutes:T.planned, cycle:S.timer.cycle });
 }
@@ -511,7 +604,51 @@ function paintPhase() {
   $('#miniPhase').textContent = p.label;
   $('#stage').classList.toggle('paused', !T.running);
   $('#runIcon').innerHTML = T.running ? '<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>' : '<path d="M8 5v14l11-7z"/>';
-  $('#runBtn').setAttribute('aria-label', T.running ? 'Pause' : 'Start');
+  $('#runBtn').setAttribute('aria-label', (T.running ? 'Pause ' : 'Start ') + p.label.toLowerCase());
+}
+/* What the timer is doing, for people who cannot see the dial: screen readers
+   always hear it; the built-in voice says it when "speak timer events" is on. */
+function timerNews(msg, urgent) {
+  announce(msg, urgent);
+  const c = CF(); if (c.speech && c.speakTimer) say(msg, true);
+}
+const minsText = ms => { const m = Math.max(1, Math.round(ms / 60000)); return m === 1 ? '1 minute' : m + ' minutes'; };
+/* Checked every tick: an advance warning before the timer ends (predictable
+   transitions matter to many autistic people, and to anyone deep in a task),
+   and a periodic "time left" for screen-reader users, who cannot glance at it. */
+function timerWarnings() {
+  const c = CF(), label = PHASES[T.phase].label.toLowerCase();
+  if (c.warnBefore && !T.warned && T.remain <= c.warnBefore * 60000 && phaseMs(T.phase) > c.warnBefore * 90000) {
+    T.warned = true;
+    const msg = `${minsText(T.remain)} left in this ${label}. ${T.phase === 'focus' ? 'A break comes next.' : 'Focus comes next.'}`;
+    chime('soft');
+    toast(msg, 0, 'important');
+    if (c.speech && c.speakTimer && !c.speakMessages) say(msg);
+  }
+  if (c.srTimeLeft) {
+    const bucket = Math.ceil(T.remain / (c.srTimeLeft * 60000));
+    if (T.srBucket == null) T.srBucket = bucket;
+    else if (bucket < T.srBucket && T.remain > 30000) { T.srBucket = bucket; announce(`${minsText(T.remain)} left in ${label}`); }
+  }
+}
+/* A = read the session aloud with the built-in voice, even if spoken
+   updates are off: it is an explicit request. */
+function readFocusAloud() {
+  const t = S.tasks.find(x => x.id === S.timer.taskId);
+  const parts = [t ? 'Current task: ' + t.title + '.' : 'No task selected.'];
+  if (S.timer.intent) parts.push('Done looks like: ' + S.timer.intent + '.');
+  parts.push(`${PHASES[T.phase].label}: ${T.running ? minsText(tickRemain()) + ' left' : 'not running, ' + minsText(T.remain || phaseMs(T.phase)) + ' set'}.`);
+  if (S.track) parts.push(`Stopwatch on ${S.track.title}: ${minsText(trackElapsed())}.`);
+  const text = parts.join(' ');
+  if (!speech.supported) { announce(text); toast('This browser has no built-in voice'); return; }
+  speech.say(text, { voice:CF().voice, rate:CF().rate });
+}
+function readSelectionAloud() {
+  const text = String(window.getSelection ? window.getSelection() : '').trim() || cmdSelection;
+  cmdSelection = '';
+  if (!text) { toast('Select some text first, then ask again'); return; }
+  if (!speech.supported) { toast('This browser has no built-in voice'); return; }
+  speech.say(text, { voice:CF().voice, rate:CF().rate });
 }
 function tickRemain() {
   if (T.running) T.remain = Math.max(0, T.endsAt - Date.now());
@@ -560,13 +697,24 @@ function start() {
     T.running = true;
     T.endsAt = Date.now() + (T.remain || phaseMs(T.phase));
     if (!T.startedAt) T.startedAt = Date.now();
+    T.srBucket = null;
     paintPhase();
-    if (T.phase === 'focus') toast(S.timer.intent ? 'Go: ' + S.timer.intent.slice(0, 48) : 'Timer running — one thing only');
+    const task = S.tasks.find(t => t.id === S.timer.taskId);
+    timerNews(`${PHASES[T.phase].label} started, ${minsText(T.endsAt - Date.now())}${T.phase === 'focus' && task ? ', on ' + task.title : ''}.`);
+    if (T.phase === 'focus') toast(S.timer.intent ? 'Go: ' + S.timer.intent.slice(0, 48) : 'Timer running — one thing only', 0, 'coach');
   }
 }
-function pause() { if (T.running) { T.remain = Math.max(0, T.endsAt - Date.now()); T.running = false; paintPhase(); renderDial(); } }
+function pause() {
+  if (!T.running) return;
+  T.remain = Math.max(0, T.endsAt - Date.now()); T.running = false; paintPhase(); renderDial();
+  timerNews(`Paused, ${minsText(T.remain)} left.`);
+}
 function toggleRun() { T.running ? pause() : start(); }
-function resetInterval() { T.remain = phaseMs(T.phase); T.running = false; T.startedAt = null; T.distractions = []; $('#tallyCount').textContent = '0'; paintPhase(); renderDial(); }
+function resetInterval() {
+  T.remain = phaseMs(T.phase); T.running = false; T.startedAt = null; T.distractions = []; T.warned = false; T.srBucket = null;
+  $('#tallyCount').textContent = '0'; paintPhase(); renderDial();
+  timerNews(`${PHASES[T.phase].label} reset to ${minsText(T.remain)}.`);
+}
 function skipPhase() { completePhase(true); }
 
 function completePhase(skipped) {
@@ -583,10 +731,12 @@ function completePhase(skipped) {
   if (!skipped) chime(wasFocus ? 'up' : 'down');
   notify(wasFocus ? 'Interval done — stand up' : 'Break over — one thing, small start');
   const auto = wasFocus ? S.settings.autoBreak : S.settings.autoFocus;
+  const was = PHASES[T.phase].label;
   setPhase(next, auto && !skipped);
+  timerNews(`${was} ${skipped ? 'skipped' : 'complete'}. ${PHASES[next].label} ${auto && !skipped ? 'has started' : 'is ready — press start when you are'}.`, !skipped);
   save(); renderFocusSide(); renderTasks();
   if (wasFocus && !skipped && S.settings.checkinAfter) postSessionCheckin();
-  else if (wasFocus && !skipped && S.settings.moveBreak) toast(movementSnack());
+  else if (wasFocus && !skipped && S.settings.moveBreak) toast(movementSnack(), 0, 'coach');
 }
 function logSession(minutes, partial) {
   const end = Date.now(), start = end - minutes * 60000;
@@ -606,6 +756,7 @@ setInterval(() => {
   if (!T.running) return;
   tickRemain(); renderDial();
   if (T.remain <= 0) completePhase(false);
+  else timerWarnings();
 }, 250);
 
 /* =====================================================================
@@ -647,7 +798,7 @@ function stopTracking(opts) {
   };
   if (!o.quiet && mins >= TRACK_CONFIRM_MIN) {
     openModal('Log this time?', `
-      <p style="font-size:12.5px;color:var(--ink-2);margin:0">The stopwatch on <strong>${esc(tr.title)}</strong> has run for <strong>${minsToHM(mins)}</strong>, since ${hhmm(new Date(tr.startedAt))}${new Date(tr.startedAt).toDateString() !== new Date().toDateString() ? ' on ' + new Date(tr.startedAt).toLocaleDateString(undefined, { weekday:'short', month:'short', day:'numeric' }) : ''}. If it kept going after you stopped, correct it here.</p>
+      <p style="font-size:calc(12.5px*var(--ts,1));color:var(--ink-2);margin:0">The stopwatch on <strong>${esc(tr.title)}</strong> has run for <strong>${minsToHM(mins)}</strong>, since ${hhmm(new Date(tr.startedAt))}${new Date(tr.startedAt).toDateString() !== new Date().toDateString() ? ' on ' + new Date(tr.startedAt).toLocaleDateString(undefined, { weekday:'short', month:'short', day:'numeric' }) : ''}. If it kept going after you stopped, correct it here.</p>
       <div class="field"><label for="trMins">Minutes to log</label><input type="number" id="trMins" min="0" max="1440" value="${mins}"></div>`,
       [{ label:'Keep it running' },
        { label:'Discard', onClick: () => { S.track = null; save(); renderTrackingEverywhere(); toast('Discarded — nothing logged'); } },
@@ -706,7 +857,7 @@ setInterval(() => {
 $('#tallyBtn').onclick = () => {
   openModal('What pulled you away?', `<div style="display:flex;flex-wrap:wrap;gap:8px" id="dGrid">${
     LIST('distractions').map(d => `<button class="btn sm" data-d="${esc(d)}">${esc(d)}</button>`).join('')}</div>
-    <p style="font-size:12px;color:var(--muted);margin:0">Logging it takes two seconds and is not a failure — it is the data that tells you which hour of the day is actually workable.</p>`,
+    <p style="font-size:calc(12px*var(--ts,1));color:var(--muted);margin:0">Logging it takes two seconds and is not a failure — it is the data that tells you which hour of the day is actually workable.</p>`,
     [{ label:'Cancel' }], body => {
       body.onclick = e => { const b = e.target.closest('[data-d]'); if (!b) return;
         T.distractions.push(b.dataset.d); $('#tallyCount').textContent = T.distractions.length;
@@ -728,8 +879,8 @@ $('#bodyDoubleBtn').onclick = () => {
   openModal('Body double', `<div style="display:grid;place-items:center;gap:14px;padding:8px 0 4px">
       <div style="width:84px;height:84px;border-radius:50%;background:var(--long-wash);display:grid;place-items:center">
         <span class="dot" style="width:14px;height:14px;background:var(--long);animation:breathe 3.4s ease-in-out infinite"></span></div>
-      <p id="bdLine" style="font-family:var(--font-display);font-size:17px;text-align:center;margin:0;max-width:34ch">${lines[0]}</p>
-      <p style="font-size:12px;color:var(--muted);text-align:center;margin:0;max-width:40ch">A quiet presence that checks in every 45 seconds. Leave it open on a second monitor.</p>
+      <p id="bdLine" style="font-family:var(--font-display);font-size:calc(17px*var(--ts,1));text-align:center;margin:0;max-width:34ch">${lines[0]}</p>
+      <p style="font-size:calc(12px*var(--ts,1));color:var(--muted);text-align:center;margin:0;max-width:40ch">A quiet presence that checks in every 45 seconds. Leave it open on a second monitor.</p>
     </div>`, [{ label:'Done' }]);
   const iv = setInterval(() => { i = (i + 1) % lines.length; const n = $('#bdLine'); if (!n) { clearInterval(iv); return; } n.textContent = lines[i]; }, 45000);
   modalDone = () => clearInterval(iv);
@@ -857,11 +1008,12 @@ function layerVol(id, v) {
 function silenceAll() { Object.keys(LIVE).forEach(id => { if (id[0] !== '_') layerOn(id, false); }); }
 function chime(dir) {
   if (!S.settings.chime || !ensureAudio()) return;
-  const base = dir === 'up' ? 523.25 : 392.00, seq = dir === 'up' ? [1, 1.5, 2] : [1, 0.75];
+  // 'soft' is one quiet note: the advance warning should inform, not startle
+  const base = dir === 'up' ? 523.25 : 392.00, seq = dir === 'up' ? [1, 1.5, 2] : dir === 'soft' ? [1.25] : [1, 0.75];
   seq.forEach((mul, i) => {
     const o = AC.createOscillator(), g = AC.createGain(), t = AC.currentTime + i * 0.16;
     o.type = 'sine'; o.frequency.value = base * mul;
-    const peak = (S.settings.chimeVol / 100) * 0.35;
+    const peak = (S.settings.chimeVol / 100) * (dir === 'soft' ? 0.16 : 0.35);
     g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(peak, t + 0.02);
     g.gain.exponentialRampToValueAtTime(0.0001, t + 1.5);
     o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t + 1.6);
@@ -919,7 +1071,7 @@ $('#soundBtn').onclick = () => {
 function renderMiniMix() {
   $('#miniMix').innerHTML = LAYERS.slice(0, 5).map(l => {
     const on = !!LIVE[l.id];
-    return `<button class="btn sm" data-mini="${l.id}" style="justify-content:space-between;${on ? 'border-color:var(--accent);color:var(--ink)' : ''}">
+    return `<button type="button" class="btn sm" data-mini="${l.id}" aria-pressed="${on}" style="justify-content:space-between;${on ? 'border-color:var(--accent);color:var(--ink)' : ''}">
       <span>${esc(l.name)}</span><span class="dot" style="background:${on ? 'var(--accent)' : 'var(--line-2)'}"></span></button>`;
   }).join('');
   $$('#miniMix [data-mini]').forEach(b => b.onclick = () => layerOn(b.dataset.mini, !LIVE[b.dataset.mini]));
@@ -930,15 +1082,15 @@ function renderLinks() {
   if (!S.links.length) { box.innerHTML = '<div class="empty">No playlists saved yet.</div>'; return; }
   box.innerHTML = S.links.map(l => `<div style="display:flex;align-items:center;gap:8px">
       <a class="btn sm" style="flex:1;justify-content:flex-start" href="${esc(safeUrl(l.url) || '#')}" target="_blank" rel="noopener noreferrer">${esc(l.name)}</a>
-      <button class="btn sm ghost" data-copy="${esc(l.url)}" data-tip="Copy the link">⧉</button>
-      <button class="btn sm ghost" data-dellink="${l.id}" aria-label="Remove">✕</button></div>`).join('');
+      <button type="button" class="btn sm ghost" data-copy="${esc(l.url)}" aria-label="Copy the link to ${esc(l.name)}" data-tip="Copy the link">⧉</button>
+      <button type="button" class="btn sm ghost" data-dellink="${l.id}" aria-label="Remove ${esc(l.name)}">✕</button></div>`).join('');
   $$('#linkList [data-dellink]').forEach(b => b.onclick = () => { S.links = S.links.filter(x => x.id !== b.dataset.dellink); save(); renderLinks(); });
   $$('#linkList [data-copy]').forEach(b => b.onclick = () => copyText(b.dataset.copy, 'Link copied'));
 }
 $('#addLink').onclick = () => openModal('Add a playlist', `
   <div class="field"><label for="lkName">Name</label><input type="text" id="lkName" placeholder="Deep focus — instrumental"></div>
   <div class="field"><label for="lkUrl">Link</label><input type="url" id="lkUrl" placeholder="https://open.spotify.com/playlist/…"></div>
-  <p style="font-size:12px;color:var(--muted);margin:0">Spotify, YouTube, Apple Music, a local radio stream — anything with a URL. It opens in a new tab.</p>`,
+  <p style="font-size:calc(12px*var(--ts,1));color:var(--muted);margin:0">Spotify, YouTube, Apple Music, a local radio stream — anything with a URL. It opens in a new tab.</p>`,
   [{ label:'Cancel' }, { label:'Save', primary:true, onClick: () => {
     const n = $('#lkName').value.trim(), u = $('#lkUrl').value.trim();
     if (!n || !u) { toast('Both a name and a link, please'); return false; }
@@ -994,8 +1146,8 @@ function quadButtons(id) {
 function taskQuadModal(id) {
   const t = S.tasks.find(x => x.id === id); if (!t) return;
   openModal('Where does this sit?', `
-    <p style="font-family:var(--font-display);font-size:16px;margin:0;line-height:1.35">${esc(t.title)}</p>
-    <p style="font-size:12px;color:var(--muted);margin:0">Two questions, in this order. Is there a real deadline? Does finishing it change anything you care about?</p>
+    <p style="font-family:var(--font-display);font-size:calc(16px*var(--ts,1));margin:0;line-height:1.35">${esc(t.title)}</p>
+    <p style="font-size:calc(12px*var(--ts,1));color:var(--muted);margin:0">Two questions, in this order. Is there a real deadline? Does finishing it change anything you care about?</p>
     ${quadButtons(id)}`,
     [{ label:'Close' },
      { label:'Make it the session task', onClick: () => setActiveTask(id) }],
@@ -1012,9 +1164,10 @@ function triage() {
   const step = () => {
     if (i >= queue.length) { closeModal(); toast('Inbox sorted'); go('matrix'); return; }
     const t = queue[i];
+    announce(`Sort ${i + 1} of ${queue.length}: ${t.title}`);
     openModal(`Sort ${i + 1} of ${queue.length}`, `
-      <p style="font-family:var(--font-display);font-size:17px;margin:0;line-height:1.35">${esc(t.title)}</p>
-      <p style="font-size:12px;color:var(--muted);margin:0">${t.est} pomodoro${t.est > 1 ? 's' : ''} · ${ENERGY_LABEL[t.energy].toLowerCase()}</p>
+      <p style="font-family:var(--font-display);font-size:calc(17px*var(--ts,1));margin:0;line-height:1.35">${esc(t.title)}</p>
+      <p style="font-size:calc(12px*var(--ts,1));color:var(--muted);margin:0">${t.est} pomodoro${t.est > 1 ? 's' : ''} · ${ENERGY_LABEL[t.energy].toLowerCase()}</p>
       ${quadButtons(t.id)}`,
       [{ label:'Stop' }, { label:'Skip this one', onClick: () => { i++; step(); return false; } }],
       body => { $$('[data-setq]', body).forEach(b => b.onclick = () => {
@@ -1036,12 +1189,14 @@ function quadMinutes(days) {
 }
 function mxChip(t) {
   const sub = S.subjects.find(x => x.id === t.subjectId);
-  return `<div class="mx-chip ${S.timer.taskId === t.id ? 'on' : ''}" draggable="true" data-mxtask="${t.id}"
+  // Drag is the mouse shortcut; Enter or Space opens the same choice as buttons.
+  return `<div class="mx-chip ${S.timer.taskId === t.id ? 'on' : ''}" draggable="true" data-mxtask="${t.id}" role="button" tabindex="0"
+      aria-label="${esc(t.title)}, ${t.done_pomos || 0} of ${t.est} pomodoros${sub ? ', ' + esc(sub.name) : ''}. Move to another box"
       data-tip="${esc(t.title)} — click to move it, or drag">
-    <span class="energy ${t.energy}" style="width:4px;border-radius:2px;align-self:stretch"></span>
+    <span class="energy ${t.energy}" aria-hidden="true" style="width:4px;border-radius:2px;align-self:stretch"></span>
     <span class="mx-t">${esc(t.title)}</span>
-    ${sub ? `<span class="dot" style="margin-top:5px;background:${sub.color}"></span>` : ''}
-    <span class="m">${t.done_pomos || 0}/${t.est}</span></div>`;
+    ${sub ? `<span class="dot" aria-hidden="true" style="margin-top:5px;background:${sub.color}"></span>` : ''}
+    <span class="m" aria-hidden="true">${t.done_pomos || 0}/${t.est}</span></div>`;
 }
 let mxDrag = null;
 function wireMx(root) {
@@ -1074,15 +1229,19 @@ function renderMatrix() {
     const q = QUADS[k], list = open.filter(t => qOf(t) === k);
     const pom = list.reduce((a, t) => a + Math.max(0, t.est - (t.done_pomos || 0)), 0);
     cell.style.setProperty('--q', q.color);
+    cell.setAttribute('role', 'group');
+    cell.setAttribute('aria-label', `${q.n} ${q.name}, ${q.axis}: ${list.length} task${list.length === 1 ? '' : 's'}`);
     cell.innerHTML = `<div class="mx-head"><span class="mx-badge">${q.n}</span><strong>${q.name}</strong>
-        <span class="top-sp"></span><span class="m num" style="font-size:10.5px;color:var(--muted)">${list.length} · ${pom} pom</span></div>
+        <span class="top-sp"></span><span class="m num" style="font-size:calc(10.5px*var(--ts,1));color:var(--muted)">${list.length} · ${pom} pom</span></div>
       <div class="mx-note">${q.note}</div>
       <div class="mx-list">${list.length ? list.map(mxChip).join('') : `<div class="mx-empty">${q.empty}</div>`}</div>`;
   });
   const un = open.filter(t => !qOf(t));
   $('#mxUnsortedN').textContent = un.length;
+  $('#mxTray').setAttribute('role', 'group');
+  $('#mxTray').setAttribute('aria-label', `Unsorted: ${un.length} task${un.length === 1 ? '' : 's'}`);
   $('#mxTray').innerHTML = `<div class="mx-head"><span class="mx-badge" style="--q:var(--muted)">?</span><strong>Unsorted</strong>
-      <span class="top-sp"></span><span class="m num" style="font-size:10.5px;color:var(--muted)">${un.length}</span></div>
+      <span class="top-sp"></span><span class="m num" style="font-size:calc(10.5px*var(--ts,1));color:var(--muted)">${un.length}</span></div>
     <div class="mx-note">Anything new lands here. Drop it into a box, or run the sorter above.</div>
     <div class="mx-list">${un.length ? un.map(mxChip).join('') : '<div class="mx-empty">Nothing waiting.</div>'}</div>`;
   wireMx(root);
@@ -1104,13 +1263,13 @@ function renderMatrix() {
 
   /* --- guide card --- */
   $('#mxGuide').innerHTML = `<div class="panel-head"><h3>How to place a task</h3></div>
-    <p style="font-size:12px;color:var(--ink-2);line-height:1.6;margin:0 0 10px"><strong>Urgent</strong> is a clock: someone or something is waiting today or tomorrow. <strong>Important</strong> is a consequence: finishing it changes the thesis, the grade, the health, the relationship. They feel identical when you are behind — they are not.</p>
+    <p style="font-size:calc(12px*var(--ts,1));color:var(--ink-2);line-height:1.6;margin:0 0 10px"><strong>Urgent</strong> is a clock: someone or something is waiting today or tomorrow. <strong>Important</strong> is a consequence: finishing it changes the thesis, the grade, the health, the relationship. They feel identical when you are behind — they are not.</p>
     ${QORDER.map(k => `<div style="display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-bottom:1px solid var(--line)">
         <span class="mx-badge" style="--q:${QUADS[k].color};margin-top:1px">${QUADS[k].n}</span>
-        <div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:600">${QUADS[k].act}</div>
-        <div style="font-size:11.5px;color:var(--muted);line-height:1.4">${QUADS[k].axis}</div></div></div>`).join('')}
-    <p style="font-size:12px;color:var(--ink-2);line-height:1.6;margin:11px 0 0">Urgency is loud and importance is quiet, so a brain that responds to loud will spend the whole week in Q1 and Q3 and call it a productive week. Placing a task takes two taps; the matrix is there so the choice is made once, in advance, rather than forty times a day under pressure.</p>
-    <p style="font-size:12px;color:var(--muted);line-height:1.6;margin:8px 0 0">One protected Q2 block a day is the entire intervention. The rest is bookkeeping.</p>`;
+        <div style="flex:1;min-width:0"><div style="font-size:calc(12.5px*var(--ts,1));font-weight:600">${QUADS[k].act}</div>
+        <div style="font-size:calc(11.5px*var(--ts,1));color:var(--muted);line-height:1.4">${QUADS[k].axis}</div></div></div>`).join('')}
+    <p style="font-size:calc(12px*var(--ts,1));color:var(--ink-2);line-height:1.6;margin:11px 0 0">Urgency is loud and importance is quiet, so a brain that responds to loud will spend the whole week in Q1 and Q3 and call it a productive week. Placing a task takes two taps; the matrix is there so the choice is made once, in advance, rather than forty times a day under pressure.</p>
+    <p style="font-size:calc(12px*var(--ts,1));color:var(--muted);line-height:1.6;margin:8px 0 0">One protected Q2 block a day is the entire intervention. The rest is bookkeeping.</p>`;
 }
 /* --- the auxiliary reminder that rides along in the focus view --- */
 function renderFocusMatrix() {
@@ -1145,8 +1304,8 @@ function renderFocusMatrix() {
   box.innerHTML = `<div class="panel-head"><h3>Priority check</h3><button class="btn sm ghost" data-goto="matrix">Matrix</button></div>
     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
       <span class="mx-badge" style="--q:${colour}">${k ? QUADS[k].n : '?'}</span>
-      <strong style="font-size:12.5px">${k ? QUADS[k].name : (t ? 'Unsorted' : 'No task selected')}</strong>
-      <span class="m" style="font-family:var(--font-mono);font-size:10.5px;color:var(--muted)">${k ? QUADS[k].axis : ''}</span>
+      <strong style="font-size:calc(12.5px*var(--ts,1))">${k ? QUADS[k].name : (t ? 'Unsorted' : 'No task selected')}</strong>
+      <span class="m" style="font-family:var(--font-mono);font-size:calc(10.5px*var(--ts,1));color:var(--muted)">${k ? QUADS[k].axis : ''}</span>
     </div>
     <div class="mini2">${QORDER.map(q => `<button class="mini-q" style="--q:${QUADS[q].color}" data-goto="matrix" data-tip="${QUADS[q].name} — ${QUADS[q].axis}">
         <span class="n">${count[q]}</span><span class="l">${QUADS[q].n} ${QUADS[q].name}</span></button>`).join('')}</div>
@@ -1163,43 +1322,74 @@ const ENERGY_LABEL = { low:'Low activation', med:'Medium', high:'High activation
 function taskRow(t, opts) {
   const o = opts || {};
   const sub = S.subjects.find(s => s.id === t.subjectId);
-  const timing = isTracking('taskId', t.id);
-  return `<div class="task ${t.done ? 'done' : ''} ${S.timer.taskId === t.id ? 'active' : ''} ${timing ? 'tracking' : ''}" data-task="${t.id}">
-    <div class="energy ${t.energy}" data-tip="${ENERGY_LABEL[t.energy]} — how hard it is to start"></div>
-    <button class="box" data-done="${t.id}" aria-label="Mark done"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
+  const timing = isTracking('taskId', t.id), q = qOf(t), title = esc(t.title);
+  // Each row is a named group; every control says which task it acts on, and
+  // nothing is conveyed by colour alone (the activation bar has text too).
+  return `<div class="task ${t.done ? 'done' : ''} ${S.timer.taskId === t.id ? 'active' : ''} ${timing ? 'tracking' : ''}" data-task="${t.id}" role="group" aria-label="${title}">
+    <div class="energy ${t.energy}" aria-hidden="true" data-tip="${ENERGY_LABEL[t.energy]} — how hard it is to start"></div>
+    <button type="button" class="box" data-done="${t.id}" role="checkbox" aria-checked="${!!t.done}" aria-label="Done: ${title}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
     <div class="t-body">
-      <div class="t-title">${esc(t.title)}</div>
+      <div class="t-title">${title}${S.timer.taskId === t.id ? '<span class="sr-only"> (session task)</span>' : ''}</div>
       <div class="t-meta">
-        ${sub ? `<span class="m" style="color:${sub.color}">${esc(sub.name)}</span>` : ''}
-        ${qOf(t) ? `<span class="qtag" style="color:${QUADS[qOf(t)].color}" data-tip="${QUADS[qOf(t)].n} · ${QUADS[qOf(t)].name} — ${QUADS[qOf(t)].axis}">${QUADS[qOf(t)].n}</span>`
-                 : `<span class="qtag" style="color:var(--muted)" data-tip="Not placed on the matrix yet">?</span>`}
+        ${sub ? `<span class="m qcol" style="--q:${sub.color}">${esc(sub.name)}</span>` : ''}
+        ${q ? `<button type="button" class="qtag" data-qtask="${t.id}" style="--q:${QUADS[q].color}" aria-label="Matrix: ${QUADS[q].n}, ${QUADS[q].name}. Change" data-tip="${QUADS[q].n} · ${QUADS[q].name} — ${QUADS[q].axis}">${QUADS[q].n}</button>`
+            : `<button type="button" class="qtag" data-qtask="${t.id}" aria-label="Not placed on the matrix. Place it" data-tip="Not placed on the matrix yet">?</button>`}
         <span class="m">${t.done_pomos || 0}/${t.est} pomos</span>
-        ${t.tracked_min ? `<span class="m" data-tip="Time logged on this task with the stopwatch">⏱ ${minsToHM(t.tracked_min)}</span>` : ''}
+        <span class="sr-only">${ENERGY_LABEL[t.energy]}.</span>
+        ${t.tracked_min ? `<span class="m" data-tip="Time logged on this task with the stopwatch"><span aria-hidden="true">⏱</span><span class="sr-only">Timed:</span> ${minsToHM(t.tracked_min)}</span>` : ''}
         ${t.due ? `<span class="m">due ${esc(t.due)}</span>` : ''}
       </div>
     </div>
     <div class="t-actions">
-      ${timing ? `<button class="btn sm primary" data-trackstop data-tip="Stop and log the time">■ <span class="num" data-track-clock>${fmtElapsed(trackElapsed())}</span></button>`
-        : t.done || o.noFocus ? '' : `<button class="btn sm ghost" data-track="${t.id}" data-tip="Start a stopwatch on this task — the time counts as study time">▶ Time</button>`}
-      ${o.noFocus ? '' : `<button class="btn sm ghost" data-focus="${t.id}" data-tip="Make this the session task">Focus</button>`}
-      <button class="btn sm ghost" data-deltask="${t.id}" aria-label="Delete">✕</button>
+      ${timing ? `<button type="button" class="btn sm primary" data-trackstop aria-label="Stop the stopwatch on ${title} and log the time" data-tip="Stop and log the time"><span aria-hidden="true">■</span> <span class="num" data-track-clock>${fmtElapsed(trackElapsed())}</span></button>`
+        : t.done || o.noFocus ? '' : `<button type="button" class="btn sm ghost" data-track="${t.id}" aria-label="Start a stopwatch on ${title}" data-tip="Start a stopwatch on this task — the time counts as study time"><span aria-hidden="true">▶</span> Time</button>`}
+      ${o.noFocus ? '' : `<button type="button" class="btn sm ghost" data-focus="${t.id}" aria-label="Make ${title} the session task" data-tip="Make this the session task">Focus</button>`}
+      <button type="button" class="btn sm ghost" data-deltask="${t.id}" aria-label="Delete task: ${title}">✕</button>
     </div></div>`;
 }
 function wireTasks(root) {
   $$('[data-done]', root).forEach(b => b.onclick = () => {
     const t = S.tasks.find(x => x.id === b.dataset.done); t.done = !t.done;
     if (t.done && isTracking('taskId', t.id)) stopTracking();          // finishing it is when you would forget the clock
+    const list = b.closest('.stack') && b.closest('.stack').id;
     save(); renderTasks(); renderFocusSide();
+    announce(t.done ? `Done: ${t.title}` : `Reopened: ${t.title}`);
+    keepFocus(list, `[data-done="${t.id}"]`);
   });
   $$('[data-focus]', root).forEach(b => b.onclick = () => setActiveTask(b.dataset.focus));
+  const listOf = b => (b.closest('[id]') || {}).id;
   $$('[data-track]', root).forEach(b => b.onclick = e => {
     e.stopPropagation();
-    const t = S.tasks.find(x => x.id === b.dataset.track);
-    if (t) startTracking({ taskId:t.id, subjectId:t.subjectId, title:t.title });
+    const t = S.tasks.find(x => x.id === b.dataset.track), list = listOf(b);
+    if (t) { startTracking({ taskId:t.id, subjectId:t.subjectId, title:t.title }); keepFocus(list, '[data-trackstop]'); }
   });
-  $$('[data-trackstop]', root).forEach(b => b.onclick = e => { e.stopPropagation(); stopTracking(); });
-  $$('.qtag[data-tip]', root).forEach(el => { const row = el.closest('[data-task]'); if (row) el.onclick = () => taskQuadModal(row.dataset.task); el.style.cursor = 'pointer'; });
-  $$('[data-deltask]', root).forEach(b => b.onclick = () => { S.tasks = S.tasks.filter(x => x.id !== b.dataset.deltask); if (S.timer.taskId === b.dataset.deltask) S.timer.taskId = null; save(); renderTasks(); renderFocusSide(); });
+  $$('[data-trackstop]', root).forEach(b => b.onclick = e => {
+    e.stopPropagation();
+    const list = listOf(b), id = S.track && S.track.taskId;
+    stopTracking(); keepFocus(list, id ? `[data-track="${id}"]` : null);
+  });
+  $$('[data-qtask]', root).forEach(el => el.onclick = e => { e.stopPropagation(); taskQuadModal(el.dataset.qtask); });
+  $$('[data-deltask]', root).forEach(b => b.onclick = () => {
+    const t = S.tasks.find(x => x.id === b.dataset.deltask);
+    const list = b.closest('.stack') && b.closest('.stack').id;
+    const rows = list ? $$('#' + list + ' .task') : [], idx = rows.indexOf(b.closest('.task'));
+    S.tasks = S.tasks.filter(x => x.id !== b.dataset.deltask); if (S.timer.taskId === b.dataset.deltask) S.timer.taskId = null;
+    save(); renderTasks(); renderFocusSide();
+    if (t) announce('Deleted ' + t.title);
+    const after = list ? $$('#' + list + ' .task') : [];
+    const next = after[idx] || after[idx - 1];
+    keepFocus(list, next ? `[data-done="${next.dataset.task}"]` : null);
+  });
+}
+/* A re-render replaces the row that had focus. Put focus back on the same
+   control (or a sensible neighbour) so keyboard users are not dropped at the top. */
+function keepFocus(listId, selector) {
+  if (document.activeElement && document.activeElement !== document.body && document.contains(document.activeElement)) return;
+  const scope = (listId && $('#' + listId)) || document;
+  const el = (selector && ($(selector, scope) || $(selector)))
+    || (scope !== document && $('button, [tabindex="0"]', scope))
+    || (view === 'tasks' ? $('#taskTitle') : null);
+  if (el) el.focus();
 }
 function setActiveTask(id) {
   S.timer.taskId = id; save(); renderFocusSide(); renderDial(); renderTasks();
@@ -1224,7 +1414,7 @@ function renderTasks() {
       <div style="display:flex;justify-content:space-between"><span>Pomodoros left</span><strong class="num">${totalPomos}</strong></div>
       <div style="display:flex;justify-content:space-between"><span>That is</span><strong class="num">${hrs.toFixed(1)} h</strong></div>
       <div style="display:flex;justify-content:space-between"><span>Free this week</span><strong class="num">${perWeek.toFixed(1)} h</strong></div>
-      <p style="font-size:12px;color:${hrs > perWeek ? 'var(--warn)' : 'var(--muted)'};margin:6px 0 0">${
+      <p style="font-size:calc(12px*var(--ts,1));color:${hrs > perWeek ? 'var(--warn)' : 'var(--muted)'};margin:6px 0 0">${
         hrs > perWeek ? 'Over capacity by ' + (hrs - perWeek).toFixed(1) + ' h. Cut something now rather than discovering it on Sunday night.' : 'Fits inside the free hours in your week window.'}</p>`;
   }
   renderMatrix();
@@ -1244,7 +1434,7 @@ $('#clearDone').onclick = () => { const n = S.tasks.filter(t => t.done).length; 
 $('#pasteTasks').onclick = () => openModal('Paste a list', `
   <div class="field"><label for="pasteBox">One task per line. Bullets, numbers and checkboxes are stripped.</label>
   <textarea id="pasteBox" rows="8" placeholder="- Read Ch. 4&#10;- 5 recall questions&#10;- Fix the eval script"></textarea></div>
-  <p style="font-size:12px;color:var(--muted);margin:0">Everything lands as 2 pomodoros, medium activation. Adjust after — or don't.</p>`,
+  <p style="font-size:calc(12px*var(--ts,1));color:var(--muted);margin:0">Everything lands as 2 pomodoros, medium activation. Adjust after — or don't.</p>`,
   [{ label:'Cancel' }, { label:'Add them', primary:true, onClick: () => {
     const lines = $('#pasteBox').value.split('\n').map(l => l.replace(/^\s*(?:[-*•]|\d+[.)]|\[[ xX]\])\s*/, '').trim()).filter(Boolean);
     lines.reverse().forEach(t => S.tasks.unshift({ id:uid(), title:t, est:2, energy:'med', subjectId:null, quad:null, done:false, done_pomos:0, created:Date.now() }));
@@ -1257,15 +1447,17 @@ $('#pasteTasks').onclick = () => openModal('Paste a list', `
 function renderFocusSide() {
   const t = S.tasks.find(x => x.id === S.timer.taskId);
   $('#activeTaskBox').innerHTML = t
-    ? `<div class="t-title" style="font-size:14px;margin-bottom:6px">${esc(t.title)}</div>
+    ? `<div class="t-title" style="font-size:calc(14px*var(--ts,1));margin-bottom:6px">${esc(t.title)}</div>
        <div class="t-meta"><span class="m">${t.done_pomos || 0}/${t.est} pomos</span><span class="m">${ENERGY_LABEL[t.energy]}</span></div>
        <div style="height:6px;border-radius:99px;background:var(--surface-3);margin-top:9px;overflow:hidden">
          <div style="height:100%;width:${clamp((t.done_pomos || 0) / t.est * 100, 0, 100)}%;background:var(--accent);border-radius:99px"></div></div>
        ${isTracking('taskId', t.id)
-         ? `<button class="btn sm primary" data-trackstop style="width:100%;justify-content:center;margin-top:10px">■ Stop stopwatch · <span class="num" data-track-clock>${fmtElapsed(trackElapsed())}</span></button>`
-         : `<button class="btn sm" data-track="${t.id}" style="width:100%;justify-content:center;margin-top:10px" data-tip="Count up instead of down: no interval, just the time you actually put in">▶ Time it with a stopwatch instead</button>`}`
+         ? `<button type="button" class="btn sm primary" data-trackstop style="width:100%;justify-content:center;margin-top:10px" aria-label="Stop the stopwatch and log the time"><span aria-hidden="true">■</span> Stop stopwatch · <span class="num" data-track-clock>${fmtElapsed(trackElapsed())}</span></button>`
+         : `<button type="button" class="btn sm" data-track="${t.id}" style="width:100%;justify-content:center;margin-top:10px" data-tip="Count up instead of down: no interval, just the time you actually put in"><span aria-hidden="true">▶</span> Time it with a stopwatch instead</button>`}
+       <button type="button" class="btn sm ghost" data-readaloud style="width:100%;justify-content:center;margin-top:6px" aria-keyshortcuts="A"><span aria-hidden="true">🔊</span> Read aloud</button>`
     : `<div class="empty">Nothing selected. A named task beats "study" — pick one below.</div>`;
   wireTasks($('#activeTaskBox'));
+  const ra = $('#activeTaskBox [data-readaloud]'); if (ra) { ra.hidden = !speech.supported; ra.onclick = readFocusAloud; }
   const queue = S.tasks.filter(x => !x.done && x.id !== S.timer.taskId)
     .sort((a, b) => qRank(a) - qRank(b)).slice(0, 4);   // Q1 then Q2 float to the top of the queue
   $('#focusQueue').innerHTML = queue.length ? queue.map(x => taskRow(x)).join('') : '<div class="empty">Queue is empty.</div>';
@@ -1278,14 +1470,15 @@ function renderFocusSide() {
     const s = new Date(e.start), en = new Date(e.end), live = now >= s && now <= en;
     const hue = e.source === 'google' ? (e.free ? 'muted' : 'ink-2') : (e.kind === 'class' ? 'long' : e.kind === 'break' ? 'rest' : 'focus');
     const timing = isTracking('eventId', e.id);
+    const when = e.allDay ? 'all day' : hhmm(s) + '–' + hhmm(en);
     return `<div style="display:flex;gap:9px;align-items:flex-start;padding:6px 0;border-bottom:1px solid var(--line)">
-      <span class="dot" style="margin-top:6px;background:var(--${hue})"></span>
+      <span class="dot" aria-hidden="true" style="margin-top:6px;background:var(--${hue})"></span>
       <div style="flex:1;min-width:0">
-        <div style="font-size:12.5px;font-weight:${live ? 700 : 500}">${esc(e.title)}${live ? ' <span class="eyebrow" style="color:var(--focus)">now</span>' : ''}</div>
-        <div class="m num" style="font-size:10.5px;color:var(--muted)">${e.allDay ? 'all day' : hhmm(s) + '–' + hhmm(en)}${e.source === 'google' ? ' · google' : ''}</div>
+        <div style="font-size:calc(12.5px*var(--ts,1));font-weight:${live ? 700 : 500}">${esc(e.title)}${live ? ' <span class="eyebrow" style="color:var(--focus)">now</span>' : ''}</div>
+        <div class="m num" style="font-size:calc(10.5px*var(--ts,1));color:var(--muted)">${when}${e.source === 'google' ? ' · google' : ''}</div>
       </div>
-      ${timing ? `<button class="btn sm primary" data-trackstop data-tip="Stop and log the time">■ <span class="num" data-track-clock>${fmtElapsed(trackElapsed())}</span></button>`
-               : `<button class="btn sm ghost" data-trackev="${esc(e.id)}" data-tip="Start timing this block">▶</button>`}</div>`;
+      ${timing ? `<button type="button" class="btn sm primary" data-trackstop aria-label="Stop timing ${esc(e.title)} and log the time" data-tip="Stop and log the time"><span aria-hidden="true">■</span> <span class="num" data-track-clock>${fmtElapsed(trackElapsed())}</span></button>`
+               : `<button type="button" class="btn sm ghost" data-trackev="${esc(e.id)}" aria-label="Start timing ${esc(e.title)}, ${when}" data-tip="Start timing this block">▶</button>`}</div>`;
   }).join('') : '<div class="empty">Nothing scheduled today. The plan view can fill it in.</div>';
   $$('#todayBlocks [data-trackev]').forEach(b => b.onclick = () => {
     const e = today.find(x => x.id === b.dataset.trackev);
@@ -1297,9 +1490,9 @@ function renderFocusSide() {
   $('#parkedCount').textContent = parked.length ? parked.length + ' waiting' : '';
   $('#parkedList').innerHTML = parked.length ? parked.map(n => `
     <div style="display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-bottom:1px solid var(--line)">
-      <div style="flex:1;font-size:12.5px;line-height:1.4">${esc(n.text)}</div>
-      <button class="btn sm ghost" data-topark="${n.id}" data-tip="Turn it into a task">→</button>
-      <button class="btn sm ghost" data-delpark="${n.id}" data-tip="Let it go">✕</button></div>`).join('')
+      <div style="flex:1;font-size:calc(12.5px*var(--ts,1));line-height:1.4">${esc(n.text)}</div>
+      <button type="button" class="btn sm ghost" data-topark="${n.id}" aria-label="Turn “${esc(n.text.slice(0, 60))}” into a task" data-tip="Turn it into a task">→</button>
+      <button type="button" class="btn sm ghost" data-delpark="${n.id}" aria-label="Let go of “${esc(n.text.slice(0, 60))}”" data-tip="Let it go">✕</button></div>`).join('')
     : '<div class="empty">Nothing parked.</div>';
   $$('#parkedList [data-delpark]').forEach(b => b.onclick = () => { S.notes = S.notes.filter(n => n.id !== b.dataset.delpark); save(); renderFocusSide(); renderBoard(); });
   $$('#parkedList [data-topark]').forEach(b => b.onclick = () => {
@@ -1307,10 +1500,14 @@ function renderFocusSide() {
     S.tasks.unshift({ id:uid(), title:n.text, est:1, energy:'med', subjectId:null, quad:null, done:false, done_pomos:0, created:Date.now() });
     S.notes = S.notes.filter(x => x.id !== n.id); save(); renderFocusSide(); renderTasks(); renderBoard(); toast('Now a task');
   });
-  $('#intentInput').value = S.timer.intent || '';
+  if (document.activeElement !== $('#intentInput')) $('#intentInput').value = S.timer.intent || '';   // never under the cursor
+  $('#activationRow').setAttribute('role', 'group');
+  $('#activationRow').setAttribute('aria-label', 'How hard was it to start this session?');
   $('#activationRow').innerHTML = ['low','med','high'].map(k2 =>
-    `<button class="scale-btn ${S.timer.activation === k2 ? 'on' : ''}" data-act="${k2}" data-tip="How hard was it to start this session?">${k2 === 'low' ? 'Easy' : k2 === 'med' ? 'Middling' : 'Uphill'}</button>`).join('');
-  $$('#activationRow [data-act]').forEach(b => b.onclick = () => { S.timer.activation = b.dataset.act; save(); renderFocusSide(); });
+    `<button type="button" class="scale-btn ${S.timer.activation === k2 ? 'on' : ''}" data-act="${k2}" aria-pressed="${S.timer.activation === k2}" data-tip="How hard was it to start this session?">${k2 === 'low' ? 'Easy' : k2 === 'med' ? 'Middling' : 'Uphill'}</button>`).join('');
+  $$('#activationRow [data-act]').forEach(b => b.onclick = () => {
+    S.timer.activation = b.dataset.act; save(); renderFocusSide(); keepFocus('activationRow', `[data-act="${b.dataset.act}"]`);
+  });
   renderFocusMatrix(); renderMiniMix(); renderTopStats(); renderQuickStart();
 }
 $('#intentInput').oninput = e => { S.timer.intent = e.target.value; save(); };
@@ -1354,13 +1551,13 @@ function renderBoard() {
   board.innerHTML = S.notes.map(n => {
     const hidden = q && !n.text.toLowerCase().includes(q);
     return `<div class="sticky ${n.pinned ? 'pinned' : ''}" data-note="${n.id}" style="left:${n.x}px;top:${n.y}px;background:${n.color};opacity:${hidden ? .25 : 1}">
-      <textarea placeholder="Type…">${esc(n.text)}</textarea>
+      <textarea placeholder="Type…" aria-label="Note${n.tag === 'parked' ? ', parked mid-session' : ''}">${esc(n.text)}</textarea>
       <div class="s-foot">
         <span class="s-tag">${n.tag === 'parked' ? 'parked mid-session' : new Date(n.at).toLocaleDateString(undefined, { month:'short', day:'numeric' })}</span>
         <span style="display:flex;gap:2px">
-          <button class="s-btn" data-color data-tip="Change colour"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg></button>
-          <button class="s-btn" data-pin data-tip="Pin to the top"><svg viewBox="0 0 24 24"><path d="M12 17v5M9 3h6l-1 7 3 3H7l3-3z"/></svg></button>
-          <button class="s-btn" data-del data-tip="Delete"><svg viewBox="0 0 24 24"><path d="M5 7h14M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button>
+          <button type="button" class="s-btn" data-color aria-label="Change note colour" data-tip="Change colour"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg></button>
+          <button type="button" class="s-btn" data-pin aria-pressed="${!!n.pinned}" aria-label="Pin note" data-tip="Pin to the top"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 17v5M9 3h6l-1 7 3 3H7l3-3z"/></svg></button>
+          <button type="button" class="s-btn" data-del aria-label="Delete note" data-tip="Delete"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 7h14M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button>
         </span></div></div>`;
   }).join('') || '<div class="empty" style="margin:24px">Nothing on the wall yet. The brain-dump button in the header throws things here.</div>';
   $$('#board .sticky').forEach(el => {
@@ -1421,21 +1618,28 @@ function layoutDay(evs) {
   return out;
 }
 function renderCalendar() {
-  const { a, b, n } = winHours(), H = 44;
+  // Row height follows the text size (capped) so larger type still fits on the
+  // hour lines; the stylesheet reads the same number back through --calh.
+  const { a, b, n } = winHours();
+  const H = Math.round(44 * Math.min(CF().textSize / 100, 1.5));
   const days = Array.from({ length:7 }, (_, i) => new Date(weekAnchor.getTime() + i * DAY));
   const todayK = dayKey(new Date());
   $('#weekLbl').textContent = days[0].toLocaleDateString(undefined, { month:'long', day:'numeric' }) + ' – ' +
     days[6].toLocaleDateString(undefined, { month:'short', day:'numeric', year:'numeric' });
-  let html = '<div class="cal-h"></div>';
-  days.forEach((d, i) => { html += `<div class="cal-h ${dayKey(d) === todayK ? 'today' : ''}"><div class="d">${DOW[i]}</div><div class="n">${d.getDate()}</div></div>`; });
-  html += '<div class="cal-hours">' + Array.from({ length:n }, (_, i) => `<div class="hour-lbl">${pad2(a + i)}:00</div>`).join('') + '</div>';
+  let html = '<div class="cal-h" aria-hidden="true"></div>';
+  days.forEach((d, i) => { html += `<div class="cal-h ${dayKey(d) === todayK ? 'today' : ''}" aria-hidden="true"><div class="d">${DOW[i]}</div><div class="n">${d.getDate()}</div></div>`; });
+  html += '<div class="cal-hours" aria-hidden="true">' + Array.from({ length:n }, (_, i) => `<div class="hour-lbl">${pad2(a + i)}:00</div>`).join('') + '</div>';
   days.forEach(d => {
     const k = dayKey(d), all = dayEvents(k);
     const allDay = all.filter(e => e.allDay), timed = all.filter(e => !e.allDay);
-    let inner = Array.from({ length:n }, () => '<div class="hour"></div>').join('');
+    let inner = Array.from({ length:n }, () => '<div class="hour" aria-hidden="true"></div>').join('');
+    const dayName = d.toLocaleDateString(undefined, { weekday:'long', month:'long', day:'numeric' });
+    // Blocks are keyboard buttons whose name says what, when and whose they are.
+    const evName = (e, when) => esc(`${e.title}, ${dayName}, ${when}, ${e.source === 'google' ? 'Google Calendar event' + (e.free ? ', marked free' : '') : (EV_KINDS[e.kind] || 'block')}${isTracking('eventId', e.id) ? ', being timed' : ''}`);
     allDay.forEach((e, i) => {
-      inner += `<div class="ev allday ${e.source === 'google' ? 'gcal' : (e.kind || 'other')}" ${e.source === 'google' ? `data-glink="${esc(e.link || '')}"` : `data-ev="${e.id}"`}
-        style="top:${1 + i * 17}px;height:15px" data-tip="${esc(e.title)} · all day"><div class="ttl">${esc(e.title)}</div></div>`;
+      inner += `<div class="ev allday ${e.source === 'google' ? 'gcal' : (e.kind || 'other')}" ${e.source === 'google' ? `data-glink="${esc(e.link || '')}" data-gid="${esc(e.id)}"` : `data-ev="${e.id}"`}
+        role="button" tabindex="0" aria-label="${evName(e, 'all day')}"
+        style="top:${1 + i * 17}px;height:15px" data-tip="${esc(e.title)} · all day"><div class="ttl" aria-hidden="true">${esc(e.title)}</div></div>`;
     });
     const offset = allDay.length ? allDay.length * 17 + 2 : 0;
     layoutDay(timed).forEach(({ ev: e, lane, lanes }) => {
@@ -1449,17 +1653,18 @@ function renderCalendar() {
       const cls = (e.source === 'google' ? (e.kind === 'gfocus' ? 'gfocus' : 'gcal') + (e.free ? ' free' : '') : (e.kind || 'other'))
         + (isTracking('eventId', e.id) ? ' tracking' : '');
       const attr = e.source === 'google' ? `data-glink="${esc(e.link || '')}" data-gid="${esc(e.id)}"` : `data-ev="${e.id}"`;
-      inner += `<div class="ev ${cls}" ${attr} style="top:${Math.max(0, top)}px;height:${h}px;left:calc(${left}% + 3px);width:calc(${w}% - 6px);z-index:${2 + lane}"
+      inner += `<div class="ev ${cls}" ${attr} role="button" tabindex="0" aria-label="${evName(e, hhmm(s0) + ' to ' + hhmm(en))}" style="top:${Math.max(0, top)}px;height:${h}px;left:calc(${left}% + 3px);width:calc(${w}% - 6px);z-index:${2 + lane}"
           data-tip="${esc(e.title)} · ${hhmm(s0)}–${hhmm(en)}${e.source === 'google' ? ' · from Google Calendar' + (e.free ? ', marked free' : '') : ''}">
-        <div class="ttl">${esc(e.title)}</div><div class="tm">${hhmm(s0)}–${hhmm(en)}</div>
-        ${e.source === 'google' && h > 40 ? '<div class="src">google</div>' : ''}</div>`;
+        <div class="ttl" aria-hidden="true">${esc(e.title)}</div><div class="tm" aria-hidden="true">${hhmm(s0)}–${hhmm(en)}</div>
+        ${e.source === 'google' && h > 40 ? '<div class="src" aria-hidden="true">google</div>' : ''}</div>`;
     });
     if (k === todayK) {
       const now = new Date(), mins = now.getHours() * 60 + now.getMinutes() - a * 60;
       if (mins >= 0 && mins <= n * 60) inner += `<div class="nowline" style="top:${mins / 60 * H + offset}px"></div>`;
     }
-    html += `<div class="cal-body" data-day="${k}" style="height:${n * H + offset}px">${inner}</div>`;
+    html += `<div class="cal-body" data-day="${k}" role="group" aria-label="${esc(dayName)}: ${all.length ? all.length + ' block' + (all.length === 1 ? '' : 's') : 'nothing planned'}" style="height:${n * H + offset}px">${inner}</div>`;
   });
+  $('#calGrid').style.setProperty('--calh', H + 'px');
   $('#calGrid').innerHTML = html;
   $$('#calGrid .ev[data-ev]').forEach(el => el.onclick = ev => { ev.stopPropagation(); editEvent(el.dataset.ev); });
   /* A Google event (a lecture, a meeting) can be timed too; editing it stays in Google. */
@@ -1468,8 +1673,8 @@ function renderCalendar() {
     const g = Object.values(GCAL.events).flat().find(x => x.id === el.dataset.gid);
     if (!g) return;
     const s0 = new Date(g.start), e0 = new Date(g.end), timing = isTracking('eventId', g.id);
-    openModal(g.title, `<p style="font-size:12.5px;color:var(--ink-2);margin:0">${g.allDay ? 'All day' : hhmm(s0) + '–' + hhmm(e0)} · ${s0.toLocaleDateString(undefined, { weekday:'long', month:'short', day:'numeric' })} · from Google Calendar</p>
-      <p style="font-size:12px;color:var(--muted);margin:0">Timing it logs the minutes you actually spend as study time, like any focus session.</p>`,
+    openModal(g.title, `<p style="font-size:calc(12.5px*var(--ts,1));color:var(--ink-2);margin:0">${g.allDay ? 'All day' : hhmm(s0) + '–' + hhmm(e0)} · ${s0.toLocaleDateString(undefined, { weekday:'long', month:'short', day:'numeric' })} · from Google Calendar</p>
+      <p style="font-size:calc(12px*var(--ts,1));color:var(--muted);margin:0">Timing it logs the minutes you actually spend as study time, like any focus session.</p>`,
       [{ label:'Close' }]
         .concat(g.link ? [{ label:'Open in Google', onClick: () => { window.open(g.link, '_blank', 'noopener'); } }] : [])
         .concat([timing ? { label:'■ Stop timing', primary:true, onClick: () => stopTracking() }
@@ -1539,7 +1744,7 @@ $('#gcalPushBtn').onclick = () => {
   const upcoming = S.events.filter(e => new Date(e.end) > new Date()).sort((a, b) => new Date(a.start) - new Date(b.start)).slice(0, 12);
   openModal('Push a block to Google', upcoming.length ? `<div class="stack">${upcoming.map(e =>
     `<button class="btn" style="justify-content:space-between" data-push="${e.id}"><span>${esc(e.title)}</span>
-      <span class="num" style="color:var(--muted);font-size:11px">${new Date(e.start).toLocaleDateString(undefined, { weekday:'short' })} ${hhmm(new Date(e.start))}</span></button>`).join('')}</div>`
+      <span class="num" style="color:var(--muted);font-size:calc(11px*var(--ts,1))">${new Date(e.start).toLocaleDateString(undefined, { weekday:'short' })} ${hhmm(new Date(e.start))}</span></button>`).join('')}</div>`
     : '<div class="empty">No upcoming blocks.</div>', [{ label:'Close' }], body => {
       $$('[data-push]', body).forEach(b => b.onclick = () => { gcalLink(S.events.find(e => e.id === b.dataset.push)); });
     });
@@ -1590,7 +1795,7 @@ function parseICS(text) {
   return out;
 }
 $('#icsImportBtn').onclick = () => openModal('Import from Google Calendar', `
-  <p style="font-size:12.5px;color:var(--ink-2);margin:0">Paste the contents of your .ics export, or pick the file. Times land in your local timezone; weekly repeats are expanded eight weeks out.</p>
+  <p style="font-size:calc(12.5px*var(--ts,1));color:var(--ink-2);margin:0">Paste the contents of your .ics export, or pick the file. Times land in your local timezone; weekly repeats are expanded eight weeks out.</p>
   <div class="field"><label for="icsBox">.ics text</label><textarea id="icsBox" rows="7" placeholder="BEGIN:VCALENDAR…"></textarea></div>
   <button class="btn" id="icsFile" style="justify-content:center">Choose an .ics file instead</button>`,
   [{ label:'Cancel' }, { label:'Import', primary:true, onClick: () => {
@@ -1640,11 +1845,11 @@ function offerText(filename, text, note) {
     downloaded = true;
   } catch (e) {}
   openModal('Export · ' + filename, `
-    <p style="font-size:12.5px;color:var(--ink-2);margin:0">${note || ''}</p>
-    <p style="font-size:12px;color:var(--muted);margin:0">${downloaded
+    <p style="font-size:calc(12.5px*var(--ts,1));color:var(--ink-2);margin:0">${note || ''}</p>
+    <p style="font-size:calc(12px*var(--ts,1));color:var(--muted);margin:0">${downloaded
       ? `<strong>${esc(filename)}</strong> should be in your downloads. If the browser blocked it, copy the text below into a file with that name.`
       : 'This browser would not start a download, so here is the file itself — copy it into a text editor and save it under that name.'}</p>
-    <textarea id="expBox" rows="10" readonly style="font-family:var(--font-mono);font-size:11px">${esc(text)}</textarea>`,
+    <textarea id="expBox" rows="10" readonly style="font-family:var(--font-mono);font-size:calc(11px*var(--ts,1))">${esc(text)}</textarea>`,
     [{ label:'Close' }, { label:'Copy to clipboard', primary:true, onClick: () => { copyText(text, 'Copied — paste it into a file'); return false; } }],
     body => { const t = $('#expBox', body); t.focus(); t.select(); });
 }
@@ -1668,15 +1873,15 @@ function renderSubjects() {
     return `<div style="padding:8px 0;border-bottom:1px solid var(--line)" data-sub="${s.id}">
       <div style="display:flex;align-items:center;gap:8px">
         <span class="dot" style="background:${s.color}"></span>
-        <strong style="font-size:12.5px;flex:1">${esc(s.name)}</strong>
+        <strong style="font-size:calc(12.5px*var(--ts,1));flex:1">${esc(s.name)}</strong>
         <span class="eyebrow">P${s.priority}</span>
-        <button class="btn sm ghost" data-editsub="${s.id}" aria-label="Edit">✎</button>
+        <button type="button" class="btn sm ghost" data-editsub="${s.id}" aria-label="Edit course ${esc(s.name)}">✎</button>
       </div>
       <div style="height:5px;border-radius:99px;background:var(--surface-3);margin:7px 0 4px;overflow:hidden;display:flex">
         <div style="width:${clamp(doneMin / target * 100, 0, 100)}%;background:${s.color}"></div>
         <div style="width:${clamp((planned - doneMin) / target * 100, 0, 100)}%;background:${s.color};opacity:.32"></div>
       </div>
-      <div class="num" style="font-size:10.5px;color:var(--muted)">${Math.round(doneMin)}m done · ${Math.round(Math.max(0, planned - doneMin))}m planned · ${s.targetHours}h target</div>
+      <div class="num" style="font-size:calc(10.5px*var(--ts,1));color:var(--muted)">${Math.round(doneMin)}m done · ${Math.round(Math.max(0, planned - doneMin))}m planned · ${s.targetHours}h target</div>
     </div>`;
   }).join('') : '<div class="empty">No courses yet. Add one so the scheduler knows what to pack.</div>';
   $$('#subjectList [data-editsub]').forEach(b => b.onclick = () => subjectModal(b.dataset.editsub));
@@ -1791,7 +1996,7 @@ let breathMode = BREATH.box ? 'box' : Object.keys(BREATH)[0];   // integer-like 
 let breathTimer = null, breathStep = 0, breathCycles = 0, breathStart = 0;
 function renderCalm() {
   $('#breathModes').innerHTML = Object.entries(BREATH).map(([k, v]) =>
-    `<button class="scale-btn ${breathMode === k ? 'on' : ''}" data-bm="${k}">${esc(v.name)}</button>`).join('');
+    `<button type="button" class="scale-btn ${breathMode === k ? 'on' : ''}" data-bm="${k}" aria-pressed="${breathMode === k}">${esc(v.name)}</button>`).join('');
   $$('#breathModes [data-bm]').forEach(b => b.onclick = () => { breathMode = b.dataset.bm; stopBreath(); renderCalm(); });
   $('#breathHint').textContent = BREATH[breathMode].hint;
   const last = S.checkins[S.checkins.length - 1];
@@ -1800,11 +2005,11 @@ function renderCalm() {
     .map(([k, label, lo, hi]) => `<div class="field">
       <label for="ck_${k}">${label} <span class="num" id="ckv_${k}">5</span></label>
       <input type="range" id="ck_${k}" min="1" max="10" value="5">
-      <div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--muted)"><span>${lo}</span><span>${hi}</span></div></div>`).join('');
+      <div style="display:flex;justify-content:space-between;font-size:calc(10.5px*var(--ts,1));color:var(--muted)"><span>${lo}</span><span>${hi}</span></div></div>`).join('');
   ['energy','stress','focus'].forEach(k => { const i = $('#ck_' + k); i.oninput = () => $('#ckv_' + k).textContent = i.value; });
   const gr = LIST('ground');
-  $('#groundList').innerHTML = gr.map((g, i) => `<div style="display:flex;gap:8px;padding:5px 0;font-size:12.5px"><span class="num" style="color:var(--muted)">${gr.length - i}</span><span>${esc(g)}</span></div>`).join('');
-  $('#moveList').innerHTML = LIST('moves').map(m => `<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--line);font-size:12.5px"><span class="dot" style="margin-top:6px;background:var(--rest)"></span><span>${esc(m)}</span></div>`).join('');
+  $('#groundList').innerHTML = gr.map((g, i) => `<div style="display:flex;gap:8px;padding:5px 0;font-size:calc(12.5px*var(--ts,1))"><span class="num" style="color:var(--muted)">${gr.length - i}</span><span>${esc(g)}</span></div>`).join('');
+  $('#moveList').innerHTML = LIST('moves').map(m => `<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--line);font-size:calc(12.5px*var(--ts,1))"><span class="dot" style="margin-top:6px;background:var(--rest)"></span><span>${esc(m)}</span></div>`).join('');
 }
 function stepBreath() {
   const steps = BREATH[breathMode].steps, [label, secs] = steps[breathStep % steps.length];
@@ -1839,9 +2044,9 @@ setInterval(() => {
 $('#groundStart').onclick = () => {
   const steps = LIST('ground'); let i = 0;
   openModal(steps.length + '-' + steps.map((_, n) => steps.length - n).slice(1).join('-'), `<div style="display:grid;place-items:center;gap:12px;padding:10px 0">
-      <div class="num" style="font-family:var(--font-display);font-size:56px;font-weight:700;color:var(--long)" id="gN">${steps.length}</div>
-      <p id="gT" style="font-size:15px;text-align:center;margin:0;max-width:32ch">${esc(steps[0] || '')}</p>
-      <p style="font-size:12px;color:var(--muted);margin:0">Take your time. Advances every 18 seconds.</p></div>`, [{ label:'Done' }]);
+      <div class="num" style="font-family:var(--font-display);font-size:calc(56px*var(--ts,1));font-weight:700;color:var(--long)" id="gN">${steps.length}</div>
+      <p id="gT" style="font-size:calc(15px*var(--ts,1));text-align:center;margin:0;max-width:32ch">${esc(steps[0] || '')}</p>
+      <p style="font-size:calc(12px*var(--ts,1));color:var(--muted);margin:0">Take your time. Advances every 18 seconds.</p></div>`, [{ label:'Done' }]);
   const iv = setInterval(() => {
     i++; if (i >= steps.length) { clearInterval(iv); const t = $('#gT'); if (t) { t.textContent = 'Back in the room. Pick the smallest next step.'; $('#gN').textContent = '·'; } return; }
     const n = $('#gN'); if (!n) { clearInterval(iv); return; }
@@ -1856,11 +2061,11 @@ $('#saveCheckin').onclick = () => {
 };
 function postSessionCheckin() {
   openModal('How did that go?', `
-    <p style="font-size:12.5px;color:var(--ink-2);margin:0">${esc(S.timer.intent || 'Interval complete.')}</p>
+    <p style="font-size:calc(12.5px*var(--ts,1));color:var(--ink-2);margin:0">${esc(S.timer.intent || 'Interval complete.')}</p>
     <div class="field"><label>Session quality <span class="num" id="qv">3</span> of 5</label>
       <div class="scale-row" id="qRow">${[1,2,3,4,5].map(n => `<button class="scale-btn" data-q="${n}">${n}</button>`).join('')}</div></div>
     <div class="field"><label for="ck2_stress">Stress right now <span class="num" id="ckv2">5</span></label><input type="range" id="ck2_stress" min="1" max="10" value="5"></div>
-    <p style="font-size:12px;color:var(--muted);margin:0">${esc(movementSnack())}</p>`,
+    <p style="font-size:calc(12px*var(--ts,1));color:var(--muted);margin:0">${esc(movementSnack())}</p>`,
     [{ label:'Skip' }, { label:'Save', primary:true, onClick: () => {
       const last = S.sessions[S.sessions.length - 1];
       if (last) last.quality = +($('#qRow .on') ? $('#qRow .on').dataset.q : 3);
@@ -1889,7 +2094,7 @@ function minutesByDay() {
   return m;
 }
 function renderStats() {
-  $('#rangeBtns').innerHTML = [7, 30, 90].map(n => `<button class="scale-btn ${range === n ? 'on' : ''}" data-range="${n}">${n}d</button>`).join('');
+  $('#rangeBtns').innerHTML = [7, 30, 90].map(n => `<button type="button" class="scale-btn ${range === n ? 'on' : ''}" data-range="${n}" aria-pressed="${range === n}" aria-label="Last ${n} days">${n}d</button>`).join('');
   $$('#rangeBtns [data-range]').forEach(b => b.onclick = () => { range = +b.dataset.range; renderStats(); });
   const keys = rangeDays(range), inRange = new Set(keys), byDayMap = minutesByDay();
   const sess = S.sessions.filter(s => inRange.has(dayKey(new Date(s.start))));
@@ -1900,7 +2105,7 @@ function renderStats() {
   $('#kpis').innerHTML = [
     ['Focus time', minsToHM(mins), `${sess.filter(s => !s.tracked).length} intervals${sess.some(s => s.tracked) ? ` + ${sess.filter(s => s.tracked).length} timed` : ''} across ${activeDays} days`],
     ['Median active day', minsToHM(median(keys.map(k => byDayMap[k] || 0).filter(v => v > 0))), `${activeDays} days with any focus`],
-    ['Current streak', streakDays() + 'd', 'days in a row with at least one interval'],
+    ...(CF().streaks ? [['Current streak', streakDays() + 'd', 'days in a row with at least one interval']] : []),
     ['Session quality', quality.length ? (quality.reduce((a, b) => a + b, 0) / quality.length).toFixed(1) + '/5' : '—', quality.length ? quality.length + ' rated' : 'rate a few to see this'],
     ['Distractions', distr ? (distr / Math.max(1, sess.length)).toFixed(1) : '0', 'logged per interval'],
     // Stopwatch sessions have no bell to run to, so they stay out of this one.
@@ -1937,6 +2142,8 @@ function drawDaily(keys) {
     ? `<text x="${(x(i) + bw / 2).toFixed(1)}" y="${H - 8}" text-anchor="middle">${keyToDate(k).toLocaleDateString(undefined, { month:'short', day:'numeric' })}</text>` : '').join('');
   const peak = vals[maxI] > 0 ? `<text class="lbl" x="${(x(maxI) + bw / 2).toFixed(1)}" y="${(y(vals[maxI]) - 6).toFixed(1)}" text-anchor="middle">${vals[maxI]}</text>` : '';
   $('#chDaily').innerHTML = g + bars + ticks + peak;
+  const total = vals.reduce((a2, v) => a2 + v, 0), activeN = vals.filter(v => v > 0).length;
+  $('#chDaily').setAttribute('aria-label', `Focus minutes per day over the last ${keys.length} days: ${minsToHM(total)} in total across ${activeN} active days${vals[maxI] ? '; the busiest day was ' + keyToDate(keys[maxI]).toLocaleDateString(undefined, { weekday:'long', month:'long', day:'numeric' }) + ' with ' + vals[maxI] + ' minutes' : ''}.`);
   $('#capDaily').textContent = `Completed focus intervals only. Peak in this range: ${vals[maxI]} minutes.`;
 }
 function drawHours(sess) {
@@ -1955,6 +2162,7 @@ function drawHours(sess) {
   out += vals.map((v, i) => (i % 3 === 0) ? `<text x="${(x(i) + bw / 2).toFixed(1)}" y="${H - 9}" text-anchor="middle">${pad2(from + i)}</text>` : '').join('');
   if (vals[best] > 0) out += `<text class="lbl" x="${(x(best) + bw / 2).toFixed(1)}" y="${(y(vals[best]) - 6).toFixed(1)}" text-anchor="middle">${pad2(from + best)}:00</text>`;
   $('#chHours').innerHTML = out;
+  $('#chHours').setAttribute('aria-label', vals[best] > 0 ? `Focus by hour of day: the most focused hour is ${pad2(from + best)}:00, with ${vals[best]} minutes in this range.` : 'Focus by hour of day: nothing logged in this range yet.');
 }
 function drawHeat() {
   const W = 480, cell = 15, gap = 3, weeks = 13;
@@ -1982,6 +2190,8 @@ function drawHeat() {
   [0.18, 0.45, 0.7, 1].forEach((o, i) => out += `<rect x="${legX + 4}" y="${TP + 20 + i * 18}" width="12" height="12" rx="3" fill="var(--accent)" opacity="${o}"/>`);
   out += `<text x="${legX}" y="${TP + 20 + 4 * 18 + 8}">more</text>`;
   $('#chHeat').innerHTML = out;
+  const heatDays = Object.keys(byDay).filter(k2 => +keyToDate(k2) >= +startD && byDay[k2] > 0).length;
+  $('#chHeat').setAttribute('aria-label', `Consistency over the last ${weeks} weeks: focus logged on ${heatDays} days.`);
 }
 function drawDistract(sess) {
   const W = 480, H = 190, L = 118, R = 38, TP = 10;
@@ -1989,11 +2199,12 @@ function drawDistract(sess) {
   sess.forEach(s => (s.distractions || []).forEach(d => counts[d] = (counts[d] || 0) + 1));
   const rows = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 6);
   if (!rows.length) {
-    $('#chDistract').innerHTML = `<text x="16" y="94" style="font-family:var(--font-ui);font-size:12px" fill="var(--muted)">Nothing logged yet \u2014 tap \u201cCaught a distraction\u201d mid-session.</text>`;
+    $('#chDistract').innerHTML = `<text x="16" y="94" style="font-family:var(--font-ui);font-size:calc(12px*var(--ts,1))" fill="var(--muted)">Nothing logged yet \u2014 tap \u201cCaught a distraction\u201d mid-session.</text>`;
     return;
   }
   const max = rows[0][1], iw = W - L - R;
   const lane = (H - TP * 2) / rows.length, bh = Math.min(24, lane - 8);
+  $('#chDistract').setAttribute('aria-label', 'What pulled you away, most often first: ' + rows.map(([k2, v2]) => k2 + ', ' + v2 + (v2 === 1 ? ' time' : ' times')).join('; ') + '.');
   $('#chDistract').innerHTML = rows.map(([k, v], i) => {
     const y = TP + i * lane, w = Math.max(4, (v / max) * iw);
     return `<text x="${L - 10}" y="${(y + bh / 2 + 4).toFixed(1)}" text-anchor="end" class="lbl">${esc(k)}</text>
@@ -2035,9 +2246,10 @@ function drawSubjects(sess) {
   const totals = {};
   sess.forEach(s => { if (s.subjectId) totals[s.subjectId] = (totals[s.subjectId] || 0) + s.minutes; });
   const rows = S.subjects.map(s => [s, totals[s.id] || 0]).sort((a, b) => b[1] - a[1]);
-  if (!rows.length || !rows[0][1]) { $('#chSubjects').innerHTML = `<text x="18" y="100" style="font-family:var(--font-ui);font-size:12px" fill="var(--muted)">No course time logged in this range.</text>`; return; }
+  if (!rows.length || !rows[0][1]) { $('#chSubjects').innerHTML = `<text x="18" y="100" style="font-family:var(--font-ui);font-size:calc(12px*var(--ts,1))" fill="var(--muted)">No course time logged in this range.</text>`; return; }
   const max = rows[0][1], iw = W - L - R, gap = 10;
   const bh = Math.min(26, (H - TP * 2) / rows.length - gap);
+  $('#chSubjects').setAttribute('aria-label', 'Time by course: ' + rows.map(([s2, v2]) => s2.name + ', ' + minsToHM(v2)).join('; ') + '.');
   $('#chSubjects').innerHTML = rows.map(([s, v], i) => {
     const y = TP + i * ((H - TP * 2) / rows.length), w = Math.max(3, (v / max) * iw);
     const target = s.targetHours * 60 * (range / 7);
@@ -2080,7 +2292,7 @@ function drawInsights(sess) {
   const short = sess.filter(s => s.partial).length;
   if (short > 2) bits.push(`${short} intervals ended early. If that keeps up, shorten the focus length to ${Math.max(10, S.settings.focus - 5)} minutes rather than fighting it.`);
   $('#insightCard').innerHTML = `<div class="panel-head"><h3>What the data is telling you</h3><span class="eyebrow">last ${range} days</span></div>` +
-    (bits.length ? `<ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:7px;font-size:13px;line-height:1.55">${bits.map(b => `<li>${b}</li>`).join('')}</ul>`
+    (bits.length ? `<ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:7px;font-size:calc(13px*var(--ts,1));line-height:1.55">${bits.map(b => `<li>${b}</li>`).join('')}</ul>`
       : '<div class="empty">Run a few sessions and the patterns show up here.</div>');
 }
 $('#exportCsv').onclick = () => {
@@ -2408,11 +2620,11 @@ function renderGcal() {
                : '<span class="eyebrow">two-way</span>') + '</div>';
   let body = '';
   if (!gcalReady()) {
-    body = `<p style="font-size:12px;color:var(--muted);margin:0">Google Calendar sync is not set up on this copy of the app. The .ics bridge below still brings your week in and out.</p>`;
+    body = `<p style="font-size:calc(12px*var(--ts,1));color:var(--muted);margin:0">Google Calendar sync is not set up on this copy of the app. The .ics bridge below still brings your week in and out.</p>`;
   } else if (!S.gcal.on) {
-    body = `<p style="font-size:12px;color:var(--muted);margin:0 0 10px">Your Google events appear in the planner and the auto-scheduler works around them. Blocks you plan here are added to your Google Calendar, and edits and deletions follow them.</p>
+    body = `<p style="font-size:calc(12px*var(--ts,1));color:var(--muted);margin:0 0 10px">Your Google events appear in the planner and the auto-scheduler works around them. Blocks you plan here are added to your Google Calendar, and edits and deletions follow them.</p>
       <button class="btn primary" id="gConnect" style="width:100%;justify-content:center">${GCAL.busy ? 'Connecting…' : 'Connect Google Calendar'}</button>
-      <p style="font-size:11px;color:var(--muted);line-height:1.5;margin:9px 0 0">Google asks you to allow calendar access in a popup. Until Google finishes reviewing this app it also says the app is <em>unverified</em>: choose <strong>Advanced</strong>, then continue. Access lasts about an hour at a time and is never stored on a server.</p>`;
+      <p style="font-size:calc(11px*var(--ts,1));color:var(--muted);line-height:1.5;margin:9px 0 0">Google asks you to allow calendar access in a popup. Until Google finishes reviewing this app it also says the app is <em>unverified</em>: choose <strong>Advanced</strong>, then continue. Access lasts about an hour at a time and is never stored on a server.</p>`;
   } else {
     const pushed = Object.keys(S.gcal.links).length;
     const count = S.gcal.cals.reduce((a, id) => a + (GCAL.events[id] || []).length, 0);
@@ -2430,12 +2642,12 @@ function renderGcal() {
       body += `<div class="field" style="margin:4px 0 8px"><label for="gTarget">Send my blocks to</label><select id="gTarget">${writable.map(c =>
           `<option value="${esc(c.id)}" ${c.id === S.gcal.target ? 'selected' : ''}>${esc(c.summary)}</option>`).join('')}</select></div>`;
     }
-    body += `<div class="switch-row" style="padding:6px 0"><div><div class="lbl" style="font-size:12.5px">Send my blocks to Google</div>
+    body += `<div class="switch-row" style="padding:6px 0"><div><div class="lbl" style="font-size:calc(12.5px*var(--ts,1))">Send my blocks to Google</div>
         <div class="hint">New, edited and deleted blocks follow automatically. Blocks imported from .ics stay here.</div></div>
         <input type="checkbox" id="gPush" ${S.gcal.push ? 'checked' : ''}></div>`;
-    body += `<div class="switch-row" style="padding:6px 0"><div class="lbl" style="font-size:12.5px">Hide events I declined</div>
+    body += `<div class="switch-row" style="padding:6px 0"><div class="lbl" style="font-size:calc(12.5px*var(--ts,1))">Hide events I declined</div>
         <input type="checkbox" id="gDeclined" ${S.gcal.hideDeclined ? 'checked' : ''}></div>`;
-    body += `<p style="font-size:11.5px;color:var(--muted);margin:8px 0 10px">Google events are read-only here — change them in Google. Blocks from this planner are managed here; edit them in the planner, not in Google.</p>`;
+    body += `<p style="font-size:calc(11.5px*var(--ts,1));color:var(--muted);margin:8px 0 10px">Google events are read-only here — change them in Google. Blocks from this planner are managed here; edit them in the planner, not in Google.</p>`;
     body += `<div style="display:flex;gap:8px"><button class="btn sm" id="gOff" style="flex:1;justify-content:center">Disconnect</button>`
       + (pushed ? `<button class="btn sm ghost" id="gWipe" style="flex:1;justify-content:center" data-tip="Deletes the ${pushed} events this planner created in Google">Remove my blocks</button>` : '') + '</div>';
   }
@@ -2444,7 +2656,7 @@ function renderGcal() {
   const sy = $('#gSync'); if (sy) sy.onclick = gcalSyncNow;
   const off = $('#gOff'); if (off) off.onclick = gcalDisconnect;
   const wipe = $('#gWipe'); if (wipe) wipe.onclick = () => openModal('Remove your blocks from Google?',
-    `<p style="font-size:12.5px;margin:0">This deletes the ${plural(Object.keys(S.gcal.links).length, 'event')} this planner created in Google Calendar and turns sending off. Your blocks in the planner and every other Google event stay as they are.</p>`,
+    `<p style="font-size:calc(12.5px*var(--ts,1));margin:0">This deletes the ${plural(Object.keys(S.gcal.links).length, 'event')} this planner created in Google Calendar and turns sending off. Your blocks in the planner and every other Google event stay as they are.</p>`,
     [{ label:'Keep them' }, { label:'Remove from Google', onClick: () => { gcalRemoveAll(); } }]);
   const tg = $('#gTarget'); if (tg) tg.onchange = e => { S.gcal.target = e.target.value; save(); toast('New blocks will go to ' + e.target.selectedOptions[0].textContent); };
   const ps = $('#gPush'); if (ps) ps.onchange = e => { S.gcal.push = e.target.checked; GCAL.planSig = null; save(); if (S.gcal.push) gcalPush(); };
@@ -2482,7 +2694,199 @@ const TIMER_PRESETS = Object.assign({
   'Ultradian 90/20':   { focus:90, short:20, long:30, cycles:2 },
   'Two-minute start':  { focus:10, short:5,  long:15, cycles:4 }
 }, CFG.timerPresets || {});
+/* =====================================================================
+   SETUP — one section at a time, chosen from a vertical tab list.
+   Every control is a native checkbox (role="switch"), radio group, select
+   or slider, so screen readers and arrow keys behave as they do everywhere.
+   Changing a control redraws the panels and puts focus back on it.
+   ===================================================================== */
+const SET_SECTIONS = ['profile','seeing','motion','focus','speech','keys','timer','prompts','data'];
+let setSec = (() => { try { return sessionStorage.getItem(CFG.storageKey + '.setup') || 'profile'; } catch (e) { return 'profile'; } })();
+const HIDEABLE_VIEWS = [['plan','Plan'],['matrix','Matrix'],['notes','Notes'],['sound','Sound'],['calm','Calm'],['stats','Stats']];
+const COMFORT_LABELS = {
+  textSize:'Text size', spacing:'Spacing', font:'Typeface', contrast:'Contrast', color:'Colour', focusRing:'Focus outline',
+  underlineLinks:'Underlined links', motion:'Motion', messages:'Pop-up messages', messageTime:'Message duration', coaching:'Coaching',
+  streaks:'Streaks', warnBefore:'Warning before the end', simpleFocus:'Simpler Focus screen', explanations:'Explanations',
+  speech:'Built-in voice', srTimeLeft:'Time-left announcements', shortcuts:'Single-key shortcuts'
+};
+
+/* ---- row builders: [kind, key] where kind is 'cf' (comfort) or 'st' (settings) ---- */
+const bindVal = ([kind, key]) => kind === 'cf' ? CF()[key] : S.settings[key];
+function rowSwitch(bind, label, hint, attrs) {
+  const id = bind.join('_');
+  return `<div class="set-row"><div class="set-text"><label class="set-label" for="${id}">${label}</label>${hint ? `<p class="set-hint" id="${id}_h">${hint}</p>` : ''}</div>
+    <div class="set-control"><input type="checkbox" role="switch" class="switch" id="${id}" data-${bind[0]}="${bind[1]}" ${bindVal(bind) ? 'checked' : ''} ${hint ? `aria-describedby="${id}_h"` : ''} ${attrs || ''}></div></div>`;
+}
+/* A radio group. aria-label carries the name rather than a <legend>: a legend
+   inside a grid fieldset keeps the width the browser gives the rendered legend,
+   which a visually-hidden rule cannot shrink, and it pushed the page sideways. */
+function rowChoice(bind, label, hint, options) {
+  const id = bind.join('_'), val = String(bindVal(bind));
+  return `<fieldset class="set-row set-fs" role="radiogroup" aria-label="${label}"${hint ? ` aria-describedby="${id}_h"` : ''}>
+    <div class="set-text"><span class="set-label" aria-hidden="true">${label}</span>${hint ? `<p class="set-hint" id="${id}_h">${hint}</p>` : ''}</div>
+    <div class="set-control"><div class="seg">${options.map(([v, t], i) =>
+      `<label><input type="radio" name="${id}" id="${id}_${i}" value="${esc(String(v))}" data-${bind[0]}="${bind[1]}" ${String(v) === val ? 'checked' : ''}><span>${t}</span></label>`).join('')}</div></div></fieldset>`;
+}
+function rowRange(bind, label, hint, min, max, step, fmt) {
+  const id = bind.join('_'), v = bindVal(bind);
+  return `<div class="set-row"><div class="set-text"><label class="set-label" for="${id}">${label} <span class="num" id="${id}_v">${fmt(v)}</span></label>${hint ? `<p class="set-hint" id="${id}_h">${hint}</p>` : ''}</div>
+    <div class="set-control"><input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${v}" data-${bind[0]}="${bind[1]}" aria-valuetext="${fmt(v)}" ${hint ? `aria-describedby="${id}_h"` : ''}></div></div>`;
+}
+const group = (title, rows) => `<div class="set-group"><h4>${title}</h4>${rows}</div>`;
+const panelHead = (title, lead) => `<h3>${title}</h3>${lead ? `<p class="set-lead">${lead}</p>` : ''}`;
+
 function renderSettings() {
+  const view = $('#view-settings'); if (!view) return;
+  const keep = view.contains(document.activeElement) ? document.activeElement.id : null;
+  renderSetTabs();
+  renderProfilePanel(); renderSeeingPanel(); renderMotionPanel(); renderFocusPanel(); renderSpeechPanel(); renderKeysPanel(); renderTimerPanel();
+  const bytes = STORE.bytes() || JSON.stringify(S).length;
+  $('#storageInfo').textContent = `${S.sessions.length} sessions · ${S.tasks.length} tasks · ${S.notes.length} notes · ${S.events.length} blocks — about ${(bytes / 1024).toFixed(1)} KB in ${STORE.label()}.`;
+  $('#dataExtra').innerHTML = (CFG.demo && !S.meta.sample)
+    ? `<button type="button" class="btn" id="demoBtn" style="width:100%;justify-content:center;margin-top:8px">Load a demo workspace</button>
+       <p class="set-hint" style="margin:7px 0 0">Three weeks of generated sessions so you can see the charts working. It is stamped as demo data and clears in one click — nothing is ever seeded without you asking.</p>`
+    : (S.meta.sample ? `<button type="button" class="btn" id="demoClearBtn" style="width:100%;justify-content:center;margin-top:8px">Clear the demo workspace</button>` : '');
+  const db = $('#demoBtn'); if (db) db.onclick = loadDemo;
+  const dc = $('#demoClearBtn'); if (dc) dc.onclick = clearDemo;
+  renderAccountCard(); renderStorageCard(); renderListsCard(); renderEmbedCard();
+  $('#dayStart').value = S.settings.dayStart; $('#dayEnd').value = S.settings.dayEnd;
+  if (keep) { const el = document.getElementById(keep); if (el) el.focus({ preventScroll:true }); }
+}
+
+/* ---- tabs (vertical tab list; arrows, Home and End move between sections) ---- */
+function renderSetTabs() {
+  if (!SET_SECTIONS.includes(setSec)) setSec = 'profile';
+  $$('#setNav [role="tab"]').forEach(t => {
+    const on = t.dataset.sec === setSec;
+    t.setAttribute('aria-selected', String(on)); t.tabIndex = on ? 0 : -1;
+  });
+  SET_SECTIONS.forEach(s => { const p = $('#set-' + s); if (p) p.hidden = s !== setSec; });
+}
+function selectSetTab(sec, focusTab) {
+  setSec = sec;
+  try { sessionStorage.setItem(CFG.storageKey + '.setup', sec); } catch (e) {}
+  renderSetTabs();
+  if (focusTab) { const t = $('#tab-' + sec); if (t) t.focus(); }
+}
+function openSetup(sec) {
+  go('settings', { quiet:true });
+  selectSetTab(sec || setSec);
+  const p = $('#set-' + (sec || setSec)); if (p) p.focus();
+}
+$$('#setNav [role="tab"]').forEach(t => t.onclick = () => selectSetTab(t.dataset.sec));
+$('#setNav').addEventListener('keydown', e => {
+  const i = SET_SECTIONS.indexOf(setSec);
+  const to = { ArrowDown:i + 1, ArrowRight:i + 1, ArrowUp:i - 1, ArrowLeft:i - 1, Home:0, End:SET_SECTIONS.length - 1 }[e.key];
+  if (to === undefined) return;
+  e.preventDefault();
+  selectSetTab(SET_SECTIONS[(to + SET_SECTIONS.length) % SET_SECTIONS.length], true);
+});
+
+/* ---- Comfort profile ---- */
+function renderProfilePanel() {
+  const c = CF(), changes = changesFromProfile(c), base = COMFORT_PRESETS[c.basedOn] || COMFORT_PRESETS.adhd;
+  const status = c.profile === 'custom' && changes.length
+    ? `<strong>Custom</strong> — based on ${esc(base.name)}, with ${changes.length} change${changes.length === 1 ? '' : 's'}: ${changes.map(k => COMFORT_LABELS[k] || k).join(', ')}.`
+    : `Using the <strong>${esc(base.name)}</strong> profile${c.basedOn === 'adhd' ? ', the default' : ''}.`;
+  $('#set-profile').innerHTML = panelHead('Comfort profile',
+    'Start from the profile closest to how you work, then adjust anything in the other sections. Needs overlap — pick the closest and switch on what you need from another.')
+    + `<fieldset class="prof-fs" role="radiogroup" aria-label="Comfort profile"><div class="prof-grid">${Object.entries(COMFORT_PRESETS).map(([k, p]) =>
+      `<label class="prof ${c.basedOn === k ? 'on' : ''}"><input type="radio" name="cf_profile" value="${k}" data-profile="${k}" ${c.basedOn === k ? 'checked' : ''}>
+        <span class="p-top"><span class="p-name">${esc(p.name)}</span><span class="p-badge">${esc(p.badge)}</span></span>
+        <span class="p-about" id="prof_${k}_about">${esc(p.about)}</span></label>`).join('')}</div></fieldset>
+      <div class="set-row"><div class="set-text"><p class="set-label" style="font-weight:500" role="status">${status}</p></div>
+        <div class="set-control">${c.profile === 'custom' && changes.length ? `<button type="button" class="btn sm" id="profReset">Reset to ${esc(base.name)}</button>` : ''}</div></div>`
+    + group('Also respected', `<p class="set-hint" style="margin:6px 0 10px">Your device settings still apply on top: dark mode, reduced motion and browser zoom (Ctrl or ⌘ and +). The app works with NVDA, JAWS and Narrator on Windows, VoiceOver on Mac, iPhone and iPad, and TalkBack on Android.</p>`);
+  const r = $('#profReset'); if (r) r.onclick = () => applyProfile(c.basedOn);
+}
+function applyProfile(key) {
+  const p = COMFORT_PRESETS[key]; if (!p) return;
+  S.settings.comfort = presetComfort(key, CF());
+  Object.assign(S.settings, p.settings);
+  applyTheme(); save(); renderSettings(); renderTopStats(); renderFocusSide(); renderCalendar();
+  if (view === 'stats') renderStats();
+  announce(`${p.name} profile applied`);
+}
+
+/* ---- Seeing ---- */
+function renderSeeingPanel() {
+  $('#set-seeing').innerHTML = panelHead('Seeing', 'Size, spacing, typeface and colour. Changes apply as you make them — the preview at the bottom shows the result.')
+    + group('Text', rowChoice(['cf','textSize'], 'Text size', 'Makes the words bigger without zooming the whole page.', [[100,'100%'],[112,'112%'],[125,'125%'],[150,'150%'],[175,'175%']])
+      + rowChoice(['cf','spacing'], 'Line and letter spacing', 'More space between lines and letters helps many readers, including people with dyslexia.', [['normal','Normal'],['relaxed','Relaxed'],['loose','Loose']])
+      + rowChoice(['cf','font'], 'Typeface', '“Easier to read” is Atkinson Hyperlegible, designed so similar letters look different. “Your system” uses the font you already read all day.', [['default','App default'],['readable','Easier to read'],['system','Your system']]))
+    + group('Colour', rowChoice(['st','theme'], 'Theme', '“Auto” follows your device’s light or dark setting.', [['auto','Auto'],['light','Light'],['dark','Dark']])
+      + rowChoice(['cf','contrast'], 'Contrast', 'High contrast darkens text and borders and strengthens every edge.', [['standard','Standard'],['high','High']])
+      + rowChoice(['cf','color'], 'Colour intensity', 'Soft calms the palette; greyscale removes colour entirely. Nothing in the app depends on colour alone.', [['vivid','Vivid'],['soft','Soft'],['mono','Greyscale']])
+      + rowChoice(['st','accent'], 'Accent colour', '', [['focus','Ember'],['rest','Moss'],['long','Iris'],['alert','Amber']]))
+    + group('Finding your place', rowChoice(['cf','focusRing'], 'Keyboard focus outline', 'Strong draws a thick, two-colour ring around whatever the keyboard is on.', [['standard','Standard'],['strong','Strong']])
+      + rowSwitch(['cf','underlineLinks'], 'Underline links', 'Links are recognisable without relying on colour.'))
+    + `<div class="set-preview" aria-hidden="true"><div class="eyebrow">Preview</div>
+        <p><strong>Write the related-work section.</strong> Two pomodoros, high activation — the part that stalls is the start, so the first step is just opening the draft.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><span class="chip"><span class="dot" style="background:var(--focus)"></span>45 min today</span>
+          <span class="qtag" style="--q:var(--rest)">Q2</span><span class="btn sm primary">Start focus</span><span class="btn sm">Park a thought</span></div></div>`;
+}
+
+/* ---- Motion and sound ---- */
+function renderMotionPanel() {
+  const sysReduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  $('#set-motion').innerHTML = panelHead('Motion and sound', 'Movement and sound can help an understimulated mind or overwhelm a sensitive one. Choose what suits you.')
+    + group('Motion', rowChoice(['cf','motion'], 'Animation', `“Follow my device” uses your system setting, which is currently <strong>${sysReduced ? 'reduce motion' : 'full motion'}</strong>. “Reduce” stops transitions and pulsing; the breathing guide keeps a slow, small swell because that movement is its purpose.`, [['system','Follow my device'],['reduce','Reduce'],['full','Full']]))
+    + group('Sounds', rowSwitch(['st','chime'], 'Chime when a timer ends', 'A short three-note bell. The early warning, if you turn it on, is a single quiet note.')
+      + rowRange(['st','chimeVol'], 'Chime volume', '', 0, 100, 5, v => v + '%'));
+}
+
+/* ---- Focus and interruptions ---- */
+function renderFocusPanel() {
+  const c = CF();
+  $('#set-focus').innerHTML = panelHead('Focus and interruptions', 'This is where ADHD and autistic preferences differ most. The defaults suit ADHD — quick feedback and nudges; the Calm profile turns most of this down.')
+    + group('Pop-up messages', rowChoice(['cf','messages'], 'Show pop-up messages', 'Screen readers hear every message either way.', [['all','All'],['important','Important only'],['none','None']])
+      + rowChoice(['cf','messageTime'], 'Keep messages on screen', '“Until dismissed” adds a close button to each one.', [['short','3 seconds'],['long','8 seconds'],['stay','Until dismissed']]))
+    + group('Encouragement', rowSwitch(['cf','coaching'], 'Coaching and nudges', 'Short “go” messages, the priority nudges on the Focus screen and suggestions to swap tasks.')
+      + rowSwitch(['cf','streaks'], 'Show streaks', 'Some people find a streak motivating; others find the pressure of breaking one stressful.')
+      + rowSwitch(['st','checkinAfter'], 'Ask how it went after each focus block', 'A ten-second rating that fills the charts. It opens a dialog when the timer ends.')
+      + rowSwitch(['st','moveBreak'], 'Suggest a movement break', 'A physical prompt at the start of each break.'))
+    + group('Changes and transitions', rowChoice(['cf','warnBefore'], 'Warn me before the timer ends', 'A quiet note and a message ahead of every change, so the switch is never a surprise.', [[0,'Off'],[1,'1 min'],[2,'2 min'],[5,'5 min']])
+      + rowSwitch(['st','autoBreak'], 'Start breaks by themselves', 'On: the break is already running when the bell rings. Off: every change waits for you.')
+      + rowSwitch(['st','autoFocus'], 'Start the next focus block by themselves', 'Off by default — coming back should be your choice.'))
+    + group('Layout', rowSwitch(['cf','simpleFocus'], 'Simpler Focus screen', 'Shows only the timer, your task, today’s blocks and parked thoughts.')
+      + rowSwitch(['cf','explanations'], 'Explanations under headings', 'The short descriptions like this one. Turn off once you know your way around.')
+      + `<fieldset class="set-row set-fs" role="group" aria-label="Sections in the side bar" aria-describedby="hv_h">
+          <div class="set-text"><span class="set-label" aria-hidden="true">Sections in the side bar</span><p class="set-hint" id="hv_h">Hide the ones you do not use. Focus, Tasks and Setup always stay.</p></div>
+          <div class="set-control" style="gap:6px 14px">${HIDEABLE_VIEWS.map(([v, t]) =>
+            `<label style="display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:calc(12.5px*var(--ts,1))"><input type="checkbox" id="hv_${v}" data-hv="${v}" ${c.hiddenViews.includes(v) ? '' : 'checked'}> ${t}</label>`).join('')}</div></fieldset>`);
+}
+
+/* ---- Reading and speech ---- */
+function renderSpeechPanel() {
+  const c = CF(), voices = speech.voices(), off = '';   // set up the voice before switching it on
+  $('#set-speech').innerHTML = panelHead('Reading and speech', 'Two separate things: announcements for screen readers you already use, and a voice built into the app for anyone who wants things read out.')
+    + group('Screen readers', `<p class="set-hint" style="margin:8px 0 2px">Buttons, dialogs, the timer and every message are announced to NVDA, JAWS, Narrator, VoiceOver, TalkBack and ChromeVox. Nothing to switch on.</p>`
+      + rowChoice(['cf','srTimeLeft'], 'Announce time left while the timer runs', 'You cannot glance at the dial, so the app says how long is left at this interval.', [[0,'Off'],[5,'Every 5 min'],[10,'Every 10 min'],[15,'Every 15 min']]))
+    + group('Built-in voice', speech.supported
+      ? rowSwitch(['cf','speech'], 'Read things aloud', 'Uses the voices already on your device, so nothing leaves the browser. Leave this off if you use a screen reader, or you will hear things twice.')
+        + `<div class="set-row"><div class="set-text"><label class="set-label" for="cf_voice">Voice</label><p class="set-hint" id="cf_voice_h">${voices.length ? voices.length + ' voices on this device.' : 'Your device is still loading its voices.'}</p></div>
+            <div class="set-control"><select id="cf_voice" data-cf="voice" aria-describedby="cf_voice_h" ${off}><option value="">Device default</option>${voices.map(v =>
+              `<option value="${esc(v.voiceURI)}" ${v.voiceURI === c.voice ? 'selected' : ''}>${esc(v.name)}${v.lang ? ' (' + esc(v.lang) + ')' : ''}</option>`).join('')}</select>
+            <button type="button" class="btn sm" id="voiceTest">Play a sample</button></div></div>`
+        + rowRange(['cf','rate'], 'Speed', '', 0.6, 1.6, 0.1, v => (+v).toFixed(1) + '×')
+        + rowSwitch(['cf','speakTimer'], 'Say timer events', 'Starts, pauses, warnings and endings.', off)
+        + rowSwitch(['cf','speakMessages'], 'Say every pop-up message', '', off)
+        + `<p class="set-hint" style="margin:10px 0 4px">Anytime: press <kbd>A</kbd> or the Read aloud button on the Focus screen to hear your current task, or select any text and choose “Read the selected text aloud” from the command palette.</p>`
+      : `<p class="set-hint" style="margin:8px 0">This browser has no built-in voice. Screen readers still work fully.</p>`);
+  const vt = $('#voiceTest'); if (vt) vt.onclick = () => speech.say('This is how the ADHD Study Pack sounds. Focus started, twenty five minutes.', { voice:CF().voice, rate:CF().rate });
+}
+speech.onVoicesChanged(() => { if (view === 'settings') renderSettings(); });
+
+/* ---- Keyboard ---- */
+function renderKeysPanel() {
+  $('#set-keys').innerHTML = panelHead('Keyboard', 'Everything works from the keyboard: Tab moves between controls, arrow keys move within a group, Enter or Space activates, and Esc closes a dialog.')
+    + group('Shortcuts', rowSwitch(['cf','shortcuts'], 'Single-key shortcuts', 'Turn off if you use a screen reader in focus mode, use speech input, or press keys by accident. Ctrl or ⌘ + K still opens the command palette.')
+      + `<div class="kbd-list" role="list" aria-label="Keyboard shortcuts">${SHORTCUTS.map(([k, d]) =>
+          `<div role="listitem" style="display:contents"><kbd>${esc(k)}</kbd><span>${esc(d)}</span></div>`).join('')}</div>`);
+}
+
+/* ---- Timer ---- */
+function renderTimerPanel() {
   $('#durFields').innerHTML = [
     ['focus','Focus interval','minutes'], ['short','Short break','minutes'],
     ['long','Long break','minutes'], ['cycles','Focus intervals before a long break','count']
@@ -2492,49 +2896,61 @@ function renderSettings() {
     S.settings[k] = clamp(+e.target.value || 1, 1, k === 'cycles' ? 12 : 180);
     save(); if (!T.running) setPhase(T.phase, false); renderPips(); renderDial();
   });
-  const rows = [
-    ['autoBreak','Start breaks automatically','The bell rings and the break is already running — no decision needed.'],
-    ['autoFocus','Start the next focus automatically','Off by default: coming back should be a choice you make.'],
-    ['checkinAfter','Ask how it went','A ten-second rating after each interval. This is what fills the charts.'],
-    ['moveBreak','Suggest a movement snack','A physical prompt at every break, because sitting through the break defeats it.'],
-    ['titleClock','Countdown in the browser tab','Time stays visible even when the tab is behind something else.'],
-    ['hideSeconds','Hide the seconds','Round to the minute while running — some people watch seconds tick and lose the thread.'],
-    ['chime','Chime at the bell',''],
-    ['notify','Desktop notifications','Needs one permission click from your browser.']
-  ];
-  $('#behaviourRows').innerHTML = rows.map(([k, lbl, hint]) => `<div class="switch-row">
-      <div><div class="lbl">${lbl}</div>${hint ? `<div class="hint">${hint}</div>` : ''}</div>
-      <input type="checkbox" id="beh_${k}" ${S.settings[k] ? 'checked' : ''}></div>`).join('')
-    + `<div class="field" style="margin-top:10px"><label for="chimeVol">Chime volume <span class="num">${S.settings.chimeVol}</span></label>
-       <input type="range" id="chimeVol" min="0" max="100" value="${S.settings.chimeVol}"></div>`;
-  rows.forEach(([k]) => $('#beh_' + k).onchange = e => {
-    S.settings[k] = e.target.checked; save();
-    if (k === 'notify' && e.target.checked && window.Notification) Notification.requestPermission().then(p => { if (p !== 'granted') { S.settings.notify = false; save(); renderSettings(); toast('Notifications stayed blocked'); } });
-    if (k === 'chime' && e.target.checked) chime('up');
-  });
-  $('#chimeVol').oninput = e => { S.settings.chimeVol = +e.target.value; save(); };
-  $('#chimeVol').onchange = () => chime('up');
-  $('#themeRow').innerHTML = ['auto','light','dark'].map(t => `<button class="scale-btn ${S.settings.theme === t ? 'on' : ''}" data-theme-set="${t}">${t[0].toUpperCase() + t.slice(1)}</button>`).join('');
-  $$('#themeRow [data-theme-set]').forEach(b => b.onclick = () => { S.settings.theme = b.dataset.themeSet; applyTheme(); save(); renderSettings(); });
-  $('#accentRow').innerHTML = [['focus','Ember'],['rest','Moss'],['long','Iris'],['alert','Amber']].map(([k, n]) =>
-    `<button class="scale-btn ${S.settings.accent === k ? 'on' : ''}" data-accent-set="${k}"><span class="dot" style="background:var(--${k});display:inline-block;margin-right:5px"></span>${n}</button>`).join('');
-  $$('#accentRow [data-accent-set]').forEach(b => b.onclick = () => { S.settings.accent = b.dataset.accentSet; applyTheme(); save(); renderSettings(); });
-  $('#appearanceRows').innerHTML = `<p style="font-size:12px;color:var(--muted);margin:12px 0 0">The page also follows your system theme on its own — "Auto" means it flips when your OS does.</p>`;
-  const bytes = STORE.bytes() || JSON.stringify(S).length;
-  $('#storageInfo').textContent = `${S.sessions.length} sessions · ${S.tasks.length} tasks · ${S.notes.length} notes · ${S.events.length} blocks — about ${(bytes / 1024).toFixed(1)} KB in ${STORE.label()}.`;
-  $('#dataExtra').innerHTML = (CFG.demo && !S.meta.sample)
-    ? `<button class="btn" id="demoBtn" style="width:100%;justify-content:center;margin-top:8px">Load a demo workspace</button>
-       <p style="font-size:11.5px;color:var(--muted);margin:7px 0 0">Three weeks of generated sessions so you can see the charts working. It is stamped as demo data and clears in one click — nothing is ever seeded without you asking.</p>`
-    : (S.meta.sample ? `<button class="btn" id="demoClearBtn" style="width:100%;justify-content:center;margin-top:8px">Clear the demo workspace</button>` : '');
-  const db = $('#demoBtn'); if (db) db.onclick = loadDemo;
-  const dc = $('#demoClearBtn'); if (dc) dc.onclick = clearDemo;
-  renderAccountCard(); renderStorageCard(); renderListsCard(); renderEmbedCard();
-  $('#dayStart').value = S.settings.dayStart; $('#dayEnd').value = S.settings.dayEnd;
+  $('#timerRows').innerHTML = group('Display', rowSwitch(['st','titleClock'], 'Countdown in the browser tab', 'Time stays visible even when the tab is behind something else.')
+      + rowSwitch(['st','hideSeconds'], 'Hide the seconds', 'Round to the minute while running — some people watch seconds tick and lose the thread.'))
+    + group('Notifications', rowSwitch(['st','notify'], 'Desktop notifications', 'A system notification when a timer ends. Your browser asks once for permission.'));
 }
+
+/* ---- one change handler for every control in Setup ---- */
+function readControl(el) {
+  if (el.type === 'checkbox') return el.checked;
+  const v = el.value;
+  return /^-?\d+(\.\d+)?$/.test(v) ? +v : v;
+}
+function setComfort(key, value) {
+  const c = CF();
+  if (JSON.stringify(c[key]) === JSON.stringify(value)) return;
+  c[key] = value;
+  c.profile = changesFromProfile(c).length ? 'custom' : c.basedOn;
+  applyTheme(); save();
+  if (key === 'streaks') { renderTopStats(); if (view === 'stats') renderStats(); }
+  if (key === 'textSize') renderCalendar();   // the week grid is drawn in pixels
+  if (key === 'speech' && value) say('Voice on.');
+  renderSettings();
+}
+function setSetting(key, value) {
+  if (S.settings[key] === value) return;
+  S.settings[key] = value;
+  if (key === 'theme' || key === 'accent') applyTheme();
+  save();
+  if (key === 'notify' && value && window.Notification) Notification.requestPermission().then(p => {
+    if (p !== 'granted') { S.settings.notify = false; save(); renderSettings(); toast('Notifications stayed blocked'); }
+  });
+  if (key === 'chime' && value) chime('up');
+  renderSettings();
+}
+$('#view-settings').addEventListener('change', e => {
+  const el = e.target;
+  if (el.dataset.profile) { applyProfile(el.dataset.profile); return; }
+  if (el.dataset.hv) {
+    const c = CF(), v = el.dataset.hv;
+    setComfort('hiddenViews', el.checked ? c.hiddenViews.filter(x => x !== v) : c.hiddenViews.concat([v]));
+    return;
+  }
+  if (el.dataset.cf) setComfort(el.dataset.cf, readControl(el));
+  else if (el.dataset.st) setSetting(el.dataset.st, readControl(el));
+});
+/* Sliders show their value as they move; the change event above saves it. */
+$('#view-settings').addEventListener('input', e => {
+  const el = e.target; if (el.type !== 'range') return;
+  const out = $('#' + el.id + '_v'); if (!out) return;
+  const txt = el.dataset.cf === 'rate' ? (+el.value).toFixed(1) + '×' : el.value + '%';
+  out.textContent = txt; el.setAttribute('aria-valuetext', txt);
+});
 $('#presetsBtn').onclick = () => openModal('Interval presets', `<div class="stack">${Object.entries(TIMER_PRESETS).map(([n, p]) =>
   `<button class="btn" style="justify-content:space-between" data-preset2="${esc(n)}"><span>${esc(n)}</span>
-    <span class="num" style="color:var(--muted);font-size:11px">${p.focus}/${p.short}/${p.long} ×${p.cycles}</span></button>`).join('')}</div>
-  <p style="font-size:12px;color:var(--muted);margin:0">If 25 minutes feels impossible on a bad day, drop to "Two-minute start". Starting is the whole game; length is negotiable.</p>`,
+    <span class="num" style="color:var(--muted);font-size:calc(11px*var(--ts,1))">${p.focus}/${p.short}/${p.long} ×${p.cycles}</span></button>`).join('')}</div>
+  <p style="font-size:calc(12px*var(--ts,1));color:var(--muted);margin:0">If 25 minutes feels impossible on a bad day, drop to "Two-minute start". Starting is the whole game; length is negotiable.</p>`,
   [{ label:'Close' }], body => {
     $$('[data-preset2]', body).forEach(b => b.onclick = () => {
       Object.assign(S.settings, TIMER_PRESETS[b.dataset.preset2]); save();
@@ -2547,7 +2963,7 @@ $('#exportBtn').onclick = () => offerText('focus-dial-backup.json', JSON.stringi
 $('#importBtn').onclick = () => openModal('Import a backup', `
   <div class="field"><label for="impBox">Paste the JSON backup</label><textarea id="impBox" rows="7" placeholder="{ &quot;settings&quot;: … }"></textarea></div>
   <button class="btn" id="impFile" style="justify-content:center">Choose a .json file instead</button>
-  <p style="font-size:12px;color:var(--crit);margin:0">This replaces everything currently in the browser.</p>`,
+  <p style="font-size:calc(12px*var(--ts,1));color:var(--crit);margin:0">This replaces everything currently in the browser.</p>`,
   [{ label:'Cancel' }, { label:'Replace everything', primary:true, onClick: () => {
     try {
       window.FocusDial.importJSON($('#impBox').value); applyTheme();
@@ -2555,8 +2971,8 @@ $('#importBtn').onclick = () => openModal('Import a backup', `
     } catch (e) { toast('That did not parse as a Focus Dial backup'); return false; }
   } }], body => { $('#impFile', body).onclick = () => pickFile('.json', txt => { $('#impBox').value = txt; toast('File loaded — press Replace'); }); });
 $('#resetBtn2').onclick = () => openModal('Erase everything?', `
-  <p style="font-size:13px;margin:0">This deletes every session, task, note and block in this browser. There is no undo, and no copy on any server.</p>
-  <p style="font-size:12.5px;color:var(--muted);margin:0">Export a backup first if there is any doubt.</p>`,
+  <p style="font-size:calc(13px*var(--ts,1));margin:0">This deletes every session, task, note and block in this browser. There is no undo, and no copy on any server.</p>
+  <p style="font-size:calc(12.5px*var(--ts,1));color:var(--muted);margin:0">Export a backup first if there is any doubt.</p>`,
   [{ label:'Keep my data' }, { label:'Erase it all', onClick: () => {
     window.FocusDial.wipe().then(() => { applyTheme(); toast('Cleared'); });
   } }]);
@@ -2605,35 +3021,75 @@ const COMMANDS = () => [
   { k:'Import an .ics file', s:'', run:() => { go('plan'); $('#icsImportBtn').click(); } },
   { k:'Export everything (JSON)', s:'', run:() => $('#exportBtn').click() },
   { k:'Start a breathing round', s:'', run:() => { go('calm'); $('#breathBtn').click(); } },
-  { k:'Switch theme', s:'', run:() => $('#themeBtn').click() }
+  { k:'Switch theme', s:'', run:() => $('#themeBtn').click() },
+  { k:'Read the current task aloud', s:'A', run:readFocusAloud },
+  { k:'Read the selected text aloud', s:'', run:readSelectionAloud },
+  { k:'Stop reading aloud', s:'Esc', run:() => speech.stop() },
+  { k:'Comfort and accessibility settings', s:'', run:() => openSetup('profile') },
+  { k:'Show keyboard shortcuts', s:'?', run:() => openSetup('keys') }
 ];
-let cmdSel = 0, cmdRows = [];
+let cmdSel = 0, cmdRows = [], cmdOpener = null;
+/* The palette is a combobox driving a listbox: the input keeps focus and
+   aria-activedescendant tells screen readers which command is highlighted. */
+let cmdSelection = '';
 function openCmd() {
-  $('#cmdScrim').classList.add('on'); $('#cmdInput').value = ''; cmdSel = 0; fillCmd('');
+  cmdOpener = document.activeElement;
+  cmdSelection = String(window.getSelection ? window.getSelection() : '').trim();   // focusing the input clears it
+  $('#cmdScrim').classList.add('on'); syncInert();
+  $('#cmdInput').value = ''; cmdSel = 0; fillCmd('');
   setTimeout(() => $('#cmdInput').focus(), 30);
 }
-function closeCmd() { $('#cmdScrim').classList.remove('on'); }
+function closeCmd() {
+  if (!$('#cmdScrim').classList.contains('on')) return;
+  $('#cmdScrim').classList.remove('on'); syncInert();
+  const back = cmdOpener; cmdOpener = null;
+  if (back && document.contains(back) && !back.closest('[inert],[hidden]')) back.focus();
+}
 function fillCmd(q) {
   cmdRows = COMMANDS().filter(c => c.k.toLowerCase().includes(q.toLowerCase()));
   cmdSel = clamp(cmdSel, 0, Math.max(0, cmdRows.length - 1));
-  $('#cmdList').innerHTML = cmdRows.map((c, i) => `<div class="cmd ${i === cmdSel ? 'sel' : ''}" data-i="${i}">${esc(c.k)}<span class="k">${c.s}</span></div>`).join('')
-    || '<div class="cmd" style="color:var(--muted)">Nothing matches</div>';
-  $$('#cmdList .cmd[data-i]').forEach(r => r.onclick = () => { const c = cmdRows[+r.dataset.i]; closeCmd(); c.run(); });
+  $('#cmdList').innerHTML = cmdRows.map((c, i) => `<div class="cmd ${i === cmdSel ? 'sel' : ''}" role="option" id="cmd-${i}" aria-selected="${i === cmdSel}" data-i="${i}">${esc(c.k)}${c.s ? `<span class="k" aria-hidden="true">${c.s}</span><span class="sr-only">, shortcut ${c.s === 'Space' ? 'Space' : c.s}</span>` : ''}</div>`).join('')
+    || '<div class="cmd" role="option" aria-disabled="true" style="color:var(--muted)">Nothing matches</div>';
+  $$('#cmdList .cmd[data-i]').forEach(r => r.onclick = () => runCmd(+r.dataset.i));
+  const sel = $('#cmd-' + cmdSel);
+  $('#cmdInput').setAttribute('aria-activedescendant', sel ? sel.id : '');
+  if (sel) sel.scrollIntoView({ block:'nearest' });
 }
+function runCmd(i) { const c = cmdRows[i]; if (!c) return; closeCmd(); c.run(); }
 $('#cmdBtn').onclick = openCmd;
-$('#cmdInput').oninput = e => fillCmd(e.target.value);
+$('#cmdInput').oninput = e => { cmdSel = 0; fillCmd(e.target.value); };
 $('#cmdScrim').addEventListener('click', e => { if (e.target.id === 'cmdScrim') closeCmd(); });
-$('#cmdInput').onkeydown = e => {
+const cmdKeys = e => {
   if (e.key === 'ArrowDown') { cmdSel = Math.min(cmdSel + 1, cmdRows.length - 1); fillCmd($('#cmdInput').value); e.preventDefault(); }
   else if (e.key === 'ArrowUp') { cmdSel = Math.max(0, cmdSel - 1); fillCmd($('#cmdInput').value); e.preventDefault(); }
-  else if (e.key === 'Enter') { const c = cmdRows[cmdSel]; if (c) { closeCmd(); c.run(); } }
+  else if (e.key === 'Home' && e.target !== $('#cmdInput')) { cmdSel = 0; fillCmd($('#cmdInput').value); e.preventDefault(); }
+  else if (e.key === 'End' && e.target !== $('#cmdInput')) { cmdSel = cmdRows.length - 1; fillCmd($('#cmdInput').value); e.preventDefault(); }
+  else if (e.key === 'Enter') { e.preventDefault(); runCmd(cmdSel); }
 };
+$('#cmdInput').onkeydown = cmdKeys;
+$('#cmdList').onkeydown = cmdKeys;
+
+/* Single-key shortcuts. They never fire while typing, never take Space or
+   Enter from a focused control, and can be switched off in Setup → Keyboard
+   (WCAG 2.1.4) — screen-reader users in focus mode, and anyone who presses
+   keys by accident, need that. Ctrl/⌘ + K always works. */
+const SHORTCUTS = [
+  ['Space', 'Start or pause the timer'], ['N', 'Skip to the next interval'], ['R', 'Reset this interval'],
+  ['T', 'Start or stop the stopwatch on the session task'], ['B', 'Park a thought'], ['D', 'Log a distraction'],
+  ['M', 'Sound mix on or off'], ['P', 'Sort unsorted tasks on the matrix'], ['A', 'Read the current task aloud'],
+  ['1 – 9', 'Go to Focus, Plan, Tasks, Matrix, Notes, Sound, Calm, Stats, Setup'], ['?', 'Show these shortcuts'],
+  ['Ctrl or ⌘ + K', 'Command palette (always on)'], ['Esc', 'Close a dialog, the palette, or stop reading aloud']
+];
+const INTERACTIVE = 'button, a[href], input, textarea, select, summary, [role="button"], [role="option"], [role="tab"], [role="switch"], [role="checkbox"], [role="radio"], [contenteditable="true"]';
 document.addEventListener('keydown', e => {
   if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); openCmd(); return; }
-  if (e.key === 'Escape') { closeCmd(); closeModal(); return; }
-  if (document.querySelector('.scrim.on')) return;
-  const typing = /input|textarea|select/i.test(document.activeElement.tagName);
-  if (typing || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (e.key === 'Escape') { speech.stop(); tipEl().classList.remove('on'); closeCmd(); closeModal(); return; }
+  if (document.querySelector('.scrim.on') || $('#gate').classList.contains('on')) return;
+  if (!CF().shortcuts) return;
+  const el = document.activeElement;
+  if (/input|textarea|select/i.test(el.tagName) || el.isContentEditable) return;
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  if ((e.code === 'Space' || e.key === 'Enter') && el.closest && el.closest(INTERACTIVE)) return;
   const map = { '1':'focus','2':'plan','3':'tasks','4':'matrix','5':'notes','6':'sound','7':'calm','8':'stats','9':'settings' };
   if (map[e.key]) { go(map[e.key]); return; }
   const k = e.key.toLowerCase();
@@ -2645,6 +3101,8 @@ document.addEventListener('keydown', e => {
   else if (k === 'm') $('#soundBtn').click();
   else if (k === 'p') triage();
   else if (k === 't') toggleTracking();
+  else if (k === 'a') readFocusAloud();
+  else if (e.key === '?') openSetup('keys');
 });
 $('#runBtn').onclick = toggleRun;
 $('#skipBtn').onclick = skipPhase;
@@ -2796,7 +3254,7 @@ function renderQuickStart() {
   if (done === steps.length) { box.hidden = true; return; }
   box.hidden = false;
   box.innerHTML = `<div class="panel-head"><h3>First run</h3><span class="eyebrow">${done} of ${steps.length}</span></div>
-    <p style="font-size:12px;color:var(--muted);margin:0 0 8px">Nothing is filled in for you. Every chart, streak and suggestion in here is computed from what you actually do.</p>
+    <p style="font-size:calc(12px*var(--ts,1));color:var(--muted);margin:0 0 8px">Nothing is filled in for you. Every chart, streak and suggestion in here is computed from what you actually do.</p>
     ${steps.map((x, i) => `<div class="qs-row ${x.done ? 'done' : ''}">
         <span class="qs-tick"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></span>
         <span class="qs-b"><span class="qs-t">${x.t}</span><span class="qs-h">${x.h}</span></span>
@@ -2831,9 +3289,9 @@ function renderAccountCard() {
     : 'Local profile on this device';
   box.innerHTML = `<div class="panel-head"><h3>Account</h3><span class="eyebrow">${AUTH.mode}</span></div>
     ${u ? `<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-        <span class="av" style="width:34px;height:34px;font-size:13px">${esc(initials(u.name || u.email))}</span>
-        <div style="min-width:0"><div style="font-size:13.5px;font-weight:600">${esc(u.name || u.email || 'You')}</div>
-        <div style="font-size:11.5px;color:var(--muted)">${esc(u.email || how)}</div></div></div>` : ''}
+        <span class="av" style="width:34px;height:34px;font-size:calc(13px*var(--ts,1))">${esc(initials(u.name || u.email))}</span>
+        <div style="min-width:0"><div style="font-size:calc(13.5px*var(--ts,1));font-weight:600">${esc(u.name || u.email || 'You')}</div>
+        <div style="font-size:calc(11.5px*var(--ts,1));color:var(--muted)">${esc(u.email || how)}</div></div></div>` : ''}
     <div class="kv"><span>Signed in with</span><strong>${esc(how)}</strong></div>
     <div class="kv"><span>Workspace</span><strong>${esc(STORE.label())}</strong></div>
     ${AUTH.mode === 'local' ? `
@@ -2843,7 +3301,7 @@ function renderAccountCard() {
         <button class="btn sm" id="outBtn" style="flex:1;justify-content:center">Sign out</button>
       </div>`
     : AUTH.mode === 'firebase' ? `
-      <p style="font-size:12px;color:var(--muted);line-height:1.55;margin:10px 0 0">Firebase verifies the password and Firestore rules decide who may read <code>users/{uid}</code>. Nothing sensitive lives in this page.</p>
+      <p style="font-size:calc(12px*var(--ts,1));color:var(--muted);line-height:1.55;margin:10px 0 0">Firebase verifies the password and Firestore rules decide who may read <code>users/{uid}</code>. Nothing sensitive lives in this page.</p>
       <button class="btn sm" id="outBtn" style="width:100%;justify-content:center;margin-top:10px">Sign out</button>`
     : ''}`;
   const pb = $('#pwBtn'); if (pb) pb.onclick = () => changePwModal(true);
@@ -2859,7 +3317,7 @@ function renderStorageCard() {
     rest:   'Your own endpoint owns the data. GET returns the state, PUT receives it, DELETE clears it — sent same-origin with any headers you configured.'
   };
   box.innerHTML = `<div class="panel-head"><h3>Where this data lives</h3><span class="eyebrow">${STORE.mode}</span></div>
-    <p style="font-size:12px;color:var(--muted);line-height:1.55;margin:0 0 10px">${notes[STORE.mode] || ''}</p>
+    <p style="font-size:calc(12px*var(--ts,1));color:var(--muted);line-height:1.55;margin:0 0 10px">${notes[STORE.mode] || ''}</p>
     <div class="kv"><span>Status</span><strong style="color:${st[0]}">${st[1]}${STORE.lastAt ? ' · ' + agoLabel(STORE.lastAt) : ''}</strong></div>
     <div class="kv"><span>${STORE.mode === 'rest' ? 'Endpoint' : 'Key'}</span><strong>${esc(STORE.mode === 'rest' ? String(CFG.endpoint) : CFG.storageKey)}</strong></div>
     <div class="kv"><span>Autosave</span><strong>${CFG.autosaveMs} ms after a change</strong></div>
@@ -2870,7 +3328,7 @@ function renderStorageCard() {
       <button class="btn sm" id="storeReload" style="flex:1;justify-content:center">Reload</button>
       <button class="btn sm" id="storeFlush" style="flex:1;justify-content:center">Save now</button>
     </div>
-    <p style="font-size:11.5px;color:var(--muted);margin:9px 0 0">The mode is set by the page that hosts this app, not from here — see <em>Embedding</em> below.</p>`;
+    <p style="font-size:calc(11.5px*var(--ts,1));color:var(--muted);margin:9px 0 0">The mode is set by the page that hosts this app, not from here — see <em>Embedding</em> below.</p>`;
   $('#storeReload').onclick = async () => {
     let ok;
     try { ok = await load(); }
@@ -2891,11 +3349,11 @@ function renderListsCard() {
     ['ground',       'Grounding steps',     'The 5-4-3-2-1 sequence, counted down from however many lines you leave.']
   ];
   box.innerHTML = `<div class="panel-head"><h3>Prompts you can edit</h3><button class="btn sm ghost" id="listsReset">Reset</button></div>
-    <p style="font-size:12px;color:var(--muted);margin:0 0 10px">One per line. These are the only words this app puts in your mouth — change them to yours.</p>
+    <p style="font-size:calc(12px*var(--ts,1));color:var(--muted);margin:0 0 10px">One per line. These are the only words this app puts in your mouth — change them to yours.</p>
     ${fields.map(([k, label, hint]) => `<div class="field" style="margin-bottom:11px">
         <label for="lst_${k}">${label}</label>
         <textarea id="lst_${k}" rows="${k === 'moves' ? 5 : 4}" spellcheck="false">${esc(LIST(k).join('\n'))}</textarea>
-        <span style="font-size:11px;color:var(--muted)">${hint}</span></div>`).join('')}`;
+        <span style="font-size:calc(11px*var(--ts,1));color:var(--muted)">${hint}</span></div>`).join('')}`;
   fields.forEach(([k]) => $('#lst_' + k).onchange = e => {
     const lines = e.target.value.split('\n').map(x => x.trim()).filter(Boolean);
     S.lists[k] = lines.length ? lines : clone(DEFAULT_LISTS[k]);
@@ -2968,7 +3426,7 @@ function gateBusy(on, label) {
   const b = $('#gateGo'); if (b) { b.disabled = on; b.textContent = on ? (label || 'Working…') : 'Sign in'; }
 }
 function showGate(msg, tone) {
-  $('#gate').classList.add('on');
+  $('#gate').classList.add('on'); syncInert();       // the workspace behind is unreachable until someone signs in
   const cloud = AUTH.mode === 'firebase', form = !cloud || CFG.emailSignIn;
   $('#gateCloud').hidden = !cloud;
   $('#gateForm').hidden = !form;                     // Google-only sites hide email + password
@@ -2983,7 +3441,7 @@ function showGate(msg, tone) {
   if (msg) gateMsg(msg, tone);
   setTimeout(() => { const f = form ? $('#gateUser') : $('#googleBtn'); if (f && !f.value) f.focus(); }, 60);
 }
-function hideGate() { $('#gate').classList.remove('on'); gateMsg(''); }
+function hideGate() { $('#gate').classList.remove('on'); syncInert(); gateMsg(''); }
 function renderWho() {
   const c = $('#whoChip'), out = $('#signOutBtn');
   if (!c) return;
@@ -3100,15 +3558,15 @@ async function offerLegacyImport() {
   if (!found.length || S.tasks.length || S.sessions.length || S.notes.length) return;
   const done = () => { S.meta.legacyChecked = true; save(); };
   openModal('Bring over your earlier pack?', `
-    <p style="font-size:12.5px;color:var(--ink-2);margin:0">The first version of this page saved a simpler pack. Copy it into this workspace? Tasks land unsorted on the matrix, step lists become notes, and the old copy stays where it is.</p>
+    <p style="font-size:calc(12.5px*var(--ts,1));color:var(--ink-2);margin:0">The first version of this page saved a simpler pack. Copy it into this workspace? Tasks land unsorted on the matrix, step lists become notes, and the old copy stays where it is.</p>
     <div class="stack" style="gap:8px">${found.map((f, i) => `<button class="btn" style="justify-content:space-between" data-legacy="${i}">
-      <span>${esc(f.label)}</span><span class="num" style="color:var(--muted);font-size:11px">${plural((f.pack.tasks || []).length, 'task')} · ${plural((f.pack.sessions || []).length, 'session')}</span></button>`).join('')}</div>`,
+      <span>${esc(f.label)}</span><span class="num" style="color:var(--muted);font-size:calc(11px*var(--ts,1))">${plural((f.pack.tasks || []).length, 'task')} · ${plural((f.pack.sessions || []).length, 'session')}</span></button>`).join('')}</div>`,
     [{ label:'No thanks', onClick: done }],
     body => { $$('[data-legacy]', body).forEach(b => b.onclick = () => { importLegacy(found[+b.dataset.legacy].pack); closeModal(); }); });
 }
 function changePwModal(force) {
   openModal('Set your own password', `
-    <p style="font-size:12.5px;color:var(--ink-2);margin:0">This profile is still on the seeded <strong>admin / admin</strong> password. Anyone who opens this page on this device can read your workspace until you change it.</p>
+    <p style="font-size:calc(12.5px*var(--ts,1));color:var(--ink-2);margin:0">This profile is still on the seeded <strong>admin / admin</strong> password. Anyone who opens this page on this device can read your workspace until you change it.</p>
     <div class="field"><label for="npw">New password</label><input type="password" id="npw" autocomplete="new-password"></div>
     <div class="field"><label for="npw2">Again</label><input type="password" id="npw2" autocomplete="new-password"></div>`,
     [{ label: force ? 'Not now' : 'Later' }, { label:'Save it', primary:true, onClick: () => {
