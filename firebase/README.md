@@ -148,10 +148,30 @@ so browsers do not mix a cached old script with the new page.
 | `apps/adhd-study-pack.html` | Markup, the CSP, and the JSON config block (app name, storage key, which sign-in options appear). |
 | `js/adhd-study-pack.js` | The whole app. Its storage adapter writes to localStorage for local profiles and to Firestore for Google users, and it loads Firebase SDK 12.19.0 from gstatic only when configured. |
 | `js/lib/comfort.js` | Accessibility and comfort settings: the defaults and the starting profiles, `applyComfort()` (reflects them onto `<html>`), the screen-reader live-region announcer, and the built-in voice. Imported with `?v=` like the page's other assets. |
+| `js/lib/records.js` | The journal database — one row per focus session, check-in and mood entry. IndexedDB signed out, a Firestore collection signed in, memory as the fallback. Also imported with `?v=`. |
 | `css/adhd-study-pack.css` | Styles, light and dark, plus the comfort variants (text scale, spacing, typeface, high contrast, muted and grey colour, strong focus ring, reduced motion). |
 | `firebase/firestore.rules` | Access rules. Keep them in sync with the Console. |
 
-Data layout: `users/{uid}/workspace/state` → `{ json: <whole workspace>, updated: <ms>, app: <version> }`.
+Data layout, in two parts:
+
+| Path | Holds | Shape |
+|---|---|---|
+| `users/{uid}/workspace/state` | The working set: settings, tasks, blocks, notes, courses, links | `{ json: <whole workspace>, updated: <ms>, app: <version> }` |
+| `users/{uid}/journal/{id}` | History: one document per focus session, check-in or mood entry | `{ kind: 'session'/'checkin'/'mood', at: <ms>, saved: <ms>, ...fields }` |
+
+History is split out because it only ever grows, and a Firestore document stops at
+1 MiB. One document per record also means two devices adding entries at the same
+time merge instead of overwriting each other. Signed out, the same records go to
+an IndexedDB store (`adhd-study-pack` / `journal`) instead.
+
+Reads fetch the collection and filter in the browser, so **no composite index is
+needed** — there is nothing to create in the Console. If a journal ever grows past
+a few thousand rows, add a `where('at', '>=', cutoff)` range (one field, indexed
+automatically) rather than a `kind` + `orderBy('at')` query, which would need one.
+
+Upgrading from 3.3.0 or earlier: history that used to sit inline in the workspace
+is copied into the journal on first load, and dropped from the workspace document
+only on the save after that — a failed migration loses nothing.
 
 The comfort settings travel inside that workspace at `settings.comfort`, so they follow the
 account to every device. They are also mirrored per device in
