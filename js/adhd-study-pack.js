@@ -12,7 +12,8 @@
    ===================================================================== */
 import { firebaseConfig } from './firebase-config.js';
 import { COMFORT_PRESETS, COMFORT_DEFAULTS, presetComfort, changesFromProfile, normaliseComfort,
-         applyComfort, announce, speech } from './lib/comfort.js?v=3.3.0';   // versioned like the page's own assets: GitHub Pages caches for ten minutes
+         applyComfort, announce, speech } from './lib/comfort.js?v=3.4.0';   // versioned like the page's own assets: GitHub Pages caches for ten minutes
+import { journal } from './lib/records.js?v=3.4.0';
 const $  = (s, r) => (r || document).querySelector(s);
 const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
 const uid = () => Math.random().toString(36).slice(2, 10);
@@ -36,7 +37,7 @@ const DOW = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
    defaults, then a <script type="application/json" id="focus-dial-config">
    block, then window.FOCUS_DIAL_CONFIG.
    ===================================================================== */
-const VERSION = '3.3.0';
+const VERSION = '3.4.0';
 const DEFAULT_CONFIG = {
   storageKey: 'focusdial.v3',
   storage:    'local',            // 'local' | 'session' | 'memory' | 'rest'
@@ -100,13 +101,17 @@ function rememberComfort(settings) {
 }
 
 const DEFAULTS = () => ({
-  schema: 3,
+  schema: 4,
   settings: Object.assign({ focus:25, short:5, long:15, cycles:4, autoBreak:true, autoFocus:false, titleClock:true,
               chime:true, chimeVol:70, notify:false, checkinAfter:true, moveBreak:true, hideSeconds:false,
               theme:deviceRecord().theme || 'auto', accent:deviceRecord().accent || 'focus', dayStart:'08:00', dayEnd:'21:00',
               comfort:deviceComfort() }, CFG.settings || {}),
   lists: Object.assign(clone(DEFAULT_LISTS), CFG.lists || {}),
-  tasks: [], events: [], notes: [], sessions: [], checkins: [], subjects: [], links: [],
+  /* tasks, events, notes, subjects and links are the working set and travel in
+     the workspace document. sessions, checkins and moods are history: they only
+     grow, so they live in the journal database (js/lib/records.js) and are held
+     here in memory for rendering. saveSnapshot() leaves them out of the write. */
+  tasks: [], events: [], notes: [], sessions: [], checkins: [], moods: [], subjects: [], links: [],
   sound: { master:60, layers:{}, beat:10, carrier:180 },
   gcal: { on:false, cals:[], hideDeclined:true, push:true, target:'primary', links:{} },
   timer: { phase:'focus', cycle:1, taskId:null, intent:'', activation:null },
@@ -178,6 +183,111 @@ const STORE = {
 };
 let S = DEFAULTS();
 let saveT = null, saveChain = Promise.resolve();
+
+/* =====================================================================
+   THE JOURNAL — history as rows in a database rather than three more
+   arrays inside the workspace document.
+
+   Sessions, check-ins and moods only ever grow. Kept in the workspace they
+   would walk a Firestore document towards its 1 MiB ceiling, and every
+   autosave would rewrite the lot. So each one is written on its own into
+   IndexedDB (signed out) or a Firestore collection (signed in), and the
+   arrays on S are the in-memory copy the views read.
+
+   JOURNAL_KEYS maps each array on S to the record kind it holds.
+   ===================================================================== */
+const JOURNAL_KEYS = { sessions:'session', checkins:'checkin', moods:'mood' };
+/** The workspace as it goes to storage: history belongs to the journal. */
+function saveSnapshot() {
+  const snap = clone(S);
+  Object.keys(JOURNAL_KEYS).forEach(k => { snap[k] = []; });
+  return snap;
+}
+/** Add a record to an in-memory array and write that one row to the database. */
+function logRecord(key, rec) {
+  const kind = JOURNAL_KEYS[key];
+  const row = Object.assign({ id:uid(), kind, at:Date.now() }, rec);
+  if (!row.kind) row.kind = kind;
+  S[key].push(row);
+  journal.put(row).then(renderStorageBits, () => {});
+  return row;
+}
+/** Remove one record from both the array and the database. */
+function dropRecord(key, id) {
+  S[key] = S[key].filter(r => r.id !== id);
+  journal.remove(id).then(renderStorageBits, () => {});
+}
+/** Read the history back out of the database into S, oldest first. */
+async function journalLoad() {
+  const rows = await journal.all();
+  Object.entries(JOURNAL_KEYS).forEach(([key, kind]) => {
+    S[key] = rows.filter(r => r.kind === kind).sort((a, b) => (a.at || 0) - (b.at || 0));
+  });
+  return rows.length;
+}
+/** Everything currently in memory, as records — for the merge on sign-in. */
+function journalRows() {
+  return Object.entries(JOURNAL_KEYS).flatMap(([key, kind]) =>
+    (S[key] || []).map(r => Object.assign({ kind, at: recordAt(r) }, r)));
+}
+/** A record's timestamp, whatever the shape it was written in. */
+function recordAt(r) {
+  if (typeof r.at === 'number') return r.at;
+  return Date.parse(r.at || r.start || '') || Date.now();
+}
+/* Point the journal at the right database for who is signed in. Records
+   written while signed out stay in IndexedDB; they are never folded into an
+   account behind the user's back (a shared laptop would leak one person's
+   moods into another's account), so enterApp offers the move instead. */
+let journalPending = [];
+async function journalOpen() {
+  if (CFG.storage === 'memory') { await journal.use('memory'); return journal.mode; }
+  if (STORE.mode !== 'cloud' || !FB.db || !FB.fs || !AUTH.user) { await journal.use('idb'); return journal.mode; }
+  await journal.use('idb');
+  try { journalPending = await journal.all(); } catch (e) { journalPending = []; }
+  await journal.use('cloud', { fs:FB.fs, db:FB.db, uid:AUTH.user.id });
+  return journal.mode;
+}
+const MOVED_KEY = CFG.storageKey + '.journal-moved';
+const movedIds = () => { try { return new Set(JSON.parse(localStorage.getItem(MOVED_KEY) || '[]')); } catch (e) { return new Set(); } };
+/**
+ * History logged on this device while signed out: offer to bring it into the
+ * account. Asking rather than doing it keeps one person's mood log out of
+ * another person's account on a shared computer. Declining leaves it in place.
+ */
+function offerJournalMerge() {
+  const pend = journalPending; journalPending = [];
+  if (journal.mode !== 'cloud' || !pend.length) return false;
+  const moved = movedIds(), fresh = pend.filter(r => !moved.has(r.id));
+  if (!fresh.length) return false;
+  const n = k => fresh.filter(r => r.kind === k).length;
+  const parts = [[n('session'), 'focus session'], [n('mood'), 'mood entry'], [n('checkin'), 'check-in']]
+    .filter(([c]) => c).map(([c, w]) => plural(c, w));
+  openModal('Bring this device’s history into your account?',
+    `<p class="doc">This browser has ${parts.join(', ')} recorded while you were signed out.</p>
+     <p class="doc">Moving it in copies those entries to your account, where they sync to your other devices. Nothing is deleted from this device either way, and nothing is moved unless you say so.</p>`,
+    [{ label:'Leave it here' },
+     { label:'Move it in', primary:true, onClick: () => {
+         journal.merge(fresh).then(async count => {
+           try { localStorage.setItem(MOVED_KEY, JSON.stringify([...moved, ...fresh.map(r => r.id)])); } catch (e) {}
+           await journalLoad(); renderAll();
+           toast(count ? `Moved ${plural(count, 'entry')} into your account` : 'Nothing new to move');
+         }, () => toast('Could not move that history — nothing was changed'));
+       } }]);
+  return true;
+}
+/** Older workspaces carried history inline: move it across, once. */
+async function journalAdopt(raw) {
+  if (!raw) return 0;
+  const rows = [];
+  Object.entries(JOURNAL_KEYS).forEach(([key, kind]) => {
+    (Array.isArray(raw[key]) ? raw[key] : []).forEach(r =>
+      rows.push(Object.assign({ kind, at: recordAt(r) }, r, { id: r.id || uid() })));
+  });
+  if (!rows.length) return 0;
+  await journal.merge(rows);
+  return rows.length;
+}
 function setStoreStatus(st, err) {
   STORE.status = st; STORE.error = err || null;
   if (st === 'saved') STORE.lastAt = Date.now();
@@ -190,7 +300,7 @@ function save() {
   gcalQueuePush();                     // planner changes follow to Google Calendar when connected
   saveT = setTimeout(() => {
     saveT = null;
-    const snap = clone(S);
+    const snap = saveSnapshot();
     setStoreStatus('saving');
     saveChain = saveChain.then(() => STORE.write(snap)).then(
       () => { setStoreStatus('saved'); emit('change', snap); },
@@ -205,9 +315,9 @@ function migrate(raw) {
   const d = DEFAULTS(), out = Object.assign(d, raw);
   ['settings','lists','sound','gcal','timer','meta'].forEach(k => out[k] = Object.assign(DEFAULTS()[k], raw[k] || {}));
   out.settings.comfort = normaliseComfort(out.settings.comfort);      // keys added since it was saved
-  ['tasks','events','notes','sessions','checkins','subjects','links'].forEach(k => { if (!Array.isArray(out[k])) out[k] = []; });
+  ['tasks','events','notes','sessions','checkins','moods','subjects','links'].forEach(k => { if (!Array.isArray(out[k])) out[k] = []; });
   out.tasks.forEach(t => { if (!('quad' in t)) t.quad = null; if (!t.id) t.id = uid(); });
-  out.schema = 3;
+  out.schema = 4;
   return out;
 }
 async function load() {
@@ -229,10 +339,17 @@ async function load() {
         const keep = { settings:S.settings, lists:S.lists, sound:S.sound, gcal:S.gcal };
         S = Object.assign(DEFAULTS(), keep);
         S.meta.notice = 'demo-cleared';
+        await journal.clear();
+      } else {
+        /* Written before the journal existed? Move that history into the
+           database now; the next save drops it from the workspace. */
+        await journalAdopt(raw);
       }
+      await journalLoad();
       setStoreStatus('saved');
       return true;
     }
+    await journalLoad();          // no workspace yet, but history may already exist
   } catch (e) {
     setStoreStatus('error', e);
     /* A synced workspace that could not be read must not be replaced by an
@@ -405,6 +522,9 @@ function fbWatch() {
     if (!json || json === fbKnown || saveT) return;
     fbKnown = json;
     const next = migrate(JSON.parse(json)); if (!next) return;
+    /* History is not in this document — it belongs to the journal, which has
+       its own copy already loaded. Keep it rather than blanking it. */
+    Object.keys(JOURNAL_KEYS).forEach(k => { next[k] = S[k]; });
     S = next;
     renderAll();
     toast('Updated from another device');
@@ -563,6 +683,8 @@ function go(v, opts) {
   if (v === 'sound') renderSound();
   if (v === 'tasks') renderTasks();
   if (v === 'matrix') renderMatrix();
+  if (v === 'mood') renderMood();
+  if (v === 'about') renderAbout();
   if (moved && !(opts && opts.quiet)) {
     const h = $('#view-' + v + ' .view-head h2') || $('#view-' + v + ' h2');
     if (h) { h.tabIndex = -1; h.focus({ preventScroll:true }); }
@@ -741,8 +863,8 @@ function completePhase(skipped) {
 function logSession(minutes, partial) {
   const end = Date.now(), start = end - minutes * 60000;
   const task = S.tasks.find(t => t.id === S.timer.taskId);
-  S.sessions.push({
-    id: uid(), start: new Date(start).toISOString(), end: new Date(end).toISOString(),
+  const rec = logRecord('sessions', {
+    at: start, start: new Date(start).toISOString(), end: new Date(end).toISOString(),
     minutes, taskId: S.timer.taskId || null, subjectId: task ? task.subjectId : null,
     intent: S.timer.intent || '', activation: S.timer.activation, quality: null,
     distractions: T.distractions.slice(), partial: !!partial
@@ -750,7 +872,7 @@ function logSession(minutes, partial) {
   if (task) { task.done_pomos = (task.done_pomos || 0) + 1; if (task.done_pomos >= task.est && !task.done) toast('Estimate reached on "' + task.title.slice(0, 30) + '"'); }
   T.distractions = []; $('#tallyCount').textContent = '0';
   renderTopStats(); renderQuickStart();
-  emit('session', clone(S.sessions[S.sessions.length - 1]));
+  emit('session', clone(rec));
 }
 setInterval(() => {
   if (!T.running) return;
@@ -810,13 +932,12 @@ function stopTracking(opts) {
 function logTracked(tr, minutes, o) {
   if (minutes < 1) { if (!o.quiet) toast('Under a minute — not logged'); return; }
   const task = S.tasks.find(t => t.id === tr.taskId), ev = S.events.find(e => e.id === tr.eventId);
-  const sess = {
-    id:uid(), start:new Date(tr.startedAt).toISOString(), end:new Date(tr.startedAt + minutes * 60000).toISOString(),
+  const sess = logRecord('sessions', {
+    at:tr.startedAt, start:new Date(tr.startedAt).toISOString(), end:new Date(tr.startedAt + minutes * 60000).toISOString(),
     minutes, taskId:tr.taskId || null, eventId:tr.eventId || null, title:tr.title,
     subjectId:tr.subjectId || (task && task.subjectId) || (ev && ev.subjectId) || null,
     intent:'', activation:null, quality:null, distractions:[], partial:false, tracked:true
-  };
-  S.sessions.push(sess);
+  });
   S.sessions.sort((a, b) => new Date(a.start) - new Date(b.start));     // it began earlier than sessions logged since
   if (task) task.tracked_min = (task.tracked_min || 0) + minutes;
   toast(o.because || `Logged ${minsToHM(minutes)} on “${tr.title.slice(0, 32)}”`);
@@ -2055,9 +2176,9 @@ $('#groundStart').onclick = () => {
   modalDone = () => clearInterval(iv);
 };
 $('#saveCheckin').onclick = () => {
-  S.checkins.push({ id:uid(), at:new Date().toISOString(), energy:+$('#ck_energy').value,
-                    stress:+$('#ck_stress').value, focus:+$('#ck_focus').value, note:$('#checkNote').value.trim(), when:'manual' });
-  $('#checkNote').value = ''; save(); renderCalm(); toast('Logged — the pattern is worth more than any one entry');
+  logRecord('checkins', { when:'manual', energy:+$('#ck_energy').value,
+                          stress:+$('#ck_stress').value, focus:+$('#ck_focus').value, note:$('#checkNote').value.trim() });
+  $('#checkNote').value = ''; save(); renderCalm(); renderMood(); toast('Logged — the pattern is worth more than any one entry');
 };
 function postSessionCheckin() {
   openModal('How did that go?', `
@@ -2068,8 +2189,9 @@ function postSessionCheckin() {
     <p style="font-size:calc(12px*var(--ts,1));color:var(--muted);margin:0">${esc(movementSnack())}</p>`,
     [{ label:'Skip' }, { label:'Save', primary:true, onClick: () => {
       const last = S.sessions[S.sessions.length - 1];
-      if (last) last.quality = +($('#qRow .on') ? $('#qRow .on').dataset.q : 3);
-      S.checkins.push({ id:uid(), at:new Date().toISOString(), energy:null, stress:+$('#ck2_stress').value, focus:last && last.quality ? last.quality * 2 : null, note:'', when:'post' });
+      if (last) { last.quality = +($('#qRow .on') ? $('#qRow .on').dataset.q : 3); journal.put(last); }
+      logRecord('checkins', { when:'post', energy:null, stress:+$('#ck2_stress').value,
+                              focus:last && last.quality ? last.quality * 2 : null, note:'' });
       save(); renderStats();
     } }], body => {
       $$('[data-q]', body).forEach(b => b.onclick = () => { $$('[data-q]', body).forEach(x => x.classList.remove('on')); b.classList.add('on'); $('#qv').textContent = b.dataset.q; });
@@ -2702,7 +2824,7 @@ const TIMER_PRESETS = Object.assign({
    ===================================================================== */
 const SET_SECTIONS = ['profile','seeing','motion','focus','speech','keys','timer','prompts','data'];
 let setSec = (() => { try { return sessionStorage.getItem(CFG.storageKey + '.setup') || 'profile'; } catch (e) { return 'profile'; } })();
-const HIDEABLE_VIEWS = [['plan','Plan'],['matrix','Matrix'],['notes','Notes'],['sound','Sound'],['calm','Calm'],['stats','Stats']];
+const HIDEABLE_VIEWS = [['plan','Plan'],['matrix','Matrix'],['notes','Notes'],['sound','Sound'],['calm','Calm'],['mood','Mood'],['stats','Stats'],['about','About']];
 const COMFORT_LABELS = {
   textSize:'Text size', spacing:'Spacing', font:'Typeface', contrast:'Contrast', color:'Colour', focusRing:'Focus outline',
   underlineLinks:'Underlined links', motion:'Motion', messages:'Pop-up messages', messageTime:'Message duration', coaching:'Coaching',
@@ -2735,13 +2857,45 @@ function rowRange(bind, label, hint, min, max, step, fmt) {
 const group = (title, rows) => `<div class="set-group"><h4>${title}</h4>${rows}</div>`;
 const panelHead = (title, lead) => `<h3>${title}</h3>${lead ? `<p class="set-lead">${lead}</p>` : ''}`;
 
+/* ---- advanced: the long tail of a section, folded away ----
+   Each panel shows the two or three settings most people want and hides the
+   rest behind one button. Nothing is removed — a disclosure, not a second
+   class of setting — and the button says how many are in there, because
+   "Advanced" on its own tells you nothing about whether to press it. */
+const ADV_KEY = CFG.storageKey + '.adv';
+const advState = (() => { try { return JSON.parse(sessionStorage.getItem(ADV_KEY) || '{}'); } catch (e) { return {}; } })();
+function advanced(key, rows, opts) {
+  const o = opts || {}, open = !!advState[key];
+  const n = (rows.match(/class="set-row/g) || []).length;
+  return `<div class="adv ${open ? 'open' : ''}">
+    <button type="button" class="adv-toggle" data-adv="${key}" aria-expanded="${open}" aria-controls="adv_${key}">
+      <svg class="adv-chev" aria-hidden="true" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+      <span class="adv-label">${esc(o.label || 'More settings')}</span>
+      <span class="adv-n">${n ? n : ''}</span>
+    </button>
+    <div class="adv-body" id="adv_${key}" ${open ? '' : 'hidden'}>
+      ${o.lead ? `<p class="set-hint adv-lead">${o.lead}</p>` : ''}${rows}
+    </div>
+  </div>`;
+}
+function toggleAdv(key, btn) {
+  const open = !advState[key];
+  advState[key] = open;
+  try { sessionStorage.setItem(ADV_KEY, JSON.stringify(advState)); } catch (e) {}
+  const body = $('#adv_' + key);
+  if (!body) return;
+  body.hidden = !open;
+  btn.setAttribute('aria-expanded', String(open));
+  btn.closest('.adv').classList.toggle('open', open);
+  announce(open ? `${btn.querySelector('.adv-label').textContent} expanded` : 'Collapsed');
+}
+
 function renderSettings() {
   const view = $('#view-settings'); if (!view) return;
   const keep = view.contains(document.activeElement) ? document.activeElement.id : null;
   renderSetTabs();
   renderProfilePanel(); renderSeeingPanel(); renderMotionPanel(); renderFocusPanel(); renderSpeechPanel(); renderKeysPanel(); renderTimerPanel();
-  const bytes = STORE.bytes() || JSON.stringify(S).length;
-  $('#storageInfo').textContent = `${S.sessions.length} sessions · ${S.tasks.length} tasks · ${S.notes.length} notes · ${S.events.length} blocks — about ${(bytes / 1024).toFixed(1)} KB in ${STORE.label()}.`;
+  $('#storageInfo').textContent = storageSummary();
   $('#dataExtra').innerHTML = (CFG.demo && !S.meta.sample)
     ? `<button type="button" class="btn" id="demoBtn" style="width:100%;justify-content:center;margin-top:8px">Load a demo workspace</button>
        <p class="set-hint" style="margin:7px 0 0">Three weeks of generated sessions so you can see the charts working. It is stamped as demo data and clears in one click — nothing is ever seeded without you asking.</p>`
@@ -2810,16 +2964,17 @@ function applyProfile(key) {
 
 /* ---- Seeing ---- */
 function renderSeeingPanel() {
-  $('#set-seeing').innerHTML = panelHead('Seeing', 'Size, spacing, typeface and colour. Changes apply as you make them — the preview at the bottom shows the result.')
-    + group('Text', rowChoice(['cf','textSize'], 'Text size', 'Makes the words bigger without zooming the whole page.', [[100,'100%'],[112,'112%'],[125,'125%'],[150,'150%'],[175,'175%']])
-      + rowChoice(['cf','spacing'], 'Line and letter spacing', 'More space between lines and letters helps many readers, including people with dyslexia.', [['normal','Normal'],['relaxed','Relaxed'],['loose','Loose']])
-      + rowChoice(['cf','font'], 'Typeface', '“Easier to read” is Atkinson Hyperlegible, designed so similar letters look different. “Your system” uses the font you already read all day.', [['default','App default'],['readable','Easier to read'],['system','Your system']]))
-    + group('Colour', rowChoice(['st','theme'], 'Theme', '“Auto” follows your device’s light or dark setting.', [['auto','Auto'],['light','Light'],['dark','Dark']])
-      + rowChoice(['cf','contrast'], 'Contrast', 'High contrast darkens text and borders and strengthens every edge.', [['standard','Standard'],['high','High']])
+  $('#set-seeing').innerHTML = panelHead('Seeing', 'Size, contrast and colour. Changes apply as you make them — the preview at the bottom shows the result.')
+    + group('The basics', rowChoice(['cf','textSize'], 'Text size', 'Makes the words bigger without zooming the whole page.', [[100,'100%'],[112,'112%'],[125,'125%'],[150,'150%'],[175,'175%']])
+      + rowChoice(['st','theme'], 'Theme', '“Auto” follows your device’s light or dark setting.', [['auto','Auto'],['light','Light'],['dark','Dark']])
+      + rowChoice(['cf','contrast'], 'Contrast', 'High contrast darkens text and borders and strengthens every edge.', [['standard','Standard'],['high','High']]))
+    + advanced('seeing', rowChoice(['cf','spacing'], 'Line and letter spacing', 'More space between lines and letters helps many readers, including people with dyslexia.', [['normal','Normal'],['relaxed','Relaxed'],['loose','Loose']])
+      + rowChoice(['cf','font'], 'Typeface', '“Easier to read” is Atkinson Hyperlegible, designed so similar letters look different. “Your system” uses the font you already read all day.', [['default','App default'],['readable','Easier to read'],['system','Your system']])
       + rowChoice(['cf','color'], 'Colour intensity', 'Soft calms the palette; greyscale removes colour entirely. Nothing in the app depends on colour alone.', [['vivid','Vivid'],['soft','Soft'],['mono','Greyscale']])
-      + rowChoice(['st','accent'], 'Accent colour', '', [['focus','Ember'],['rest','Moss'],['long','Iris'],['alert','Amber']]))
-    + group('Finding your place', rowChoice(['cf','focusRing'], 'Keyboard focus outline', 'Strong draws a thick, two-colour ring around whatever the keyboard is on.', [['standard','Standard'],['strong','Strong']])
-      + rowSwitch(['cf','underlineLinks'], 'Underline links', 'Links are recognisable without relying on colour.'))
+      + rowChoice(['st','accent'], 'Accent colour', '', [['focus','Ember'],['rest','Moss'],['long','Iris'],['alert','Amber']])
+      + rowChoice(['cf','focusRing'], 'Keyboard focus outline', 'Strong draws a thick, two-colour ring around whatever the keyboard is on.', [['standard','Standard'],['strong','Strong']])
+      + rowSwitch(['cf','underlineLinks'], 'Underline links', 'Links are recognisable without relying on colour.'),
+      { label:'Typeface, colour and focus', lead:'Spacing, the reading typeface, how strong the colour is, and how the keyboard outline looks.' })
     + `<div class="set-preview" aria-hidden="true"><div class="eyebrow">Preview</div>
         <p><strong>Write the related-work section.</strong> Two pomodoros, high activation — the part that stalls is the start, so the first step is just opening the draft.</p>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><span class="chip"><span class="dot" style="background:var(--focus)"></span>45 min today</span>
@@ -2830,30 +2985,32 @@ function renderSeeingPanel() {
 function renderMotionPanel() {
   const sysReduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   $('#set-motion').innerHTML = panelHead('Motion and sound', 'Movement and sound can help an understimulated mind or overwhelm a sensitive one. Choose what suits you.')
-    + group('Motion', rowChoice(['cf','motion'], 'Animation', `“Follow my device” uses your system setting, which is currently <strong>${sysReduced ? 'reduce motion' : 'full motion'}</strong>. “Reduce” stops transitions and pulsing; the breathing guide keeps a slow, small swell because that movement is its purpose.`, [['system','Follow my device'],['reduce','Reduce'],['full','Full']]))
-    + group('Sounds', rowSwitch(['st','chime'], 'Chime when a timer ends', 'A short three-note bell. The early warning, if you turn it on, is a single quiet note.')
-      + rowRange(['st','chimeVol'], 'Chime volume', '', 0, 100, 5, v => v + '%'));
+    + group('The basics', rowChoice(['cf','motion'], 'Animation', `“Follow my device” uses your system setting, which is currently <strong>${sysReduced ? 'reduce motion' : 'full motion'}</strong>. “Reduce” stops transitions and pulsing; the breathing guide keeps a slow, small swell because that movement is its purpose.`, [['system','Follow my device'],['reduce','Reduce'],['full','Full']])
+      + rowSwitch(['st','chime'], 'Chime when a timer ends', 'A short three-note bell. The early warning, if you turn it on, is a single quiet note.'))
+    + advanced('motion', rowRange(['st','chimeVol'], 'Chime volume', '', 0, 100, 5, v => v + '%'),
+      { label:'Sound level' });
 }
 
 /* ---- Focus and interruptions ---- */
 function renderFocusPanel() {
   const c = CF();
   $('#set-focus').innerHTML = panelHead('Focus and interruptions', 'This is where ADHD and autistic preferences differ most. The defaults suit ADHD — quick feedback and nudges; the Calm profile turns most of this down.')
-    + group('Pop-up messages', rowChoice(['cf','messages'], 'Show pop-up messages', 'Screen readers hear every message either way.', [['all','All'],['important','Important only'],['none','None']])
-      + rowChoice(['cf','messageTime'], 'Keep messages on screen', '“Until dismissed” adds a close button to each one.', [['short','3 seconds'],['long','8 seconds'],['stay','Until dismissed']]))
-    + group('Encouragement', rowSwitch(['cf','coaching'], 'Coaching and nudges', 'Short “go” messages, the priority nudges on the Focus screen and suggestions to swap tasks.')
+    + group('The basics', rowChoice(['cf','messages'], 'Show pop-up messages', 'Screen readers hear every message either way.', [['all','All'],['important','Important only'],['none','None']])
+      + rowSwitch(['cf','coaching'], 'Coaching and nudges', 'Short “go” messages, the priority nudges on the Focus screen and suggestions to swap tasks.')
       + rowSwitch(['cf','streaks'], 'Show streaks', 'Some people find a streak motivating; others find the pressure of breaking one stressful.')
+      + rowChoice(['cf','warnBefore'], 'Warn me before the timer ends', 'A quiet note and a message ahead of every change, so the switch is never a surprise.', [[0,'Off'],[1,'1 min'],[2,'2 min'],[5,'5 min']]))
+    + advanced('focus', rowChoice(['cf','messageTime'], 'Keep messages on screen', '“Until dismissed” adds a close button to each one.', [['short','3 seconds'],['long','8 seconds'],['stay','Until dismissed']])
       + rowSwitch(['st','checkinAfter'], 'Ask how it went after each focus block', 'A ten-second rating that fills the charts. It opens a dialog when the timer ends.')
-      + rowSwitch(['st','moveBreak'], 'Suggest a movement break', 'A physical prompt at the start of each break.'))
-    + group('Changes and transitions', rowChoice(['cf','warnBefore'], 'Warn me before the timer ends', 'A quiet note and a message ahead of every change, so the switch is never a surprise.', [[0,'Off'],[1,'1 min'],[2,'2 min'],[5,'5 min']])
+      + rowSwitch(['st','moveBreak'], 'Suggest a movement break', 'A physical prompt at the start of each break.')
       + rowSwitch(['st','autoBreak'], 'Start breaks by themselves', 'On: the break is already running when the bell rings. Off: every change waits for you.')
-      + rowSwitch(['st','autoFocus'], 'Start the next focus block by themselves', 'Off by default — coming back should be your choice.'))
-    + group('Layout', rowSwitch(['cf','simpleFocus'], 'Simpler Focus screen', 'Shows only the timer, your task, today’s blocks and parked thoughts.')
+      + rowSwitch(['st','autoFocus'], 'Start the next focus block by themselves', 'Off by default — coming back should be your choice.')
+      + rowSwitch(['cf','simpleFocus'], 'Simpler Focus screen', 'Shows only the timer, your task, today’s blocks and parked thoughts.')
       + rowSwitch(['cf','explanations'], 'Explanations under headings', 'The short descriptions like this one. Turn off once you know your way around.')
       + `<fieldset class="set-row set-fs" role="group" aria-label="Sections in the side bar" aria-describedby="hv_h">
           <div class="set-text"><span class="set-label" aria-hidden="true">Sections in the side bar</span><p class="set-hint" id="hv_h">Hide the ones you do not use. Focus, Tasks and Setup always stay.</p></div>
           <div class="set-control" style="gap:6px 14px">${HIDEABLE_VIEWS.map(([v, t]) =>
-            `<label style="display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:calc(12.5px*var(--ts,1))"><input type="checkbox" id="hv_${v}" data-hv="${v}" ${c.hiddenViews.includes(v) ? '' : 'checked'}> ${t}</label>`).join('')}</div></fieldset>`);
+            `<label style="display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:calc(12.5px*var(--ts,1))"><input type="checkbox" id="hv_${v}" data-hv="${v}" ${c.hiddenViews.includes(v) ? '' : 'checked'}> ${t}</label>`).join('')}</div></fieldset>`,
+      { label:'Timing, automation and layout', lead:'How long messages stay, what starts by itself, and which sections appear in the side bar.' });
 }
 
 /* ---- Reading and speech ---- */
@@ -2864,13 +3021,14 @@ function renderSpeechPanel() {
       + rowChoice(['cf','srTimeLeft'], 'Announce time left while the timer runs', 'You cannot glance at the dial, so the app says how long is left at this interval.', [[0,'Off'],[5,'Every 5 min'],[10,'Every 10 min'],[15,'Every 15 min']]))
     + group('Built-in voice', speech.supported
       ? rowSwitch(['cf','speech'], 'Read things aloud', 'Uses the voices already on your device, so nothing leaves the browser. Leave this off if you use a screen reader, or you will hear things twice.')
-        + `<div class="set-row"><div class="set-text"><label class="set-label" for="cf_voice">Voice</label><p class="set-hint" id="cf_voice_h">${voices.length ? voices.length + ' voices on this device.' : 'Your device is still loading its voices.'}</p></div>
+        + advanced('speech', `<div class="set-row"><div class="set-text"><label class="set-label" for="cf_voice">Voice</label><p class="set-hint" id="cf_voice_h">${voices.length ? voices.length + ' voices on this device.' : 'Your device is still loading its voices.'}</p></div>
             <div class="set-control"><select id="cf_voice" data-cf="voice" aria-describedby="cf_voice_h" ${off}><option value="">Device default</option>${voices.map(v =>
               `<option value="${esc(v.voiceURI)}" ${v.voiceURI === c.voice ? 'selected' : ''}>${esc(v.name)}${v.lang ? ' (' + esc(v.lang) + ')' : ''}</option>`).join('')}</select>
             <button type="button" class="btn sm" id="voiceTest">Play a sample</button></div></div>`
         + rowRange(['cf','rate'], 'Speed', '', 0.6, 1.6, 0.1, v => (+v).toFixed(1) + '×')
         + rowSwitch(['cf','speakTimer'], 'Say timer events', 'Starts, pauses, warnings and endings.', off)
-        + rowSwitch(['cf','speakMessages'], 'Say every pop-up message', '', off)
+        + rowSwitch(['cf','speakMessages'], 'Say every pop-up message', '', off),
+          { label:'Which voice, how fast, what it says' })
         + `<p class="set-hint" style="margin:10px 0 4px">Anytime: press <kbd>A</kbd> or the Read aloud button on the Focus screen to hear your current task, or select any text and choose “Read the selected text aloud” from the command palette.</p>`
       : `<p class="set-hint" style="margin:8px 0">This browser has no built-in voice. Screen readers still work fully.</p>`);
   const vt = $('#voiceTest'); if (vt) vt.onclick = () => speech.say('This is how the ADHD Study Pack sounds. Focus started, twenty five minutes.', { voice:CF().voice, rate:CF().rate });
@@ -2880,9 +3038,10 @@ speech.onVoicesChanged(() => { if (view === 'settings') renderSettings(); });
 /* ---- Keyboard ---- */
 function renderKeysPanel() {
   $('#set-keys').innerHTML = panelHead('Keyboard', 'Everything works from the keyboard: Tab moves between controls, arrow keys move within a group, Enter or Space activates, and Esc closes a dialog.')
-    + group('Shortcuts', rowSwitch(['cf','shortcuts'], 'Single-key shortcuts', 'Turn off if you use a screen reader in focus mode, use speech input, or press keys by accident. Ctrl or ⌘ + K still opens the command palette.')
-      + `<div class="kbd-list" role="list" aria-label="Keyboard shortcuts">${SHORTCUTS.map(([k, d]) =>
-          `<div role="listitem" style="display:contents"><kbd>${esc(k)}</kbd><span>${esc(d)}</span></div>`).join('')}</div>`);
+    + group('Shortcuts', rowSwitch(['cf','shortcuts'], 'Single-key shortcuts', 'Turn off if you use a screen reader in focus mode, use speech input, or press keys by accident. Ctrl or ⌘ + K still opens the command palette.'))
+    + advanced('keys', `<div class="kbd-list" role="list" aria-label="Keyboard shortcuts">${SHORTCUTS.map(([k, d]) =>
+          `<div role="listitem" style="display:contents"><kbd>${esc(k)}</kbd><span>${esc(d)}</span></div>`).join('')}</div>`,
+      { label:'The full list of keys' });
 }
 
 /* ---- Timer ---- */
@@ -2896,9 +3055,11 @@ function renderTimerPanel() {
     S.settings[k] = clamp(+e.target.value || 1, 1, k === 'cycles' ? 12 : 180);
     save(); if (!T.running) setPhase(T.phase, false); renderPips(); renderDial();
   });
-  $('#timerRows').innerHTML = group('Display', rowSwitch(['st','titleClock'], 'Countdown in the browser tab', 'Time stays visible even when the tab is behind something else.')
-      + rowSwitch(['st','hideSeconds'], 'Hide the seconds', 'Round to the minute while running — some people watch seconds tick and lose the thread.'))
-    + group('Notifications', rowSwitch(['st','notify'], 'Desktop notifications', 'A system notification when a timer ends. Your browser asks once for permission.'));
+  $('#timerRows').innerHTML = advanced('timer',
+    rowSwitch(['st','titleClock'], 'Countdown in the browser tab', 'Time stays visible even when the tab is behind something else.')
+    + rowSwitch(['st','hideSeconds'], 'Hide the seconds', 'Round to the minute while running — some people watch seconds tick and lose the thread.')
+    + rowSwitch(['st','notify'], 'Desktop notifications', 'A system notification when a timer ends. Your browser asks once for permission.'),
+    { label:'Display and notifications' });
 }
 
 /* ---- one change handler for every control in Setup ---- */
@@ -2939,6 +3100,11 @@ $('#view-settings').addEventListener('change', e => {
   }
   if (el.dataset.cf) setComfort(el.dataset.cf, readControl(el));
   else if (el.dataset.st) setSetting(el.dataset.st, readControl(el));
+});
+/* One handler for every "more settings" button in Setup. */
+$('#view-settings').addEventListener('click', e => {
+  const b = e.target.closest && e.target.closest('[data-adv]');
+  if (b) toggleAdv(b.dataset.adv, b);
 });
 /* Sliders show their value as they move; the change event above saves it. */
 $('#view-settings').addEventListener('input', e => {
@@ -2981,7 +3147,8 @@ $('#resetBtn2').onclick = () => openModal('Erase everything?', `
    letting the next sync delete the real events they point to. */
 function clearDemo() {
   S.gcal.links = {};
-  S.sessions = []; S.checkins = []; S.notes = []; S.tasks = []; S.events = []; S.subjects = [];
+  journal.clear();
+  S.sessions = []; S.checkins = []; S.moods = []; S.notes = []; S.tasks = []; S.events = []; S.subjects = [];
   S.meta.sample = false; S.meta.notice = null; S.timer.taskId = null; S.timer.intent = ''; S.timer.activation = null;
   save(); renderAll(); if (S.gcal.on) gcalSubscribe();
   toast('Clean slate — your Google link and settings are untouched');
@@ -3014,8 +3181,11 @@ const COMMANDS = () => [
   { k:'Go to Notes', s:'5', run:() => go('notes') },
   { k:'Go to Sound', s:'6', run:() => go('sound') },
   { k:'Go to Calm', s:'7', run:() => go('calm') },
-  { k:'Go to Statistics', s:'8', run:() => go('stats') },
-  { k:'Go to Setup', s:'9', run:() => go('settings') },
+  { k:'Go to Mood', s:'8', run:() => go('mood') },
+  { k:'Go to Statistics', s:'9', run:() => go('stats') },
+  { k:'Go to Setup', s:'0', run:() => go('settings') },
+  { k:'Log how you feel right now', s:'', run:() => { go('mood'); const f = document.getElementById('md_mood'); if (f) f.focus(); } },
+  { k:'About the Study Pack', s:'', run:() => go('about') },
   { k:'Auto-schedule this week', s:'', run:() => { go('plan'); $('#autoPlan').click(); } },
   { k:'Sync Google Calendar now', s:'', run:() => { go('plan'); gcalSyncNow(); } },
   { k:'Import an .ics file', s:'', run:() => { go('plan'); $('#icsImportBtn').click(); } },
@@ -3077,7 +3247,7 @@ const SHORTCUTS = [
   ['Space', 'Start or pause the timer'], ['N', 'Skip to the next interval'], ['R', 'Reset this interval'],
   ['T', 'Start or stop the stopwatch on the session task'], ['B', 'Park a thought'], ['D', 'Log a distraction'],
   ['M', 'Sound mix on or off'], ['P', 'Sort unsorted tasks on the matrix'], ['A', 'Read the current task aloud'],
-  ['1 – 9', 'Go to Focus, Plan, Tasks, Matrix, Notes, Sound, Calm, Stats, Setup'], ['?', 'Show these shortcuts'],
+  ['1 – 0', 'Go to Focus, Plan, Tasks, Matrix, Notes, Sound, Calm, Mood, Stats, Setup'], ['?', 'Show these shortcuts'],
   ['Ctrl or ⌘ + K', 'Command palette (always on)'], ['Esc', 'Close a dialog, the palette, or stop reading aloud']
 ];
 const INTERACTIVE = 'button, a[href], input, textarea, select, summary, [role="button"], [role="option"], [role="tab"], [role="switch"], [role="checkbox"], [role="radio"], [contenteditable="true"]';
@@ -3090,7 +3260,7 @@ document.addEventListener('keydown', e => {
   if (/input|textarea|select/i.test(el.tagName) || el.isContentEditable) return;
   if (e.metaKey || e.ctrlKey || e.altKey) return;
   if ((e.code === 'Space' || e.key === 'Enter') && el.closest && el.closest(INTERACTIVE)) return;
-  const map = { '1':'focus','2':'plan','3':'tasks','4':'matrix','5':'notes','6':'sound','7':'calm','8':'stats','9':'settings' };
+  const map = { '1':'focus','2':'plan','3':'tasks','4':'matrix','5':'notes','6':'sound','7':'calm','8':'mood','9':'stats','0':'settings' };
   if (map[e.key]) { go(map[e.key]); return; }
   const k = e.key.toLowerCase();
   if (e.code === 'Space') { e.preventDefault(); toggleRun(); }
@@ -3164,7 +3334,7 @@ function seedDemo() {
     x:24 + (i % 4) * 214, y:24 + Math.floor(i / 4) * 150, pinned:i === 1, at:Date.now() - i * DAY }));
   const HOURS = [9, 9, 10, 10, 11, 14, 15, 15, 16, 17, 20, 21];
   const today = startOfDay(new Date());
-  S.sessions = []; S.checkins = [];
+  S.sessions = []; S.checkins = []; S.moods = [];
   for (let d = 20; d >= 0; d--) {
     const date = new Date(+today - d * DAY), dow = date.getDay();
     const pool = d === 0 ? HOURS.filter(h => h < new Date().getHours()) : HOURS;
@@ -3178,7 +3348,7 @@ function seedDemo() {
         const task = pick(S.tasks), partial = r() < 0.13;
         const mins = partial ? 8 + Math.floor(r() * 12) : 25;
         const dcount = Math.floor(r() * 3);
-        S.sessions.push({ id:uid(), start:st.toISOString(), end:new Date(+st + mins * 60000).toISOString(),
+        S.sessions.push({ id:uid(), kind:'session', at:+st, start:st.toISOString(), end:new Date(+st + mins * 60000).toISOString(),
           minutes:mins, taskId:task.id, subjectId:task.subjectId, intent:'', activation:pick(['low','med','high']),
           quality: r() < 0.85 ? 2 + Math.floor(r() * 4) : null, partial,
           distractions: Array.from({ length:dcount }, () => pick(LIST('distractions'))) });
@@ -3186,8 +3356,22 @@ function seedDemo() {
     }
     if (d < 14) {
       const at2 = new Date(date); at2.setHours(20, 0, 0, 0);
-      S.checkins.push({ id:uid(), at:at2.toISOString(), energy:3 + Math.floor(r() * 6),
+      S.checkins.push({ id:uid(), kind:'checkin', at:+at2, energy:3 + Math.floor(r() * 6),
         stress:2 + Math.floor(r() * 7), focus:3 + Math.floor(r() * 6), note:'', when:'manual' });
+    }
+    /* A mood log most evenings, drifting with the week so the charts show a
+       shape rather than noise: better on days with focus time behind them. */
+    if (d < 28 && r() < 0.82) {
+      const mt = new Date(date); mt.setHours(19 + Math.floor(r() * 3), Math.floor(r() * 60), 0, 0);
+      if (mt > new Date()) continue;
+      const worked = S.sessions.filter(s => dayKey(new Date(s.start)) === dayKey(date)).length;
+      const lift = Math.min(2, worked * 0.35);
+      S.moods.push({ id:uid(), kind:'mood', at:+mt,
+        mood: clamp(Math.round(4 + lift + (r() * 3 - 1.5)), 1, 9),
+        energy: clamp(Math.round(4 + (r() * 4 - 2)), 1, 9),
+        stress: clamp(Math.round(6 - lift + (r() * 3 - 1.5)), 1, 9),
+        tags: [pick(MOOD_TAGS), pick(MOOD_TAGS)].filter((t, i, a) => a.indexOf(t) === i && r() < 0.75),
+        note: '' });
     }
   }
   S.sessions.sort((a, b) => new Date(a.start) - new Date(b.start));
@@ -3195,8 +3379,437 @@ function seedDemo() {
   S.timer.intent = 'Get the eval running end to end, even if the numbers are bad.';
   S.timer.activation = 'high';
   S.meta.sample = true;
+  /* The generated history goes into the journal as well, so the demo
+     exercises the same database the real thing uses. */
+  journal.clear().then(() => journal.putMany(journalRows())).then(renderStorageBits, () => {});
   save();
 }
+
+/* =====================================================================
+   MOOD — how it felt, beside what you did.
+
+   Three numbers (mood, energy, stress), optional tags and a line of text,
+   stored one row per entry in the journal database. The charts put focus
+   minutes behind the mood line on purpose: on its own a mood log is a diary,
+   but next to the hours it becomes evidence about which days cost you.
+
+   Every picture here has a sentence under it saying the same thing, and the
+   grid is a real table, so nothing in this view is only available to people
+   who can see colour.
+   ===================================================================== */
+const MOOD_TAGS = ['slept well', 'slept badly', 'ate properly', 'skipped meals', 'caffeine', 'moved',
+                   'outside', 'meds', 'missed meds', 'people', 'alone', 'deadline', 'pain', 'unwell'];
+const MOOD_WORDS  = ['', 'Rough', 'Low', 'Flat', 'Meh', 'Steady', 'Fine', 'Good', 'Bright', 'Great'];
+const ENERGY_WORDS = ['', 'Empty', 'Drained', 'Slow', 'Quiet', 'Even', 'Warm', 'Lively', 'Buzzing', 'Wired'];
+const STRESS_WORDS = ['', 'Calm', 'Easy', 'Settled', 'Mild', 'Noticeable', 'Tight', 'Strained', 'Frayed', 'Fried'];
+const MOOD_AXES = [
+  ['mood',   'Mood',   MOOD_WORDS,   'How it feels overall, 1 rough to 9 great.'],
+  ['energy', 'Energy', ENERGY_WORDS, 'Flat to wired. Neither end is the good end.'],
+  ['stress', 'Stress', STRESS_WORDS, 'Lower is calmer.']
+];
+/* A divergent scale with the middle at 5: rough red, neutral amber, good moss.
+   Built from the app's own tokens, so high contrast, muted colour and
+   greyscale all follow along — and never the accent, which changes under the
+   user and would make "greener is better" a lie on three of the four accents. */
+const MOOD_STOPS = ['var(--crit)', 'var(--warn)', 'var(--rest)'];
+function moodColor(v, alpha) {
+  const t = clamp((Number(v) - 1) / 8, 0, 1) * 2, i = Math.min(1, Math.floor(t));
+  const mix = `color-mix(in srgb, ${MOOD_STOPS[i + 1]} ${Math.round((t - i) * 100)}%, ${MOOD_STOPS[i]})`;
+  return alpha == null ? mix : `color-mix(in srgb, ${mix} ${Math.round(alpha * 100)}%, transparent)`;
+}
+let moodDraft = { mood:5, energy:5, stress:5, tags:[], note:'' };
+let moodDays = 30;
+
+const moodAt = m => new Date(recordAt(m));
+const moodInRange = () => { const from = +startOfDay(new Date()) - (moodDays - 1) * DAY; return S.moods.filter(m => recordAt(m) >= from); };
+const avg = arr => arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : null;
+/* minutesByDay() is the stats view's — the same focus minutes, reused here as
+   the "what you did" half of every mood chart. */
+function moodByDay(list) {
+  const by = {};
+  (list || S.moods).forEach(x => { const k = dayKey(moodAt(x)); (by[k] = by[k] || []).push(x); });
+  return by;
+}
+
+function renderMood() {
+  if (!$('#view-mood')) return;
+  renderMoodRange(); renderMoodComposer(); renderMoodNow();
+  drawMoodRibbon(); drawMoodGrid(); renderMoodPatterns(); renderMoodList();
+}
+function renderMoodRange() {
+  const box = $('#moodRange'); if (!box) return;
+  box.innerHTML = [[7, '7 days'], [30, '30 days'], [90, '3 months']].map(([d, t]) =>
+    `<label><input type="radio" name="moodDays" value="${d}" ${moodDays === d ? 'checked' : ''}><span>${t}</span></label>`).join('');
+  $$('#moodRange input').forEach(i => i.onchange = () => { moodDays = +i.value; renderMood(); announce(`Showing ${i.value} days`); });
+}
+/* The composer. The pad is a nicety on top of three real sliders — it moves
+   them and they move it — so nothing depends on being able to drag. */
+function renderMoodComposer() {
+  const box = $('#moodFields'); if (!box) return;
+  box.innerHTML = MOOD_AXES.map(([key, label, words, hint]) => `
+    <div class="mfield">
+      <label for="md_${key}">${label} <span class="num" id="mdv_${key}">${moodDraft[key]} · ${words[moodDraft[key]]}</span></label>
+      <input type="range" id="md_${key}" min="1" max="9" step="1" value="${moodDraft[key]}"
+             aria-describedby="mdh_${key}" aria-valuetext="${moodDraft[key]} of 9, ${words[moodDraft[key]]}" data-mood="${key}">
+      <p class="hint" id="mdh_${key}">${hint}</p>
+    </div>`).join('');
+  MOOD_AXES.forEach(([key, , words]) => {
+    const i = $('#md_' + key);
+    i.oninput = () => {
+      moodDraft[key] = +i.value;
+      $('#mdv_' + key).textContent = `${i.value} · ${words[+i.value]}`;
+      i.setAttribute('aria-valuetext', `${i.value} of 9, ${words[+i.value]}`);
+      paintMoodPad();
+    };
+  });
+  const tags = $('#moodTags');
+  tags.innerHTML = MOOD_TAGS.map(t =>
+    `<button type="button" class="tag ${moodDraft.tags.includes(t) ? 'on' : ''}" data-tag="${esc(t)}" aria-pressed="${moodDraft.tags.includes(t)}">${esc(t)}</button>`).join('');
+  $$('#moodTags .tag').forEach(b => b.onclick = () => {
+    const t = b.dataset.tag, on = moodDraft.tags.includes(t);
+    moodDraft.tags = on ? moodDraft.tags.filter(x => x !== t) : moodDraft.tags.concat(t);
+    b.classList.toggle('on', !on); b.setAttribute('aria-pressed', String(!on));
+  });
+  paintMoodPad();
+}
+function paintMoodPad() {
+  const dot = $('#padDot'), glow = $('#padGlow'); if (!dot) return;
+  const x = ((moodDraft.energy - 1) / 8) * 100, y = 100 - ((moodDraft.mood - 1) / 8) * 100;
+  dot.style.left = x + '%'; dot.style.top = y + '%';
+  dot.style.background = moodColor(moodDraft.mood);
+  if (glow) { glow.style.left = x + '%'; glow.style.top = y + '%'; glow.style.background = moodColor(moodDraft.mood, 0.55); }
+  const read = $('#padRead');
+  if (read) read.textContent = `${MOOD_WORDS[moodDraft.mood]}, ${ENERGY_WORDS[moodDraft.energy].toLowerCase()} energy, ${STRESS_WORDS[moodDraft.stress].toLowerCase()} stress`;
+}
+/* Dragging on the pad sets mood and energy together. */
+function wireMoodPad() {
+  const pad = $('#moodPad'); if (!pad) return;
+  const set = e => {
+    const r = pad.getBoundingClientRect();
+    moodDraft.energy = clamp(Math.round(((e.clientX - r.left) / r.width) * 8 + 1), 1, 9);
+    moodDraft.mood   = clamp(Math.round((1 - (e.clientY - r.top) / r.height) * 8 + 1), 1, 9);
+    MOOD_AXES.forEach(([k, , words]) => {
+      const i = $('#md_' + k); if (!i) return;
+      i.value = moodDraft[k];
+      $('#mdv_' + k).textContent = `${moodDraft[k]} · ${words[moodDraft[k]]}`;
+      i.setAttribute('aria-valuetext', `${moodDraft[k]} of 9, ${words[moodDraft[k]]}`);
+    });
+    paintMoodPad();
+  };
+  pad.addEventListener('pointerdown', e => { pad.setPointerCapture(e.pointerId); set(e); });
+  pad.addEventListener('pointermove', e => { if (e.buttons) set(e); });
+}
+function saveMood() {
+  const rec = logRecord('moods', {
+    mood:moodDraft.mood, energy:moodDraft.energy, stress:moodDraft.stress,
+    tags:moodDraft.tags.slice(), note:($('#moodNote').value || '').trim()
+  });
+  $('#moodNote').value = '';
+  moodDraft.tags = [];
+  renderMood(); renderTopStats();
+  toast(`Logged: ${MOOD_WORDS[rec.mood].toLowerCase()}, ${STRESS_WORDS[rec.stress].toLowerCase()} stress`);
+  announce('Mood entry saved');
+}
+function renderMoodNow() {
+  const box = $('#moodNowCard'); if (!box) return;
+  const last = S.moods[S.moods.length - 1];
+  const lbl = $('#moodLast');
+  if (lbl) lbl.textContent = last ? 'last ' + agoLabel(recordAt(last)) : 'nothing logged yet';
+  if (!last) {
+    box.innerHTML = `<div class="panel-head"><h3>Right now</h3></div>
+      <p class="doc" style="margin:0">Nothing logged yet. One entry takes about five seconds, and the charts start being useful after a week of them.</p>`;
+    return;
+  }
+  const todays = S.moods.filter(m => dayKey(moodAt(m)) === dayKey(new Date()));
+  box.innerHTML = `<div class="panel-head"><h3>Right now</h3><span class="eyebrow">${agoLabel(recordAt(last))}</span></div>
+    <div class="now-orb" style="--c:${moodColor(last.mood)}" aria-hidden="true"><span>${last.mood}</span></div>
+    <p class="now-word">${MOOD_WORDS[last.mood]}</p>
+    <p class="now-sub">${ENERGY_WORDS[last.energy].toLowerCase()} energy · ${STRESS_WORDS[last.stress].toLowerCase()} stress</p>
+    ${last.tags && last.tags.length ? `<div class="tagline read">${last.tags.map(t => `<span class="tag on">${esc(t)}</span>`).join('')}</div>` : ''}
+    ${last.note ? `<p class="now-note">“${esc(last.note)}”</p>` : ''}
+    <p class="now-meta">${todays.length ? plural(todays.length, 'entry') + ' today' : 'first one today'}</p>`;
+}
+/* The ribbon: a day's average mood as a line over the focus minutes behind it. */
+function drawMoodRibbon() {
+  const box = $('#moodRibbon'); if (!box) return;
+  const days = Array.from({ length:moodDays }, (_, i) => new Date(+startOfDay(new Date()) - (moodDays - 1 - i) * DAY));
+  const by = moodByDay(), mins = minutesByDay();
+  const series = days.map(d => { const k = dayKey(d); return { d, k, mood:avg((by[k] || []).map(x => x.mood)), mins:mins[k] || 0 }; });
+  const have = series.filter(s => s.mood != null);
+  const note = $('#moodRibbonNote'); if (note) note.textContent = `${have.length} of ${moodDays} days logged`;
+  if (have.length < 2) {
+    box.innerHTML = `<div class="empty">Two days of entries and the line appears. It is worth the week.</div>`;
+    $('#moodRibbonSum').textContent = '';
+    return;
+  }
+  const W = 720, H = 240, L = 34, R = 14, TP = 16, B = 26, iw = W - L - R, ih = H - TP - B;
+  const x = i => L + (i / Math.max(1, series.length - 1)) * iw;
+  const y = v => TP + ih - ((v - 1) / 8) * ih;
+  const maxMin = Math.max(60, ...series.map(s => s.mins));
+  const bars = series.map((s, i) => {
+    if (!s.mins) return '';
+    const h = (s.mins / maxMin) * (ih * 0.55), w = Math.max(2, iw / series.length * 0.55);
+    return `<rect x="${(x(i) - w / 2).toFixed(1)}" y="${(TP + ih - h).toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" rx="${Math.min(3, w / 2).toFixed(1)}" fill="var(--ink)" opacity=".07"/>`;
+  }).join('');
+  /* Gaps are gaps: the line breaks where nothing was logged rather than
+     drawing a straight guess between two distant days. */
+  let d = '', open = false;
+  series.forEach((s, i) => { if (s.mood == null) { open = false; return; } d += `${open ? 'L' : 'M'}${x(i).toFixed(1)},${y(s.mood).toFixed(1)} `; open = true; });
+  const first = series.findIndex(s => s.mood != null), lastI = series.length - 1 - [...series].reverse().findIndex(s => s.mood != null);
+  const areaPts = series.map((s, i) => s.mood == null ? null : `${x(i).toFixed(1)},${y(s.mood).toFixed(1)}`).filter(Boolean).join(' L');
+  const dots = series.map((s, i) => s.mood == null ? '' :
+    `<circle cx="${x(i).toFixed(1)}" cy="${y(s.mood).toFixed(1)}" r="3.6" fill="${moodColor(s.mood)}" stroke="var(--surface)" stroke-width="1.6"/>`).join('');
+  const ticks = [1, 5, 9].map(v => `<line class="gl" x1="${L}" y1="${y(v).toFixed(1)}" x2="${W - R}" y2="${y(v).toFixed(1)}"/>
+      <text x="${L - 8}" y="${(y(v) + 4).toFixed(1)}" text-anchor="end">${MOOD_WORDS[v]}</text>`).join('');
+  const fmt = dt => dt.toLocaleDateString(undefined, { month:'short', day:'numeric' });
+  const mean = avg(have.map(s => s.mood));
+  box.innerHTML = `<svg class="chart mood-ribbon" viewBox="0 0 ${W} ${H}" role="img"
+      aria-label="Mood by day over ${moodDays} days, averaging ${mean.toFixed(1)} out of 9, with focus minutes shown behind it.">
+    <defs><linearGradient id="ribG" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${moodColor(8, 0.45)}"/><stop offset="100%" stop-color="${moodColor(5, 0.02)}"/>
+    </linearGradient></defs>
+    ${ticks}${bars}
+    <path d="M${areaPts} L${x(lastI).toFixed(1)},${TP + ih} L${x(first).toFixed(1)},${TP + ih} Z" fill="url(#ribG)"/>
+    <path class="rib-line" d="${d.trim()}" fill="none" stroke="var(--accent)" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+    ${dots}
+    <text x="${L}" y="${H - 6}">${fmt(days[0])}</text>
+    <text x="${W - R}" y="${H - 6}" text-anchor="end">today</text>
+  </svg>`;
+  const best = have.reduce((a, b) => (b.mood > a.mood ? b : a));
+  const worst = have.reduce((a, b) => (b.mood < a.mood ? b : a));
+  $('#moodRibbonSum').textContent = `Average ${mean.toFixed(1)} out of 9 across ${plural(have.length, 'logged day')}. ` +
+    `Best was ${fmt(best.d)} at ${best.mood.toFixed(1)}, hardest was ${fmt(worst.d)} at ${worst.mood.toFixed(1)}. ` +
+    `The faint bars are focus minutes.`;
+}
+/* Day by day as a real table: colour for the eye, text for everything else. */
+function drawMoodGrid() {
+  const box = $('#moodGrid'); if (!box) return;
+  const weeks = Math.ceil(moodDays / 7) + 1;
+  const end = startOfDay(new Date());
+  const start = new Date(+end - (weeks * 7 - 1) * DAY);
+  start.setDate(start.getDate() - ((start.getDay() + 6) % 7));          // back to a Monday
+  const by = moodByDay(), mins = minutesByDay();
+  const cols = [];
+  for (let w = 0; ; w++) {
+    const col = [];
+    for (let dow = 0; dow < 7; dow++) {
+      const d = new Date(+start + (w * 7 + dow) * DAY);
+      if (d > end) { col.push(null); continue; }
+      const k = dayKey(d);
+      col.push({ d, k, mood:avg((by[k] || []).map(x => x.mood)), n:(by[k] || []).length, mins:mins[k] || 0 });
+    }
+    cols.push(col);
+    if (+new Date(+start + (w * 7 + 6) * DAY) >= +end) break;
+  }
+  const DOWS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const cell = c => {
+    if (!c) return '<td class="mg-cell empty-cell"></td>';
+    const date = c.d.toLocaleDateString(undefined, { month:'short', day:'numeric' });
+    const said = c.mood == null ? 'nothing logged' : `mood ${c.mood.toFixed(1)} of 9`;
+    const did = c.mins ? `, ${minsToHM(c.mins)} focused` : '';
+    return `<td class="mg-cell${c.mood == null ? ' none' : ''}" style="${c.mood == null ? '' : `--c:${moodColor(c.mood)}`}"
+      data-tip="${esc(date + ' — ' + said + did)}"><span class="sr-only">${esc(date + ': ' + said + did)}</span>
+      ${c.mins ? `<span class="mg-bar" style="height:${Math.min(100, c.mins / 1.8).toFixed(0)}%" aria-hidden="true"></span>` : ''}</td>`;
+  };
+  box.innerHTML = `<table class="mg">
+    <caption class="sr-only">Mood by day for the last ${weeks * 7} days, with focus minutes</caption>
+    <tbody>${DOWS.map((dw, i) => `<tr><th scope="row"><span aria-hidden="true">${dw[0]}</span><span class="sr-only">${dw}</span></th>${cols.map(c => cell(c[i])).join('')}</tr>`).join('')}</tbody>
+  </table>`;
+  const logged = cols.flat().filter(c => c && c.mood != null);
+  const streak = moodStreak();
+  $('#moodGridSum').textContent = logged.length
+    ? `${plural(logged.length, 'day')} logged in this window${streak > 1 ? `, ${streak} of them in a row up to today` : ''}. Green is a good day, amber middling, red a hard one; the small bar inside a square is how long you focused. Every square is also read out as a date and a number.`
+    : 'Nothing logged in this window yet.';
+}
+function moodStreak() {
+  const keys = new Set(S.moods.map(m => dayKey(moodAt(m))));
+  let n = 0, d = startOfDay(new Date());
+  while (keys.has(dayKey(d))) { n++; d = new Date(+d - DAY); }
+  return n;
+}
+/* The part that earns the logging: what actually goes with the good days. */
+function renderMoodPatterns() {
+  const box = $('#moodPatterns'); if (!box) return;
+  const list = moodInRange();
+  if (list.length < 4) {
+    box.innerHTML = `<p class="doc" style="margin:0">After four or five entries this fills in: which weekday treats you best, what the focused days do to your stress, and which tags keep turning up on the rough ones.</p>`;
+    return;
+  }
+  const mins = minutesByDay(), rows = [];
+  const push = (label, value, note) => rows.push(`<div class="kv"><span>${esc(label)}</span><strong>${esc(value)}</strong></div>${note ? `<p class="kv-note">${esc(note)}</p>` : ''}`);
+  push('Average mood', `${avg(list.map(m => m.mood)).toFixed(1)} of 9`);
+  push('Average stress', `${avg(list.map(m => m.stress)).toFixed(1)} of 9`);
+
+  /* Days with focus time against days without. */
+  const byDay = moodByDay(list);
+  const worked = [], idle = [];
+  Object.entries(byDay).forEach(([k, xs]) => ((mins[k] || 0) >= 25 ? worked : idle).push(avg(xs.map(x => x.mood))));
+  if (worked.length >= 2 && idle.length >= 2) {
+    const w = avg(worked), i = avg(idle), diff = w - i;
+    push('Days you focused', `${w.toFixed(1)} vs ${i.toFixed(1)}`,
+      Math.abs(diff) < 0.3 ? 'About the same either way.'
+        : diff > 0 ? `Mood runs ${diff.toFixed(1)} higher on days with at least 25 minutes of focus.`
+                   : `Mood runs ${Math.abs(diff).toFixed(1)} lower on the days you worked — worth looking at.`);
+  }
+  /* Best and worst weekday. */
+  const dows = [[], [], [], [], [], [], []];
+  list.forEach(m => dows[moodAt(m).getDay()].push(m.mood));
+  const named = dows.map((v, i) => [i, avg(v), v.length]).filter(([, a, n]) => a != null && n >= 2);
+  if (named.length >= 3) {
+    const DOWN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const best = named.reduce((a, b) => (b[1] > a[1] ? b : a)), worst = named.reduce((a, b) => (b[1] < a[1] ? b : a));
+    if (best[0] !== worst[0]) push('Best weekday', DOWN[best[0]], `${DOWN[worst[0]]} is the hardest, at ${worst[1].toFixed(1)} against ${best[1].toFixed(1)}.`);
+  }
+  /* Tags that sit with the good and the rough entries. */
+  const tally = {};
+  list.forEach(m => (m.tags || []).forEach(t => { (tally[t] = tally[t] || []).push(m.mood); }));
+  const tagRows = Object.entries(tally).filter(([, v]) => v.length >= 2)
+    .map(([t, v]) => [t, avg(v), v.length]).sort((a, b) => b[1] - a[1]);
+  if (tagRows.length >= 2) {
+    const top = tagRows[0], bottom = tagRows[tagRows.length - 1];
+    box.innerHTML = rows.join('') +
+      `<div class="tag-stat"><span class="tag on">${esc(top[0])}</span><span>${top[1].toFixed(1)} average · ${plural(top[2], 'entry')}</span></div>
+       <div class="tag-stat"><span class="tag">${esc(bottom[0])}</span><span>${bottom[1].toFixed(1)} average · ${plural(bottom[2], 'entry')}</span></div>
+       <p class="kv-note">Tags you attach most often, best and worst by the mood recorded with them. Not proof of anything — a prompt to look.</p>`;
+    return;
+  }
+  box.innerHTML = rows.join('');
+}
+function renderMoodList() {
+  const box = $('#moodList'); if (!box) return;
+  const list = S.moods.slice().reverse().slice(0, 40);
+  const c = $('#moodCount'); if (c) c.textContent = plural(S.moods.length, 'entry');
+  if (!list.length) { box.innerHTML = `<div class="empty">No entries yet.</div>`; return; }
+  box.innerHTML = list.map(m => `
+    <div class="m-row" data-mood-id="${esc(m.id)}">
+      <span class="m-chip" style="--c:${moodColor(m.mood)}" aria-hidden="true">${m.mood}</span>
+      <div class="m-body">
+        <div class="m-top"><strong>${MOOD_WORDS[m.mood]}</strong><span class="m-when">${esc(moodAt(m).toLocaleDateString(undefined, { month:'short', day:'numeric' }))} · ${esc(moodAt(m).toLocaleTimeString([], { hour:'numeric', minute:'2-digit' }))}</span></div>
+        <div class="m-meta">${ENERGY_WORDS[m.energy].toLowerCase()} energy · ${STRESS_WORDS[m.stress].toLowerCase()} stress</div>
+        ${m.note ? `<div class="m-note">${esc(m.note)}</div>` : ''}
+        ${(m.tags || []).length ? `<div class="tagline read">${m.tags.map(t => `<span class="tag on">${esc(t)}</span>`).join('')}</div>` : ''}
+      </div>
+      <button type="button" class="s-btn" data-mood-del="${esc(m.id)}" aria-label="Delete the entry from ${esc(moodAt(m).toLocaleDateString(undefined, { month:'long', day:'numeric' }))}" data-tip="Delete this entry">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 7h14M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button>
+    </div>`).join('');
+  $$('#moodList [data-mood-del]').forEach(b => b.onclick = () => {
+    const id = b.dataset.moodDel;
+    keepFocus('moodList', '[data-mood-del]');
+    dropRecord('moods', id);
+    renderMood();
+    announce('Entry deleted');
+  });
+}
+
+/* =====================================================================
+   ABOUT — the one showy screen.
+
+   The motion here is choreography, not decoration for its own sake: the
+   dial draws the way a real interval fills, the numbers count up because
+   they are your numbers, and each band arrives as it comes into view so
+   the page reads as a sequence rather than a wall.
+
+   All of it is additive. Under reduced motion — the system setting or
+   Setup → Motion — every element starts in its final state, the counters
+   print their value, and nothing moves. Nothing is announced twice either:
+   the content is in the DOM from the start, so a screen reader simply
+   reads the page.
+   ===================================================================== */
+const AB_FEATURES = [
+  ['Focus dial', 'M12 3a9 9 0 1 1-9 9', 'Intervals you can shrink to two minutes on a bad day, an activation check before you start, and a distraction tally that does not stop the clock.'],
+  ['Priority matrix', 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z', 'Urgent and important pulled apart, one card at a time, then measured: how much of your week actually went to the quadrant you claim matters.'],
+  ['Week planner', 'M4 6h16v14H4zM4 10h16M9 3v4M15 3v4', 'Blocks scheduled into the hours you have historically focused well, two-way sync with Google Calendar, and .ics in and out.'],
+  ['Stopwatch', 'M12 8v5l3 2M12 3a9 9 0 1 0 9 9', 'Click any task or calendar block to start timing it. Everything it records lands in the same history as the pomodoro sessions.'],
+  ['Mood log', 'M3 15c3-5 5.5-5 8.5-1.5S17 17 21 9', 'Mood, energy and stress in five seconds, charted against the hours you actually worked — so the pattern is evidence rather than a feeling.'],
+  ['Sound and calm', 'M4 9v6M8 6v12M12 3v18M16 7v10M20 10v4', 'Synthesised focus sound with no streaming, a breathing pacer, and a 90-second grounding routine for the days it gets away from you.'],
+  ['Built for how you read', 'M3 12h18M12 3v18', 'Five comfort profiles, text to 175%, high contrast, muted colour, a built-in voice, and full screen-reader support — ADHD by default, adjustable for needs that conflict with it.'],
+  ['Yours, wherever', 'M12 3v12M7 10l5 5 5-5M4 19h16', 'One file exports everything. Signed in it syncs across devices; signed out it stays in this browser and still works offline.']
+];
+const AB_FLOW = [
+  ['Decide one thing', 'The intent box takes a sentence. It is the difference between “study” and “get the eval running end to end”.'],
+  ['Rate the activation', 'Low, medium or high. Low offers a two-minute start instead of twenty-five, because the point is to begin.'],
+  ['Run the block', 'The dial fills, the mix plays if you want it, and anything distracting goes into the parking lot with one key.'],
+  ['Say how it went', 'Ten seconds of rating. That is what turns the charts from a log into something that can tell you when you focus best.']
+];
+const AB_NOTES = [
+  ['Where the data is', 'Signed out, everything is in this browser: the workspace in localStorage, your history in an IndexedDB database. Signed in, both go to your own Firestore space under rules that let nobody else read them. No analytics, no third party, nothing sold.'],
+  ['No build step', 'Plain JavaScript modules, no framework and no bundler. What the browser runs is what is in the repository, and the page refuses to run inline script at all.'],
+  ['Made for one person first', 'This was built around one ADHD study routine and then made adjustable, because the things that make it work for that attention system are exactly the things some autistic users need to turn off.']
+];
+function renderAbout() {
+  const grid = $('#abGrid'); if (!grid) return;
+  const mins = S.sessions.reduce((a, s) => a + s.minutes, 0);
+  const days = new Set(S.sessions.map(s => dayKey(new Date(s.start)))).size;
+  const nums = mins > 0
+    ? [[Math.round(mins / 60), 'hours focused', 'since you started using it'],
+       [S.sessions.length, 'blocks finished', 'every one of them logged'],
+       [days, 'days shown up', 'which is the only streak that counts'],
+       [S.moods.length, 'mood entries', 'beside the hours that earned them']]
+    : [[9, 'sections', 'focus, plan, tasks, matrix, notes, sound, calm, mood, stats'],
+       [5, 'comfort profiles', 'ADHD by default, four more to start from'],
+       [175, 'per cent text', 'and the layout still holds'],
+       [0, 'trackers', 'nothing about you leaves the browser unasked']];
+  $('#abStats').innerHTML = nums.map(([v, k, note]) =>
+    `<div class="ab-stat"><strong class="num" data-count="${v}">0</strong><span class="ab-stat-k">${esc(k)}</span><span class="ab-stat-n">${esc(note)}</span></div>`).join('');
+  grid.innerHTML = AB_FEATURES.map(([name, d, text], i) => `
+    <article class="ab-card reveal" style="--i:${i}">
+      <span class="ab-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="${d}"/></svg></span>
+      <h4>${esc(name)}</h4><p>${esc(text)}</p>
+    </article>`).join('');
+  $('#abFlow').innerHTML = AB_FLOW.map(([t, p], i) => `
+    <li class="ab-step reveal" style="--i:${i}">
+      <span class="ab-step-n" aria-hidden="true">${i + 1}</span>
+      <div><h4>${esc(t)}</h4><p>${esc(p)}</p></div>
+    </li>`).join('');
+  $('#abNotes').innerHTML = `<h3 class="ab-h">Straight answers</h3>` + AB_NOTES.map(([t, p]) =>
+    `<details class="ab-note"><summary>${esc(t)}</summary><p>${esc(p)}</p></details>`).join('') +
+    `<p class="ab-version">Version ${VERSION} · <a href="../projects/adhd-study-pack.html">how it was built</a> · <a href="../index.html">the rest of the site</a></p>`;
+  abAnimate();
+}
+/** True when motion should be suppressed — the system setting or the app's. */
+function motionOff() {
+  const c = CF();
+  if (c.motion === 'reduce') return true;
+  if (c.motion === 'full') return false;
+  return matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+let abObserver = null;
+function abAnimate() {
+  const root = $('#view-about'); if (!root) return;
+  const items = $$('.reveal', root);
+  if (abObserver) abObserver.disconnect();
+  if (motionOff()) { items.forEach(el => el.classList.add('in')); abCount(true); return; }
+  items.forEach(el => el.classList.remove('in'));
+  abObserver = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      e.target.classList.add('in');
+      abObserver.unobserve(e.target);
+      if (e.target.id === 'abStats') abCount(false);
+    });
+  }, { root:root, rootMargin:'0px 0px -8% 0px', threshold:0.12 });
+  items.forEach(el => abObserver.observe(el));
+  /* The hero is already on screen when the view opens. */
+  requestAnimationFrame(() => { const h = $('#abHero'); if (h) h.classList.add('in'); });
+}
+/** Count each figure up to its value; print it outright when motion is off. */
+function abCount(instant) {
+  $$('#abStats [data-count]').forEach(el => {
+    const target = +el.dataset.count;
+    if (instant || !target) { el.textContent = String(target); return; }
+    const dur = 900, t0 = performance.now();
+    const step = now => {
+      const p = Math.min(1, (now - t0) / dur), eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = String(Math.round(target * eased));
+      if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  });
+}
+
+$('#moodSave').onclick = saveMood;
+$('#moodNote').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); saveMood(); } });
+wireMoodPad();
 
 /* =====================================================================
    EMPTY STATE, STORAGE READOUT, AND THE HOST-PAGE SURFACE
@@ -3307,6 +3920,16 @@ function renderAccountCard() {
   const pb = $('#pwBtn'); if (pb) pb.onclick = () => changePwModal(true);
   const ob = $('#outBtn'); if (ob) ob.onclick = signOut;
 }
+/** Repaint whatever shows counts, after a record lands in the database. */
+function renderStorageBits() {
+  if (view !== 'settings') return;
+  const el = $('#storageInfo'); if (el) el.textContent = storageSummary();
+  renderStorageCard();
+}
+const storageSummary = () => `${S.sessions.length} sessions · ${S.moods.length} mood entries · ${S.tasks.length} tasks · ` +
+  `${S.notes.length} notes · ${S.events.length} blocks — the workspace is about ` +
+  `${(STORE.bytes() / 1024 || JSON.stringify(saveSnapshot()).length / 1024).toFixed(1)} KB in ${STORE.label()}, ` +
+  `and history is in ${journal.label()}.`;
 function renderStorageCard() {
   const box = $('#storageCard'); if (!box) return;
   const st = STORE_LABELS[STORE.status] || STORE_LABELS.idle;
@@ -3321,8 +3944,9 @@ function renderStorageCard() {
     <div class="kv"><span>Status</span><strong style="color:${st[0]}">${st[1]}${STORE.lastAt ? ' · ' + agoLabel(STORE.lastAt) : ''}</strong></div>
     <div class="kv"><span>${STORE.mode === 'rest' ? 'Endpoint' : 'Key'}</span><strong>${esc(STORE.mode === 'rest' ? String(CFG.endpoint) : CFG.storageKey)}</strong></div>
     <div class="kv"><span>Autosave</span><strong>${CFG.autosaveMs} ms after a change</strong></div>
-    <div class="kv"><span>Records</span><strong>${S.sessions.length}s · ${S.tasks.length}t · ${S.events.length}b · ${S.notes.length}n</strong></div>
-    <div class="kv"><span>Size</span><strong>${(JSON.stringify(S).length / 1024).toFixed(1)} KB</strong></div>
+    <div class="kv"><span>Workspace</span><strong>${S.tasks.length} tasks · ${S.events.length} blocks · ${S.notes.length} notes · ${(JSON.stringify(saveSnapshot()).length / 1024).toFixed(1)} KB</strong></div>
+    <div class="kv"><span>Journal</span><strong>${S.sessions.length} sessions · ${S.moods.length} moods · ${S.checkins.length} check-ins</strong></div>
+    <div class="kv"><span>Journal database</span><strong>${esc(journal.label())}</strong></div>
     ${STORE.error ? `<div class="gerr" style="margin:10px 0 0"><strong>Last write failed</strong>${esc(STORE.error.message || String(STORE.error))}</div>` : ''}
     <div style="display:flex;gap:8px;margin-top:11px">
       <button class="btn sm" id="storeReload" style="flex:1;justify-content:center">Reload</button>
@@ -3338,7 +3962,7 @@ function renderStorageCard() {
   };
   $('#storeFlush').onclick = () => { clearTimeout(saveT);
     setStoreStatus('saving');
-    STORE.write(clone(S)).then(() => { setStoreStatus('saved'); toast('Saved'); },
+    STORE.write(saveSnapshot()).then(() => { setStoreStatus('saved'); toast('Saved'); },
                                e => { setStoreStatus('error', e); toast('Save failed — ' + (e.message || e)); }); };
 }
 function renderListsCard() {
@@ -3478,6 +4102,7 @@ async function enterApp(user) {
   if (STORE.mode === 'cloud') sessionClear();         // a Google session outranks an old local one
   gateMsg('Opening your workspace…', 'ok');
   try {
+    await journalOpen();
     await load();
   } catch (e) {
     STORE.blocked = true; AUTH.user = null;
@@ -3494,7 +4119,7 @@ async function enterApp(user) {
   gcalAfterLoad();
   emit('signin', { id:user.id, name:user.name, email:user.email, provider:user.provider });
   if (user.mustChange) setTimeout(changePwModal, 700);
-  else offerLegacyImport();
+  else if (!offerJournalMerge()) offerLegacyImport();
 }
 
 /* ---------------------------------------------------------------------
@@ -3577,7 +4202,7 @@ function changePwModal(force) {
 }
 async function signOut() {
   clearTimeout(saveT); saveT = null;
-  if (!STORE.blocked) STORE.writeSync(S);
+  if (!STORE.blocked) STORE.writeSync(saveSnapshot());
   fbUnwatchNow(); fbKnown = null;
   gcalReset();                                        // the calendar token belongs to whoever just left
   sessionClear();                                     // before Firebase's own sign-out event fires
@@ -3640,7 +4265,7 @@ function wireGate() {
    ===================================================================== */
 function renderAll() {
   applyTheme(); renderPips(); renderDial(); renderFocusSide(); renderTasks();
-  renderCalendar(); renderBoard(); renderSound(); renderCalm(); renderSettings(); renderStats(); renderGcal();
+  renderCalendar(); renderBoard(); renderSound(); renderCalm(); renderMood(); renderSettings(); renderStats(); renderGcal();
   renderBanner(); renderQuickStart(); renderStoreChip(); renderWho(); renderTracking();
   $('#dayStart').value = S.settings.dayStart; $('#dayEnd').value = S.settings.dayEnd;
 }
@@ -3674,23 +4299,28 @@ window.FocusDial = {
   focusTask(id) { setActiveTask(id); },
   start, pause, skip: skipPhase, reset: resetInterval,
   view: go,
+  /* A backup is the workspace and the journal together — the file is the whole
+     thing, wherever the two halves happen to be stored. */
   exportJSON: () => JSON.stringify(S, null, 2),
+  journal,
   importJSON(text) {
     const data = typeof text === 'string' ? JSON.parse(text) : text;
     const next = migrate(data); if (!next) throw new Error('not a Focus Dial state object');
-    S = next; save(); setPhase(S.timer.phase || 'focus', false); renderAll(); return this.getState();
+    S = next;
+    journal.clear().then(() => journal.putMany(journalRows())).then(renderStorageBits, () => {});
+    save(); setPhase(S.timer.phase || 'focus', false); renderAll(); return this.getState();
   },
   loadDemo, clear: clearDemo,
   get user() { return AUTH.user ? clone(AUTH.user) : null; },
   signOut, signIn: (u, p, remember) => AUTH.mode === 'firebase'
     ? fbInit().then(() => FB.auth.signInWithEmailAndPassword(u, p))
     : localSignIn(u, p, remember !== false).then(enterApp),
-  async wipe() { clearTimeout(saveT); await STORE.clear(); S = DEFAULTS(); save(); setPhase('focus', false); renderAll(); }
+  async wipe() { clearTimeout(saveT); await STORE.clear(); await journal.clear(); S = DEFAULTS(); save(); setPhase('focus', false); renderAll(); }
 };
 (async function init() {
   renderTicks(); applyTheme(); renderSiteNav(); applyBrand(); wireGate();
   setInterval(() => { if (view === 'plan') renderCalendar(); renderTopStats(); }, 60000);
-  window.addEventListener('beforeunload', () => { clearTimeout(saveT); if (AUTH.user || AUTH.mode === 'none') STORE.writeSync(S); });
+  window.addEventListener('beforeunload', () => { clearTimeout(saveT); if (AUTH.user || AUTH.mode === 'none') STORE.writeSync(saveSnapshot()); });
   document.addEventListener('visibilitychange', () => { if (!document.hidden) { tickRemain(); renderDial(); } });
 
   if (AUTH.mode === 'none') {                       // embedded with the host page doing its own auth

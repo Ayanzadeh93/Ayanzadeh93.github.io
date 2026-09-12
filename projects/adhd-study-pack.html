@@ -225,6 +225,17 @@
                         5-4-3-2-1 grounding run, check-ins and movement prompts for the break.
                     </p>
                     <p>
+                        <strong>Mood, energy and stress.</strong> Three numbers and a couple of tags,
+                        logged in about five seconds from a two-dimensional pad &mdash; mood up the
+                        side, energy across &mdash; or from the sliders beside it. What makes it
+                        worth doing is the second half: the charts draw your focus minutes behind the
+                        mood line, so the view can say things like <em>mood runs 1.2 higher on days
+                        with at least 25 minutes of focus</em>, name your best and worst weekday, and
+                        surface which tags keep turning up on the rough days. A day-by-day grid shows
+                        a month at a glance and is built as a real table, so it reads as data to a
+                        screen reader rather than as colour.
+                    </p>
+                    <p>
                         <strong>Statistics.</strong> Focus minutes per day, best hours, a consistency
                         heatmap, what pulls you away, time by course, a session log with CSV export,
                         and plain-language insights drawn from all of it.
@@ -256,6 +267,21 @@
                         courtesy lock on a shared laptop, not security. Either way, the whole
                         workspace exports as JSON and imports back in one step.
                     </p>
+                    <p>
+                        <strong>Two stores, because they grow differently.</strong> The working set
+                        &mdash; tasks, blocks, notes, settings &mdash; is small and bounded, so it
+                        travels as one document. History is not: focus sessions, check-ins and mood
+                        entries only ever accumulate, and a Firestore document stops at one mebibyte.
+                        So every time-stamped record is written on its own into a real database
+                        &mdash; an IndexedDB store signed out, a Firestore collection
+                        (<code>users/{uid}/journal</code>) signed in &mdash; indexed by kind and
+                        time. A record written on a phone and one written on a laptop now merge
+                        instead of overwriting each other, and the history can grow for years.
+                        Upgrading moves any inline history across before anything is dropped, and
+                        entries logged before you signed in are only folded into an account when you
+                        say so &mdash; on a shared computer they would otherwise land in whoever
+                        signed in first.
+                    </p>
                 </div>
             </div>
         </section>
@@ -277,6 +303,13 @@
                         Under <code>prefers-reduced-motion</code> the breathing and pulse animations
                         stop. On a phone the navigation becomes a scrolling strip and every view
                         stacks to a single column.
+                    </p>
+                    <p>
+                        <strong>Settings that start simple.</strong> Every Setup section opens with
+                        the two or three things most people change and folds the rest behind one
+                        button that says how many are inside. Nothing is removed &mdash; a
+                        disclosure, not a second class of setting &mdash; and the choice of what is
+                        open stays put while you work.
                     </p>
                     <p>
                         <strong>Comfort profiles.</strong> ADHD and autism often want opposite things
