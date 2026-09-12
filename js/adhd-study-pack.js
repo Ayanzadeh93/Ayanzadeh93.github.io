@@ -197,6 +197,20 @@ let saveT = null, saveChain = Promise.resolve();
    JOURNAL_KEYS maps each array on S to the record kind it holds.
    ===================================================================== */
 const JOURNAL_KEYS = { sessions:'session', checkins:'checkin', moods:'mood' };
+/* A refused write is said out loud, once. Offline is not this: the Firestore
+   SDK queues those and nothing fires. What reaches here is a real refusal —
+   most likely the security rules for users/{uid}/journal not being published —
+   and the entry just made will not survive a reload, so saying nothing would
+   be lying by omission. */
+journal.onError = err => {
+  if (journal._told) return;
+  journal._told = true;
+  const denied = /permission|insufficient/i.test(err && (err.code || err.message) || '');
+  toast(denied
+    ? 'Your history could not be saved to your account — the database rules for it are not in place. Export a backup from Setup.'
+    : 'Your history could not be saved — ' + ((err && err.message) || 'the database refused the write'), 0, 'alert');
+  renderStorageBits();
+};
 /** The workspace as it goes to storage: history belongs to the journal. */
 function saveSnapshot() {
   const snap = clone(S);
@@ -3947,6 +3961,7 @@ function renderStorageCard() {
     <div class="kv"><span>Workspace</span><strong>${S.tasks.length} tasks · ${S.events.length} blocks · ${S.notes.length} notes · ${(JSON.stringify(saveSnapshot()).length / 1024).toFixed(1)} KB</strong></div>
     <div class="kv"><span>Journal</span><strong>${S.sessions.length} sessions · ${S.moods.length} moods · ${S.checkins.length} check-ins</strong></div>
     <div class="kv"><span>Journal database</span><strong>${esc(journal.label())}</strong></div>
+    ${journal.error ? `<div class="gerr" style="margin:10px 0 0"><strong>History is not being saved</strong>${esc(journal.error.message || String(journal.error))}</div>` : ''}
     ${STORE.error ? `<div class="gerr" style="margin:10px 0 0"><strong>Last write failed</strong>${esc(STORE.error.message || String(STORE.error))}</div>` : ''}
     <div style="display:flex;gap:8px;margin-top:11px">
       <button class="btn sm" id="storeReload" style="flex:1;justify-content:center">Reload</button>

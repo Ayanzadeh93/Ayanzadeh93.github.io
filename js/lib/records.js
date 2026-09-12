@@ -78,7 +78,13 @@ export const journal = {
     ready: false,
     error: null,
     cloud: null,          // { fs, db, uid } — set by the app when Firestore is up
+    /* Called when a write is refused. A rejected write must never be silent:
+       offline the SDK queues and nothing fires, so anything that reaches here
+       is a real refusal — rules not published, quota, a bad row — and the
+       entry the person just made is not going to survive a reload. */
+    onError: null,
     _db: null,
+    _fail(e) { this.error = e; if (this.onError) try { this.onError(e); } catch (x) {} },
 
     /** Choose where records live. Returns the mode actually in use. */
     async use(mode, cloud) {
@@ -133,14 +139,14 @@ export const journal = {
                 const { id, ...rest } = row;
                 /* Not awaited on purpose: offline the server ack never settles, and
                    the SDK's own cache has already accepted the write. */
-                this.cloud.fs.setDoc(this._doc(id), rest).catch(e => { this.error = e; });
+                this.cloud.fs.setDoc(this._doc(id), rest).catch(e => this._fail(e));
             } else if (this.mode === 'memory') {
                 memory.set(row.id, row);
             } else {
                 await idbRun(this._db, 'readwrite', os => os.put(row));
             }
             this.error = null;
-        } catch (e) { this.error = e; }
+        } catch (e) { this._fail(e); }
         return row;
     },
 
@@ -162,7 +168,7 @@ export const journal = {
                 await idbRun(this._db, 'readwrite', os => rows.forEach(r => os.put(r)));
             }
             this.error = null;
-        } catch (e) { this.error = e; return 0; }
+        } catch (e) { this._fail(e); return 0; }
         return rows.length;
     },
 
