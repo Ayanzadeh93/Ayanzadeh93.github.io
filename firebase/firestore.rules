@@ -4,6 +4,9 @@ rules_version = '2';
 //
 // Written by js/adhd-study-pack.js:
 //   users/{uid}/workspace/state   { json: <whole workspace as JSON>, updated: <ms>, app: <version> }
+//   users/{uid}/journal/{id}      one row per focus session, check-in or mood
+//                                 entry: { kind, at, saved, ...fields } — see
+//                                 js/lib/records.js
 // Read once for the one-time import from the first version of the page:
 //   users/{uid}/pack/{tasks | parked | sessions | activeTaskId}
 //
@@ -25,6 +28,18 @@ service cloud.firestore {
                             && request.resource.data.json is string
                             && request.resource.data.json.size() < 1000000;
       allow delete: if isOwner(uid);
+    }
+
+    // History: one small document per record, so it can grow past the 1 MiB
+    // a single document allows and two devices can add entries at once.
+    // Each row must carry a known kind and a numeric timestamp, and stay
+    // small — a bug or a bad import cannot turn this into file storage.
+    match /users/{uid}/journal/{id} {
+      allow read, delete: if isOwner(uid);
+      allow create, update: if isOwner(uid)
+                            && request.resource.data.kind in ['session', 'checkin', 'mood']
+                            && request.resource.data.at is number
+                            && request.resource.data.keys().size() < 24;
     }
 
     // First version of the page. Kept readable (and deletable) so its data
