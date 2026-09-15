@@ -509,7 +509,7 @@ section,
 .brand-link {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
     text-decoration: none;
     color: inherit;
     transition: var(--transition);
@@ -521,8 +521,8 @@ section,
 
 .ai-logo {
     position: relative;
-    width: 40px;
-    height: 40px;
+    width: 32px;
+    height: 32px;
 }
 
 .neural-network-icon {
@@ -1092,7 +1092,7 @@ button.theme-toggle-btn {
 
 .hero-links {
     display: flex;
-    gap: 12px;
+    gap: 8px;
     justify-content: center;
     flex-wrap: wrap;
     position: relative;
@@ -1504,7 +1504,7 @@ html.js-enabled body.reduce-motion .experience-timeline::before {
     border: 1px solid color-mix(in srgb, var(--chip-tone) 22%, var(--border-color));
     background: color-mix(in srgb, var(--chip-tone) 8%, var(--background-white));
     color: var(--text-dark);
-    font-size: 0.92rem;
+    font-size: 0.88rem;
     font-weight: 500;
     line-height: 1.2;
     box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
@@ -1801,7 +1801,7 @@ html.js-enabled body.reduce-motion .experience-timeline::before {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 12px;
+    gap: 8px;
     flex-wrap: wrap;
     margin-bottom: 8px;
 }
@@ -1978,7 +1978,7 @@ html.js-enabled body.reduce-motion .experience-timeline::before {
 .category-title {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
     font-size: 1.5rem;
     font-weight: 600;
     color: var(--text-dark);
@@ -2189,7 +2189,7 @@ html.js-enabled body.reduce-motion .experience-timeline::before {
 .journal-list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
 }
 
 .journal-item {
@@ -2635,7 +2635,7 @@ html.js-enabled body.reduce-motion .experience-timeline::before {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
+    gap: 8px;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     margin-top: 10px;
     letter-spacing: 0.3px;
@@ -2808,7 +2808,7 @@ html.js-enabled body.reduce-motion .experience-timeline::before {
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
     z-index: 10000;
     opacity: 0;
     transform: translateY(20px);
@@ -3121,7 +3121,7 @@ html.js-enabled body.reduce-motion .experience-timeline::before {
     }
 
     .footer-content {
-        gap: 12px;
+        gap: 8px;
     }
 
     .footer-social a {
@@ -3129,7 +3129,7 @@ html.js-enabled body.reduce-motion .experience-timeline::before {
     }
 
     .footer-copyright p {
-        font-size: 0.92rem;
+        font-size: 0.88rem;
     }
 
     .footer-legal {
@@ -3938,7 +3938,7 @@ body.enhanced-keyboard .top-nav-link:focus {
 .modal-meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 8px;
     margin-top: 15px;
 }
 
@@ -5022,8 +5022,8 @@ img[loading="lazy"].loaded {
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    gap: 12px;
-    padding: 22px 20px 20px;
+    gap: 8px;
+    padding: 16px;
     background: var(--background-white);
     border-radius: 16px;
     border: 1px solid var(--surface-border);
@@ -5049,7 +5049,7 @@ img[loading="lazy"].loaded {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
+    gap: 8px;
 }
 
 .focus-index {
@@ -5060,8 +5060,8 @@ img[loading="lazy"].loaded {
 }
 
 .focus-icon {
-    width: 40px;
-    height: 40px;
+    width: 32px;
+    height: 32px;
     display: grid;
     place-items: center;
     border-radius: 12px;
@@ -5106,7 +5106,7 @@ img[loading="lazy"].loaded {
 .focus-item h4,
 .focus-panel h4 {
     color: var(--text-dark);
-    font-size: 1.12rem;
+    font-size: 1.05rem;
     margin: 0;
     font-weight: 600;
     letter-spacing: -0.02em;
@@ -5115,7 +5115,7 @@ img[loading="lazy"].loaded {
 .focus-item p,
 .focus-panel p {
     color: var(--text-medium);
-    font-size: 0.92rem;
+    font-size: 0.88rem;
     line-height: 1.55;
     margin: 0;
     max-width: none;
@@ -5183,7 +5183,7 @@ img[loading="lazy"].loaded {
 .teaching-course-list > li {
     display: grid;
     grid-template-columns: auto 1fr;
-    gap: 12px;
+    gap: 8px;
     align-items: start;
     padding: 10px 12px;
     border: 1px solid var(--border-light);
@@ -5265,13 +5265,13 @@ img[loading="lazy"].loaded {
     padding: 0;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
+    gap: 8px;
 }
 
 .mentoring-list li {
     display: flex;
     align-items: flex-start;
-    gap: 12px;
+    gap: 8px;
     padding: 14px 16px;
     background: var(--card-surface);
     border: 1px solid var(--surface-border);
@@ -5521,7 +5521,7 @@ img[loading="lazy"].loaded {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
+    gap: 8px;
     margin-bottom: 48px;
 }
 
@@ -5564,7 +5564,7 @@ img[loading="lazy"].loaded {
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 16px;
-    gap: 12px;
+    gap: 8px;
 }
 
 .news-date-badge {
@@ -5730,7 +5730,7 @@ img[loading="lazy"].loaded {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
+    gap: 8px;
 }
 
 .featured-research-section .section-title i {
@@ -5864,7 +5864,7 @@ img[loading="lazy"].loaded {
 .paper-highlights {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    gap: 8px;
     margin-bottom: 20px;
 }
 
@@ -5906,7 +5906,7 @@ img[loading="lazy"].loaded {
 
 .paper-links {
     display: flex;
-    gap: 12px;
+    gap: 8px;
     flex-wrap: wrap;
 }
 
@@ -5967,7 +5967,7 @@ img[loading="lazy"].loaded {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 12px;
+    gap: 8px;
     border: 1px dashed rgba(255, 255, 255, 0.2);
 }
 
