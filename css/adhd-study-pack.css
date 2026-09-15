@@ -334,6 +334,64 @@ input[type="checkbox"]{accent-color:var(--accent); width:16px; height:16px}
 .layer.on .pwr{background:var(--accent); border-color:transparent}
 .layer.on .pwr::after{transform:translateX(14px); background:var(--accent-ink)}
 
+/* ---------- presets & chips ---------- */
+.preset-chip.active, [data-preset].active {
+  background: var(--accent) !important;
+  border-color: transparent !important;
+  color: var(--accent-ink) !important;
+  font-weight: 600;
+}
+.preset-chip-custom {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-2);
+  transition: .14s;
+}
+.preset-chip-custom.active {
+  background: var(--accent);
+  border-color: transparent;
+}
+.preset-chip-custom .preset-chip {
+  border: 0 !important;
+  background: transparent !important;
+  border-radius: 8px 0 0 8px;
+  padding-right: 5px;
+}
+.preset-chip-custom.active .preset-chip {
+  color: var(--accent-ink) !important;
+}
+.preset-del {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  margin-right: 4px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: .14s;
+  padding: 0;
+}
+.preset-del:hover {
+  background: color-mix(in srgb, var(--ink) 12%, transparent);
+  color: var(--ink);
+}
+.preset-chip-custom.active .preset-del {
+  color: var(--accent-ink);
+  opacity: .8;
+}
+.preset-chip-custom.active .preset-del:hover {
+  background: color-mix(in srgb, var(--accent-ink) 25%, transparent);
+  opacity: 1;
+}
+
 /* ---------- stats ---------- */
 .kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,calc(150px*min(var(--ts,1),1.5))),1fr)); gap:12px}
 .kpi{padding:13px 15px; border-radius:var(--r-m); background:var(--surface); border:1px solid var(--line)}
@@ -511,7 +569,7 @@ svg.chart .lbl{fill:var(--ink-2); font-weight:600}
 .gate-brand h1{font-family:var(--font-display); font-size:calc(19px*var(--ts,1)); font-weight:700; letter-spacing:-.02em; margin:0}
 .gate-sub{font-size:calc(12.5px*var(--ts,1)); color:var(--muted); line-height:1.5; margin:8px 0 16px}
 .gate form{display:flex; flex-direction:column; gap:11px}
-.gate .row{display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:calc(12px*var(--ts,1)); color:var(--muted)}
+.gate .row{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; font-size:calc(12px*var(--ts,1)); color:var(--muted)}
 .gate .row label{display:flex; align-items:center; gap:7px; cursor:pointer}
 .gate-or{display:flex; align-items:center; gap:10px; margin:14px 0 11px; color:var(--muted); font-size:calc(11px*var(--ts,1))}
 .gate-or::before,.gate-or::after{content:""; height:1px; background:var(--line); flex:1}

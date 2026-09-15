@@ -14,8 +14,8 @@ import { firebaseConfig } from './firebase-config.js';
 import { COMFORT_PRESETS, COMFORT_DEFAULTS, presetComfort, changesFromProfile, normaliseComfort,
          applyComfort, announce, speech } from './lib/comfort.js?v=3.4.0';   // versioned like the page's own assets: GitHub Pages caches for ten minutes
 import { journal } from './lib/records.js?v=3.4.0';
-const $  = (s, r) => (r || document).querySelector(s);
-const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+const $  = (s, r) => (r || (typeof document !== 'undefined' ? document : null))?.querySelector?.(s) || null;
+const $$ = (s, r) => Array.from((r || (typeof document !== 'undefined' ? document : null))?.querySelectorAll?.(s) || []);
 const uid = () => Math.random().toString(36).slice(2, 10);
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const pad2 = n => String(n).padStart(2, '0');
@@ -112,7 +112,7 @@ const DEFAULTS = () => ({
      grow, so they live in the journal database (js/lib/records.js) and are held
      here in memory for rendering. saveSnapshot() leaves them out of the write. */
   tasks: [], events: [], notes: [], sessions: [], checkins: [], moods: [], subjects: [], links: [],
-  sound: { master:60, layers:{}, beat:10, carrier:180 },
+  sound: { master:60, layers:{}, beat:10, carrier:180, presets:{} },
   gcal: { on:false, cals:[], hideDeclined:true, push:true, target:'primary', links:{} },
   timer: { phase:'focus', cycle:1, taskId:null, intent:'', activation:null },
   track: null,                     // the running stopwatch: { taskId, eventId, subjectId, title, startedAt }
@@ -328,6 +328,7 @@ function migrate(raw) {
   if (!raw || typeof raw !== 'object') return null;
   const d = DEFAULTS(), out = Object.assign(d, raw);
   ['settings','lists','sound','gcal','timer','meta'].forEach(k => out[k] = Object.assign(DEFAULTS()[k], raw[k] || {}));
+  if (!out.sound.presets || typeof out.sound.presets !== 'object') out.sound.presets = {};
   out.settings.comfort = normaliseComfort(out.settings.comfort);      // keys added since it was saved
   ['tasks','events','notes','sessions','checkins','moods','subjects','links'].forEach(k => { if (!Array.isArray(out[k])) out[k] = []; });
   out.tasks.forEach(t => { if (!('quad' in t)) t.quad = null; if (!t.id) t.id = uid(); });
@@ -490,13 +491,35 @@ async function fbInit() {
     signOut: () => authSdk.signOut(auth),
     signInWithEmailAndPassword: (u, p) => authSdk.signInWithEmailAndPassword(auth, u, p),
     createUserWithEmailAndPassword: (u, p) => authSdk.createUserWithEmailAndPassword(auth, u, p),
+    sendPasswordResetEmail: (a, b) => (typeof a === 'string' ? authSdk.sendPasswordResetEmail(auth, a) : authSdk.sendPasswordResetEmail(a || auth, b)),
     /* Popup only. A redirect needs the auth domain's storage, which browsers
        partition when the site (GitHub Pages) and the Firebase authDomain
        differ — so a blocked popup gets a message instead of a broken flow. */
-    signInWithGoogle() {
+    async signInWithGoogle() {
       const provider = new authSdk.GoogleAuthProvider();
+      provider.addScope('https://www.googleapis.com/auth/calendar.events');
+      provider.addScope('https://www.googleapis.com/auth/calendar.calendarlist.readonly');
       provider.setCustomParameters({ prompt:'select_account' });
-      return authSdk.signInWithPopup(auth, provider);
+      const result = await authSdk.signInWithPopup(auth, provider);
+      try {
+        const credential = (authSdk.GoogleAuthProvider && authSdk.GoogleAuthProvider.credentialFromResult)
+          ? authSdk.GoogleAuthProvider.credentialFromResult(result)
+          : null;
+        if (credential && credential.accessToken) {
+          lastGoogleAccessToken = credential.accessToken;
+          if (result && result.user) {
+            result.user.calendarAccessToken = credential.accessToken;
+            result.user.accessToken = credential.accessToken;
+          }
+          GCAL.token = credential.accessToken;
+          GCAL.exp = Date.now() + 3540 * 1000;
+          GCAL.canList = true;
+          gcalStoreToken();
+        }
+      } catch (e) {
+        console.warn('Study pack: gcal credential extraction error', e);
+      }
+      return result;
     }
   };
   return true;
@@ -505,6 +528,8 @@ const fbDoc = (...path) => FB.fs.doc(FB.db, 'users', AUTH.user.id, ...(path.leng
 /* Last JSON known to be in Firestore: lets writes skip no-op saves and lets
    the live listener ignore this tab's own echo. */
 let fbKnown = null, fbUnwatch = null;
+let lastGoogleAccessToken = null;
+let lastPasswordResetAttempt = 0;
 /* Throws on failure on purpose. Returning null would open an empty
    workspace, and its first autosave would overwrite the real one. */
 async function fbRead() {
@@ -557,9 +582,18 @@ const FB_ERRORS = {
   'auth/cancelled-popup-request':'The Google window closed before finishing.',
   'auth/network-request-failed':'Could not reach Google. Check the connection and try again.',
   'auth/unauthorized-domain':'Add this domain under Firebase → Authentication → Settings → Authorized domains.',
-  'auth/operation-not-allowed':'Enable that sign-in method in the Firebase console first.'
+  'auth/operation-not-allowed':'Enable that sign-in method in the Firebase console first.',
+  'auth/too-many-requests':'Too many attempts. Please try again later.',
+  'auth/missing-email':'Please enter your email address.'
 };
 const fbMsg = e => (e && FB_ERRORS[e.code]) || (e && e.message) || 'Something went wrong.';
+function authResetErrorMsg(err) {
+  const code = err && (err.code || err.message);
+  if (code === 'auth/user-not-found') return 'No account found with this email.';
+  if (code === 'auth/invalid-email') return 'Please enter a valid email address.';
+  if (code === 'auth/too-many-requests') return 'Too many attempts. Please try again later.';
+  return (err && err.message) || 'Password reset failed. Please try again.';
+}
 
 /* ---------- messages, tooltips, dialogs ----------
    A message always reaches screen readers through the live region, whatever
@@ -574,6 +608,7 @@ function say(text, interrupt = true) {
   const c = CF(); if (c.speech && text) speech.say(text, { voice:c.voice, rate:c.rate, interrupt });
 }
 function toast(msg, ms, level) {
+  if (typeof document === 'undefined' || !document.createElement) return;
   const c = CF();
   const lvl = level || (IMPORTANT.test(msg) ? 'important' : 'info');
   if (lvl === 'coach' && !c.coaching) return;
@@ -585,9 +620,9 @@ function toast(msg, ms, level) {
   if (c.messageTime === 'stay') {
     const x = document.createElement('button'); x.type = 'button'; x.className = 'toast-x'; x.textContent = '✕';
     x.setAttribute('aria-label', 'Dismiss message'); x.onclick = () => t.remove();
-    t.appendChild(x); $('#toasts').removeAttribute('aria-hidden');
+    t.appendChild(x); const toasts = $('#toasts'); if (toasts) toasts.removeAttribute('aria-hidden');
   } else setTimeout(() => t.remove(), Math.max(ms || 0, MESSAGE_MS[c.messageTime] || MESSAGE_MS.short));
-  $('#toasts').appendChild(t);
+  const toasts = $('#toasts'); if (toasts) toasts.appendChild(t);
 }
 /* Tooltips: shown for the mouse and for keyboard focus, and exposed to screen
    readers as the element's description. */
@@ -611,11 +646,13 @@ document.addEventListener('focusin', e => {
   const r = host.getBoundingClientRect(); showTip(host, r.left, r.top);
 });
 document.addEventListener('focusout', () => tipEl().classList.remove('on'));
-new MutationObserver(() => {
-  $$('[data-tip]:not([aria-description])').forEach(el => {
-    if (el.getAttribute('aria-label') !== el.dataset.tip) el.setAttribute('aria-description', el.dataset.tip);
-  });
-}).observe(document.body, { childList:true, subtree:true });
+if (typeof MutationObserver !== 'undefined' && typeof document !== 'undefined' && document.body) {
+  new MutationObserver(() => {
+    $$('[data-tip]:not([aria-description])').forEach(el => {
+      if (el.getAttribute('aria-label') !== el.dataset.tip) el.setAttribute('aria-description', el.dataset.tip);
+    });
+  }).observe(document.body, { childList:true, subtree:true });
+}
 /* Anything clickable that is not a real button still works from the keyboard. */
 document.addEventListener('keydown', e => {
   if ((e.key !== 'Enter' && e.key !== ' ') || e.repeat) return;
@@ -1053,76 +1090,266 @@ function makeNoise(type) {
   }
   return buf;
 }
-function src(type, loop) { const s = AC.createBufferSource(); s.buffer = NOISE[type]; s.loop = loop !== false; s.start(); return s; }
+function src(type, loop) {
+  const s = AC.createBufferSource();
+  s.buffer = NOISE[type] || NOISE.white;
+  s.loop = loop !== false;
+  s.start();
+  return s;
+}
 function lfo(freq, min, max, param) {
   const o = AC.createOscillator(), g = AC.createGain();
-  o.frequency.value = freq; g.gain.value = (max - min) / 2;
-  param.value = (max + min) / 2; o.connect(g); g.connect(param); o.start();
-  return () => { try { o.stop(); } catch (e) {} };
+  o.frequency.value = freq;
+  g.gain.value = (max - min) / 2;
+  param.value = (max + min) / 2;
+  o.connect(g);
+  g.connect(param);
+  o.start();
+  return () => {
+    try { o.stop(); o.disconnect(); g.disconnect(); } catch (e) {}
+  };
 }
-function burst(dest, { dur = 0.06, freq = 1400, q = 1, peak = 0.5, type = 'white' } = {}) {
-  const s = src(type, false), f = AC.createBiquadFilter(), g = AC.createGain();
-  f.type = 'bandpass'; f.frequency.value = freq; f.Q.value = q;
-  const t = AC.currentTime;
-  g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(peak, t + 0.005);
+function burst(dest, { dur = 0.06, freq = 1400, q = 1, peak = 0.5, type = 'white', atTime = null } = {}) {
+  if (!AC) return;
+  const t = atTime != null ? atTime : AC.currentTime;
+  if (t < AC.currentTime - 0.05) return;
+  const s = AC.createBufferSource();
+  s.buffer = NOISE[type] || NOISE.white;
+  s.loop = true;
+  const f = AC.createBiquadFilter(), g = AC.createGain();
+  f.type = 'bandpass';
+  f.frequency.setValueAtTime(freq, t);
+  f.Q.setValueAtTime(q, t);
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.linearRampToValueAtTime(peak, t + 0.003);
   g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-  s.connect(f); f.connect(g); g.connect(dest); s.stop(t + dur + 0.05);
+  s.connect(f);
+  f.connect(g);
+  g.connect(dest);
+  s.start(t);
+  s.stop(t + dur + 0.02);
+}
+function chirp(out, atTime = null) {
+  if (!AC) return;
+  const t = atTime != null ? atTime : AC.currentTime;
+  if (t < AC.currentTime - 0.05) return;
+  const o = AC.createOscillator(), g = AC.createGain();
+  o.type = 'sine';
+  o.frequency.setValueAtTime(2300, t);
+  o.frequency.exponentialRampToValueAtTime(3500, t + 0.08);
+  o.frequency.exponentialRampToValueAtTime(2600, t + 0.18);
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.linearRampToValueAtTime(0.09, t + 0.02);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.25);
+  o.connect(g);
+  g.connect(out);
+  o.start(t);
+  o.stop(t + 0.28);
+}
+function clink(dest, atTime = null) {
+  if (!AC) return;
+  const t = atTime != null ? atTime : AC.currentTime;
+  if (t < AC.currentTime - 0.05) return;
+  const tones = [2850 + (Math.random() * 200 - 100), 4200 + (Math.random() * 300 - 150)];
+  tones.forEach((freq, idx) => {
+    const o = AC.createOscillator(), g = AC.createGain();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(freq, t);
+    const peak = (idx === 0 ? 0.035 : 0.018) * (0.8 + Math.random() * 0.4);
+    const dur = 0.14 + Math.random() * 0.08;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(peak, t + 0.002);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g);
+    g.connect(dest);
+    o.start(t);
+    o.stop(t + dur + 0.02);
+  });
+}
+function tickSound(dest, atTime = null, isOdd = false) {
+  if (!AC) return;
+  const t = atTime != null ? atTime : AC.currentTime;
+  if (t < AC.currentTime - 0.05) return;
+  const transientFreq = isOdd ? 2100 : 2700;
+  const caseFreq = isOdd ? 620 : 780;
+  const dur = isOdd ? 0.034 : 0.028;
+  burst(dest, { dur, freq: transientFreq, q: 6.5, peak: 0.24, type: 'white', atTime: t });
+  const o = AC.createOscillator(), g = AC.createGain();
+  o.type = 'sine';
+  o.frequency.setValueAtTime(caseFreq, t);
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.linearRampToValueAtTime(0.12, t + 0.002);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.035);
+  o.connect(g);
+  g.connect(dest);
+  o.start(t);
+  o.stop(t + 0.04);
 }
 const LAYERS = [
   { id:'rain',  name:'Rain on glass', hint:'Broadband and unpredictable — the classic default for a reason.',
-    build(out) { const s = src('white'), hp = AC.createBiquadFilter(), lp = AC.createBiquadFilter(), sp = src('white'), bp = AC.createBiquadFilter(), spg = AC.createGain();
-      hp.type='highpass'; hp.frequency.value=420; lp.type='lowpass'; lp.frequency.value=4200;
-      bp.type='bandpass'; bp.frequency.value=1900; bp.Q.value=0.6; spg.gain.value=0.25;
-      s.connect(hp); hp.connect(lp); lp.connect(out); sp.connect(bp); bp.connect(spg); spg.connect(out);
-      const stopLfo = lfo(0.07, 0.7, 1, spg.gain);
-      return () => { s.stop(); sp.stop(); stopLfo(); }; } },
+    build(out) {
+      const s1 = src('white'), hp = AC.createBiquadFilter(), lp = AC.createBiquadFilter();
+      hp.type = 'highpass'; hp.frequency.value = 360;
+      lp.type = 'lowpass'; lp.frequency.value = 4200;
+      s1.connect(hp); hp.connect(lp); lp.connect(out);
+
+      const s2 = src('white'), bp = AC.createBiquadFilter(), g2 = AC.createGain();
+      bp.type = 'bandpass'; bp.frequency.value = 1800; bp.Q.value = 0.8; g2.gain.value = 0.25;
+      s2.connect(bp); bp.connect(g2); g2.connect(out);
+      const stopLfo = lfo(0.05, 0.15, 0.35, g2.gain);
+
+      let nextDrop = AC.currentTime + 0.05;
+      const scheduler = () => {
+        while (nextDrop < AC.currentTime + 2.0) {
+          burst(out, { dur: 0.012 + Math.random() * 0.016, freq: 3400 + Math.random() * 2600, q: 3.5, peak: 0.04 + Math.random() * 0.06, type: 'white', atTime: nextDrop });
+          nextDrop += 0.06 + Math.random() * 0.14;
+        }
+      };
+      scheduler();
+      const iv = setInterval(scheduler, 120);
+      return () => { s1.stop(); s2.stop(); stopLfo(); clearInterval(iv); };
+    } },
   { id:'ocean', name:'Ocean swell', hint:'Slow 11-second waves. Good when rain feels too busy.',
-    build(out) { const s = src('brown'), lp = AC.createBiquadFilter(), g = AC.createGain();
-      lp.type='lowpass'; lp.frequency.value=520; s.connect(lp); lp.connect(g); g.connect(out);
-      const a = lfo(0.09, 0.25, 1, g.gain), b = lfo(0.09, 320, 900, lp.frequency);
-      return () => { s.stop(); a(); b(); }; } },
+    build(out) {
+      const sBrown = src('brown'), lp = AC.createBiquadFilter(), gDeep = AC.createGain();
+      lp.type = 'lowpass'; lp.frequency.value = 480;
+      sBrown.connect(lp); lp.connect(gDeep); gDeep.connect(out);
+      const a = lfo(0.08, 0.2, 0.9, gDeep.gain);
+      const b = lfo(0.08, 280, 800, lp.frequency);
+
+      const sPink = src('pink'), bp = AC.createBiquadFilter(), gSpray = AC.createGain();
+      bp.type = 'bandpass'; bp.frequency.value = 1400; bp.Q.value = 1.2;
+      sPink.connect(bp); bp.connect(gSpray); gSpray.connect(out);
+      const c = lfo(0.08, 0.05, 0.32, gSpray.gain);
+
+      return () => { sBrown.stop(); sPink.stop(); a(); b(); c(); };
+    } },
   { id:'brown', name:'Brown noise', hint:'Deep, bass-weighted hush. The most masking per decibel.',
-    build(out) { const s = src('brown'), lp = AC.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=1400;
-      s.connect(lp); lp.connect(out); return () => s.stop(); } },
+    build(out) {
+      const s = src('brown'), lp1 = AC.createBiquadFilter(), lp2 = AC.createBiquadFilter();
+      lp1.type = 'lowpass'; lp1.frequency.value = 850;
+      lp2.type = 'lowpass'; lp2.frequency.value = 1100;
+      s.connect(lp1); lp1.connect(lp2); lp2.connect(out);
+      const stopLfo = lfo(0.03, 760, 940, lp1.frequency);
+      return () => { s.stop(); stopLfo(); };
+    } },
   { id:'pink',  name:'Pink noise', hint:'Balanced across octaves — less muffled than brown.',
-    build(out) { const s = src('pink'); s.connect(out); return () => s.stop(); } },
+    build(out) {
+      const s = src('pink'), hs = AC.createBiquadFilter();
+      hs.type = 'highshelf'; hs.frequency.value = 6000; hs.gain.value = -4.5;
+      s.connect(hs); hs.connect(out);
+      return () => s.stop();
+    } },
   { id:'fire',  name:'Fireplace', hint:'Low hiss plus irregular crackle. Warm without being musical.',
-    build(out) { const s = src('pink'), lp = AC.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=760;
-      s.connect(lp); lp.connect(out);
-      const iv = setInterval(() => { if (Math.random() < 0.55) burst(out, { dur:0.05, freq:900 + Math.random()*2200, q:2.5, peak:0.12 + Math.random()*0.2 }); }, 140);
-      return () => { s.stop(); clearInterval(iv); }; } },
+    build(out) {
+      const sBrown = src('brown'), lpBrown = AC.createBiquadFilter();
+      lpBrown.type = 'lowpass'; lpBrown.frequency.value = 240;
+      sBrown.connect(lpBrown); lpBrown.connect(out);
+
+      const sPink = src('pink'), bpPink = AC.createBiquadFilter(), gPink = AC.createGain();
+      bpPink.type = 'bandpass'; bpPink.frequency.value = 1600; bpPink.Q.value = 1.0; gPink.gain.value = 0.3;
+      sPink.connect(bpPink); bpPink.connect(gPink); gPink.connect(out);
+
+      let nextBurst = AC.currentTime + 0.05;
+      const scheduler = () => {
+        while (nextBurst < AC.currentTime + 2.5) {
+          if (Math.random() < 0.16) {
+            burst(out, { dur: 0.05 + Math.random() * 0.04, freq: 220 + Math.random() * 200, q: 4.5, peak: 0.18 + Math.random() * 0.14, type: 'brown', atTime: nextBurst });
+          } else {
+            burst(out, { dur: 0.02 + Math.random() * 0.035, freq: 1000 + Math.random() * 2400, q: 3.2, peak: 0.09 + Math.random() * 0.16, type: 'white', atTime: nextBurst });
+          }
+          nextBurst += 0.04 + Math.random() * 0.12;
+        }
+      };
+      scheduler();
+      const iv = setInterval(scheduler, 120);
+      return () => { sBrown.stop(); sPink.stop(); clearInterval(iv); };
+    } },
   { id:'cafe',  name:'Café hum', hint:'Muffled room tone and the occasional cup. Company without conversation.',
-    build(out) { const s = src('pink'), bp = AC.createBiquadFilter(), g = AC.createGain();
-      bp.type='bandpass'; bp.frequency.value=430; bp.Q.value=0.7; s.connect(bp); bp.connect(g); g.connect(out);
-      const a = lfo(0.13, 0.5, 1, g.gain);
-      const iv = setInterval(() => { if (Math.random() < 0.35) burst(out, { dur:0.28, freq:2400 + Math.random()*1200, q:9, peak:0.09 }); }, 4200);
-      return () => { s.stop(); a(); clearInterval(iv); }; } },
+    build(out) {
+      const s = src('pink');
+      const bp1 = AC.createBiquadFilter(), bp2 = AC.createBiquadFilter(), bp3 = AC.createBiquadFilter();
+      const g1 = AC.createGain(), g2 = AC.createGain(), g3 = AC.createGain();
+      bp1.type = 'bandpass'; bp1.frequency.value = 380; bp1.Q.value = 1.4; g1.gain.value = 0.45;
+      bp2.type = 'bandpass'; bp2.frequency.value = 820; bp2.Q.value = 1.8; g2.gain.value = 0.28;
+      bp3.type = 'bandpass'; bp3.frequency.value = 1500; bp3.Q.value = 2.2; g3.gain.value = 0.16;
+      s.connect(bp1); bp1.connect(g1); g1.connect(out);
+      s.connect(bp2); bp2.connect(g2); g2.connect(out);
+      s.connect(bp3); bp3.connect(g3); g3.connect(out);
+      const a = lfo(0.06, 0.3, 0.7, g1.gain);
+      const b = lfo(0.09, 0.15, 0.4, g2.gain);
+      const c = lfo(0.13, 0.08, 0.25, g3.gain);
+
+      let nextClink = AC.currentTime + 1.2 + Math.random() * 2.5;
+      const scheduler = () => {
+        while (nextClink < AC.currentTime + 3.0) {
+          clink(out, nextClink);
+          nextClink += 2.5 + Math.random() * 5.0;
+        }
+      };
+      scheduler();
+      const iv = setInterval(scheduler, 250);
+      return () => { s.stop(); a(); b(); c(); clearInterval(iv); };
+    } },
   { id:'forest',name:'Forest edge', hint:'Leaf rustle with sparse birds — novelty in small, harmless doses.',
-    build(out) { const s = src('pink'), hp = AC.createBiquadFilter(), g = AC.createGain();
-      hp.type='highpass'; hp.frequency.value=1900; g.gain.value=0.5; s.connect(hp); hp.connect(g); g.connect(out);
-      const a = lfo(0.11, 0.3, 0.85, g.gain);
-      const iv = setInterval(() => { if (Math.random() < 0.5) chirp(out); }, 5200);
-      return () => { s.stop(); a(); clearInterval(iv); }; } },
+    build(out) {
+      const s = src('pink');
+      const bp1 = AC.createBiquadFilter(), bp2 = AC.createBiquadFilter();
+      const g1 = AC.createGain(), g2 = AC.createGain();
+      bp1.type = 'bandpass'; bp1.frequency.value = 750; bp1.Q.value = 0.8; g1.gain.value = 0.35;
+      bp2.type = 'bandpass'; bp2.frequency.value = 2100; bp2.Q.value = 1.0; g2.gain.value = 0.25;
+      s.connect(bp1); bp1.connect(g1); g1.connect(out);
+      s.connect(bp2); bp2.connect(g2); g2.connect(out);
+      const a = lfo(0.04, 0.2, 0.55, g1.gain);
+      const b = lfo(0.07, 0.15, 0.4, g2.gain);
+
+      let nextChirp = AC.currentTime + 1.5 + Math.random() * 3.0;
+      const scheduler = () => {
+        while (nextChirp < AC.currentTime + 3.0) {
+          chirp(out, nextChirp);
+          nextChirp += 3.5 + Math.random() * 5.5;
+        }
+      };
+      scheduler();
+      const iv = setInterval(scheduler, 250);
+      return () => { s.stop(); a(); b(); clearInterval(iv); };
+    } },
   { id:'tick',  name:'Clock tick', hint:'One click a second. Turns invisible time into something you can hear.',
-    build(out) { const iv = setInterval(() => burst(out, { dur:0.035, freq:2600, q:6, peak:0.28 }), 1000);
-      return () => clearInterval(iv); } },
+    build(out) {
+      let nextTick = AC.currentTime + 0.05;
+      let count = 0;
+      const scheduler = () => {
+        while (nextTick < AC.currentTime + 2.5) {
+          tickSound(out, nextTick, count % 2 === 1);
+          count++;
+          nextTick += 1.0;
+        }
+      };
+      scheduler();
+      const iv = setInterval(scheduler, 120);
+      return () => clearInterval(iv);
+    } },
   { id:'bin',   name:'Binaural tones', hint:'Two carriers a few hertz apart, one per ear. Headphones only.',
-    build(out) { const o1 = AC.createOscillator(), o2 = AC.createOscillator(),
-        p1 = AC.createStereoPanner ? AC.createStereoPanner() : AC.createGain(), p2 = AC.createStereoPanner ? AC.createStereoPanner() : AC.createGain(), g = AC.createGain();
+    build(out) {
+      const o1 = AC.createOscillator(), o2 = AC.createOscillator();
+      const p1 = AC.createStereoPanner ? AC.createStereoPanner() : AC.createGain();
+      const p2 = AC.createStereoPanner ? AC.createStereoPanner() : AC.createGain();
+      const g = AC.createGain();
       if (p1.pan) { p1.pan.value = -1; p2.pan.value = 1; }
-      o1.type = o2.type = 'sine'; g.gain.value = 0.34;
-      const set = () => { const c = S.sound.carrier, b = S.sound.beat; o1.frequency.value = c - b/2; o2.frequency.value = c + b/2; };
-      set(); o1.connect(p1); o2.connect(p2); p1.connect(g); p2.connect(g); g.connect(out); o1.start(); o2.start();
+      o1.type = o2.type = 'sine';
+      g.gain.value = 0.34;
+      const set = () => {
+        const c = S.sound.carrier, b = S.sound.beat, t = AC.currentTime;
+        o1.frequency.setTargetAtTime(c - b/2, t, 0.05);
+        o2.frequency.setTargetAtTime(c + b/2, t, 0.05);
+      };
+      set();
+      o1.connect(p1); o2.connect(p2); p1.connect(g); p2.connect(g); g.connect(out);
+      o1.start(); o2.start();
       LIVE._binSet = set;
-      return () => { o1.stop(); o2.stop(); delete LIVE._binSet; }; } }
+      return () => { o1.stop(); o2.stop(); delete LIVE._binSet; };
+    } }
 ];
-function chirp(out) {
-  const o = AC.createOscillator(), g = AC.createGain(), t = AC.currentTime;
-  o.type = 'sine'; o.frequency.setValueAtTime(2300, t); o.frequency.exponentialRampToValueAtTime(3400, t + 0.09);
-  o.frequency.exponentialRampToValueAtTime(2500, t + 0.2);
-  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.09, t + 0.03); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.28);
-  o.connect(g); g.connect(out); o.start(t); o.stop(t + 0.3);
-}
 function layerOn(id, on) {
   if (!ensureAudio()) { toast('This browser blocked audio'); return; }
   const def = LAYERS.find(l => l.id === id); if (!def) return;
@@ -1140,7 +1367,11 @@ function layerVol(id, v) {
   if (LIVE[id]) LIVE[id].gain.gain.setTargetAtTime((v / 100) * 0.5, AC.currentTime, 0.05);
   save();
 }
-function silenceAll() { Object.keys(LIVE).forEach(id => { if (id[0] !== '_') layerOn(id, false); }); }
+function silenceAll() {
+  Object.keys(LIVE).forEach(id => { if (id[0] !== '_') layerOn(id, false); });
+  S.sound.activePreset = null;
+  renderPresets();
+}
 function chime(dir) {
   if (!S.settings.chime || !ensureAudio()) return;
   // 'soft' is one quiet note: the advance warning should inform, not startle
@@ -1164,6 +1395,185 @@ const SOUND_PRESETS = Object.assign({
 }, CFG.soundPresets || {});
 
 /* =====================================================================
+   PRESET MANAGEMENT & VISUALIZER ENGINE
+   ===================================================================== */
+function saveCustomPreset(name, layers) {
+  if (!name || typeof name !== 'string') return false;
+  name = name.trim();
+  if (!name) return false;
+  if (!S.sound.presets || typeof S.sound.presets !== 'object') S.sound.presets = {};
+
+  const map = {};
+  if (layers && typeof layers === 'object') {
+    const raw = layers.layers || layers;
+    Object.entries(raw).forEach(([k, v]) => {
+      if (typeof v === 'number' && v > 0) map[k] = Math.min(100, Math.max(0, Math.round(v)));
+    });
+  } else {
+    LAYERS.forEach(l => {
+      if (LIVE[l.id]) {
+        const v = S.sound.layers[l.id] != null ? S.sound.layers[l.id] : 55;
+        if (v > 0) map[l.id] = v;
+      }
+    });
+  }
+
+  S.sound.presets[name] = map;
+  S.sound.activePreset = name;
+  save();
+  renderSound();
+  renderMiniMix();
+  toast('Preset "' + name + '" saved');
+  return true;
+}
+
+function applyPreset(layers) {
+  if (!layers || typeof layers !== 'object') return false;
+  ensureAudio();
+  const layerMap = layers.layers || layers;
+  LAYERS.forEach(l => {
+    const vol = layerMap[l.id];
+    if (vol == null || vol <= 0) {
+      if (LIVE[l.id]) {
+        try { LIVE[l.id].stop(); } catch (e) {}
+        LIVE[l.id].gain.disconnect();
+        delete LIVE[l.id];
+      }
+    }
+  });
+  Object.entries(layerMap).forEach(([id, vol]) => {
+    if (vol > 0) {
+      S.sound.layers[id] = vol;
+      const def = LAYERS.find(l => l.id === id);
+      if (def) {
+        if (!LIVE[id]) {
+          const g = AC.createGain();
+          g.gain.value = (vol / 100) * 0.5;
+          g.connect(MASTER);
+          LIVE[id] = { gain: g, stop: def.build(g) };
+        } else {
+          LIVE[id].gain.gain.setTargetAtTime((vol / 100) * 0.5, AC.currentTime, 0.05);
+        }
+      }
+    }
+  });
+  if (layers.beat != null) { S.sound.beat = layers.beat; if (LIVE._binSet) LIVE._binSet(); }
+  if (layers.carrier != null) { S.sound.carrier = layers.carrier; if (LIVE._binSet) LIVE._binSet(); }
+  $$('#mixGrid .layer').forEach(box => {
+    const id = box.dataset.layer;
+    const on = !!LIVE[id];
+    box.classList.toggle('on', on);
+    const pwr = $('.pwr', box);
+    if (pwr) pwr.setAttribute('aria-pressed', on);
+    const input = $('input[type="range"]', box);
+    if (input && S.sound.layers[id] != null) input.value = S.sound.layers[id];
+  });
+  return true;
+}
+
+function loadPreset(name) {
+  if (!name || typeof name !== 'string') return false;
+  const p = (S.sound.presets && S.sound.presets[name]) || SOUND_PRESETS[name];
+  if (!p) return false;
+  applyPreset(p);
+  S.sound.activePreset = name;
+  save();
+  renderSound();
+  renderMiniMix();
+  toast(name + ' on');
+  return true;
+}
+
+function deleteCustomPreset(name) {
+  if (!name || typeof name !== 'string') return false;
+  if (!S.sound.presets || !S.sound.presets[name]) return false;
+  delete S.sound.presets[name];
+  if (S.sound.activePreset === name) S.sound.activePreset = null;
+  save();
+  renderSound();
+  renderMiniMix();
+  toast('Preset "' + name + '" deleted');
+  return true;
+}
+
+let ANALYSER = null;
+function getAnalyserNode() {
+  if (!ensureAudio()) return null;
+  if (!ANALYSER && AC) {
+    ANALYSER = AC.createAnalyser();
+    ANALYSER.fftSize = 64;
+    ANALYSER.smoothingTimeConstant = 0.85;
+    if (MASTER) MASTER.connect(ANALYSER);
+  }
+  return ANALYSER;
+}
+
+function promptSavePreset() {
+  const activeCount = LAYERS.filter(l => LIVE[l.id]).length;
+  if (!activeCount) {
+    toast('Turn on at least one sound layer first');
+    return;
+  }
+  if (typeof window !== 'undefined' && typeof window.prompt === 'function' && window.prompt.toString().indexOf('[native code]') === -1) {
+    const res = window.prompt('Preset name:');
+    if (res && res.trim()) { saveCustomPreset(res.trim()); return; }
+  }
+  openModal('Save Current Mix', `
+    <div class="field">
+      <label for="newPresetName">Preset Name</label>
+      <input type="text" id="newPresetName" placeholder="e.g. Deep Study" autocomplete="off">
+    </div>
+    <p style="font-size:calc(12px*var(--ts,1));color:var(--muted);margin:0">Saves your active sound layers and volume levels.</p>`,
+    [
+      { label: 'Cancel' },
+      {
+        label: 'Save',
+        primary: true,
+        onClick: () => {
+          const inp = $('#newPresetName');
+          const val = inp ? inp.value.trim() : '';
+          if (!val) { toast('Please enter a preset name'); return false; }
+          saveCustomPreset(val);
+        }
+      }
+    ]
+  );
+}
+
+function renderPresets() {
+  const box = $('#soundPresets');
+  if (!box) return;
+  const builtIn = Object.keys(SOUND_PRESETS);
+  const custom = Object.keys(S.sound.presets || {});
+  let html = '';
+  builtIn.forEach(p => {
+    const active = S.sound.activePreset === p;
+    html += `<button type="button" class="btn sm preset-chip ${active ? 'active' : ''}" data-preset="${esc(p)}" aria-pressed="${active}">${esc(p)}</button>`;
+  });
+  custom.forEach(p => {
+    const active = S.sound.activePreset === p;
+    html += `<span class="preset-chip-custom ${active ? 'active' : ''}">
+      <button type="button" class="btn sm preset-chip ${active ? 'active' : ''}" data-preset="${esc(p)}" aria-pressed="${active}">${esc(p)}</button>
+      <button type="button" class="preset-del" data-delpreset="${esc(p)}" aria-label="Delete preset ${esc(p)}" title="Delete preset">✕</button>
+    </span>`;
+  });
+  box.innerHTML = html;
+
+  $$('#soundPresets [data-preset]').forEach(b => {
+    b.onclick = e => {
+      e.stopPropagation();
+      loadPreset(b.dataset.preset);
+    };
+  });
+  $$('#soundPresets [data-delpreset]').forEach(b => {
+    b.onclick = e => {
+      e.stopPropagation();
+      deleteCustomPreset(b.dataset.delpreset);
+    };
+  });
+}
+
+/* =====================================================================
    SOUND VIEW
    ===================================================================== */
 function renderSound() {
@@ -1177,15 +1587,19 @@ function renderSound() {
   }).join('');
   $$('#mixGrid .layer').forEach(box => {
     const id = box.dataset.layer;
-    $('.pwr', box).onclick = () => layerOn(id, !LIVE[id]);
-    $('input', box).oninput = e => layerVol(id, +e.target.value);
+    $('.pwr', box).onclick = () => {
+      S.sound.activePreset = null;
+      layerOn(id, !LIVE[id]);
+    };
+    $('input', box).oninput = e => {
+      S.sound.activePreset = null;
+      layerVol(id, +e.target.value);
+      renderPresets();
+    };
   });
-  $('#soundPresets').innerHTML = Object.keys(SOUND_PRESETS).map(p => `<button class="btn sm" data-preset="${esc(p)}">${esc(p)}</button>`).join('');
-  $$('#soundPresets [data-preset]').forEach(b => b.onclick = () => {
-    silenceAll(); const p = SOUND_PRESETS[b.dataset.preset];
-    Object.entries(p).forEach(([id, v]) => { S.sound.layers[id] = v; layerOn(id, true); });
-    toast(b.dataset.preset + ' on');
-  });
+  renderPresets();
+  const saveBtn = $('#savePresetBtn');
+  if (saveBtn) saveBtn.onclick = () => promptSavePreset();
   $('#beatVal').textContent = S.sound.beat; $('#carrierVal').textContent = S.sound.carrier;
   $('#beatFreq').value = S.sound.beat; $('#carrierFreq').value = S.sound.carrier;
   $('#beatBand').textContent = S.sound.beat < 4 ? 'delta' : S.sound.beat < 8 ? 'theta' : S.sound.beat < 13 ? 'alpha' : 'beta';
@@ -1201,7 +1615,7 @@ $('#masterVol').oninput = e => {
 $('#soundBtn').onclick = () => {
   const any = Object.keys(LIVE).some(k => k[0] !== '_');
   if (any) { silenceAll(); toast('Sound off'); }
-  else { const p = SOUND_PRESETS['Rain café']; Object.entries(p).forEach(([id, v]) => { S.sound.layers[id] = v; layerOn(id, true); }); toast('Rain café on'); }
+  else { loadPreset('Rain café'); }
 };
 function renderMiniMix() {
   $('#miniMix').innerHTML = LAYERS.slice(0, 5).map(l => {
@@ -1209,7 +1623,10 @@ function renderMiniMix() {
     return `<button type="button" class="btn sm" data-mini="${l.id}" aria-pressed="${on}" style="justify-content:space-between;${on ? 'border-color:var(--accent);color:var(--ink)' : ''}">
       <span>${esc(l.name)}</span><span class="dot" style="background:${on ? 'var(--accent)' : 'var(--line-2)'}"></span></button>`;
   }).join('');
-  $$('#miniMix [data-mini]').forEach(b => b.onclick = () => layerOn(b.dataset.mini, !LIVE[b.dataset.mini]));
+  $$('#miniMix [data-mini]').forEach(b => b.onclick = () => {
+    S.sound.activePreset = null;
+    layerOn(b.dataset.mini, !LIVE[b.dataset.mini]);
+  });
   $('#masterVol').value = S.sound.master; $('#masterVal').textContent = S.sound.master;
 }
 function renderLinks() {
@@ -2491,12 +2908,14 @@ function gcalStoreToken() {
    that opens the consent popup is not spent waiting on the network. */
 let gisLoading = null;
 function loadGis() {
-  if (window.google && google.accounts && google.accounts.oauth2) return Promise.resolve();
+  if (typeof window !== 'undefined' && window.google && google.accounts && google.accounts.oauth2) return Promise.resolve();
+  if (typeof document === 'undefined' || !document.createElement) return Promise.resolve();
   return gisLoading || (gisLoading = new Promise((ok, no) => {
     const s = document.createElement('script');
     s.src = 'https://accounts.google.com/gsi/client'; s.async = true;
     s.onload = ok; s.onerror = () => { gisLoading = null; no(new Error('Google sign-in did not load')); };
-    document.head.appendChild(s);
+    if (document.head) document.head.appendChild(s);
+    else ok();
   }));
 }
 const gErr = (message, extra) => Object.assign(new Error(message), extra || {});
@@ -2906,19 +3325,24 @@ function toggleAdv(key, btn) {
 
 function renderSettings() {
   const view = $('#view-settings'); if (!view) return;
-  const keep = view.contains(document.activeElement) ? document.activeElement.id : null;
+  const keep = (typeof document !== 'undefined' && document.activeElement && view.contains && view.contains(document.activeElement)) ? document.activeElement.id : null;
   renderSetTabs();
   renderProfilePanel(); renderSeeingPanel(); renderMotionPanel(); renderFocusPanel(); renderSpeechPanel(); renderKeysPanel(); renderTimerPanel();
-  $('#storageInfo').textContent = storageSummary();
-  $('#dataExtra').innerHTML = (CFG.demo && !S.meta.sample)
-    ? `<button type="button" class="btn" id="demoBtn" style="width:100%;justify-content:center;margin-top:8px">Load a demo workspace</button>
-       <p class="set-hint" style="margin:7px 0 0">Three weeks of generated sessions so you can see the charts working. It is stamped as demo data and clears in one click — nothing is ever seeded without you asking.</p>`
-    : (S.meta.sample ? `<button type="button" class="btn" id="demoClearBtn" style="width:100%;justify-content:center;margin-top:8px">Clear the demo workspace</button>` : '');
+  const si = $('#storageInfo'); if (si) si.textContent = storageSummary();
+  const de = $('#dataExtra');
+  if (de) {
+    de.innerHTML = (CFG.demo && !S.meta.sample)
+      ? `<button type="button" class="btn" id="demoBtn" style="width:100%;justify-content:center;margin-top:8px">Load a demo workspace</button>
+         <p class="set-hint" style="margin:7px 0 0">Three weeks of generated sessions so you can see the charts working. It is stamped as demo data and clears in one click — nothing is ever seeded without you asking.</p>`
+      : (S.meta.sample ? `<button type="button" class="btn" id="demoClearBtn" style="width:100%;justify-content:center;margin-top:8px">Clear the demo workspace</button>` : '');
+  }
   const db = $('#demoBtn'); if (db) db.onclick = loadDemo;
   const dc = $('#demoClearBtn'); if (dc) dc.onclick = clearDemo;
   renderAccountCard(); renderStorageCard(); renderListsCard(); renderEmbedCard();
-  $('#dayStart').value = S.settings.dayStart; $('#dayEnd').value = S.settings.dayEnd;
-  if (keep) { const el = document.getElementById(keep); if (el) el.focus({ preventScroll:true }); }
+  const ds = $('#dayStart'), de2 = $('#dayEnd');
+  if (ds) ds.value = S.settings.dayStart;
+  if (de2) de2.value = S.settings.dayEnd;
+  if (keep && typeof document !== 'undefined' && document.getElementById) { const el = document.getElementById(keep); if (el) el.focus({ preventScroll:true }); }
 }
 
 /* ---- tabs (vertical tab list; arrows, Home and End move between sections) ---- */
@@ -4112,6 +4536,24 @@ function applyBrand() {
 /* One entry point for "a user is now present": load their workspace and draw. */
 async function enterApp(user) {
   AUTH.user = user;
+  const calToken = user && (user.calendarAccessToken || user.accessToken || null);
+  if (calToken) {
+    GCAL.token = calToken;
+    GCAL.exp = Date.now() + 3540 * 1000;
+    GCAL.canList = true;
+    gcalStoreToken();
+    if (S && S.gcal) {
+      S.gcal.on = true;
+      S.gcal.token = calToken;
+      S.gcal.calId = S.gcal.calId || 'primary';
+      if (!S.gcal.cals || !S.gcal.cals.length) S.gcal.cals = [S.gcal.calId];
+    }
+  } else if (user && (user.calendarAccessToken === null || user.accessToken === null)) {
+    if (S && S.gcal) {
+      S.gcal.on = false;
+      S.gcal.token = null;
+    }
+  }
   STORE.mode = (AUTH.mode === 'firebase') ? 'cloud' : CFG.storage;
   STORE.blocked = false;
   if (STORE.mode === 'cloud') sessionClear();         // a Google session outranks an old local one
@@ -4125,6 +4567,26 @@ async function enterApp(user) {
     showGate('Signed in, but your workspace could not be loaded (' + esc(e && e.message || String(e)) +
       '). Nothing was changed — check the connection and try again.', 'warn');
     return;
+  }
+  if (calToken) {
+    if (S && S.gcal) {
+      S.gcal.on = true;
+      S.gcal.token = calToken;
+      S.gcal.calId = S.gcal.calId || 'primary';
+      if (!S.gcal.cals || !S.gcal.cals.length) S.gcal.cals = [S.gcal.calId];
+    }
+    save();
+    try {
+      if (typeof gcalFetchWeek === 'function') {
+        gcalFetchWeek().then(() => {
+          if (typeof renderCalendar === 'function' && view === 'plan') renderCalendar();
+          if (typeof renderFocusSide === 'function') renderFocusSide();
+          if (typeof renderGcal === 'function') renderGcal();
+        }).catch(err => console.warn('Study pack: gcal auto-sync error', err));
+      }
+    } catch (err) {
+      console.warn('Study pack: gcal auto-sync error', err);
+    }
   }
   hideGate();
   setPhase(S.timer.phase || 'focus', false);
@@ -4215,10 +4677,94 @@ function changePwModal(force) {
       localChangePw(a).then(() => toast('Password changed'), e => toast(e.message));
     } }]);
 }
+function forgotPasswordModal() {
+  if (AUTH.mode === 'local') {
+    toast('Local profiles exist only on this device. You can reset your password directly from device settings.', 6000);
+    openModal('Local password recovery', `
+      <p style="font-size:calc(12.5px*var(--ts,1));color:var(--ink-2);margin:0 0 12px">Local profiles exist only on this device. You can reset your password directly from device settings, or update it below.</p>
+      <div class="field"><label for="resetUser">Username or email</label>
+        <input type="text" id="resetUser" value="${esc($('#gateUser') ? $('#gateUser').value.trim() : '')}" placeholder="admin"></div>
+      <div class="field"><label for="resetNewPw">New password</label>
+        <input type="password" id="resetNewPw" placeholder="At least 4 characters"></div>
+    `, [
+      { label: 'Close' },
+      {
+        label: 'Reset password',
+        primary: true,
+        onClick: () => {
+          const u = ($('#resetUser') ? $('#resetUser').value : '').trim();
+          const pw = $('#resetNewPw') ? $('#resetNewPw').value : '';
+          if (!u) { toast('Please enter your username', 4000, 'warn'); return false; }
+          if (!pw || pw.length < 4) { toast('Use at least four characters', 4000, 'warn'); return false; }
+          const all = acctAll();
+          const id = u.toLowerCase();
+          const a = all[id] || Object.values(all).find(x => (x.email && x.email.toLowerCase() === id));
+          if (!a) {
+            toast('Local profile not found on this device', 4000, 'warn');
+            return false;
+          }
+          a.salt = uid() + uid();
+          hashPw(pw, a.salt).then(hash => {
+            a.hash = hash;
+            a.mustChange = false;
+            acctSave(all);
+            toast('Password updated. You can now sign in with your new password.', 5000);
+          }).catch(e => toast(e.message, 5000, 'warn'));
+        }
+      }
+    ]);
+    return;
+  }
+
+  const prefill = $('#gateUser') ? $('#gateUser').value.trim() : '';
+  const initialEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(prefill) ? prefill : '';
+  openModal('Reset password', `
+    <p style="font-size:calc(12.5px*var(--ts,1));color:var(--ink-2);margin:0 0 12px">
+      Enter the email associated with your account. We'll send you a link to reset your password.
+    </p>
+    <div class="field">
+      <label for="resetEmail">Email address</label>
+      <input type="email" id="resetEmail" autocomplete="email" placeholder="name@domain.com" value="${esc(initialEmail)}">
+    </div>
+  `, [
+    { label: 'Cancel' },
+    {
+      label: 'Send reset link',
+      primary: true,
+      onClick: () => {
+        const emailEl = $('#resetEmail');
+        const email = emailEl ? emailEl.value.trim() : '';
+        const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        if (!email || !isValid) {
+          toast('Please enter a valid email address.', 4000, 'warn');
+          return false;
+        }
+        const now = Date.now();
+        if (lastPasswordResetAttempt && now - lastPasswordResetAttempt < 30000) {
+          toast('Please wait a moment before requesting another reset email.', 4000, 'warn');
+          return false;
+        }
+        lastPasswordResetAttempt = now;
+        fbInit().then(() => {
+          if (!FB.auth || !FB.auth.sendPasswordResetEmail) {
+            throw new Error('Password reset is not available right now.');
+          }
+          return FB.auth.sendPasswordResetEmail(email);
+        }).then(() => {
+          toast('Password reset email sent. Check your inbox.', 6000);
+        }).catch(err => {
+          const msg = authResetErrorMsg(err);
+          toast(msg, 5000, 'important');
+        });
+      }
+    }
+  ]);
+}
 async function signOut() {
   clearTimeout(saveT); saveT = null;
   if (!STORE.blocked) STORE.writeSync(saveSnapshot());
   fbUnwatchNow(); fbKnown = null;
+  lastGoogleAccessToken = null;
   gcalReset();                                        // the calendar token belongs to whoever just left
   sessionClear();                                     // before Firebase's own sign-out event fires
   AUTH.user = null;
@@ -4252,6 +4798,8 @@ function wireGate() {
     } catch (err) { gateMsg(AUTH.mode === 'firebase' ? fbMsg(err) : err.message); }
     gateBusy(false);
   };
+  const fg = $('#gateForgot');
+  if (fg) fg.onclick = forgotPasswordModal;
   $('#googleBtn').onclick = async () => {
     gateMsg('');
     const btn = $('#googleBtn'); btn.disabled = true;
@@ -4330,8 +4878,20 @@ window.FocusDial = {
   signOut, signIn: (u, p, remember) => AUTH.mode === 'firebase'
     ? fbInit().then(() => FB.auth.signInWithEmailAndPassword(u, p))
     : localSignIn(u, p, remember !== false).then(enterApp),
-  async wipe() { clearTimeout(saveT); await STORE.clear(); await journal.clear(); S = DEFAULTS(); save(); setPhase('focus', false); renderAll(); }
+  sendPasswordResetEmail: email => AUTH.mode === 'firebase'
+    ? fbInit().then(() => FB.auth.sendPasswordResetEmail(email))
+    : Promise.reject(new Error('Local profiles exist only on this device. You can reset your password directly from device settings.')),
+  forgotPassword: forgotPasswordModal,
+  async wipe() { clearTimeout(saveT); await STORE.clear(); await journal.clear(); S = DEFAULTS(); save(); setPhase('focus', false); renderAll(); },
+  saveCustomPreset, loadPreset, deleteCustomPreset, applyPreset, getAnalyserNode
 };
+if (typeof window !== 'undefined') {
+  window.saveCustomPreset = saveCustomPreset;
+  window.loadPreset = loadPreset;
+  window.deleteCustomPreset = deleteCustomPreset;
+  window.applyPreset = applyPreset;
+  window.getAnalyserNode = getAnalyserNode;
+}
 (async function init() {
   renderTicks(); applyTheme(); renderSiteNav(); applyBrand(); wireGate();
   setInterval(() => { if (view === 'plan') renderCalendar(); renderTopStats(); }, 60000);
@@ -4346,8 +4906,11 @@ window.FocusDial = {
       FB.auth.onAuthStateChanged(u => {
         if (u) {
           AUTH.mode = 'firebase';
+          const isGoogle = (u.providerData && u.providerData[0] && u.providerData[0].providerId === 'google.com');
+          const token = isGoogle ? (lastGoogleAccessToken || GCAL.token || null) : null;
           enterApp({ id:u.uid, name:u.displayName || (u.email || '').split('@')[0], email:u.email,
-                     provider:(u.providerData[0] && u.providerData[0].providerId === 'google.com') ? 'google' : 'firebase' });
+                     provider:isGoogle ? 'google' : 'firebase',
+                     calendarAccessToken:token, accessToken:token });
           return;
         }
         if (AUTH.user && AUTH.user.provider === 'local') return;   // a local profile is open; not ours to close
@@ -4373,3 +4936,31 @@ window.FocusDial = {
   AUTH.ready = true;
   emit('ready', { version:VERSION, storage:STORE.mode, auth:AUTH.mode, signedIn:!!AUTH.user });
 })();
+
+async function sendPasswordResetEmail(email) {
+  if (AUTH.mode === 'local') {
+    throw new Error('Local profiles exist only on this device. You can reset your password directly from device settings.');
+  }
+  await fbInit();
+  return FB.auth.sendPasswordResetEmail(email);
+}
+
+export {
+  saveCustomPreset,
+  loadPreset,
+  deleteCustomPreset,
+  applyPreset,
+  getAnalyserNode,
+  ensureAudio,
+  silenceAll,
+  layerOn,
+  layerVol,
+  LAYERS,
+  SOUND_PRESETS,
+  migrate,
+  DEFAULTS,
+  sendPasswordResetEmail,
+  forgotPasswordModal,
+  enterApp
+};
+

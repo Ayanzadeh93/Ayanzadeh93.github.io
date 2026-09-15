@@ -32,7 +32,7 @@
     "startView":   "focus",
     "migrateFrom": [],
     "auth":        "auto",
-    "emailSignIn": false,
+    "emailSignIn": true,
     "seedAdmin":   false,
     "demo":        true,
     "embedDocs":   false,
@@ -311,7 +311,13 @@
       <div class="grid side">
         <div class="stack" style="gap:16px">
           <div class="card pad">
-            <div class="panel-head"><h3>Layers</h3><div style="display:flex;gap:6px;flex-wrap:wrap" id="soundPresets"></div></div>
+            <div class="panel-head" style="align-items:flex-start;flex-wrap:wrap;gap:10px">
+              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                <h3 style="margin:0">Layers</h3>
+                <button type="button" class="btn sm ghost" id="savePresetBtn" title="Save current mix as a custom preset">Save Current Mix</button>
+              </div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center" id="soundPresets"></div>
+            </div>
             <div class="mix" id="mixGrid"></div>
           </div>
           <div class="card pad">
@@ -620,6 +626,7 @@
         <input type="password" id="gatePass" autocomplete="current-password" placeholder="••••••••"></div>
       <div class="row">
         <label><input type="checkbox" id="gateRemember" checked> Stay signed in on this device</label>
+        <button type="button" class="btn sm ghost" id="gateForgot">Forgot password?</button>
         <button type="button" class="btn sm ghost" id="gateSignup">Create account</button>
       </div>
       <button class="btn primary" type="submit" id="gateGo" style="justify-content:center;padding:10px">Sign in</button>

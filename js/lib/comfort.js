@@ -123,14 +123,15 @@ export function normaliseComfort(raw) {
 
 const FONT_CSS = 'https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap';
 function ensureReadableFont() {
-    if (document.getElementById('comfort-font')) return;
+    if (typeof document === 'undefined' || !document.getElementById || document.getElementById('comfort-font')) return;
     const link = document.createElement('link');
     link.id = 'comfort-font'; link.rel = 'stylesheet'; link.href = FONT_CSS;
-    document.head.appendChild(link);
+    if (document.head) document.head.appendChild(link);
 }
 
 /** Reflect the settings on <html>; the stylesheet does the rest. */
-export function applyComfort(c, root = document.documentElement) {
+export function applyComfort(c, root = (typeof document !== 'undefined' ? document.documentElement : null)) {
+    if (!root) return;
     root.style.setProperty('--ts', String(c.textSize / 100));
     const set = (name, value) => { if (value) root.setAttribute('data-' + name, value); else root.removeAttribute('data-' + name); };
     set('spacing', c.spacing !== 'normal' && c.spacing);
@@ -159,12 +160,19 @@ export function applyComfort(c, root = document.documentElement) {
    --------------------------------------------------------------------------- */
 const pending = { srPolite: [], srAlert: [] }, flushAt = {};
 export function announce(message, urgent = false) {
+    if (typeof document === 'undefined' || !document.getElementById) return;
     const id = urgent ? 'srAlert' : 'srPolite', el = document.getElementById(id);
     if (!el || !message) return;
     pending[id].push(String(message));
     el.textContent = '';
     clearTimeout(flushAt[id]);
-    flushAt[id] = setTimeout(() => { el.textContent = pending[id].join(' '); pending[id] = []; }, 80);
+    flushAt[id] = setTimeout(() => {
+        if (typeof document !== 'undefined' && document.getElementById) {
+            const target = document.getElementById(id);
+            if (target) target.textContent = pending[id].join(' ');
+        }
+        pending[id] = [];
+    }, 80);
 }
 
 /* ---------------------------------------------------------------------------
