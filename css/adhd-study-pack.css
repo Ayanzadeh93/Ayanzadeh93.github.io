@@ -970,6 +970,69 @@ kbd{font-family:var(--font-mono); font-size:.9em; padding:0 4px; border:1px soli
 .help-body{margin:0 0 12px; font-size:calc(13px*var(--ts,1)); color:var(--ink-2); line-height:1.65; max-width:62ch}
 .help-empty{margin:24px 0 0; text-align:center; color:var(--muted); font-size:calc(13px*var(--ts,1))}
 
+/* ---- habits ---- */
+.habits-wrap{display:grid; grid-template-columns:minmax(0,1fr) minmax(260px,320px); gap:18px; max-width:1180px; align-items:start}
+.habit-today{display:grid; gap:10px}
+.habit-today-card .empty{padding:14px}
+.habit-sections{display:flex; flex-direction:column; gap:18px; margin-top:18px}
+.habit-section h3{font-size:calc(14px*var(--ts,1)); font-weight:700; margin:0 0 10px; display:flex; align-items:center; gap:8px}
+.habit-section h3 svg{width:18px; height:18px; stroke:var(--accent); fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round}
+.habit-list{display:grid; gap:10px}
+.habit-card{
+  display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:12px; align-items:center;
+  padding:14px 16px; border:1px solid var(--line); border-radius:var(--r-l); background:var(--surface);
+  transition:border-color .15s, box-shadow .15s;
+}
+.habit-card.done{border-color:color-mix(in srgb, var(--good) 45%, var(--line)); background:color-mix(in srgb, var(--good) 6%, var(--surface))}
+.habit-card.snoozed{opacity:.55}
+.habit-ico{
+  width:44px; height:44px; border-radius:12px; display:grid; place-items:center; flex:none;
+  background:color-mix(in srgb, var(--accent) 12%, var(--surface-2)); color:var(--accent);
+}
+.habit-ico svg{width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round}
+.habit-body{min-width:0}
+.habit-title{margin:0; font-size:calc(14px*var(--ts,1)); font-weight:700; letter-spacing:-.01em}
+.habit-meta{margin:3px 0 0; font-size:calc(11.5px*var(--ts,1)); color:var(--muted); line-height:1.45}
+.habit-actions{display:flex; flex-direction:column; align-items:flex-end; gap:6px}
+.habit-streak{font-size:calc(11px*var(--ts,1)); font-weight:700; color:var(--good); white-space:nowrap}
+.habit-check{
+  width:42px; height:42px; border-radius:50%; border:2px solid var(--line-2); background:var(--surface-2);
+  cursor:pointer; display:grid; place-items:center; transition:background .15s, border-color .15s, transform .12s;
+}
+.habit-check.on{background:var(--good); border-color:var(--good); color:#fff}
+.habit-check svg{width:20px; height:20px; stroke:currentColor; fill:none; stroke-width:2.5; stroke-linecap:round}
+.habit-check:active{transform:scale(.94)}
+.habit-counter{display:flex; align-items:center; gap:8px}
+.habit-counter .cnt{font-family:var(--font-mono); font-size:calc(20px*var(--ts,1)); font-weight:700; min-width:2.5ch; text-align:center}
+.habit-counter .btn.icon{width:36px; height:36px; padding:0; justify-content:center}
+.habit-dots{display:flex; flex-wrap:wrap; gap:5px; margin-top:8px}
+.habit-dot{
+  width:14px; height:14px; border-radius:50%; border:1.5px solid var(--line-2); background:var(--surface-2);
+  transition:background .12s, border-color .12s;
+}
+.habit-dot.on{background:var(--accent); border-color:var(--accent)}
+.habit-clean{text-align:center; padding:4px 0}
+.habit-clean strong{font-family:var(--font-display); font-size:calc(28px*var(--ts,1)); font-weight:700; letter-spacing:-.03em; line-height:1; color:var(--good)}
+.habit-clean span{display:block; font-size:calc(11px*var(--ts,1)); color:var(--muted); margin-top:2px}
+.habit-row-btns{display:flex; gap:6px; flex-wrap:wrap; margin-top:8px}
+.habit-week{display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin-top:8px}
+.habit-week .wk{font-size:calc(9.5px*var(--ts,1)); color:var(--muted); text-align:center; font-weight:600}
+.habit-week .cell{
+  aspect-ratio:1; border-radius:6px; border:1px solid var(--line); background:var(--surface-2);
+  display:grid; place-items:center; font-size:calc(9px*var(--ts,1)); color:var(--muted);
+}
+.habit-week .cell.on{background:color-mix(in srgb, var(--good) 70%, var(--surface)); border-color:var(--good); color:var(--ink)}
+.habit-week .cell.part{background:color-mix(in srgb, var(--accent) 35%, var(--surface)); border-color:var(--accent)}
+.habit-snooze-list{display:flex; flex-direction:column; gap:8px}
+.habit-snooze-item{display:flex; align-items:center; gap:8px; font-size:calc(12px*var(--ts,1))}
+.impulse-stage{display:grid; place-items:center; gap:12px; padding:8px 0}
+.impulse-ring{
+  width:120px; height:120px; border-radius:50%; border:4px solid var(--line);
+  display:grid; place-items:center; font-family:var(--font-mono); font-size:calc(32px*var(--ts,1)); font-weight:700;
+}
+.impulse-ring.run{border-color:var(--accent); color:var(--accent)}
+@media (max-width:900px){ .habits-wrap{grid-template-columns:minmax(0,1fr)} }
+
 .about{max-width:1080px; margin:0 auto; padding-bottom:32px}
 .ab-hero{
   position:relative; overflow:hidden; border-radius:26px; border:1px solid var(--line);

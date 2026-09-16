@@ -12,8 +12,8 @@
    ===================================================================== */
 import { firebaseConfig } from './firebase-config.js';
 import { COMFORT_PRESETS, COMFORT_DEFAULTS, presetComfort, changesFromProfile, normaliseComfort,
-         applyComfort, announce, speech } from './lib/comfort.js?v=3.5.0';   // versioned like the page's own assets: GitHub Pages caches for ten minutes
-import { journal } from './lib/records.js?v=3.5.0';
+         applyComfort, announce, speech } from './lib/comfort.js?v=3.6.0';   // versioned like the page's own assets: GitHub Pages caches for ten minutes
+import { journal } from './lib/records.js?v=3.6.0';
 const $  = (s, r) => (r || (typeof document !== 'undefined' ? document : null))?.querySelector?.(s) || null;
 const $$ = (s, r) => Array.from((r || (typeof document !== 'undefined' ? document : null))?.querySelectorAll?.(s) || []);
 const uid = () => Math.random().toString(36).slice(2, 10);
@@ -37,7 +37,7 @@ const DOW = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
    defaults, then a <script type="application/json" id="focus-dial-config">
    block, then window.FOCUS_DIAL_CONFIG.
    ===================================================================== */
-const VERSION = '3.5.0';
+const VERSION = '3.6.0';
 const DEFAULT_CONFIG = {
   storageKey: 'focusdial.v3',
   storage:    'local',            // 'local' | 'session' | 'memory' | 'rest'
@@ -111,7 +111,7 @@ const DEFAULTS = () => ({
      the workspace document. sessions, checkins and moods are history: they only
      grow, so they live in the journal database (js/lib/records.js) and are held
      here in memory for rendering. saveSnapshot() leaves them out of the write. */
-  tasks: [], events: [], notes: [], sessions: [], checkins: [], moods: [], subjects: [], links: [],
+  tasks: [], events: [], notes: [], habits: [], sessions: [], checkins: [], moods: [], subjects: [], links: [],
   sound: { master:60, layers:{}, beat:10, carrier:180, presets:{} },
   gcal: { on:false, cals:[], hideDeclined:true, push:true, target:'primary', links:{} },
   timer: { phase:'focus', cycle:1, taskId:null, intent:'', activation:null },
@@ -330,8 +330,9 @@ function migrate(raw) {
   ['settings','lists','sound','gcal','timer','meta'].forEach(k => out[k] = Object.assign(DEFAULTS()[k], raw[k] || {}));
   if (!out.sound.presets || typeof out.sound.presets !== 'object') out.sound.presets = {};
   out.settings.comfort = normaliseComfort(out.settings.comfort);      // keys added since it was saved
-  ['tasks','events','notes','sessions','checkins','moods','subjects','links'].forEach(k => { if (!Array.isArray(out[k])) out[k] = []; });
+  ['tasks','events','notes','habits','sessions','checkins','moods','subjects','links'].forEach(k => { if (!Array.isArray(out[k])) out[k] = []; });
   out.tasks.forEach(t => { if (!('quad' in t)) t.quad = null; if (!t.id) t.id = uid(); });
+  out.habits = out.habits.map(normaliseHabit).filter(Boolean);
   out.schema = 4;
   return out;
 }
@@ -735,6 +736,7 @@ function go(v, opts) {
   if (v === 'tasks') renderTasks();
   if (v === 'matrix') renderMatrix();
   if (v === 'mood') renderMood();
+  if (v === 'habits') renderHabits();
   if (v === 'about') renderAbout();
   if (v === 'help') renderHelp();
   if (moved && !(opts && opts.quiet)) {
@@ -3123,6 +3125,7 @@ async function gcalConnect() {
     GCAL.busy = false;
     const n = await gcalPush();
     toast('Google Calendar connected' + (n && n.made ? ` — ${plural(n.made, 'block')} sent to Google` : ''));
+    gcalSyncAllHabits();
   } catch (e) { gcalFail(e); }
   GCAL.busy = false;
   renderCalendar(); renderFocusSide(); renderGcal();
@@ -3258,7 +3261,7 @@ const TIMER_PRESETS = Object.assign({
    ===================================================================== */
 const SET_SECTIONS = ['profile','seeing','motion','focus','speech','keys','timer','prompts','data'];
 let setSec = (() => { try { return sessionStorage.getItem(CFG.storageKey + '.setup') || 'profile'; } catch (e) { return 'profile'; } })();
-const HIDEABLE_VIEWS = [['plan','Plan'],['matrix','Matrix'],['notes','Notes'],['sound','Sound'],['calm','Calm'],['mood','Mood'],['stats','Stats'],['help','Help'],['about','About']];
+const HIDEABLE_VIEWS = [['plan','Plan'],['matrix','Matrix'],['notes','Notes'],['sound','Sound'],['calm','Calm'],['mood','Mood'],['habits','Habits'],['stats','Stats'],['help','Help'],['about','About']];
 const COMFORT_LABELS = {
   textSize:'Text size', spacing:'Spacing', font:'Typeface', contrast:'Contrast', color:'Colour', focusRing:'Focus outline',
   underlineLinks:'Underlined links', motion:'Motion', messages:'Pop-up messages', messageTime:'Message duration', coaching:'Coaching',
@@ -3624,6 +3627,7 @@ const COMMANDS = () => [
   { k:'Go to Sound', s:'6', run:() => go('sound') },
   { k:'Go to Calm', s:'7', run:() => go('calm') },
   { k:'Go to Mood', s:'8', run:() => go('mood') },
+  { k:'Go to Habits and routines', s:'', run:() => go('habits') },
   { k:'Go to Statistics', s:'9', run:() => go('stats') },
   { k:'Go to Setup', s:'0', run:() => go('settings') },
   { k:'Log how you feel right now', s:'', run:() => { go('mood'); const f = document.getElementById('md_mood'); if (f) f.focus(); } },
@@ -4145,9 +4149,435 @@ function renderMoodList() {
 }
 
 /* =====================================================================
+   HABITS — build good routines, break bad ones, count what matters
+   ===================================================================== */
+const HABIT_ICONS = {
+  water: '<path d="M12 2.5c-3 5.5-6 9.5-6 13a6 6 0 0 0 12 0c0-3.5-3-7.5-6-13z"/>',
+  coffee: '<path d="M6 8h10v8a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V8z"/><path d="M16 10h2a2 2 0 0 1 0 4h-2M9 2v2M13 2v2"/>',
+  stretch: '<path d="M12 4v4M8 8l4 4 4-4M6 20l3-6M18 20l-3-6M12 14v6"/>',
+  meds: '<rect x="7" y="3" width="10" height="18" rx="5"/><path d="M7 12h10"/>',
+  read: '<path d="M4 6.5A2.5 2.5 0 0 1 6.5 4H20v16H6.5A2.5 2.5 0 0 1 4 17.5z"/><path d="M4 6.5V17.5"/>',
+  sleep: '<path d="M21 14.5A7.5 7.5 0 1 1 10 6.3"/>',
+  walk: '<path d="M14 4a2 2 0 1 0-4 0M12 6v5l-3 2M9 18l-1 3M15 18l1 3M12 13l3 3"/>',
+  eat: '<path d="M12 3c-4 4-6 7-6 10a6 6 0 0 0 12 0c0-3-2-6-6-10z"/>',
+  phone: '<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/>',
+  snack: '<path d="M6 12h12M6 12c0-3 2-5 6-5s6 2 6 5M6 12v4c0 2 2.5 4 6 4s6-2 6-4v-4"/>',
+  study: '<path d="M4 6h16v12H4z"/><path d="M4 10h16M12 6v12"/>',
+  default: '<path d="M20 6 9 17l-5-5"/>'
+};
+const HABIT_TEMPLATES = [
+  { type:'counter', icon:'water', title:'Water', unit:'glasses', dailyGoal:8, micro:'One glass', cue:'With meals', remindAt:'09:00' },
+  { type:'counter', icon:'coffee', title:'Coffee', unit:'cups', dailyGoal:3, micro:'Track awareness', cue:'Before noon', remindAt:'10:00' },
+  { type:'good', icon:'stretch', title:'Morning stretch', micro:'Touch toes once', target:5, cue:'After waking', remindAt:'07:30' },
+  { type:'good', icon:'meds', title:'Take meds', micro:'Open the bottle', target:7, cue:'With breakfast', remindAt:'08:00' },
+  { type:'good', icon:'read', title:'Daily review', micro:'Open notes for 2 min', target:5, cue:'After lunch', remindAt:'13:00' },
+  { type:'good', icon:'walk', title:'Walk outside', micro:'Step outside the door', target:4, cue:'Before dinner', remindAt:'17:00' },
+  { type:'bad', icon:'phone', title:'Doomscrolling', replacement:'Put the phone in another room for five minutes' },
+  { type:'bad', icon:'snack', title:'Late-night snacking', replacement:'Drink water and wait ten minutes' }
+];
+const IMPULSE_PRESETS = [
+  { label:'1 min pause', seconds:60 },
+  { label:'2 min pause', seconds:120 },
+  { label:'5 min pause', seconds:300 }
+];
+let impulseTimer = null, impulseLeft = 0, habitFilter = 'all';
+
+function habitIconSvg(key) {
+  const d = HABIT_ICONS[key] || HABIT_ICONS.default;
+  return `<svg aria-hidden="true" viewBox="0 0 24 24">${d}</svg>`;
+}
+function normaliseHabit(raw) {
+  if (!raw || typeof raw !== 'object') return null;
+  const h = Object.assign({
+    id:uid(), type:'good', icon:'default', title:'Habit', enabled:true,
+    micro:'', cue:'', target:7, unit:'times', dailyGoal:8, step:1,
+    history:{}, streak:0, bestStreak:0,
+    daysClean:0, lastRelapse:new Date().toISOString(), urges:[], replacement:'',
+    remindAt:'', snoozeDay:null, snoozeUntil:0, gcalLink:null,
+    createdAt:new Date().toISOString()
+  }, raw);
+  if (!h.id) h.id = uid();
+  if (!h.history || typeof h.history !== 'object') h.history = {};
+  if (!Array.isArray(h.urges)) h.urges = [];
+  h.target = Math.max(1, Math.min(7, Number(h.target) || 7));
+  h.dailyGoal = Math.max(1, Math.min(24, Number(h.dailyGoal) || 8));
+  h.step = Math.max(1, Number(h.step) || 1);
+  h.snoozeUntil = Number(h.snoozeUntil) || 0;
+  recalcHabitStats(h);
+  return h;
+}
+function habitById(id) { return S.habits.find(h => h.id === id); }
+function isHabitSnoozed(h) {
+  if (!h) return false;
+  if (h.snoozeUntil && Date.now() < h.snoozeUntil) return true;
+  if (h.snoozeDay && h.snoozeDay === dayKey(new Date())) return true;
+  return false;
+}
+function habitCountToday(h) {
+  const v = h.history[dayKey(new Date())];
+  return typeof v === 'number' ? v : (v ? 1 : 0);
+}
+function habitDoneToday(h) {
+  if (h.type === 'counter') return habitCountToday(h) >= h.dailyGoal;
+  if (h.type === 'good') return !!h.history[dayKey(new Date())];
+  return false;
+}
+function habitStreak(h) {
+  if (h.type !== 'good') return 0;
+  const today = dayKey(new Date());
+  let check = startOfDay(new Date()), streak = 0;
+  if (h.history[today]) {
+    streak = 1;
+    check = new Date(+check - DAY);
+  } else {
+    const y = dayKey(new Date(+startOfDay(new Date()) - DAY));
+    if (!h.history[y]) return 0;
+    check = new Date(+startOfDay(new Date()) - DAY);
+  }
+  while (true) {
+    const k = dayKey(check);
+    if (h.history[k]) { streak++; check = new Date(+check - DAY); }
+    else break;
+  }
+  return streak;
+}
+function habitDaysClean(h) {
+  if (h.type !== 'bad') return 0;
+  const t = Date.parse(h.lastRelapse);
+  if (!t || Number.isNaN(t)) return 0;
+  return Math.max(0, Math.floor((Date.now() - t) / DAY));
+}
+function recalcHabitStats(h) {
+  if (h.type === 'good') {
+    h.streak = habitStreak(h);
+    if (h.streak > h.bestStreak) h.bestStreak = h.streak;
+  } else if (h.type === 'bad') h.daysClean = habitDaysClean(h);
+}
+function snoozeHabit(h, mode) {
+  if (mode === 'today') {
+    h.snoozeDay = dayKey(new Date());
+    const end = startOfDay(new Date()); end.setHours(23, 59, 59, 999);
+    h.snoozeUntil = +end;
+  } else if (mode === '1h') h.snoozeUntil = Date.now() + 3600000;
+  else if (mode === '2h') h.snoozeUntil = Date.now() + 7200000;
+  else if (mode === 'tomorrow') {
+    const t = startOfDay(new Date()); t.setDate(t.getDate() + 1); t.setHours(8, 0, 0, 0);
+    h.snoozeUntil = +t;
+    h.snoozeDay = dayKey(t);
+  } else if (mode === 'clear') { h.snoozeDay = null; h.snoozeUntil = 0; }
+  gcalHabitSync(h);
+  save(); renderHabits();
+  toast(mode === 'clear' ? 'Reminder back on' : 'Snoozed — you can still log manually');
+}
+function toggleGoodHabit(h) {
+  const k = dayKey(new Date());
+  if (h.history[k]) delete h.history[k];
+  else {
+    h.history[k] = true;
+    chime('soft');
+    toast(`${h.title} — logged for today`);
+  }
+  recalcHabitStats(h);
+  save(); renderHabits();
+}
+function bumpCounter(h, delta) {
+  const k = dayKey(new Date());
+  const cur = habitCountToday(h);
+  const next = clamp(cur + delta, 0, h.dailyGoal + 10);
+  if (next <= 0) delete h.history[k];
+  else h.history[k] = next;
+  if (delta > 0 && next === h.dailyGoal) { chime('soft'); toast(`${h.title} — daily goal reached`); }
+  save(); renderHabits();
+}
+function resetBadHabit(h) {
+  h.lastRelapse = new Date().toISOString();
+  recalcHabitStats(h);
+  save(); renderHabits();
+  toast('Relapse logged — the counter reset, not your worth');
+}
+function logUrge(h, note) {
+  h.urges.push({ date:new Date().toISOString(), note:String(note || '').trim() });
+  save(); renderHabits();
+  toast('Urge logged — wait it out or run a pause');
+}
+function startImpulsePause(seconds) {
+  impulseLeft = seconds;
+  openModal('Impulse pause', `
+    <div class="impulse-stage">
+      <div class="impulse-ring run num" id="impulseRing">${seconds}</div>
+      <p style="font-size:calc(13px*var(--ts,1));color:var(--muted);text-align:center;margin:0;max-width:36ch">Do not decide yet. Breathe. The urge often passes before the timer does.</p>
+      <button type="button" class="btn" id="impulseStop">Stop early</button>
+    </div>`,
+    [{ label:'Close' }],
+    () => {
+      const ring = $('#impulseRing'), stop = $('#impulseStop');
+      if (stop) stop.onclick = () => { clearInterval(impulseTimer); impulseTimer = null; closeModal(); };
+      impulseTimer = setInterval(() => {
+        impulseLeft--;
+        if (ring) ring.textContent = String(Math.max(0, impulseLeft));
+        if (impulseLeft <= 0) {
+          clearInterval(impulseTimer); impulseTimer = null;
+          chime('soft');
+          toast('Pause done — decide with a clear head');
+          closeModal();
+        }
+      }, 1000);
+    });
+}
+function gcalHabitBody(h) {
+  const [hh, mm] = (h.remindAt || '09:00').split(':').map(Number);
+  const start = startOfDay(new Date());
+  start.setHours(hh || 9, mm || 0, 0, 0);
+  if (+start < Date.now()) start.setDate(start.getDate() + 1);
+  if (h.snoozeUntil && h.snoozeUntil > Date.now()) start.setTime(h.snoozeUntil);
+  const end = new Date(+start + 15 * 60000);
+  return {
+    summary: `Habit: ${h.title}`,
+    description: `${CFG.appName} habit reminder.${h.micro ? ' Micro step: ' + h.micro : ''}${h.cue ? ' Cue: ' + h.cue : ''}`,
+    start:{ dateTime:start.toISOString() },
+    end:{ dateTime:end.toISOString() },
+    reminders:{ useDefault:false, overrides:[{ method:'popup', minutes:0 }] },
+    extendedProperties:{ private:{ studyPackHabitId:h.id } }
+  };
+}
+async function gcalHabitSync(h) {
+  if (!h || !S.gcal.on || !gcalTokenValid() || !h.remindAt || S.meta.sample) return;
+  try {
+    const cal = S.gcal.target || 'primary';
+    if (isHabitSnoozed(h) && h.gcalLink) {
+      const start = new Date(h.snoozeUntil || Date.now() + 3600000);
+      await gFetch(`/calendars/${enc(cal)}/events/${enc(h.gcalLink.id)}`, {
+        method:'PATCH', body:JSON.stringify({ start:{ dateTime:start.toISOString() }, end:{ dateTime:new Date(+start + 900000).toISOString() } })
+      });
+      return;
+    }
+    if (!h.remindAt) return;
+    const body = gcalHabitBody(h);
+    if (h.gcalLink) {
+      await gFetch(`/calendars/${enc(h.gcalLink.cal || cal)}/events/${enc(h.gcalLink.id)}`, { method:'PATCH', body:JSON.stringify(body) });
+    } else {
+      const g = await gFetch(`/calendars/${enc(cal)}/events`, { method:'POST', body:JSON.stringify(body) });
+      h.gcalLink = { id:g.id, cal };
+    }
+    save();
+  } catch (e) { /* habit reminders are optional */ }
+}
+async function gcalSyncAllHabits() {
+  if (!S.gcal.on || !gcalTokenValid()) return;
+  for (const h of S.habits) if (h.remindAt && h.enabled) await gcalHabitSync(h);
+}
+function habitReminderTick() {
+  if (view !== 'habits' && !S.settings.chime) return;
+  const now = new Date(), hm = pad2(now.getHours()) + ':' + pad2(now.getMinutes());
+  S.habits.forEach(h => {
+    if (!h.enabled || !h.remindAt || h.remindAt !== hm || isHabitSnoozed(h)) return;
+    if (h._lastRemind === hm) return;
+    h._lastRemind = hm;
+    toast(`Reminder: ${h.title}${h.micro ? ' — ' + h.micro : ''}`, 5000, 'coach');
+    if (S.settings.chime) chime('soft');
+    announce(`Habit reminder: ${h.title}`);
+  });
+}
+function habitCardHtml(h, compact) {
+  const snoozed = isHabitSnoozed(h), done = habitDoneToday(h);
+  let action = '';
+  if (h.type === 'good') {
+    action = `<button type="button" class="habit-check ${done ? 'on' : ''}" data-hcheck="${esc(h.id)}" aria-label="${done ? 'Undo' : 'Mark'} ${esc(h.title)} done today" aria-pressed="${done}">
+      <svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></button>`;
+  } else if (h.type === 'counter') {
+    const n = habitCountToday(h);
+    action = `<div class="habit-counter">
+      <button type="button" class="btn icon sm" data-hdec="${esc(h.id)}" aria-label="Remove one ${esc(h.unit)}">−</button>
+      <span class="cnt">${n}</span>
+      <button type="button" class="btn icon sm primary" data-hinc="${esc(h.id)}" aria-label="Add one ${esc(h.unit)}">+</button>
+    </div>`;
+  } else {
+    action = `<div class="habit-clean"><strong class="num">${h.daysClean}</strong><span>days clean</span></div>`;
+  }
+  const dots = h.type === 'counter' && !compact ? `<div class="habit-dots" aria-hidden="true">${Array.from({ length:h.dailyGoal }, (_, i) =>
+    `<span class="habit-dot ${i < habitCountToday(h) ? 'on' : ''}"></span>`).join('')}</div>` : '';
+  const meta = h.type === 'good'
+    ? (h.micro ? esc(h.micro) : '') + (h.cue ? (h.micro ? ' · ' : '') + esc(h.cue) : '')
+    : h.type === 'counter'
+      ? `${habitCountToday(h)} / ${h.dailyGoal} ${esc(h.unit)} today`
+      : (h.replacement ? esc(h.replacement) : 'Log urges, pause before acting');
+  const streak = h.type === 'good' && h.streak ? `<span class="habit-streak">${h.streak}-day streak</span>` : '';
+  const snoozeBtns = compact ? '' : `<div class="habit-row-btns">
+    <button type="button" class="btn sm ghost" data-hsnooze="${esc(h.id)}" data-hmode="1h">Snooze 1h</button>
+    <button type="button" class="btn sm ghost" data-hsnooze="${esc(h.id)}" data-hmode="today">Skip today</button>
+    ${h.remindAt ? `<button type="button" class="btn sm ghost" data-hgcal="${esc(h.id)}" title="Sync reminder to Google Calendar" aria-label="Sync to Google Calendar"><svg aria-hidden="true" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></button>` : ''}
+    <button type="button" class="btn sm ghost" data-hedit="${esc(h.id)}" aria-label="Edit ${esc(h.title)}">Edit</button>
+  </div>`;
+  const badBtns = h.type === 'bad' && !compact ? `<div class="habit-row-btns">
+    <button type="button" class="btn sm" data-hurge="${esc(h.id)}">Log urge</button>
+    <button type="button" class="btn sm" data-hpause="${esc(h.id)}">Pause</button>
+    <button type="button" class="btn sm ghost" data-hreset="${esc(h.id)}">Relapse</button>
+  </div>` : '';
+  return `<article class="habit-card ${done ? 'done' : ''} ${snoozed ? 'snoozed' : ''}" role="listitem" data-hid="${esc(h.id)}">
+    <span class="habit-ico">${habitIconSvg(h.icon)}</span>
+    <div class="habit-body">
+      <h4 class="habit-title">${esc(h.title)}</h4>
+      <p class="habit-meta">${meta || '—'}${h.remindAt && !compact ? ` · Reminder ${esc(h.remindAt)}` : ''}</p>
+      ${dots}${snoozeBtns}${badBtns}
+    </div>
+    <div class="habit-actions">${streak}${action}</div>
+  </article>`;
+}
+function renderHabitToday() {
+  const box = $('#habitToday'), lbl = $('#habitTodayLbl'); if (!box) return;
+  const active = S.habits.filter(h => h.enabled && !isHabitSnoozed(h));
+  const done = active.filter(habitDoneToday).length;
+  if (lbl) lbl.textContent = active.length ? `${done} of ${active.length} done` : 'nothing set up yet';
+  if (!active.length) {
+    box.innerHTML = `<div class="empty">Add a habit from Templates — water, coffee, stretch, or something you are breaking.</div>`;
+    return;
+  }
+  box.innerHTML = active.map(h => habitCardHtml(h, true)).join('');
+  wireHabitCards(box);
+}
+function renderHabitSections() {
+  const box = $('#habitSections'); if (!box) return;
+  const groups = [
+    ['Build', 'good', 'Micro-commitments with forgiving streaks'],
+    ['Counters', 'counter', 'Tap to track — water, coffee, anything countable'],
+    ['Break', 'bad', 'Days clean, urge log, and impulse pause']
+  ];
+  box.innerHTML = groups.map(([title, type, sub]) => {
+    const list = S.habits.filter(h => h.enabled && h.type === type);
+    if (!list.length) return '';
+    return `<section class="habit-section" aria-label="${title}">
+      <h3>${habitIconSvg(type === 'counter' ? 'water' : type === 'bad' ? 'phone' : 'stretch')} ${title}</h3>
+      <p class="habit-meta" style="margin:-4px 0 10px">${sub}</p>
+      <div class="habit-list" role="list">${list.map(h => habitCardHtml(h, false)).join('')}</div>
+    </section>`;
+  }).join('') || (S.habits.length ? '' : '');
+  wireHabitCards(box);
+}
+function renderHabitWeek() {
+  const box = $('#habitWeekCard'); if (!box) return;
+  const good = S.habits.filter(h => h.enabled && h.type === 'good');
+  if (!good.length) { box.innerHTML = `<div class="panel-head"><h3>This week</h3></div><div class="empty">Build habits show a week grid here.</div>`; return; }
+  const days = Array.from({ length:7 }, (_, i) => {
+    const d = new Date(+startOfDay(new Date()) - (6 - i) * DAY);
+    return { k:dayKey(d), lbl:DOW[(d.getDay() + 6) % 7].slice(0, 1) };
+  });
+  box.innerHTML = `<div class="panel-head"><h3>This week</h3><span class="eyebrow">build habits</span></div>` +
+    good.slice(0, 4).map(h => {
+      const cells = days.map(({ k, lbl }) => {
+        const v = h.history[k];
+        const cls = v ? 'on' : '';
+        return `<span class="cell ${cls}" title="${k}">${lbl}</span>`;
+      }).join('');
+      return `<div style="margin-bottom:12px"><div style="font-size:calc(12px*var(--ts,1));font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:6px">
+        <span class="habit-ico" style="width:24px;height:24px;border-radius:7px">${habitIconSvg(h.icon)}</span>${esc(h.title)}</div>
+        <div class="habit-week"><span class="wk">M</span><span class="wk">T</span><span class="wk">W</span><span class="wk">T</span><span class="wk">F</span><span class="wk">S</span><span class="wk">S</span>${cells}</div></div>`;
+    }).join('');
+}
+function renderHabitSnoozed() {
+  const box = $('#habitSnoozedCard'); if (!box) return;
+  const snoozed = S.habits.filter(h => h.enabled && isHabitSnoozed(h));
+  if (!snoozed.length) { box.hidden = true; return; }
+  box.hidden = false;
+  box.innerHTML = `<div class="panel-head"><h3>Snoozed</h3><span class="eyebrow">${snoozed.length}</span></div>
+    <div class="habit-snooze-list">${snoozed.map(h => `<div class="habit-snooze-item">
+      <span class="habit-ico" style="width:28px;height:28px;border-radius:8px">${habitIconSvg(h.icon)}</span>
+      <span style="flex:1">${esc(h.title)}</span>
+      <button type="button" class="btn sm ghost" data-hsnooze="${esc(h.id)}" data-hmode="clear">Wake</button>
+    </div>`).join('')}</div>`;
+  wireHabitCards(box);
+}
+function renderHabitImpulse() {
+  const box = $('#habitImpulseCard'); if (!box) return;
+  box.innerHTML = `<div class="panel-head"><h3>Impulse pause</h3></div>
+    <p class="habit-meta" style="margin:0 0 10px">When an urge hits, start a pause before you act. Pick a length:</p>
+    <div style="display:flex;flex-direction:column;gap:8px">${IMPULSE_PRESETS.map(p =>
+      `<button type="button" class="btn sm" data-hpause-sec="${p.seconds}" style="justify-content:center">${esc(p.label)}</button>`).join('')}</div>`;
+  $$('[data-hpause-sec]', box).forEach(b => b.onclick = () => startImpulsePause(+b.dataset.hpauseSec));
+}
+function wireHabitCards(root) {
+  if (!root) return;
+  root.querySelectorAll('[data-hcheck]').forEach(b => b.onclick = () => toggleGoodHabit(habitById(b.dataset.hcheck)));
+  root.querySelectorAll('[data-hinc]').forEach(b => b.onclick = () => bumpCounter(habitById(b.dataset.hinc), 1));
+  root.querySelectorAll('[data-hdec]').forEach(b => b.onclick = () => bumpCounter(habitById(b.dataset.hdec), -1));
+  root.querySelectorAll('[data-hsnooze]').forEach(b => b.onclick = () => snoozeHabit(habitById(b.dataset.hsnooze), b.dataset.hmode));
+  root.querySelectorAll('[data-hurge]').forEach(b => b.onclick = () => {
+    const h = habitById(b.dataset.hurge);
+    openModal('Log an urge', `<div class="field"><label for="urgeNote">What triggered it?</label><textarea id="urgeNote" rows="3" placeholder="Bored, stressed, alone in the kitchen…"></textarea></div>`,
+      [{ label:'Cancel' }, { label:'Log it', primary:true, onClick:() => { logUrge(h, $('#urgeNote').value); } }]);
+  });
+  root.querySelectorAll('[data-hpause]').forEach(b => b.onclick = () => startImpulsePause(120));
+  root.querySelectorAll('[data-hreset]').forEach(b => b.onclick = () => {
+    const h = habitById(b.dataset.hreset);
+    openModal('Log a relapse?', `<p class="doc">This resets the days-clean counter for “${esc(h.title)}”. It does not erase your progress — it is honest data.</p>`,
+      [{ label:'Cancel' }, { label:'Log relapse', primary:true, onClick:() => { resetBadHabit(h); } }]);
+  });
+  root.querySelectorAll('[data-hgcal]').forEach(b => b.onclick = () => {
+    gcalHabitSync(habitById(b.dataset.hgcal)).then(() => toast('Reminder synced to Google Calendar'));
+  });
+  root.querySelectorAll('[data-hedit]').forEach(b => b.onclick = () => openHabitForm(habitById(b.dataset.hedit)));
+}
+function openHabitForm(existing) {
+  const h = existing || normaliseHabit({ id:uid() });
+  const types = [['good','Build'],['counter','Counter'],['bad','Break']];
+  openModal(existing ? 'Edit habit' : 'New habit', `
+    <div class="field"><label for="hf_title">Name</label><input type="text" id="hf_title" value="${esc(h.title)}" autocomplete="off"></div>
+    <fieldset class="set-fs" role="radiogroup" aria-label="Kind"><div class="seg">${types.map(([v, t]) =>
+      `<label><input type="radio" name="hf_type" value="${v}" ${h.type === v ? 'checked' : ''}><span>${t}</span></label>`).join('')}</div></fieldset>
+    <div class="field"><label for="hf_icon">Icon</label><select id="hf_icon">${Object.keys(HABIT_ICONS).map(k =>
+      `<option value="${k}" ${h.icon === k ? 'selected' : ''}>${k}</option>`).join('')}</select></div>
+    <div class="field hf-good hf-counter"><label for="hf_micro">Micro step</label><input type="text" id="hf_micro" value="${esc(h.micro)}" placeholder="One glass, open the book…"></div>
+    <div class="field hf-good"><label for="hf_cue">Cue</label><input type="text" id="hf_cue" value="${esc(h.cue)}" placeholder="After coffee, before bed…"></div>
+    <div class="field hf-counter"><label for="hf_goal">Daily goal</label><input type="number" id="hf_goal" min="1" max="24" value="${h.dailyGoal}"></div>
+    <div class="field hf-counter"><label for="hf_unit">Unit</label><input type="text" id="hf_unit" value="${esc(h.unit)}" placeholder="glasses, cups…"></div>
+    <div class="field hf-bad"><label for="hf_rep">Instead, try…</label><input type="text" id="hf_rep" value="${esc(h.replacement)}"></div>
+    <div class="field"><label for="hf_remind">Daily reminder</label><input type="time" id="hf_remind" value="${esc(h.remindAt || '')}"></div>`,
+    [{ label:'Cancel' }, { label:existing ? 'Save' : 'Add', primary:true, onClick:() => {
+      h.title = ($('#hf_title').value || '').trim() || 'Habit';
+      const typeEl = $('#modalBody') && $('#modalBody').querySelector('input[name="hf_type"]:checked');
+      h.type = (typeEl && typeEl.value) || 'good';
+      h.icon = $('#hf_icon').value || 'default';
+      h.micro = ($('#hf_micro').value || '').trim();
+      h.cue = ($('#hf_cue').value || '').trim();
+      h.dailyGoal = +($('#hf_goal').value || 8);
+      h.unit = ($('#hf_unit').value || 'times').trim();
+      h.replacement = ($('#hf_rep').value || '').trim();
+      h.remindAt = ($('#hf_remind').value || '').trim();
+      recalcHabitStats(h);
+      if (existing) Object.assign(existing, h);
+      else S.habits.push(h);
+      save(); gcalHabitSync(h); renderHabits();
+    } }]);
+}
+function openHabitTemplates() {
+  openModal('Add from a template', `<div class="habit-list">${HABIT_TEMPLATES.map((t, i) => {
+    const preview = normaliseHabit(Object.assign({ id:'t' + i }, t));
+    return `<button type="button" class="habit-card" style="width:100%;cursor:pointer;text-align:left" data-tpl="${i}">
+      <span class="habit-ico">${habitIconSvg(t.icon)}</span>
+      <div class="habit-body"><h4 class="habit-title">${esc(t.title)}</h4><p class="habit-meta">${esc(t.type)} · ${esc(t.micro || t.replacement || t.unit || '')}</p></div>
+    </button>`;
+  }).join('')}</div>`, [{ label:'Close' }], body => {
+    $$('[data-tpl]', body).forEach(b => b.onclick = () => {
+      const t = HABIT_TEMPLATES[+b.dataset.tpl];
+      S.habits.push(normaliseHabit(Object.assign({ id:uid() }, t)));
+      save(); renderHabits(); closeModal();
+      toast(`Added ${t.title}`);
+    });
+  });
+}
+function renderHabits() {
+  if (!$('#view-habits')) return;
+  renderHabitToday(); renderHabitSections(); renderHabitWeek(); renderHabitSnoozed(); renderHabitImpulse();
+}
+const habitAddBtn = () => $('#habitAddBtn');
+const habitTplBtn = () => $('#habitTemplatesBtn');
+if (habitAddBtn()) habitAddBtn().onclick = () => openHabitForm(null);
+if (habitTplBtn()) habitTplBtn().onclick = openHabitTemplates;
+setInterval(habitReminderTick, 60000);
+
+/* =====================================================================
    HELP — guides and ADHD strategies, kept out of the working views
    ===================================================================== */
-const HELP_CATS = ['All', 'Focus', 'Planning', 'Wellness', 'Sync', 'Tips'];
+const HELP_CATS = ['All', 'Focus', 'Planning', 'Wellness', 'Sync', 'Tips', 'Habits'];
 const HELP_DOCS = [
   { id:'focus', title:'Focus dial', category:'Focus', view:'focus', viewLabel:'Focus',
     body:'Pomodoro intervals with a visual ring and cycles you can shrink to two minutes on a bad day. Write one sentence in Session intent — what "done" looks like. Rate activation before you start; low offers a short run instead of twenty-five minutes. Park distracting thoughts without stopping the clock; they stay until the break. Body double runs quiet co-working prompts. The distraction tally logs drift without shame.' },
@@ -4165,6 +4595,8 @@ const HELP_DOCS = [
     body:'Regulation for two failure modes: too wound up to start, and too wound up to stop. Breathing pacer with several rhythms. Check-in sliders log how you feel. The 90-second 5-4-3-2-1 reset and movement snacks are for breaks.' },
   { id:'mood', title:'Mood and energy journal', category:'Wellness', view:'mood', viewLabel:'Mood',
     body:'How you felt, next to what you did. One entry is a shrug; a month of them shows which days treat you well and which ones cost you. Mood sits beside focus hours so the pattern is evidence, not a feeling.' },
+  { id:'habits', title:'ADHD habit tracker', category:'Habits', view:'habits', viewLabel:'Habits',
+    body:'Three kinds: Build (micro-commitments with forgiving streaks), Counters (water, coffee — tap + and −), and Break (days clean, urge log, impulse pause). Snooze for an hour or skip today without guilt. Reminders can sync to Google Calendar. Templates get you started in one tap.' },
   { id:'stats', title:'Honest statistics', category:'Wellness', view:'stats', viewLabel:'Statistics',
     body:'Not a scoreboard — evidence about when you actually focus well and what pulls you off, so the plan can bend to fit it. Daily bars count completed focus intervals only; paused and abandoned ones do not. Hour-of-day chart averages completed minutes. Heatmap cells darken with more focus minutes; streaks show as runs. Distractions are tallied during sessions. Course chart ranks completed focus minutes.' },
   { id:'setup', title:'Comfort and setup', category:'Wellness', view:'settings', viewLabel:'Setup',
@@ -4925,7 +5357,7 @@ function wireGate() {
    ===================================================================== */
 function renderAll() {
   applyTheme(); renderPips(); renderDial(); renderFocusSide(); renderTasks();
-  renderCalendar(); renderBoard(); renderSound(); renderCalm(); renderMood(); renderSettings(); renderStats(); renderGcal();
+  renderCalendar(); renderBoard(); renderSound(); renderCalm(); renderMood(); renderHabits(); renderSettings(); renderStats(); renderGcal();
   renderBanner(); renderQuickStart(); renderStoreChip(); renderWho(); renderTracking();
   $('#dayStart').value = S.settings.dayStart; $('#dayEnd').value = S.settings.dayEnd;
 }
