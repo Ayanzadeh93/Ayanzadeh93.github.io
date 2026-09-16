@@ -12,8 +12,8 @@
    ===================================================================== */
 import { firebaseConfig } from './firebase-config.js';
 import { COMFORT_PRESETS, COMFORT_DEFAULTS, presetComfort, changesFromProfile, normaliseComfort,
-         applyComfort, announce, speech } from './lib/comfort.js?v=3.4.0';   // versioned like the page's own assets: GitHub Pages caches for ten minutes
-import { journal } from './lib/records.js?v=3.4.0';
+         applyComfort, announce, speech } from './lib/comfort.js?v=3.5.0';   // versioned like the page's own assets: GitHub Pages caches for ten minutes
+import { journal } from './lib/records.js?v=3.5.0';
 const $  = (s, r) => (r || (typeof document !== 'undefined' ? document : null))?.querySelector?.(s) || null;
 const $$ = (s, r) => Array.from((r || (typeof document !== 'undefined' ? document : null))?.querySelectorAll?.(s) || []);
 const uid = () => Math.random().toString(36).slice(2, 10);
@@ -37,7 +37,7 @@ const DOW = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
    defaults, then a <script type="application/json" id="focus-dial-config">
    block, then window.FOCUS_DIAL_CONFIG.
    ===================================================================== */
-const VERSION = '3.4.0';
+const VERSION = '3.5.0';
 const DEFAULT_CONFIG = {
   storageKey: 'focusdial.v3',
   storage:    'local',            // 'local' | 'session' | 'memory' | 'rest'
@@ -736,6 +736,7 @@ function go(v, opts) {
   if (v === 'matrix') renderMatrix();
   if (v === 'mood') renderMood();
   if (v === 'about') renderAbout();
+  if (v === 'help') renderHelp();
   if (moved && !(opts && opts.quiet)) {
     const h = $('#view-' + v + ' .view-head h2') || $('#view-' + v + ' h2');
     if (h) { h.tabIndex = -1; h.focus({ preventScroll:true }); }
@@ -743,7 +744,10 @@ function go(v, opts) {
   }
 }
 $$('.rail-btn[data-view]').forEach(b => b.onclick = () => go(b.dataset.view));
-document.addEventListener('click', e => { const g = e.target.closest('[data-goto]'); if (g) go(g.dataset.goto); });
+document.addEventListener('click', e => {
+  const g = e.target.closest('[data-goto]'); if (g) { go(g.dataset.goto); return; }
+  const h = e.target.closest('[data-help]'); if (h) openHelp(h.dataset.help);
+});
 
 /* =====================================================================
    TIMER — wall-clock anchored so background tab throttling can't drift it
@@ -1814,14 +1818,11 @@ function renderMatrix() {
     : '<div class="empty">Run a few sessions on placed tasks and the split shows up here.</div>');
 
   /* --- guide card --- */
-  $('#mxGuide').innerHTML = `<div class="panel-head"><h3>How to place a task</h3></div>
-    <p style="font-size:calc(12px*var(--ts,1));color:var(--ink-2);line-height:1.6;margin:0 0 10px"><strong>Urgent</strong> is a clock: someone or something is waiting today or tomorrow. <strong>Important</strong> is a consequence: finishing it changes the thesis, the grade, the health, the relationship. They feel identical when you are behind — they are not.</p>
+  $('#mxGuide').innerHTML = `<div class="panel-head"><h3>Quadrants</h3><button type="button" class="help-link btn sm ghost" data-help="matrix" aria-label="Full matrix guide">Guide</button></div>
     ${QORDER.map(k => `<div style="display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-bottom:1px solid var(--line)">
         <span class="mx-badge" style="--q:${QUADS[k].color};margin-top:1px">${QUADS[k].n}</span>
         <div style="flex:1;min-width:0"><div style="font-size:calc(12.5px*var(--ts,1));font-weight:600">${QUADS[k].act}</div>
-        <div style="font-size:calc(11.5px*var(--ts,1));color:var(--muted);line-height:1.4">${QUADS[k].axis}</div></div></div>`).join('')}
-    <p style="font-size:calc(12px*var(--ts,1));color:var(--ink-2);line-height:1.6;margin:11px 0 0">Urgency is loud and importance is quiet, so a brain that responds to loud will spend the whole week in Q1 and Q3 and call it a productive week. Placing a task takes two taps; the matrix is there so the choice is made once, in advance, rather than forty times a day under pressure.</p>
-    <p style="font-size:calc(12px*var(--ts,1));color:var(--muted);line-height:1.6;margin:8px 0 0">One protected Q2 block a day is the entire intervention. The rest is bookkeeping.</p>`;
+        <div style="font-size:calc(11.5px*var(--ts,1));color:var(--muted);line-height:1.4">${QUADS[k].axis}</div></div></div>`).join('')}`;
 }
 /* --- the auxiliary reminder that rides along in the focus view --- */
 function renderFocusMatrix() {
@@ -3257,35 +3258,38 @@ const TIMER_PRESETS = Object.assign({
    ===================================================================== */
 const SET_SECTIONS = ['profile','seeing','motion','focus','speech','keys','timer','prompts','data'];
 let setSec = (() => { try { return sessionStorage.getItem(CFG.storageKey + '.setup') || 'profile'; } catch (e) { return 'profile'; } })();
-const HIDEABLE_VIEWS = [['plan','Plan'],['matrix','Matrix'],['notes','Notes'],['sound','Sound'],['calm','Calm'],['mood','Mood'],['stats','Stats'],['about','About']];
+const HIDEABLE_VIEWS = [['plan','Plan'],['matrix','Matrix'],['notes','Notes'],['sound','Sound'],['calm','Calm'],['mood','Mood'],['stats','Stats'],['help','Help'],['about','About']];
 const COMFORT_LABELS = {
   textSize:'Text size', spacing:'Spacing', font:'Typeface', contrast:'Contrast', color:'Colour', focusRing:'Focus outline',
   underlineLinks:'Underlined links', motion:'Motion', messages:'Pop-up messages', messageTime:'Message duration', coaching:'Coaching',
-  streaks:'Streaks', warnBefore:'Warning before the end', simpleFocus:'Simpler Focus screen', explanations:'Explanations',
+  streaks:'Streaks', warnBefore:'Warning before the end', simpleFocus:'Simpler Focus screen', explanations:'Guide buttons',
   speech:'Built-in voice', srTimeLeft:'Time-left announcements', shortcuts:'Single-key shortcuts'
 };
 
 /* ---- row builders: [kind, key] where kind is 'cf' (comfort) or 'st' (settings) ---- */
 const bindVal = ([kind, key]) => kind === 'cf' ? CF()[key] : S.settings[key];
+function tipBtn(hint) {
+  return hint ? `<button type="button" class="tip-btn" aria-label="More information" data-tip="${esc(hint)}">ℹ</button>` : '';
+}
 function rowSwitch(bind, label, hint, attrs) {
   const id = bind.join('_');
-  return `<div class="set-row"><div class="set-text"><label class="set-label" for="${id}">${label}</label>${hint ? `<p class="set-hint" id="${id}_h">${hint}</p>` : ''}</div>
-    <div class="set-control"><input type="checkbox" role="switch" class="switch" id="${id}" data-${bind[0]}="${bind[1]}" ${bindVal(bind) ? 'checked' : ''} ${hint ? `aria-describedby="${id}_h"` : ''} ${attrs || ''}></div></div>`;
+  return `<div class="set-row"><div class="set-text"><label class="set-label" for="${id}">${label}</label>${tipBtn(hint)}</div>
+    <div class="set-control"><input type="checkbox" role="switch" class="switch" id="${id}" data-${bind[0]}="${bind[1]}" ${bindVal(bind) ? 'checked' : ''} ${attrs || ''}></div></div>`;
 }
 /* A radio group. aria-label carries the name rather than a <legend>: a legend
    inside a grid fieldset keeps the width the browser gives the rendered legend,
    which a visually-hidden rule cannot shrink, and it pushed the page sideways. */
 function rowChoice(bind, label, hint, options) {
   const id = bind.join('_'), val = String(bindVal(bind));
-  return `<fieldset class="set-row set-fs" role="radiogroup" aria-label="${label}"${hint ? ` aria-describedby="${id}_h"` : ''}>
-    <div class="set-text"><span class="set-label" aria-hidden="true">${label}</span>${hint ? `<p class="set-hint" id="${id}_h">${hint}</p>` : ''}</div>
+  return `<fieldset class="set-row set-fs" role="radiogroup" aria-label="${label}">
+    <div class="set-text"><span class="set-label" aria-hidden="true">${label}</span>${tipBtn(hint)}</div>
     <div class="set-control"><div class="seg">${options.map(([v, t], i) =>
       `<label><input type="radio" name="${id}" id="${id}_${i}" value="${esc(String(v))}" data-${bind[0]}="${bind[1]}" ${String(v) === val ? 'checked' : ''}><span>${t}</span></label>`).join('')}</div></div></fieldset>`;
 }
 function rowRange(bind, label, hint, min, max, step, fmt) {
   const id = bind.join('_'), v = bindVal(bind);
-  return `<div class="set-row"><div class="set-text"><label class="set-label" for="${id}">${label} <span class="num" id="${id}_v">${fmt(v)}</span></label>${hint ? `<p class="set-hint" id="${id}_h">${hint}</p>` : ''}</div>
-    <div class="set-control"><input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${v}" data-${bind[0]}="${bind[1]}" aria-valuetext="${fmt(v)}" ${hint ? `aria-describedby="${id}_h"` : ''}></div></div>`;
+  return `<div class="set-row"><div class="set-text"><label class="set-label" for="${id}">${label} <span class="num" id="${id}_v">${fmt(v)}</span></label>${tipBtn(hint)}</div>
+    <div class="set-control"><input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${v}" data-${bind[0]}="${bind[1]}" aria-valuetext="${fmt(v)}"></div></div>`;
 }
 const group = (title, rows) => `<div class="set-group"><h4>${title}</h4>${rows}</div>`;
 const panelHead = (title, lead) => `<h3>${title}</h3>${lead ? `<p class="set-lead">${lead}</p>` : ''}`;
@@ -3443,7 +3447,7 @@ function renderFocusPanel() {
       + rowSwitch(['st','autoBreak'], 'Start breaks by themselves', 'On: the break is already running when the bell rings. Off: every change waits for you.')
       + rowSwitch(['st','autoFocus'], 'Start the next focus block by themselves', 'Off by default — coming back should be your choice.')
       + rowSwitch(['cf','simpleFocus'], 'Simpler Focus screen', 'Shows only the timer, your task, today’s blocks and parked thoughts.')
-      + rowSwitch(['cf','explanations'], 'Explanations under headings', 'The short descriptions like this one. Turn off once you know your way around.')
+      + rowSwitch(['cf','explanations'], 'Guide buttons on each screen', 'Small “Guide” links jump to Help. Turn off once you know your way around — full guides always live in Help.')
       + `<fieldset class="set-row set-fs" role="group" aria-label="Sections in the side bar" aria-describedby="hv_h">
           <div class="set-text"><span class="set-label" aria-hidden="true">Sections in the side bar</span><p class="set-hint" id="hv_h">Hide the ones you do not use. Focus, Tasks and Setup always stay.</p></div>
           <div class="set-control" style="gap:6px 14px">${HIDEABLE_VIEWS.map(([v, t]) =>
@@ -3623,6 +3627,7 @@ const COMMANDS = () => [
   { k:'Go to Statistics', s:'9', run:() => go('stats') },
   { k:'Go to Setup', s:'0', run:() => go('settings') },
   { k:'Log how you feel right now', s:'', run:() => { go('mood'); const f = document.getElementById('md_mood'); if (f) f.focus(); } },
+  { k:'Help and guides', s:'', run:() => go('help') },
   { k:'About the Study Pack', s:'', run:() => go('about') },
   { k:'Auto-schedule this week', s:'', run:() => { go('plan'); $('#autoPlan').click(); } },
   { k:'Sync Google Calendar now', s:'', run:() => { go('plan'); gcalSyncNow(); } },
@@ -4138,6 +4143,98 @@ function renderMoodList() {
     announce('Entry deleted');
   });
 }
+
+/* =====================================================================
+   HELP — guides and ADHD strategies, kept out of the working views
+   ===================================================================== */
+const HELP_CATS = ['All', 'Focus', 'Planning', 'Wellness', 'Sync', 'Tips'];
+const HELP_DOCS = [
+  { id:'focus', title:'Focus dial', category:'Focus', view:'focus', viewLabel:'Focus',
+    body:'Pomodoro intervals with a visual ring and cycles you can shrink to two minutes on a bad day. Write one sentence in Session intent — what "done" looks like. Rate activation before you start; low offers a short run instead of twenty-five minutes. Park distracting thoughts without stopping the clock; they stay until the break. Body double runs quiet co-working prompts. The distraction tally logs drift without shame.' },
+  { id:'plan', title:'Week planner', category:'Planning', view:'plan', viewLabel:'Plan',
+    body:'Your week, your courses, and blocks with start times. Auto-schedule packs sessions into free hours, weights by priority and how far each course is from its weekly target, and puts the heaviest course in your best hours. Google Calendar syncs two-way; .ics import and export work when the connector is not available.' },
+  { id:'tasks', title:'Task list', category:'Planning', view:'tasks', viewLabel:'Tasks',
+    body:'Every task carries a pomodoro estimate and an activation cost — how hard it is to start, which is the part that actually stalls. Start with the dread: one ten-minute run at a high-activation task beats an hour on easy ones. Paste a list, triage unsorted items onto the matrix, or clear finished tasks in one click.' },
+  { id:'matrix', title:'Eisenhower priority matrix', category:'Planning', view:'matrix', viewLabel:'Matrix',
+    body:'Urgency and importance are different axes; an attention system that runs on urgency cannot tell them apart from the inside. Urgent is a clock — someone is waiting today or tomorrow. Important is a consequence — finishing changes the thesis, the grade, the health. Two taps per task separates loud from matters before the day gets a vote. Drag between quadrants or click a task. One protected Q2 block a day is the entire intervention.' },
+  { id:'notes', title:'Sticky notes', category:'Planning', view:'notes', viewLabel:'Notes',
+    body:'Drag notes anywhere on the board. Pinned notes ride along in the Focus view; parked ones came from a session you refused to abandon. Search filters as you type.' },
+  { id:'sound', title:'Procedural sounds and presets', category:'Focus', view:'sound', viewLabel:'Sound',
+    body:'Every layer is synthesised live in your browser — no files, no streaming, works offline. Stack layers, adjust master volume, save the mix as a preset. Binaural tones are a texture you either like or do not — evidence for entrainment is thin. Playlist links open in a new tab. Broadband noise gives an understimulated mind something constant to chew on; lyrics compete with reading.' },
+  { id:'calm', title:'Calm breathing and grounding', category:'Wellness', view:'calm', viewLabel:'Calm',
+    body:'Regulation for two failure modes: too wound up to start, and too wound up to stop. Breathing pacer with several rhythms. Check-in sliders log how you feel. The 90-second 5-4-3-2-1 reset and movement snacks are for breaks.' },
+  { id:'mood', title:'Mood and energy journal', category:'Wellness', view:'mood', viewLabel:'Mood',
+    body:'How you felt, next to what you did. One entry is a shrug; a month of them shows which days treat you well and which ones cost you. Mood sits beside focus hours so the pattern is evidence, not a feeling.' },
+  { id:'stats', title:'Honest statistics', category:'Wellness', view:'stats', viewLabel:'Statistics',
+    body:'Not a scoreboard — evidence about when you actually focus well and what pulls you off, so the plan can bend to fit it. Daily bars count completed focus intervals only; paused and abandoned ones do not. Hour-of-day chart averages completed minutes. Heatmap cells darken with more focus minutes; streaks show as runs. Distractions are tallied during sessions. Course chart ranks completed focus minutes.' },
+  { id:'setup', title:'Comfort and setup', category:'Wellness', view:'settings', viewLabel:'Setup',
+    body:'Five comfort profiles start from ADHD defaults and adjust for calmer motion, larger text, easier reading, or screen readers. Changes apply at once and follow your account across devices. Press ℹ on any switch for a short explanation without cluttering the panel.' },
+  { id:'sync', title:'Cloud and Google Calendar sync', category:'Sync', view:'plan', viewLabel:'Plan',
+    body:'Signed out, everything stays in this browser. Signed in, workspace and history sync to your own Firestore space. Google Calendar access lasts about an hour at a time — press Sync now to refresh. To download an .ics manually: Google Calendar → Settings → Settings for my calendars → your calendar → Integrate calendar.' },
+  { id:'body_doubling', title:'Body doubling strategy', category:'Tips', view:'focus', viewLabel:'Focus',
+    body:'Virtual co-working gives an ADHD attention system external structure: someone else is working too, which lowers the activation cost of starting. Use the Body double button on the Focus screen or a real call — the mechanism is accountability without conversation.' },
+  { id:'pacing', title:'Pomodoro dopamine pacing', category:'Tips', view:'focus', viewLabel:'Focus',
+    body:'Short intense intervals with guaranteed breaks prevent hyperfocus burnout and keep reward predictable. When activation is low, take the two-minute start instead of forcing twenty-five — beginning is the win; length can grow once you are in motion.' },
+  { id:'blindness', title:'Time blindness management', category:'Tips', view:'plan', viewLabel:'Plan',
+    body:'External timers, visual rings, and end-time labels compensate for an unreliable internal clock. Auto-schedule puts blocks on the calendar with real start times. Warn-before-end in Setup gives a quiet heads-up before every switch so changes are never a surprise.' }
+];
+let helpCat = 'all', helpQuery = '', helpScrollId = null;
+
+function filterHelpDocs() {
+  const q = helpQuery.toLowerCase().trim();
+  return HELP_DOCS.filter(d => {
+    const matchCat = helpCat === 'all' || d.category.toLowerCase() === helpCat;
+    const matchText = !q || d.title.toLowerCase().includes(q) || d.body.toLowerCase().includes(q);
+    return matchCat && matchText;
+  });
+}
+function helpCard(d) {
+  const open = d.view ? `<button type="button" class="btn sm ghost" data-goto="${esc(d.view)}">Open ${esc(d.viewLabel || d.title)}</button>` : '';
+  return `<article class="help-card" id="help-${esc(d.id)}">
+    <div class="panel-head"><h3>${esc(d.title)}</h3><span class="chip">${esc(d.category)}</span></div>
+    <p class="help-body">${esc(d.body)}</p>${open}</article>`;
+}
+function renderHelpCats() {
+  const box = $('#helpCats'); if (!box) return;
+  box.innerHTML = HELP_CATS.map((c, i) => {
+    const key = c.toLowerCase(), on = (key === 'all' ? helpCat === 'all' : helpCat === key);
+    return `<button type="button" class="chip help-cat ${on ? 'on' : ''}" role="tab" aria-selected="${on}" tabindex="${on ? 0 : -1}" data-hcat="${esc(key)}" id="hcat_${i}">${esc(c)}</button>`;
+  }).join('');
+  $$('.help-cat', box).forEach(b => b.onclick = () => {
+    helpCat = b.dataset.hcat;
+    renderHelpCats();
+    renderHelpGrid();
+    announce(`Showing ${b.textContent} guides`);
+  });
+}
+function renderHelpGrid() {
+  const grid = $('#helpGrid'), empty = $('#helpEmpty'); if (!grid) return;
+  const docs = filterHelpDocs();
+  if (empty) empty.hidden = docs.length > 0;
+  grid.innerHTML = docs.map(helpCard).join('');
+  if (helpScrollId) {
+    const el = document.getElementById('help-' + helpScrollId);
+    if (el) {
+      el.classList.add('help-focus');
+      el.scrollIntoView({ behavior: motionOff() ? 'auto' : 'smooth', block: 'nearest' });
+      setTimeout(() => el.classList.remove('help-focus'), 2200);
+    }
+    helpScrollId = null;
+  }
+}
+function renderHelp() {
+  const search = $('#helpSearch');
+  if (search && search.value !== helpQuery) search.value = helpQuery;
+  renderHelpCats();
+  renderHelpGrid();
+}
+function openHelp(sectionId) {
+  helpScrollId = sectionId || null;
+  if (sectionId) { helpCat = 'all'; helpQuery = ''; }
+  go('help');
+}
+const helpSearchEl = () => $('#helpSearch');
+if (helpSearchEl()) helpSearchEl().addEventListener('input', e => { helpQuery = e.target.value; renderHelpGrid(); });
 
 /* =====================================================================
    ABOUT — the one showy screen.
