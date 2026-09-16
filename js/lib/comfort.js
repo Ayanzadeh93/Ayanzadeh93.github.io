@@ -39,7 +39,7 @@ export const COMFORT_DEFAULTS = Object.freeze({
     streaks: true,              // streak chip and streak figures
     warnBefore: 0,              // minutes of warning before a timer ends (0 = off)
     simpleFocus: false,         // hide the secondary cards on the Focus screen
-    explanations: true,         // the descriptive paragraphs under headings
+    explanations: true,         // small Guide links on each screen (full text lives in Help)
     hiddenViews: [],            // sections left out of the navigation
     // Reading & speech
     speech: false,              // built-in voice

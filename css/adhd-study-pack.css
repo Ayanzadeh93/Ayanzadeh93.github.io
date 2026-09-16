@@ -103,8 +103,10 @@ button,input,select,textarea{font:inherit; color:inherit}
 .view{display:none; overflow:auto; padding:22px; flex:1; min-height:0}
 .view.on{display:block}
 .view-head{display:flex; align-items:flex-end; gap:14px; margin-bottom:18px; flex-wrap:wrap}
-.view-head h2{font-size:calc(22px*var(--ts,1)); font-weight:700}
+.view-title-row{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+.view-head h2{font-size:calc(22px*var(--ts,1)); font-weight:700; margin:0}
 .view-head p{margin:0; color:var(--muted); font-size:calc(13px*var(--ts,1)); max-width:60ch}
+.help-link{font-size:calc(11px*var(--ts,1)); font-weight:600; padding:2px 9px; letter-spacing:.02em; flex:none}
 
 /* ---------- primitives ---------- */
 .btn{
@@ -736,7 +738,7 @@ svg.chart .lbl{fill:var(--ink-2); font-weight:600}
 [data-coaching="off"] #focusMatrix :is(.mx-nudge,[data-mxswap],[data-mxsort]){display:none}
 [data-streaks="off"] #streakChip{display:none}
 [data-simple="on"] :is(#quickStart,#focusMatrix,.fx-queue,.fx-sound){display:none!important}
-[data-explain="off"] :is(.view-head p,.hint,.mx-note,.cap,.explain){display:none!important}
+[data-explain="off"] :is(.view-head p,.hint,.mx-note,.cap,.explain,.help-link){display:none!important}
 
 /* =====================================================================
    SETUP VIEW
@@ -764,6 +766,12 @@ fieldset.set-row > legend{float:left; padding:0; width:100%}
 fieldset.set-row > legend + *{clear:left}
 .set-label{font-weight:600; font-size:calc(13.5px*var(--ts,1)); color:var(--ink); display:block}
 .set-hint{margin:3px 0 0; color:var(--muted); font-size:calc(12px*var(--ts,1)); line-height:1.55; max-width:62ch}
+.set-text{display:flex; align-items:flex-start; gap:6px; flex-wrap:wrap; flex:1; min-width:0}
+.tip-btn{
+  flex:none; width:22px; height:22px; border-radius:50%; border:1px solid var(--line); background:var(--surface-2);
+  color:var(--muted); font-size:calc(11px*var(--ts,1)); cursor:pointer; line-height:1; padding:0; font-family:var(--font-ui);
+}
+.tip-btn:hover,.tip-btn:focus-visible{color:var(--accent); border-color:var(--accent); outline:none; box-shadow:0 0 0 3px var(--focus-wash)}
 .set-row.stack-row{grid-template-columns:minmax(0,1fr)}
 .set-control{justify-self:end; display:flex; align-items:center; gap:10px; flex-wrap:wrap; min-width:0; max-width:100%}
 /* a voice name can be very long — the control shrinks rather than the row growing */
@@ -939,6 +947,29 @@ kbd{font-family:var(--font-mono); font-size:.9em; padding:0 4px; border:1px soli
    The one screen that is allowed to show off. Every animation is additive:
    with motion off, each piece simply starts where it would have landed.
    ===================================================================== */
+/* ---- help center ---- */
+.help{max-width:760px; margin:0 auto; padding-bottom:28px}
+.help-lead{margin:0 0 18px; font-size:calc(13.5px*var(--ts,1)); color:var(--ink-2); line-height:1.6; max-width:52ch}
+.help-toolbar{display:flex; flex-direction:column; gap:12px; margin-bottom:20px; position:sticky; top:0; z-index:2;
+  padding:12px 0 14px; background:linear-gradient(var(--bg) 70%, transparent)}
+.help-search{
+  width:100%; max-width:420px; padding:10px 12px; border-radius:10px; border:1px solid var(--line);
+  background:var(--surface); font-size:calc(13.5px*var(--ts,1));
+}
+.help-cats{display:flex; gap:6px; flex-wrap:wrap}
+.help-cats .chip{cursor:pointer; border:1px solid var(--line); background:var(--surface)}
+.help-cats .chip.on{background:var(--accent); border-color:transparent; color:var(--accent-ink)}
+.help-grid{display:flex; flex-direction:column; gap:14px}
+.help-card{
+  border:1px solid var(--line); border-radius:var(--r-l); background:var(--surface); padding:16px 18px;
+  scroll-margin-top:88px; transition:border-color .2s, box-shadow .2s;
+}
+.help-card.help-focus{border-color:var(--accent); box-shadow:0 0 0 3px var(--focus-wash)}
+.help-card h3{margin:0; font-size:calc(15px*var(--ts,1)); font-weight:700; letter-spacing:-.01em}
+.help-card .panel-head{margin-bottom:10px; align-items:flex-start}
+.help-body{margin:0 0 12px; font-size:calc(13px*var(--ts,1)); color:var(--ink-2); line-height:1.65; max-width:62ch}
+.help-empty{margin:24px 0 0; text-align:center; color:var(--muted); font-size:calc(13px*var(--ts,1))}
+
 .about{max-width:1080px; margin:0 auto; padding-bottom:32px}
 .ab-hero{
   position:relative; overflow:hidden; border-radius:26px; border:1px solid var(--line);
