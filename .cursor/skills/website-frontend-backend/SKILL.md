@@ -33,7 +33,7 @@ Transitions) are fair game, because the browser runs the source files as written
 ├── js/lib/                 # Pure helpers: dom.js, citations.js, search.js
 ├── js/components/          # <pub-explorer>, <cite-dialog>, index.js entry
 ├── apps/                   # Standalone reference apps
-├── data/                   # JSON content: projects.json, claude-code/catalog.json
+├── data/                   # JSON content: projects.json
 ├── tests/validate_content.py  # Schema + route validation, run in CI
 ├── projects/*.html         # One page per project
 ├── sitemap.xml / robots.txt
@@ -48,12 +48,11 @@ changes are data edits and must never require touching rendering code**:
 | Data file | Rendered by | Covers |
 |-----------|-------------|--------|
 | `data/projects.json` | `js/projects-index.js`, `js/project-detail.js` | The projects index and detail routes |
-| `data/claude-code/catalog.json` | `apps/claude-code-encyclopedia.html` (GitHub family) | GitHub CLI entries in the encyclopedia. Claude Code and Codex remain embedded in that page. `apps/claude-code-catalog.html` redirects there. |
+| GitHub CLI catalog (standalone) | [`Ayanzadeh93/claude-code-encyclopedia`](https://github.com/Ayanzadeh93/claude-code-encyclopedia) | GitHub CLI entries live with the encyclopedia app. `apps/claude-code-*.html` in this repo are redirects. |
 
-`tests/validate_content.py` validates both on every push and pull request via
-`.github/workflows/content-validation.yml`. It enforces unique ids, resolvable
-cross-references, populated families and sections, well-formed examples, and
-size budgets on the route assets. **Run it before committing a data change** —
+`tests/validate_content.py` validates `data/projects.json` and lightweight
+route contracts on every push and pull request via
+`.github/workflows/content-validation.yml`. **Run it before committing a data change** —
 it is faster than a CI round trip:
 
 ```bash
@@ -168,16 +167,12 @@ Copy checklists from [reference.md](reference.md) when executing these tasks.
 
 ### Add a CLI catalog entry
 
-1. Add the record to `data/claude-code/catalog.json` — nothing else.
+GitHub CLI records live in the standalone encyclopedia repo, not this one.
+
+1. Add the record to [`Ayanzadeh93/claude-code-encyclopedia`](https://github.com/Ayanzadeh93/claude-code-encyclopedia) `data/catalog.json`.
 2. Required fields: `id`, `section`, `name`, `type`, `description`, `aliases`,
    `examples`, `introducedVersion`, `tags`, `note`. Ids are `<section>-<slug>`.
-3. `section` must exist in `sections`, and that section's `family` must exist in
-   `families`. Every example needs both a `command` and a `label`; the label is
-   rendered as the code block's caption, so name the surface (`shell`, `json`,
-   `settings.json`).
-4. Run `python tests/validate_content.py`.
-5. Verify any external identifier — a DOI, a documented flag — before adding it.
-   A confidently wrong reference entry is worse than a missing one.
+3. Run `python3 tests/validate_catalog.py` in that repo.
 
 ### Add a custom element
 
