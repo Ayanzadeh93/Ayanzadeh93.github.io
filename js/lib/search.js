@@ -10,8 +10,13 @@
  * and tested independently of the component that renders it.
  */
 
-/** Field weights. Title dominates; year is a weak signal on its own. */
-const FIELD_WEIGHTS = {
+/**
+ * Default field weights, tuned for the publication list: title dominates and
+ * year is a weak signal on its own. Any caller with differently-shaped records
+ * passes its own map instead — the keys just have to match the record's
+ * haystack, so the scoring engine itself stays domain-agnostic.
+ */
+export const DEFAULT_WEIGHTS = {
     title: 10,
     authors: 6,
     venue: 4,
@@ -49,9 +54,10 @@ export function tokenize(query) {
  *
  * @param {Object} record  a searchable record with a `haystack` field map
  * @param {string[]} tokens
+ * @param {Object<string, number>} [weights] field weights, defaulting to DEFAULT_WEIGHTS
  * @returns {number} 0 when the record does not match
  */
-export function scoreRecord(record, tokens) {
+export function scoreRecord(record, tokens, weights = DEFAULT_WEIGHTS) {
     if (tokens.length === 0) return 1;
 
     let total = 0;
@@ -59,7 +65,7 @@ export function scoreRecord(record, tokens) {
     for (const token of tokens) {
         let best = 0;
 
-        for (const [field, weight] of Object.entries(FIELD_WEIGHTS)) {
+        for (const [field, weight] of Object.entries(weights)) {
             const value = record.haystack[field];
             if (!value) continue;
 
@@ -90,17 +96,18 @@ export function scoreRecord(record, tokens) {
  * @param {string} [criteria.query]
  * @param {string} [criteria.type]  record type, or 'all'
  * @param {string} [criteria.sort]  'relevance' | 'newest' | 'oldest'
+ * @param {Object<string, number>} [criteria.weights] override the field weights
  * @returns {Object[]} matching records, ordered
  */
 export function filterRecords(records, criteria = {}) {
-    const { query = '', type = 'all', sort = 'newest' } = criteria;
+    const { query = '', type = 'all', sort = 'newest', weights = DEFAULT_WEIGHTS } = criteria;
     const tokens = tokenize(query);
 
     const matches = [];
     for (const record of records) {
         if (type !== 'all' && record.type !== type) continue;
 
-        const score = scoreRecord(record, tokens);
+        const score = scoreRecord(record, tokens, weights);
         if (score === 0) continue;
 
         matches.push({ record, score });

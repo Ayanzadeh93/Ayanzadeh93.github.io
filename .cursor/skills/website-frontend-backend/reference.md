@@ -42,7 +42,7 @@
 - [ ] File: projects/<slug>.html
 - [ ] Title: "<Project Name> | Aydin Ayanzadeh"
 - [ ] Meta description (1–2 sentences)
-- [ ] Canonical: https://ayanzadeh93.github.io/projects/<slug>.html
+- [ ] Canonical: https://www.ayanzadeh.com/projects/<slug>.html
 - [ ] Hero: badges, h1, tagline, meta items (author, institution, dates)
 - [ ] Action links (paper, code, demo) with rel="noopener noreferrer" on external targets
 - [ ] Card on index.html#projects with matching link
@@ -92,7 +92,7 @@ Dark overrides: `:root[data-theme="dark"]` and `[data-theme="dark"] .component` 
 
 ```xml
 <url>
-    <loc>https://ayanzadeh93.github.io/projects/new-project.html</loc>
+    <loc>https://www.ayanzadeh.com/projects/new-project.html</loc>
     <lastmod>YYYY-MM-DD</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -181,3 +181,55 @@ title 10 / authors 6 / venue 4 / tags 3 / year 2.
 5. Enhance markup that is already in the page. If the element renders content
    that is not in the HTML, the no-JS and crawler view loses it.
 6. Ship JS-only controls as `hidden` in the markup and unhide them on upgrade.
+
+## CLI Catalog Entry Template
+
+Records live in the standalone [`claude-code-encyclopedia`](https://github.com/Ayanzadeh93/claude-code-encyclopedia)
+repo (`data/catalog.json`). The live app is
+https://www.ayanzadeh.com/claude-code-encyclopedia/. Adding a `gh` command is a
+data edit in that repo. Older `apps/claude-code-catalog.html` URLs on this site
+redirect there and keep query and hash.
+
+```json
+{
+  "id": "ghpr-gh-pr-merge",
+  "section": "ghpr",
+  "name": "gh pr merge",
+  "type": "Pull request",
+  "description": "One sentence, present tense, saying what the command does.",
+  "aliases": [],
+  "examples": [
+    { "command": "gh pr merge 42 --squash --delete-branch", "label": "squash" }
+  ],
+  "introducedVersion": null,
+  "tags": ["pull request", "merge", "squash"],
+  "note": "The caveat a reader would otherwise learn the hard way, or null."
+}
+```
+
+| Field | Rule |
+|-------|------|
+| `id` | `<section>-<slugified name>`, unique across the file. Also the deep-link anchor, so keep it stable. |
+| `section` | Must exist in `sections`; that section's `family` must exist in `families`. |
+| `name` | Rendered in monospace as the card heading. Unique within its section. |
+| `description` | One sentence. The card summary, and a mid-weight search field. |
+| `examples` | Each needs `command` and `label`. The label captions the code block — name the surface (`shell`, `json`, `settings.json`, `enterprise`). |
+| `tags` | At least one. Searchable, and the first six render as chips. |
+| `note` | Use it for the caveat, not for restating the description. `null` when there isn't one. |
+
+Search in the live encyclopedia is name-first and token AND-ed.
+
+Two rendering modes, chosen by whether a query is active:
+
+- **No query** — entries are grouped under section headings in the catalog's
+  authored order, so the page reads as a document.
+- **With a query** — a flat list in relevance order. Grouping here would re-sort
+  the results and bury the best match under whichever section sorts first.
+
+### Adding a family
+
+1. Append to `families` with `id`, `label`, `blurb` and `source`.
+2. Add its sections to `sections`, each carrying that `family` id.
+3. Add entries. The validator rejects an empty family or an empty section, so a
+   new family must ship with content.
+4. Run `python tests/validate_content.py`.

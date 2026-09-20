@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updated": "2026-09-08",
+  "updated": "2026-09-20",
   "projects": [
     {
       "id": "indoor-navigation",
@@ -15,13 +15,30 @@
         "Combines scene understanding, floor-plan reasoning, and navigation guidance.",
         "Designed around accessibility and practical indoor mobility workflows."
       ],
-      "methods": ["Vision-language models", "Computer vision", "Graph reasoning", "Assistive AI"],
-      "tags": ["VLM", "Accessibility", "Indoor Navigation", "Computer Vision"],
+      "methods": [
+        "Vision-language models",
+        "Computer vision",
+        "Graph reasoning",
+        "Assistive AI"
+      ],
+      "tags": [
+        "VLM",
+        "Accessibility",
+        "Indoor Navigation",
+        "Computer Vision"
+      ],
       "legacyPage": "indoor-navigation.html",
       "links": [
-        {"label": "Existing project page", "href": "indoor-navigation.html", "kind": "page"}
+        {
+          "label": "Existing project page",
+          "href": "indoor-navigation.html",
+          "kind": "page"
+        }
       ],
-      "related": ["claude-code-encyclopedia", "vision-language-medical"]
+      "related": [
+        "claude-code-encyclopedia",
+        "vision-language-medical"
+      ]
     },
     {
       "id": "wildfire-vlm",
@@ -36,36 +53,143 @@
         "Connects visual wildfire evidence with language-based risk interpretation.",
         "Targets remote-sensing and environmental decision-support settings."
       ],
-      "methods": ["Vision-language models", "Remote sensing", "Satellite imagery", "Risk assessment"],
-      "tags": ["Wildfire", "VLM", "Remote Sensing", "IGARSS 2026"],
+      "methods": [
+        "Vision-language models",
+        "Remote sensing",
+        "Satellite imagery",
+        "Risk assessment"
+      ],
+      "tags": [
+        "Wildfire",
+        "VLM",
+        "Remote Sensing",
+        "IGARSS 2026"
+      ],
       "legacyPage": "wildfire-vlm.html",
       "links": [
-        {"label": "Existing project page", "href": "wildfire-vlm.html", "kind": "page"}
+        {
+          "label": "Existing project page",
+          "href": "wildfire-vlm.html",
+          "kind": "page"
+        }
       ],
-      "related": ["indoor-navigation", "vision-language-medical"]
+      "related": [
+        "indoor-navigation",
+        "vision-language-medical"
+      ]
     },
     {
       "id": "claude-code-encyclopedia",
       "title": "Claude Code Encyclopedia",
-      "subtitle": "Searchable Claude Code and Codex CLI reference",
+      "subtitle": "Searchable Claude Code, Codex and GitHub CLI reference",
       "category": "Developer Tools",
       "status": "Live",
       "featured": true,
       "year": 2026,
-      "summary": "A searchable, offline-capable reference covering 504 commands, flags, settings keys, hooks, and configuration paths across Claude Code and OpenAI Codex CLI.",
+      "summary": "A searchable reference covering Claude Code, OpenAI Codex CLI and GitHub CLI in one encyclopedia UI: commands, flags, settings keys, hooks, gh workflows and configuration paths, with OS-aware examples. GitHub CLI entries are loaded from a structured JSON catalog so adding a command is a data edit.",
       "highlights": [
-        "504 reference entries across 18 sections.",
-        "OS-aware examples, version awareness, keyboard navigation, and local favorites."
+        "One encyclopedia UI for Claude Code, Codex CLI and GitHub CLI, with family filters and deep links.",
+        "Lives in its own repo (Ayanzadeh93/claude-code-encyclopedia) and GitHub Pages app, same pattern as the ADHD Study Pack.",
+        "504 embedded Claude and Codex entries, plus GitHub CLI records loaded from structured JSON.",
+        "OS-aware examples, version awareness, keyboard navigation, and local favorites.",
+        "Older catalog URLs redirect into the encyclopedia and keep family, search and hash."
       ],
-      "methods": ["Vanilla JavaScript", "Static data", "Client-side search", "Progressive enhancement"],
-      "tags": ["Claude Code", "Codex CLI", "Developer Tools", "Offline"],
+      "methods": [
+        "Vanilla JavaScript",
+        "ES modules",
+        "Structured JSON data layer",
+        "Client-side ranked search",
+        "Progressive enhancement"
+      ],
+      "tags": [
+        "Claude Code",
+        "Codex CLI",
+        "GitHub CLI",
+        "Developer Tools",
+        "Offline"
+      ],
       "legacyPage": "claude-code-encyclopedia.html",
       "links": [
-        {"label": "Project page", "href": "claude-code-encyclopedia.html", "kind": "page"},
-        {"label": "Launch encyclopedia", "href": "../apps/claude-code-encyclopedia.html", "kind": "app"},
-        {"label": "Data-backed catalog preview", "href": "../apps/claude-code-catalog.html", "kind": "app"}
+        {
+          "label": "Project page",
+          "href": "claude-code-encyclopedia.html",
+          "kind": "page"
+        },
+        {
+          "label": "Launch encyclopedia",
+          "href": "https://www.ayanzadeh.com/claude-code-encyclopedia/",
+          "kind": "app"
+        },
+        {
+          "label": "GitHub CLI",
+          "href": "https://www.ayanzadeh.com/claude-code-encyclopedia/?family=github",
+          "kind": "app"
+        },
+        {
+          "label": "Source",
+          "href": "https://github.com/Ayanzadeh93/claude-code-encyclopedia",
+          "kind": "repo"
+        }
       ],
-      "related": ["indoor-navigation", "ml-data-pipeline"]
+      "related": [
+        "indoor-navigation",
+        "ml-data-pipeline"
+      ]
+    },
+    {
+      "id": "adhd-study-pack",
+      "title": "ADHD Study Pack",
+      "subtitle": "Pomodoro workspace for an ADHD attention system",
+      "category": "Assistive Tooling",
+      "status": "Live",
+      "featured": true,
+      "year": 2026,
+      "summary": "A browser-based Pomodoro workspace built around how an ADHD study session actually falls apart: a focus dial with intervals you can shrink to a two-minute start, an Eisenhower matrix, a week planner, habits, a Help centre, and a Passport of focus achievements — with Google sign-in that syncs the workspace.",
+      "highlights": [
+        "Eisenhower priority matrix with drag-and-drop, one-at-a-time triage and a check on where focus time really went.",
+        "Week planner with courses, weekly targets and an auto-scheduler that favours your historically best hours; .ics import and export.",
+        "Focus dial with interval presets, activation rating, distraction tally, brain dump and a body-double mode.",
+        "Synthesised focus sounds, breathing and grounding tools, and Google sign-in that syncs the workspace across devices.",
+        "Comfort profiles for conflicting needs — ADHD by default, with Calm and predictable, Low vision, Easier reading and Screen reader as starting points, then every setting adjustable: WCAG 2.2 AA, NVDA, JAWS, Narrator, VoiceOver and TalkBack, and a built-in voice for reading aloud.",
+        "Mood, energy and stress logged in seconds and charted against the hours actually worked, on a journal database (IndexedDB locally, one Firestore document per record when signed in) that scales past the single-document ceiling.",
+        "Help centre and a habit tracker (build, counters, break) with forgiving streaks and optional calendar reminders.",
+        "Passport: display name, photo and bio on the same Google or email account, plus animated badges earned from finished focus sessions (First Spark through Focus Legend)."
+      ],
+      "methods": [
+        "Vanilla JavaScript",
+        "ES modules",
+        "Web Audio API",
+        "Firebase Authentication",
+        "Cloud Firestore"
+      ],
+      "tags": [
+        "Accessibility",
+        "Assistive Tooling",
+        "Executive Function",
+        "Productivity"
+      ],
+      "legacyPage": "adhd-study-pack.html",
+      "links": [
+        {
+          "label": "Project page",
+          "href": "adhd-study-pack.html",
+          "kind": "page"
+        },
+        {
+          "label": "Open the Study Pack",
+          "href": "https://www.ayanzadeh.com/adhd-study-pack/",
+          "kind": "app"
+        },
+        {
+          "label": "Source",
+          "href": "https://github.com/Ayanzadeh93/adhd-study-pack",
+          "kind": "repo"
+        }
+      ],
+      "related": [
+        "indoor-navigation",
+        "claude-code-encyclopedia"
+      ]
     },
     {
       "id": "medical-segmentation",
@@ -80,13 +204,29 @@
         "Focuses on segmentation and classification workflows.",
         "Designed for imbalanced medical-imaging datasets."
       ],
-      "methods": ["Deep learning", "Image segmentation", "Medical imaging", "Class imbalance"],
-      "tags": ["Medical AI", "Segmentation", "Deep Learning"],
+      "methods": [
+        "Deep learning",
+        "Image segmentation",
+        "Medical imaging",
+        "Class imbalance"
+      ],
+      "tags": [
+        "Medical AI",
+        "Segmentation",
+        "Deep Learning"
+      ],
       "legacyPage": "medical-segmentation.html",
       "links": [
-        {"label": "Existing project page", "href": "medical-segmentation.html", "kind": "page"}
+        {
+          "label": "Existing project page",
+          "href": "medical-segmentation.html",
+          "kind": "page"
+        }
       ],
-      "related": ["vision-language-medical", "knowledge-distillation"]
+      "related": [
+        "vision-language-medical",
+        "knowledge-distillation"
+      ]
     },
     {
       "id": "vision-language-medical",
@@ -101,13 +241,30 @@
         "Explores zero-shot medical-image classification.",
         "Connects medical visual features with language representations."
       ],
-      "methods": ["CLIP", "Vision-language learning", "Medical imaging", "Zero-shot learning"],
-      "tags": ["Medical AI", "CLIP", "VLM", "Zero-shot"],
+      "methods": [
+        "CLIP",
+        "Vision-language learning",
+        "Medical imaging",
+        "Zero-shot learning"
+      ],
+      "tags": [
+        "Medical AI",
+        "CLIP",
+        "VLM",
+        "Zero-shot"
+      ],
       "legacyPage": "vision-language-medical.html",
       "links": [
-        {"label": "Existing project page", "href": "vision-language-medical.html", "kind": "page"}
+        {
+          "label": "Existing project page",
+          "href": "vision-language-medical.html",
+          "kind": "page"
+        }
       ],
-      "related": ["medical-segmentation", "indoor-navigation"]
+      "related": [
+        "medical-segmentation",
+        "indoor-navigation"
+      ]
     },
     {
       "id": "knowledge-distillation",
@@ -122,13 +279,28 @@
         "Focuses on efficient transfer from larger teacher models to smaller students.",
         "Targets reduced deployment cost while retaining predictive quality."
       ],
-      "methods": ["Knowledge distillation", "Model compression", "Deep learning"],
-      "tags": ["Efficient AI", "Distillation", "Compression"],
+      "methods": [
+        "Knowledge distillation",
+        "Model compression",
+        "Deep learning"
+      ],
+      "tags": [
+        "Efficient AI",
+        "Distillation",
+        "Compression"
+      ],
       "legacyPage": "knowledge-distillation.html",
       "links": [
-        {"label": "Existing project page", "href": "knowledge-distillation.html", "kind": "page"}
+        {
+          "label": "Existing project page",
+          "href": "knowledge-distillation.html",
+          "kind": "page"
+        }
       ],
-      "related": ["medical-segmentation", "graph-autoencoder"]
+      "related": [
+        "medical-segmentation",
+        "graph-autoencoder"
+      ]
     },
     {
       "id": "graph-autoencoder",
@@ -143,13 +315,29 @@
         "Uses graph autoencoding for representation learning.",
         "Explores residual connections in graph neural networks."
       ],
-      "methods": ["Graph neural networks", "Autoencoders", "Representation learning", "Residual connections"],
-      "tags": ["GNN", "Graph ML", "Autoencoder"],
+      "methods": [
+        "Graph neural networks",
+        "Autoencoders",
+        "Representation learning",
+        "Residual connections"
+      ],
+      "tags": [
+        "GNN",
+        "Graph ML",
+        "Autoencoder"
+      ],
       "legacyPage": "graph-autoencoder.html",
       "links": [
-        {"label": "Existing project page", "href": "graph-autoencoder.html", "kind": "page"}
+        {
+          "label": "Existing project page",
+          "href": "graph-autoencoder.html",
+          "kind": "page"
+        }
       ],
-      "related": ["knowledge-distillation", "ml-data-pipeline"]
+      "related": [
+        "knowledge-distillation",
+        "ml-data-pipeline"
+      ]
     },
     {
       "id": "ml-data-pipeline",
@@ -164,13 +352,29 @@
         "Automates preprocessing and feature-engineering stages.",
         "Designed around high-volume machine-learning data workflows."
       ],
-      "methods": ["Data engineering", "ML pipelines", "Feature engineering", "Automation"],
-      "tags": ["ML Systems", "Data Pipeline", "Automation"],
+      "methods": [
+        "Data engineering",
+        "ML pipelines",
+        "Feature engineering",
+        "Automation"
+      ],
+      "tags": [
+        "ML Systems",
+        "Data Pipeline",
+        "Automation"
+      ],
       "legacyPage": "ml-data-pipeline.html",
       "links": [
-        {"label": "Existing project page", "href": "ml-data-pipeline.html", "kind": "page"}
+        {
+          "label": "Existing project page",
+          "href": "ml-data-pipeline.html",
+          "kind": "page"
+        }
       ],
-      "related": ["claude-code-encyclopedia", "graph-autoencoder"]
+      "related": [
+        "claude-code-encyclopedia",
+        "graph-autoencoder"
+      ]
     }
   ]
 }
