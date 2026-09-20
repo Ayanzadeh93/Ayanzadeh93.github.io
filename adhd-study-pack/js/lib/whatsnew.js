@@ -6,6 +6,16 @@ export const AWAY_MS = 7 * 86400000;
 
 export const RELEASES = [
   {
+    version: '3.9.0',
+    name: 'Fifty milestones & quieter search',
+    date: '2026-09-20',
+    highlights: [
+      'Passport now carries fifty FocusQuest milestones — creative glyphs from First Spark to Focus Sovereign.',
+      '⌘K search jumps to any section by name or alias, and /ask · ai: · @coach send prompts to the on-device coach.',
+      'Setup panels and a few views use calm scene photos and icons; denser layout for fewer distractions.'
+    ]
+  },
+  {
     version: '3.8.1',
     name: 'Professional colour & gradients',
     date: '2026-09-20',

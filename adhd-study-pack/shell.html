@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
   <!-- ?v= busts GitHub Pages' 10-minute cache when the app changes; bump it with VERSION in the script. -->
-  <link rel="stylesheet" href="css/adhd-study-pack.css?v=3.8.1">
+  <link rel="stylesheet" href="css/adhd-study-pack.css?v=3.9.0">
   <!-- Read by js/adhd-study-pack.js (never executed). The Firebase project
        comes from js/firebase-config.js, so it is not repeated here. -->
   <script type="application/json" id="focus-dial-config">
@@ -377,14 +377,14 @@
 
     <!-- ============ HELP ============ -->
     <section class="view" id="view-help" aria-labelledby="helpTitle">
-      <div class="view-head">
+      <div class="view-head compact">
         <div class="view-title-row"><h2 id="helpTitle">Help</h2></div>
+        <p class="view-sub">One question at a time. Search, then leave.</p>
       </div>
       <div class="help">
-        <p class="help-lead">Guides for every part of the app. Search when you need something — ignore the rest until then.</p>
         <div class="help-toolbar">
           <label class="sr-only" for="helpSearch">Search guides</label>
-          <input type="search" id="helpSearch" class="help-search" placeholder="Search guides…" autocomplete="off" enterkeyhint="search">
+          <input type="search" id="helpSearch" class="help-search" placeholder="Search guides… or press ⌘K to jump anywhere" autocomplete="off" enterkeyhint="search">
           <div class="help-cats" id="helpCats" role="tablist" aria-label="Guide categories"></div>
         </div>
         <div class="help-grid" id="helpGrid" role="region" aria-live="polite"></div>
@@ -515,7 +515,7 @@
 
     <!-- ============ HABITS ============ -->
     <section class="view" id="view-habits" aria-labelledby="habitsTitle">
-      <div class="view-head">
+      <div class="view-head compact">
         <div class="view-title-row"><h2 id="habitsTitle">Habits</h2><button type="button" class="help-link btn sm ghost" data-help="habits" aria-label="Open Habits guide">Guide</button></div>
         <span class="top-sp"></span>
         <button class="btn sm" type="button" id="habitTemplatesBtn" aria-label="Add from template">Templates</button>
@@ -587,9 +587,14 @@
 
     <!-- ============ PASSPORT ============ -->
     <section class="view" id="view-passport" aria-labelledby="passportTitle">
-      <div class="view-head">
+      <div class="view-head compact">
         <div class="view-title-row"><h2 id="passportTitle">Passport</h2><button type="button" class="help-link btn sm ghost" data-help="passport" aria-label="Open Passport guide">Guide</button></div>
+        <p class="view-sub">Fifty milestones. One quiet path.</p>
       </div>
+      <figure class="view-shot" aria-hidden="true">
+        <img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1400&q=60" alt="" loading="lazy" width="1400" height="320">
+        <figcaption>Keep showing up — badges follow finished blocks.</figcaption>
+      </figure>
       <div class="passport-wrap">
         <div class="stack" style="gap:16px">
           <div class="card pad passport-hero">
@@ -613,7 +618,7 @@
           </div>
           <div class="card pad">
             <div class="panel-head"><h3>Milestones</h3><span class="eyebrow" id="passportBadgeCount"></span></div>
-            <p class="hint">Badges unlock from real focus sessions, not a separate app. Finish a block and the animation plays here.</p>
+            <p class="hint">Fifty FocusQuest badges unlock from real focus sessions — creative glyphs, same spirit as First Spark through Focus Sovereign. Finish a block and the animation plays here.</p>
             <div class="passport-badges" id="passportBadges"></div>
           </div>
         </div>
@@ -629,7 +634,9 @@
 
     <!-- ============ SETTINGS ============ -->
     <section class="view" id="view-settings">
-      <div class="view-head"><div class="view-title-row"><h2>Setup</h2><button type="button" class="help-link btn sm ghost" data-help="setup" aria-label="Open Setup guide">Guide</button></div></div>
+      <div class="view-head compact"><div class="view-title-row"><h2>Setup</h2><button type="button" class="help-link btn sm ghost" data-help="setup" aria-label="Open Setup guide">Guide</button></div>
+        <p class="view-sub">Change one thing. Leave the rest alone.</p>
+      </div>
       <div class="set-shell">
         <div class="set-nav" id="setNav" role="tablist" aria-label="Setup sections" aria-orientation="vertical">
           <button type="button" class="set-tab" role="tab" id="tab-profile" aria-controls="set-profile" aria-selected="true" tabindex="0" data-sec="profile"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c1.2-3.6 4-5.5 7-5.5s5.8 1.9 7 5.5"/></svg><span>Comfort profile</span></button>
@@ -650,16 +657,23 @@
           <section class="set-panel" id="set-speech" role="tabpanel" aria-labelledby="tab-speech" tabindex="-1" hidden></section>
           <section class="set-panel" id="set-keys" role="tabpanel" aria-labelledby="tab-keys" tabindex="-1" hidden></section>
           <section class="set-panel" id="set-timer" role="tabpanel" aria-labelledby="tab-timer" tabindex="-1" hidden>
-            <h3>Timer</h3>
-            <p class="set-lead">Tune the intervals until they fit your actual attention span, not the 1980s tomato.</p>
+            <div class="set-scene" aria-hidden="true"><img src="https://images.unsplash.com/photo-1501139083538-0139583c060f?auto=format&fit=crop&w=900&q=60" alt="" loading="lazy" width="900" height="280"><span class="set-scene-ico">⏱</span></div>
+            <div class="set-panel-head"><h3><span class="set-h-ico" aria-hidden="true">⏱</span>Timer</h3>
+            <p class="set-lead">Tune the intervals until they fit your actual attention span, not the 1980s tomato.</p></div>
             <div class="set-group"><div class="set-group-head"><h4>Intervals</h4><button type="button" class="btn sm" id="presetsBtn">Presets</button></div>
               <div class="set-fields" id="durFields"></div></div>
             <div id="timerRows"></div>
           </section>
-          <section class="set-panel" id="set-prompts" role="tabpanel" aria-labelledby="tab-prompts" tabindex="-1" hidden><div id="listsCard"></div></section>
+          <section class="set-panel" id="set-prompts" role="tabpanel" aria-labelledby="tab-prompts" tabindex="-1" hidden>
+            <div class="set-scene" aria-hidden="true"><img src="https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=900&q=60" alt="" loading="lazy" width="900" height="280"><span class="set-scene-ico">💬</span></div>
+            <div class="set-panel-head"><h3><span class="set-h-ico" aria-hidden="true">💬</span>Prompts</h3>
+            <p class="set-lead">Custom lists the workspace can draw from — one job per list, easy to scan.</p></div>
+            <div id="listsCard"></div>
+          </section>
           <section class="set-panel" id="set-data" role="tabpanel" aria-labelledby="tab-data" tabindex="-1" hidden>
-            <h3>Account and data</h3>
-            <p class="set-lead">Who you are signed in as, where the workspace is stored, and your backups.</p>
+            <div class="set-scene" aria-hidden="true"><img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=900&q=60" alt="" loading="lazy" width="900" height="280"><span class="set-scene-ico">🗄</span></div>
+            <div class="set-panel-head"><h3><span class="set-h-ico" aria-hidden="true">🗄</span>Account and data</h3>
+            <p class="set-lead">Who you are signed in as, where the workspace is stored, and your backups.</p></div>
             <div class="set-cards">
               <div class="card pad" id="accountCard"></div>
               <div class="card pad" id="storageCard"></div>
@@ -714,7 +728,7 @@
   </div>
 </div>
 <div class="scrim" id="scrim"><div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-head"><h2 id="modalTitle">Title</h2><button type="button" class="btn icon ghost" id="modalX" aria-label="Close dialog">✕</button></div><div class="body" id="modalBody"></div><footer id="modalFoot"></footer></div></div>
-<div class="scrim" id="cmdScrim"><div class="cmdk" role="dialog" aria-modal="true" aria-label="Command palette"><input type="text" id="cmdInput" placeholder="Type a command… (start, plan, rain, breathe, export)" autocomplete="off" role="combobox" aria-expanded="true" aria-controls="cmdList" aria-autocomplete="list" aria-label="Search commands"><div class="cmd-list" id="cmdList" role="listbox" aria-label="Commands" tabindex="0"></div></div></div>
+<div class="scrim" id="cmdScrim"><div class="cmdk" role="dialog" aria-modal="true" aria-label="Command palette"><input type="text" id="cmdInput" placeholder="Go somewhere, or /ask the coach…" autocomplete="off" role="combobox" aria-expanded="true" aria-controls="cmdList" aria-autocomplete="list" aria-label="Search commands and sections"><div class="cmd-list" id="cmdList" role="listbox" aria-label="Commands" tabindex="0"></div></div></div>
 <div class="scrim unlock-scrim" id="unlockScrim" hidden>
   <div class="unlock-card" role="dialog" aria-modal="true" aria-labelledby="unlockTitle">
     <p class="unlock-kicker">Achievement unlocked</p>
