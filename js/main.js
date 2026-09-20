@@ -1,4 +1,5 @@
 // Enhanced main.js with performance optimizations and accessibility features
+// Shared helpers live in js/utils.js (window.SiteUtils).
 
 const supportsIntersectionObserver = 'IntersectionObserver' in window;
 const REVEAL_FALLBACK_DELAY = 2000; // Fallback delay to reveal content if observers do not trigger.
@@ -183,13 +184,7 @@ function initThemeToggle() {
         }
     };
 
-    let savedTheme = null;
-    try {
-        savedTheme = localStorage.getItem('theme');
-    } catch (error) {
-        savedTheme = null;
-        reportError('Could not read saved theme, falling back to system preference', error);
-    }
+    const savedTheme = SiteUtils.readStoredValue('theme');
 
     // Saved choice wins; otherwise follow the operating system preference
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -359,41 +354,17 @@ function initIntersectionObserver() {
         return;
     }
 
-    const observerOptions = {
-        threshold: 0.15,
-        rootMargin: '-40px 0px'
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('animate-in');
-                
+    SiteUtils.observeReveal(
+        ['section', REVEAL_PRIMARY_SELECTOR, REVEAL_SECONDARY_SELECTOR],
+        {
+            threshold: 0.15,
+            rootMargin: '-40px 0px',
+            onReveal: (target) => {
                 // Update active navigation link
-                const id = entry.target.getAttribute('id');
+                const id = target.getAttribute('id');
                 if (id) updateActiveNavLink(`#${id}`);
-
             }
-        });
-    }, observerOptions);
-
-    // Observe all sections
-    document.querySelectorAll('section').forEach(section => {
-        observer.observe(section);
-    });
-
-    const observeElements = (elements) => {
-        elements.forEach((element) => {
-            observer.observe(element);
-        });
-    };
-
-    observeElements(
-        document.querySelectorAll(REVEAL_PRIMARY_SELECTOR)
-    );
-
-    observeElements(
-        document.querySelectorAll(REVEAL_SECONDARY_SELECTOR)
+        }
     );
 
     setTimeout(() => {
@@ -450,7 +421,7 @@ function validateField(field) {
 
     // Remove existing error states
     field.classList.remove('error');
-    removeFieldError(field);
+    SiteUtils.removeFieldError(field);
 
     // Validation rules
     switch (fieldName) {
@@ -461,8 +432,7 @@ function validateField(field) {
             }
             break;
         case 'email':
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(value)) {
+            if (!SiteUtils.isValidEmail(value)) {
                 errorMessage = 'Please enter a valid email address.';
                 isValid = false;
             }
@@ -477,28 +447,10 @@ function validateField(field) {
 
     if (!isValid) {
         field.classList.add('error');
-        showFieldError(field, errorMessage);
+        SiteUtils.showFieldError(field, errorMessage);
     }
 
     return isValid;
-}
-
-function showFieldError(field, message) {
-    let errorElement = field.parentNode.querySelector('.field-error');
-    if (!errorElement) {
-        errorElement = document.createElement('div');
-        errorElement.className = 'field-error';
-        errorElement.setAttribute('role', 'alert');
-        field.parentNode.appendChild(errorElement);
-    }
-    errorElement.textContent = message;
-}
-
-function removeFieldError(field) {
-    const errorElement = field.parentNode.querySelector('.field-error');
-    if (errorElement) {
-        errorElement.remove();
-    }
 }
 
 // Loading states
@@ -518,13 +470,11 @@ function hideLoadingSpinner() {
 }
 
 function showLoadingOverlay() {
-    const overlay = document.getElementById('loadingOverlay');
-    if (overlay) overlay.classList.add('active');
+    SiteUtils.setLoadingOverlay(true);
 }
 
 function hideLoadingOverlay() {
-    const overlay = document.getElementById('loadingOverlay');
-    if (overlay) overlay.classList.remove('active');
+    SiteUtils.setLoadingOverlay(false);
 }
 
 // Lazy loading for images
@@ -540,15 +490,12 @@ function initLazyLoading() {
         // Fallback for browsers without native lazy loading
         const imageObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
-                if (!entry.isIntersecting) return;
-
-                const img = entry.target;
-                imageObserver.unobserve(img);
-
-                const source = img.dataset.src;
-                if (!source) {
-                    reportError('Lazy image has no data-src', img);
-                    return;
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    img.src = img.dataset.src;
+                    img.removeAttribute('data-src');
+                    img.classList.add('loaded');
+                    imageObserver.unobserve(img);
                 }
 
                 img.addEventListener('load', () => img.classList.add('loaded'), { once: true });
@@ -598,25 +545,11 @@ function initHeroParallax() {
 
 // Accessibility features
 function initAccessibilityFeatures() {
-    // Announce dynamic content changes
-    initAriaLiveRegions();
+    // Single announcement channel shared by every page script
+    window.announceToScreenReader = announceToScreenReader;
 
     // High contrast mode detection
     detectHighContrastMode();
-}
-
-function initAriaLiveRegions() {
-    // Create live region for announcements
-    const liveRegion = document.createElement('div');
-    liveRegion.setAttribute('aria-live', 'polite');
-    liveRegion.setAttribute('aria-atomic', 'true');
-    liveRegion.className = 'sr-only';
-    document.body.appendChild(liveRegion);
-    
-    window.announceToScreenReader = function(message) {
-        liveRegion.textContent = message;
-        setTimeout(() => liveRegion.textContent = '', 1000);
-    };
 }
 
 function detectHighContrastMode() {
@@ -642,19 +575,10 @@ function submitForm(form) {
     
     // Disable submit button to prevent double submission
     const submitButton = form.querySelector('button[type="submit"]');
-    const originalText = submitButton ? submitButton.innerHTML : '';
-    if (submitButton) {
-        submitButton.disabled = true;
-        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Sending...';
-    }
-
-    const restoreForm = () => {
-        hideLoadingSpinner();
-        if (submitButton) {
-            submitButton.disabled = false;
-            submitButton.innerHTML = originalText;
-        }
-    };
+    const restoreButton = SiteUtils.setButtonBusy(
+        submitButton,
+        '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Sending...'
+    );
     
     // Keep reply-to synced with the email field for easier responses.
     const emailInput = form.querySelector('input[name="email"]');
@@ -675,7 +599,8 @@ function submitForm(form) {
         }
     })
     .then(response => {
-        restoreForm();
+        hideLoadingSpinner();
+        restoreButton();
         
         if (response.ok) {
         showSuccessMessage('Thank you for your message! I will get back to you soon.');
@@ -710,8 +635,9 @@ function submitForm(form) {
         }
     })
     .catch(error => {
-        restoreForm();
-        reportError('Form submission failed', error);
+        hideLoadingSpinner();
+        restoreButton();
+        console.error('Form submission error:', error);
         showErrorMessage('There was a problem sending your message. Please check your connection and try again, or email me directly at a.ayanzadeh@gmail.com.');
     });
 }
@@ -730,10 +656,10 @@ function showMessage(message, type) {
         msg.remove();
     });
     
-    const messageEl = document.createElement('div');
-    messageEl.className = `${type}-message show`;
-    messageEl.textContent = message;
-    messageEl.setAttribute('role', 'alert');
+    const messageEl = SiteUtils.createDismissibleMessage(`${type}-message show`, message, 5000, (element) => {
+        element.classList.remove('show');
+        setTimeout(() => element.remove(), 300);
+    });
     
     const contactForm = document.getElementById('contactForm');
     if (contactForm) {
@@ -745,12 +671,6 @@ function showMessage(message, type) {
         }
 
         contactForm.insertBefore(messageEl, contactForm.firstChild);
-        
-        // Auto-hide after 5 seconds
-        setTimeout(() => {
-            messageEl.classList.remove('show');
-            setTimeout(() => messageEl.remove(), 300);
-        }, 5000);
     }
     
     // Announce to screen readers
@@ -1306,92 +1226,30 @@ function initializeScreenReaderSupport() {
 }
 
 function announceToScreenReader(message, priority = 'polite') {
-    const announcer = document.getElementById(priority === 'assertive' ? 'sr-alerts' : 'sr-status');
-    if (announcer) {
-        // Clear previous message
-        announcer.textContent = '';
-        
-        // Add new message after a brief delay to ensure it's announced
-        setTimeout(() => {
-            announcer.textContent = message;
-        }, 100);
-        
-        // Clear message after it's been announced
-        setTimeout(() => {
-            announcer.textContent = '';
-        }, 3000);
-    }
+    SiteUtils.announce(message, priority);
 }
 
 // Accessibility Preferences
 const ACCESSIBILITY_PREFERENCES_KEY = 'accessibilityPreferences';
 
-// Reads stored preferences, discarding corrupt data instead of failing every
-// later read and write against it.
-function readAccessibilityPreferences() {
-    let raw;
-    try {
-        raw = localStorage.getItem(ACCESSIBILITY_PREFERENCES_KEY);
-    } catch (e) {
-        reportError('Could not read accessibility preferences', e);
-        return null;
-    }
-
-    if (!raw) return {};
-
-    try {
-        const parsed = JSON.parse(raw);
-        if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-            throw new Error('Stored accessibility preferences are not an object');
-        }
-        return parsed;
-    } catch (e) {
-        reportError('Discarding corrupt accessibility preferences', e);
-        clearStoredAccessibilityPreferences();
-        return {};
-    }
-}
-
-function clearStoredAccessibilityPreferences() {
-    try {
-        localStorage.removeItem(ACCESSIBILITY_PREFERENCES_KEY);
-        return true;
-    } catch (e) {
-        reportError('Could not clear accessibility preferences', e);
-        return false;
-    }
-}
-
 function saveAccessibilityPreference(key, value) {
-    const preferences = readAccessibilityPreferences();
-    if (!preferences) return;
-
+    const preferences = SiteUtils.readStoredJSON(ACCESSIBILITY_PREFERENCES_KEY, {});
     preferences[key] = value;
-
-    try {
-        localStorage.setItem(ACCESSIBILITY_PREFERENCES_KEY, JSON.stringify(preferences));
-    } catch (e) {
-        reportError(`Could not save accessibility preference "${key}"`, e);
-    }
+    SiteUtils.writeStoredJSON(ACCESSIBILITY_PREFERENCES_KEY, preferences);
 }
 
 function loadAccessibilityPreferences() {
-    const preferences = readAccessibilityPreferences();
-    if (!preferences) return;
+    const preferences = SiteUtils.readStoredJSON(ACCESSIBILITY_PREFERENCES_KEY, {});
 
-    // Apply each preference independently so one failing toggle handler does not
-    // stop the remaining preferences from being restored.
     Object.entries(preferences).forEach(([key, value]) => {
         const toggleId = key.replace(/([A-Z])/g, '-$1').toLowerCase() + '-toggle';
         const toggle = document.getElementById(toggleId);
 
-        if (!toggle) return;
-
-        safeInvoke(`Applying accessibility preference "${key}"`, () => {
-            toggle.checked = Boolean(value);
+        if (toggle) {
+            toggle.checked = value;
             // Trigger the change event to apply the setting
             toggle.dispatchEvent(new Event('change'));
-        });
+        }
     });
 }
 
@@ -1405,7 +1263,7 @@ function resetAccessibilitySettings() {
         });
     });
     
-    const cleared = clearStoredAccessibilityPreferences();
+    SiteUtils.removeStoredValue(ACCESSIBILITY_PREFERENCES_KEY);
 
     stopPageReader();
     
@@ -1559,47 +1417,13 @@ document.addEventListener('DOMContentLoaded', function() {
 // ========================================
 
 function copyToClipboard(text) {
-    // Try using the modern Clipboard API first
-    if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(text).then(function() {
+    SiteUtils.copyText(text).then(copied => {
+        if (copied) {
             showCitationNotification('Citation copied to clipboard!');
-        }).catch(function(err) {
-            reportError('Clipboard API copy failed, using fallback', err);
-            fallbackCopyTextToClipboard(text);
-        });
-    } else {
-        // Fallback for older browsers or non-HTTPS
-        fallbackCopyTextToClipboard(text);
-    }
-}
-
-function fallbackCopyTextToClipboard(text) {
-    const textArea = document.createElement("textarea");
-    textArea.value = text;
-    textArea.style.position = "fixed";
-    textArea.style.top = "-9999px";
-    textArea.style.left = "-9999px";
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
-
-    let successful = false;
-    try {
-        successful = document.execCommand('copy');
-        if (!successful) {
-            reportError('execCommand("copy") reported failure', null);
+        } else {
+            showCitationNotification('Failed to copy citation', 'error');
         }
-    } catch (err) {
-        reportError('Fallback clipboard copy failed', err);
-    } finally {
-        // Always remove the scratch element, even if copying threw.
-        textArea.remove();
-    }
-
-    showCitationNotification(
-        successful ? 'Citation copied to clipboard!' : 'Failed to copy citation. Please copy it manually.',
-        successful ? 'success' : 'error'
-    );
+    });
 }
 
 function showCitationNotification(message, type = 'success') {
@@ -1631,4 +1455,57 @@ function showCitationNotification(message, type = 'success') {
             notification.remove();
         }, 300);
     }, 3000);
+}
+
+// Exposed for unit tests; browsers ignore this because `module` is undefined there.
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        initNavbarScroll,
+        initThemeToggle,
+        initMobileMenu,
+        initSmoothScrolling,
+        initFormValidation,
+        initIntersectionObserver,
+        initLazyLoading,
+        initHeroParallax,
+        initAriaLiveRegions,
+        initializeAccessibilityFeatures,
+        ensureAccessibilityStructure,
+        initializeAccessibilityMenu,
+        openAccessibilityMenu,
+        closeAccessibilityMenu,
+        initializeKeyboardEnhancements,
+        initializeScreenReaderSupport,
+        initializeReadingGuide,
+        initializeReadingGuideTracking,
+        removeReadingGuideTracking,
+        updateReadingGuide,
+        initializePageReader,
+        showCustomModal,
+        validateField,
+        showFieldError,
+        removeFieldError,
+        showLoadingSpinner,
+        hideLoadingSpinner,
+        showLoadingOverlay,
+        hideLoadingOverlay,
+        updateActiveNavLink,
+        submitForm,
+        showMessage,
+        showErrorMessage,
+        showSuccessMessage,
+        updateLayoutForScreenSize,
+        announceToScreenReader,
+        saveAccessibilityPreference,
+        loadAccessibilityPreferences,
+        resetAccessibilitySettings,
+        getPageReaderText,
+        startPageReader,
+        stopPageReader,
+        updatePageReaderButtons,
+        copyToClipboard,
+        fallbackCopyTextToClipboard,
+        showCitationNotification,
+        detectHighContrastMode
+    };
 }

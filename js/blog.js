@@ -245,19 +245,18 @@ function initNewsletterForm() {
 
 function validateEmail(emailInput) {
     const email = emailInput.value.trim();
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     emailInput.classList.remove('error', 'valid');
-    removeFieldError(emailInput);
+    SiteUtils.removeFieldError(emailInput);
 
     if (!email) {
-        showFieldError(emailInput, 'Email is required.');
+        SiteUtils.showFieldError(emailInput, 'Email is required.');
         emailInput.classList.add('error');
         return false;
     }
 
-    if (!emailRegex.test(email)) {
-        showFieldError(emailInput, 'Please enter a valid email address.');
+    if (!SiteUtils.isValidEmail(email)) {
+        SiteUtils.showFieldError(emailInput, 'Please enter a valid email address.');
         emailInput.classList.add('error');
         return false;
     }
@@ -377,6 +376,7 @@ function showFormMessage(form, message, type) {
     messageElement.textContent = message;
     messageElement.setAttribute('role', type === 'error' ? 'alert' : 'status');
 
+    const messageElement = SiteUtils.createDismissibleMessage(`form-message ${type}-message`, message);
     form.insertBefore(messageElement, form.firstChild);
 
     // Errors name a fallback email address, so leave them up to be read.
