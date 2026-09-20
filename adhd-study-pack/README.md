@@ -7,7 +7,13 @@ data stays in the browser.
 
 **Live:** [https://www.ayanzadeh.com/adhd-study-pack/](https://www.ayanzadeh.com/adhd-study-pack/)
 
-Version **3.8.1** adds professional accent colours (Slate, Navy, Teal, Sage,
+Version **3.9.0** expands Passport to **fifty** FocusQuest milestones, adds
+scene photos and icons across Setup and key views, densifies the layout for
+fewer distractions, and upgrades ⌘K search so section names, aliases, and
+agent shortcuts (`/ask`, `ai:`, `@coach`) jump you around or talk to the
+on-device coach.
+
+**3.8.1** added professional accent colours (Slate, Navy, Teal, Sage,
 Graphite) and optional Soft / Rich accent gradients under Setup → Seeing.
 
 **3.7.3** is the prior ADHD product line. **Continue with Google** only
@@ -24,7 +30,7 @@ what is stored. Both links sit on the sign-in card so Google can crawl them.
 a welcome-back if you have not opened the pack for a week.
 
 **3.7.0** folded Passport into this app: a profile card (display name, photo,
-bio), achievement badges from real focus sessions, and the existing Google /
+bio), achievement badges from real focus sessions (now fifty in 3.9.0), and the existing Google /
 email sign-in with forgot-password. Help centre and Habits (Build, Counters,
 Break) live here too.
 

@@ -1332,3 +1332,80 @@ kbd{font-family:var(--font-mono); font-size:.9em; padding:0 4px; border:1px soli
   .passport-hero{grid-template-columns:1fr;justify-items:center;text-align:center}
   .passport-id{width:100%}
 }
+
+/* ---------- ADHD-friendly density, scenes, command icons ---------- */
+.view-head.compact{align-items:center;gap:10px;margin-bottom:12px}
+.view-head .view-sub{margin:0;color:var(--muted);font-size:calc(13px*var(--ts,1));max-width:42ch;line-height:1.35}
+.view-shot{
+  position:relative;margin:0 0 14px;border-radius:var(--r-l);overflow:hidden;
+  border:1px solid var(--line);max-height:128px;background:var(--surface-2);
+}
+.view-shot img{display:block;width:100%;height:128px;object-fit:cover;filter:saturate(.85) brightness(.92)}
+.view-shot figcaption{
+  position:absolute;left:12px;bottom:10px;margin:0;padding:4px 10px;border-radius:999px;
+  background:color-mix(in srgb, var(--bg) 78%, transparent);backdrop-filter:blur(8px);
+  font-size:calc(11.5px*var(--ts,1));color:var(--ink-2);letter-spacing:.01em
+}
+[data-motion="reduce"] .view-shot img,[data-color="mono"] .view-shot img{filter:grayscale(1) brightness(.95)}
+
+.set-scene{
+  position:relative;margin:-4px -4px 14px;border-radius:var(--r-m);overflow:hidden;
+  border:1px solid var(--line);height:88px;background:var(--surface-2)
+}
+.set-scene img{width:100%;height:100%;object-fit:cover;display:block;opacity:.88;filter:saturate(.8)}
+.set-scene-ico{
+  position:absolute;right:12px;bottom:10px;width:36px;height:36px;border-radius:12px;
+  display:grid;place-items:center;font-size:18px;
+  background:color-mix(in srgb, var(--surface) 88%, transparent);border:1px solid var(--line);
+  box-shadow:var(--shadow-1)
+}
+.set-panel-head{margin-bottom:4px}
+.set-panel-head h3{display:flex;align-items:center;gap:8px;margin:0 0 4px}
+.set-h-ico{font-size:1.05em;line-height:1}
+.set-shell{gap:16px;max-width:1040px}
+.set-panel{padding:16px 16px 10px}
+.set-nav{padding:6px;gap:2px}
+.set-tab{padding:8px 10px;gap:8px;font-size:calc(13px*var(--ts,1))}
+.prof .p-name{display:inline-flex;align-items:center;gap:7px}
+.prof .p-ico{font-size:1.1em;line-height:1}
+.prof{padding:12px 13px 11px}
+
+.cmdk{width:min(580px,100%)}
+.cmd-list{max-height:min(52vh,420px);overflow:auto}
+.cmd{display:flex;align-items:center;gap:10px;padding:9px 14px}
+.cmd-ico{width:1.4em;text-align:center;flex:none;opacity:.9}
+.cmd-label{flex:1;min-width:0}
+.cmd.agent .cmd-label{color:var(--accent)}
+.cmd-tip{
+  padding:8px 14px 6px;font-size:calc(11.5px*var(--ts,1));color:var(--muted);
+  border-bottom:1px solid var(--line);line-height:1.4;position:sticky;top:0;
+  background:color-mix(in srgb, var(--surface) 94%, transparent);backdrop-filter:blur(6px);z-index:1
+}
+.cmd-tip kbd{margin:0 2px}
+
+.passport-badges{grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:8px}
+.p-badge{padding:10px;min-height:0;gap:4px}
+.p-badge .p-ico{font-size:20px}
+.p-badge h4{font-size:calc(12.5px*var(--ts,1))}
+.p-badge p{font-size:calc(11px*var(--ts,1));display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.passport-next-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.passport-next-list li{display:flex;gap:10px;align-items:flex-start}
+.passport-next-list .p-ico{font-size:20px;line-height:1.2}
+.passport-next-list strong{display:block;font-size:calc(13px*var(--ts,1))}
+.passport-next-list span{display:block;font-size:calc(12px*var(--ts,1));color:var(--muted);line-height:1.35}
+.passport-hero{gap:16px}
+.passport-photo{width:96px;height:96px;font-size:28px}
+.card.pad{padding:14px 16px}
+.help-lead{display:none}
+.help-toolbar{margin-top:0}
+
+@media (max-width:860px){
+  .view-shot{max-height:96px}
+  .view-shot img{height:96px}
+  .set-scene{height:72px;margin:0 0 12px}
+  .passport-badges{grid-template-columns:repeat(auto-fill,minmax(118px,1fr))}
+}
+@media (prefers-reduced-motion:reduce){
+  .set-scene img,.view-shot img{filter:none}
+}
+

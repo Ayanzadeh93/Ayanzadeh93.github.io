@@ -50,7 +50,7 @@ try {
   const help = document.getElementById('view-help');
   if (help && !document.getElementById('view-coach')) help.insertAdjacentHTML('beforebegin', VIEW);
   ensureSheet(new URL('../css/guide-studio.css?v=1', import.meta.url).href);
-  await import('./adhd-study-pack.js?v=3.8.1');
+  await import('./adhd-study-pack.js?v=3.9.0');
   await import('./webllm-coach.js?v=7');
   await import('./coach-extra.js?v=1');
   await import('./coach-hook.js?v=1');

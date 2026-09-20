@@ -16,9 +16,9 @@ import { COMFORT_PRESETS, COMFORT_DEFAULTS, presetComfort, changesFromProfile, n
 import { journal } from './lib/records.js?v=3.8.1';
 import { ACHIEVEMENTS, emptyPassport, normalisePassport, initialsOf as passportInitials,
          computeStats as passportStats, achievementProgress, earnedKeys, freshKeys, adoptKeys,
-         getAchievement } from './lib/passport.js?v=3.8.1';
+         getAchievement } from './lib/passport.js?v=3.9.0';
 import { RELEASES, AWAY_MS, whatsNewPayload, mergeWhatsNewRecord,
-         readWhatsNewRecord, writeWhatsNewRecord, cmpVersion, whatsNewDeviceKey } from './lib/whatsnew.js?v=3.8.1';
+         readWhatsNewRecord, writeWhatsNewRecord, cmpVersion, whatsNewDeviceKey } from './lib/whatsnew.js?v=3.9.0';
 const $  = (s, r) => (r || (typeof document !== 'undefined' ? document : null))?.querySelector?.(s) || null;
 const $$ = (s, r) => Array.from((r || (typeof document !== 'undefined' ? document : null))?.querySelectorAll?.(s) || []);
 const uid = () => Math.random().toString(36).slice(2, 10);
@@ -42,7 +42,7 @@ const DOW = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
    defaults, then a <script type="application/json" id="focus-dial-config">
    block, then window.FOCUS_DIAL_CONFIG.
    ===================================================================== */
-const VERSION = '3.8.1';
+const VERSION = '3.9.0';
 const DEFAULT_CONFIG = {
   storageKey: 'focusdial.v3',
   storage:    'local',            // 'local' | 'session' | 'memory' | 'rest'
@@ -3455,7 +3455,25 @@ function rowRange(bind, label, hint, min, max, step, fmt) {
     <div class="set-control"><input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${v}" data-${bind[0]}="${bind[1]}" aria-valuetext="${fmt(v)}"></div></div>`;
 }
 const group = (title, rows) => `<div class="set-group"><h4>${title}</h4>${rows}</div>`;
-const panelHead = (title, lead) => `<h3>${title}</h3>${lead ? `<p class="set-lead">${lead}</p>` : ''}`;
+const SET_SCENE = {
+  profile: { ico: '🧭', shot: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=60', alt: 'Quiet path through soft morning light' },
+  seeing:  { ico: '👁', shot: 'https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?auto=format&fit=crop&w=900&q=60', alt: 'Soft window light on a calm desk' },
+  motion:  { ico: '〰️', shot: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=60', alt: 'Gentle waves on a quiet shore' },
+  focus:   { ico: '🎯', shot: 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?auto=format&fit=crop&w=900&q=60', alt: 'Notebook and coffee ready for one task' },
+  speech:  { ico: '🔊', shot: 'https://images.unsplash.com/photo-1478737270239-2f02b77fc618?auto=format&fit=crop&w=900&q=60', alt: 'Microphone in a quiet room' },
+  keys:    { ico: '⌨️', shot: 'https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?auto=format&fit=crop&w=900&q=60', alt: 'Keyboard close-up' },
+  timer:   { ico: '⏱', shot: 'https://images.unsplash.com/photo-1501139083538-0139583c060f?auto=format&fit=crop&w=900&q=60', alt: 'Analog clock face' },
+  prompts: { ico: '💬', shot: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=900&q=60', alt: 'Handwriting on lined paper' },
+  data:    { ico: '🗄', shot: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=900&q=60', alt: 'Earth from orbit at night' }
+};
+const PROF_ICONS = { adhd: '⚡', calm: '🌿', lowvision: '🔎', reading: '📖', screenreader: '🎧' };
+const panelHead = (title, lead, sec) => {
+  const scene = sec && SET_SCENE[sec];
+  const banner = scene
+    ? `<div class="set-scene" aria-hidden="true"><img src="${esc(scene.shot)}" alt="" loading="lazy" width="900" height="280"><span class="set-scene-ico">${scene.ico}</span></div>`
+    : '';
+  return `${banner}<div class="set-panel-head"><h3>${scene ? `<span class="set-h-ico" aria-hidden="true">${scene.ico}</span>` : ''}${title}</h3>${lead ? `<p class="set-lead">${lead}</p>` : ''}</div>`;
+};
 
 /* ---- advanced: the long tail of a section, folded away ----
    Each panel shows the two or three settings most people want and hides the
@@ -3548,10 +3566,10 @@ function renderProfilePanel() {
     ? `<strong>Custom</strong> — based on ${esc(base.name)}, with ${changes.length} change${changes.length === 1 ? '' : 's'}: ${changes.map(k => COMFORT_LABELS[k] || k).join(', ')}.`
     : `Using the <strong>${esc(base.name)}</strong> profile${c.basedOn === 'adhd' ? ', the default' : ''}.`;
   $('#set-profile').innerHTML = panelHead('Comfort profile',
-    'Start from the profile closest to how you work, then adjust anything in the other sections. Needs overlap — pick the closest and switch on what you need from another.')
+    'Start from the profile closest to how you work, then adjust anything in the other sections. Needs overlap — pick the closest and switch on what you need from another.', 'profile')
     + `<fieldset class="prof-fs" role="radiogroup" aria-label="Comfort profile"><div class="prof-grid">${Object.entries(COMFORT_PRESETS).map(([k, p]) =>
       `<label class="prof ${c.basedOn === k ? 'on' : ''}"><input type="radio" name="cf_profile" value="${k}" data-profile="${k}" ${c.basedOn === k ? 'checked' : ''}>
-        <span class="p-top"><span class="p-name">${esc(p.name)}</span><span class="p-badge">${esc(p.badge)}</span></span>
+        <span class="p-top"><span class="p-name"><span class="p-ico" aria-hidden="true">${PROF_ICONS[k] || '•'}</span>${esc(p.name)}</span><span class="p-badge">${esc(p.badge)}</span></span>
         <span class="p-about" id="prof_${k}_about">${esc(p.about)}</span></label>`).join('')}</div></fieldset>
       <div class="set-row"><div class="set-text"><p class="set-label" style="font-weight:500" role="status">${status}</p></div>
         <div class="set-control">${c.profile === 'custom' && changes.length ? `<button type="button" class="btn sm" id="profReset">Reset to ${esc(base.name)}</button>` : ''}</div></div>`
@@ -3581,7 +3599,7 @@ function accentPickerHtml() {
     </div></div>`;
 }
 function renderSeeingPanel() {
-  $('#set-seeing').innerHTML = panelHead('Seeing', 'Size, contrast and colour. Changes apply as you make them — the preview at the bottom shows the result.')
+  $('#set-seeing').innerHTML = panelHead('Seeing', 'Size, contrast and colour. Changes apply as you make them — the preview at the bottom shows the result.', 'seeing')
     + group('The basics', rowChoice(['cf','textSize'], 'Text size', 'Makes the words bigger without zooming the whole page.', [[100,'100%'],[112,'112%'],[125,'125%'],[150,'150%'],[175,'175%']])
       + rowChoice(['st','theme'], 'Theme', '“Auto” follows your device’s light or dark setting.', [['auto','Auto'],['light','Light'],['dark','Dark']])
       + rowChoice(['cf','contrast'], 'Contrast', 'High contrast darkens text and borders and strengthens every edge.', [['standard','Standard'],['high','High']]))
@@ -3602,7 +3620,7 @@ function renderSeeingPanel() {
 /* ---- Motion and sound ---- */
 function renderMotionPanel() {
   const sysReduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-  $('#set-motion').innerHTML = panelHead('Motion and sound', 'Movement and sound can help an understimulated mind or overwhelm a sensitive one. Choose what suits you.')
+  $('#set-motion').innerHTML = panelHead('Motion and sound', 'Movement and sound can help an understimulated mind or overwhelm a sensitive one. Choose what suits you.', 'motion')
     + group('The basics', rowChoice(['cf','motion'], 'Animation', `“Follow my device” uses your system setting, which is currently <strong>${sysReduced ? 'reduce motion' : 'full motion'}</strong>. “Reduce” stops transitions and pulsing; the breathing guide keeps a slow, small swell because that movement is its purpose.`, [['system','Follow my device'],['reduce','Reduce'],['full','Full']])
       + rowSwitch(['st','chime'], 'Chime when a timer ends', 'A short three-note bell. The early warning, if you turn it on, is a single quiet note.'))
     + advanced('motion', rowRange(['st','chimeVol'], 'Chime volume', '', 0, 100, 5, v => v + '%'),
@@ -3612,7 +3630,7 @@ function renderMotionPanel() {
 /* ---- Focus and interruptions ---- */
 function renderFocusPanel() {
   const c = CF();
-  $('#set-focus').innerHTML = panelHead('Focus and interruptions', 'This is where ADHD and autistic preferences differ most. The defaults suit ADHD — quick feedback and nudges; the Calm profile turns most of this down.')
+  $('#set-focus').innerHTML = panelHead('Focus and interruptions', 'This is where ADHD and autistic preferences differ most. The defaults suit ADHD — quick feedback and nudges; the Calm profile turns most of this down.', 'focus')
     + group('The basics', rowChoice(['cf','messages'], 'Show pop-up messages', 'Screen readers hear every message either way.', [['all','All'],['important','Important only'],['none','None']])
       + rowSwitch(['cf','coaching'], 'Coaching and nudges', 'Short “go” messages, the priority nudges on the Focus screen and suggestions to swap tasks.')
       + rowSwitch(['cf','streaks'], 'Show streaks', 'Some people find a streak motivating; others find the pressure of breaking one stressful.')
@@ -3634,7 +3652,7 @@ function renderFocusPanel() {
 /* ---- Reading and speech ---- */
 function renderSpeechPanel() {
   const c = CF(), voices = speech.voices(), off = '';   // set up the voice before switching it on
-  $('#set-speech').innerHTML = panelHead('Reading and speech', 'Two separate things: announcements for screen readers you already use, and a voice built into the app for anyone who wants things read out.')
+  $('#set-speech').innerHTML = panelHead('Reading and speech', 'Two separate things: announcements for screen readers you already use, and a voice built into the app for anyone who wants things read out.', 'speech')
     + group('Screen readers', `<p class="set-hint" style="margin:8px 0 2px">Buttons, dialogs, the timer and every message are announced to NVDA, JAWS, Narrator, VoiceOver, TalkBack and ChromeVox. Nothing to switch on.</p>`
       + rowChoice(['cf','srTimeLeft'], 'Announce time left while the timer runs', 'You cannot glance at the dial, so the app says how long is left at this interval.', [[0,'Off'],[5,'Every 5 min'],[10,'Every 10 min'],[15,'Every 15 min']]))
     + group('Built-in voice', speech.supported
@@ -3655,7 +3673,7 @@ speech.onVoicesChanged(() => { if (view === 'settings') renderSettings(); });
 
 /* ---- Keyboard ---- */
 function renderKeysPanel() {
-  $('#set-keys').innerHTML = panelHead('Keyboard', 'Everything works from the keyboard: Tab moves between controls, arrow keys move within a group, Enter or Space activates, and Esc closes a dialog.')
+  $('#set-keys').innerHTML = panelHead('Keyboard', 'Everything works from the keyboard: Tab moves between controls, arrow keys move within a group, Enter or Space activates, and Esc closes a dialog.', 'keys')
     + group('Shortcuts', rowSwitch(['cf','shortcuts'], 'Single-key shortcuts', 'Turn off if you use a screen reader in focus mode, use speech input, or press keys by accident. Ctrl or ⌘ + K still opens the command palette.'))
     + advanced('keys', `<div class="kbd-list" role="list" aria-label="Keyboard shortcuts">${SHORTCUTS.map(([k, d]) =>
           `<div role="listitem" style="display:contents"><kbd>${esc(k)}</kbd><span>${esc(d)}</span></div>`).join('')}</div>`,
@@ -3792,47 +3810,99 @@ function loadDemo() {
 /* =====================================================================
    COMMAND PALETTE + KEYBOARD
    ===================================================================== */
+function askCoach(prompt) {
+  const text = String(prompt || '').trim();
+  go('coach');
+  const run = () => {
+    if (window.StudyCoach && typeof window.StudyCoach.ask === 'function') {
+      window.StudyCoach.ask(text || 'brief me');
+      return true;
+    }
+    const input = document.querySelector('#view-coach [data-coach-input], #coachPanel [data-coach-input]');
+    const form = document.querySelector('#view-coach [data-coach-form], #coachPanel [data-coach-form]');
+    if (input) {
+      input.value = text || 'brief me';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      if (form && typeof form.requestSubmit === 'function') form.requestSubmit();
+      else if (form) form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+      return true;
+    }
+    return false;
+  };
+  if (!run()) setTimeout(run, 80);
+}
+function parseAgentShortcut(raw) {
+  const q = String(raw || '').trim();
+  const m = q.match(/^(?:\/(?:ask|coach|ai|agent|llm)|(?:ask|ai|agent|llm)\s*:|@coach)\s+([\s\S]+)$/i)
+    || q.match(/^(?:ask|ai|agent|llm)\s+(.+)$/i);
+  if (!m) return null;
+  return m[1].trim();
+}
 const COMMANDS = () => [
-  { k:'Start / pause timer', s:'Space', run:toggleRun },
-  { k:'Skip to next interval', s:'N', run:skipPhase },
-  { k:'Reset this interval', s:'R', run:resetInterval },
-  { k:'Start / stop the stopwatch on the session task', s:'T', run:toggleTracking },
-  { k:'Park a thought', s:'B', run:brainDump },
-  { k:'Log a distraction', s:'D', run:() => $('#tallyBtn').click() },
-  { k:'Toggle the sound mix', s:'M', run:() => $('#soundBtn').click() },
-  { k:'Silence all sound', s:'', run:silenceAll },
-  { k:'Sort unsorted tasks on the matrix', s:'P', run:triage },
-  { k:'Go to Focus', s:'1', run:() => go('focus') },
-  { k:'Go to Plan', s:'2', run:() => go('plan') },
-  { k:'Go to Tasks', s:'3', run:() => go('tasks') },
-  { k:'Go to Priority matrix', s:'4', run:() => go('matrix') },
-  { k:'Go to Notes', s:'5', run:() => go('notes') },
-  { k:'Go to Sound', s:'6', run:() => go('sound') },
-  { k:'Go to Calm', s:'7', run:() => go('calm') },
-  { k:'Go to Mood', s:'8', run:() => go('mood') },
-  { k:'Go to Habits and routines', s:'', run:() => go('habits') },
-  { k:'Go to Statistics', s:'9', run:() => go('stats') },
-  { k:'Go to Passport', s:'', run:() => go('passport') },
-  { k:'Go to Setup', s:'0', run:() => go('settings') },
-  { k:'Log how you feel right now', s:'', run:() => { go('mood'); const f = document.getElementById('md_mood'); if (f) f.focus(); } },
-  { k:'Help and guides', s:'', run:() => go('help') },
-  { k:'About the Study Pack', s:'', run:() => go('about') },
-  { k:'Auto-schedule this week', s:'', run:() => { go('plan'); $('#autoPlan').click(); } },
-  { k:'Sync Google Calendar now', s:'', run:() => { go('plan'); gcalSyncNow(); } },
-  { k:'Import an .ics file', s:'', run:() => { go('plan'); $('#icsImportBtn').click(); } },
-  { k:'Export everything (JSON)', s:'', run:() => $('#exportBtn').click() },
-  { k:'Start a breathing round', s:'', run:() => { go('calm'); $('#breathBtn').click(); } },
-  { k:'Switch theme', s:'', run:() => $('#themeBtn').click() },
-  { k:'Read the current task aloud', s:'A', run:readFocusAloud },
-  { k:'Read the selected text aloud', s:'', run:readSelectionAloud },
-  { k:'Stop reading aloud', s:'Esc', run:() => speech.stop() },
-  { k:'Comfort and accessibility settings', s:'', run:() => openSetup('profile') },
-  { k:'Show keyboard shortcuts', s:'?', run:() => openSetup('keys') }
+  { k:'Start / pause timer', a:'play pause pomodoro dial space', ico:'▶', s:'Space', run:toggleRun },
+  { k:'Skip to next interval', a:'next skip phase', ico:'⏭', s:'N', run:skipPhase },
+  { k:'Reset this interval', a:'restart reset timer', ico:'↺', s:'R', run:resetInterval },
+  { k:'Start / stop the stopwatch on the session task', a:'stopwatch track timing', ico:'⏱', s:'T', run:toggleTracking },
+  { k:'Park a thought', a:'brain dump parking lot thought', ico:'💭', s:'B', run:brainDump },
+  { k:'Log a distraction', a:'tally interrupt distraction', ico:'◎', s:'D', run:() => $('#tallyBtn').click() },
+  { k:'Toggle the sound mix', a:'audio ambient noise rain', ico:'🔊', s:'M', run:() => $('#soundBtn').click() },
+  { k:'Silence all sound', a:'mute quiet off', ico:'🔇', s:'', run:silenceAll },
+  { k:'Sort unsorted tasks on the matrix', a:'triage eisenhower priority', ico:'⊞', s:'P', run:triage },
+  { k:'Go to Focus', a:'home dial pomodoro timer 1', ico:'◉', s:'1', run:() => go('focus'), view:'focus' },
+  { k:'Go to Plan', a:'calendar week schedule ics gcal 2', ico:'📅', s:'2', run:() => go('plan'), view:'plan' },
+  { k:'Go to Tasks', a:'todo inbox list 3', ico:'☑', s:'3', run:() => go('tasks'), view:'tasks' },
+  { k:'Go to Priority matrix', a:'eisenhower quadrant urgent important 4', ico:'▦', s:'4', run:() => go('matrix'), view:'matrix' },
+  { k:'Go to Notes', a:'sticky board memo 5', ico:'🗒', s:'5', run:() => go('notes'), view:'notes' },
+  { k:'Go to Sound', a:'rain brown noise cafe fireplace 6', ico:'🎧', s:'6', run:() => go('sound'), view:'sound' },
+  { k:'Go to Calm', a:'breathe breathing ground radio 7', ico:'◌', s:'7', run:() => go('calm'), view:'calm' },
+  { k:'Go to Mood', a:'feelings journal energy stress 8', ico:'☾', s:'8', run:() => go('mood'), view:'mood' },
+  { k:'Go to Habits and routines', a:'routine streak habit tracker', ico:'🔁', s:'', run:() => go('habits'), view:'habits' },
+  { k:'Go to Statistics', a:'charts history analytics 9', ico:'📊', s:'9', run:() => go('stats'), view:'stats' },
+  { k:'Go to Passport', a:'badges milestones achievements profile photo quest', ico:'🛂', s:'', run:() => go('passport'), view:'passport' },
+  { k:'Go to Study coach', a:'llm ai agent assistant chat ask', ico:'✦', s:'', run:() => go('coach'), view:'coach' },
+  { k:'Go to Setup', a:'settings preferences comfort accessibility 0', ico:'⚙', s:'0', run:() => go('settings'), view:'settings' },
+  { k:'Go to Help', a:'guides docs how to tutorial', ico:'?', s:'', run:() => go('help'), view:'help' },
+  { k:'About the Study Pack', a:'credits version whats new', ico:'ℹ', s:'', run:() => go('about'), view:'about' },
+  { k:'Ask coach: brief me', a:'/ask summary status catch up agent llm', ico:'✦', s:'', run:() => askCoach('brief me'), agent:true },
+  { k:'Ask coach: what next', a:'/ask next move stuck overwhelmed agent', ico:'✦', s:'', run:() => askCoach('what next'), agent:true },
+  { k:'Ask coach: list my tasks', a:'/ask find tasks agent llm', ico:'✦', s:'', run:() => askCoach('list tasks'), agent:true },
+  { k:'Ask coach: start focus', a:'/ask begin pomodoro agent', ico:'✦', s:'', run:() => askCoach('start focus'), agent:true },
+  { k:'Ask coach: play rain', a:'/ask sound ambient agent', ico:'✦', s:'', run:() => askCoach('play rain'), agent:true },
+  { k:'Log how you feel right now', a:'mood checkin feelings', ico:'♡', s:'', run:() => { go('mood'); const f = document.getElementById('md_mood'); if (f) f.focus(); } },
+  { k:'Auto-schedule this week', a:'plan auto fill calendar', ico:'🗓', s:'', run:() => { go('plan'); $('#autoPlan').click(); } },
+  { k:'Sync Google Calendar now', a:'gcal google sync', ico:'↻', s:'', run:() => { go('plan'); gcalSyncNow(); } },
+  { k:'Import an .ics file', a:'ics calendar import', ico:'⬇', s:'', run:() => { go('plan'); $('#icsImportBtn').click(); } },
+  { k:'Export everything (JSON)', a:'backup download save', ico:'⬆', s:'', run:() => $('#exportBtn').click() },
+  { k:'Start a breathing round', a:'breathe calm box breath', ico:'💨', s:'', run:() => { go('calm'); $('#breathBtn').click(); } },
+  { k:'Switch theme', a:'dark light auto appearance', ico:'◐', s:'', run:() => $('#themeBtn').click() },
+  { k:'Read the current task aloud', a:'speech speak voice', ico:'🔊', s:'A', run:readFocusAloud },
+  { k:'Read the selected text aloud', a:'speech selection', ico:'🔊', s:'', run:readSelectionAloud },
+  { k:'Stop reading aloud', a:'speech stop', ico:'⏹', s:'Esc', run:() => speech.stop() },
+  { k:'Comfort and accessibility settings', a:'profile adhd calm dyslexia', ico:'🧭', s:'', run:() => openSetup('profile') },
+  { k:'Open Seeing settings', a:'text size theme contrast colour font', ico:'👁', s:'', run:() => openSetup('seeing') },
+  { k:'Open Motion settings', a:'animation chime reduce motion', ico:'〰️', s:'', run:() => openSetup('motion') },
+  { k:'Open Focus settings', a:'nudges streaks coaching interruptions', ico:'🎯', s:'', run:() => openSetup('focus') },
+  { k:'Open Timer settings', a:'pomodoro intervals presets durations', ico:'⏱', s:'', run:() => openSetup('timer') },
+  { k:'Open Account and data', a:'export import wipe storage account', ico:'🗄', s:'', run:() => openSetup('data') },
+  { k:'Show keyboard shortcuts', a:'hotkeys keys cheatsheet', ico:'⌨️', s:'?', run:() => openSetup('keys') }
 ];
 let cmdSel = 0, cmdRows = [], cmdOpener = null;
 /* The palette is a combobox driving a listbox: the input keeps focus and
    aria-activedescendant tells screen readers which command is highlighted. */
 let cmdSelection = '';
+function cmdHaystack(c) {
+  return `${c.k} ${c.a || ''} ${c.view || ''} ${c.agent ? 'agent llm ai coach ask' : ''}`.toLowerCase();
+}
+function rankCmd(c, q) {
+  if (!q) return c.agent ? 2 : 1;
+  const hay = cmdHaystack(c);
+  if (c.k.toLowerCase() === q) return 100;
+  if (c.k.toLowerCase().startsWith(q)) return 80;
+  if ((c.view || '') === q) return 70;
+  if (hay.includes(` ${q} `) || hay.startsWith(q + ' ') || hay.endsWith(' ' + q)) return 60;
+  if (hay.includes(q)) return 40;
+  return 0;
+}
 function openCmd() {
   cmdOpener = document.activeElement;
   cmdSelection = String(window.getSelection ? window.getSelection() : '').trim();   // focusing the input clears it
@@ -3847,10 +3917,32 @@ function closeCmd() {
   if (back && document.contains(back) && !back.closest('[inert],[hidden]')) back.focus();
 }
 function fillCmd(q) {
-  cmdRows = COMMANDS().filter(c => c.k.toLowerCase().includes(q.toLowerCase()));
+  const raw = String(q || '');
+  const agentPrompt = parseAgentShortcut(raw);
+  const needle = raw.trim().toLowerCase();
+  if (agentPrompt) {
+    cmdRows = [{
+      k: `Ask coach: ${agentPrompt.slice(0, 72)}`,
+      a: 'agent llm ai',
+      ico: '✦',
+      s: '↵',
+      agent: true,
+      run: () => askCoach(agentPrompt)
+    }];
+  } else {
+    cmdRows = COMMANDS()
+      .map(c => ({ c, score: rankCmd(c, needle) }))
+      .filter(x => !needle || x.score > 0)
+      .sort((a, b) => b.score - a.score || a.c.k.localeCompare(b.c.k))
+      .map(x => x.c);
+  }
   cmdSel = clamp(cmdSel, 0, Math.max(0, cmdRows.length - 1));
-  $('#cmdList').innerHTML = cmdRows.map((c, i) => `<div class="cmd ${i === cmdSel ? 'sel' : ''}" role="option" id="cmd-${i}" aria-selected="${i === cmdSel}" data-i="${i}">${esc(c.k)}${c.s ? `<span class="k" aria-hidden="true">${c.s}</span><span class="sr-only">, shortcut ${c.s === 'Space' ? 'Space' : c.s}</span>` : ''}</div>`).join('')
-    || '<div class="cmd" role="option" aria-disabled="true" style="color:var(--muted)">Nothing matches</div>';
+  const tip = agentPrompt
+    ? '<div class="cmd-tip" role="note">Agent shortcut — Enter sends this to the on-device coach</div>'
+    : '<div class="cmd-tip" role="note">Jump with a section name · <kbd>/ask</kbd> <kbd>ai:</kbd> <kbd>@coach</kbd> talk to the LLM</div>';
+  $('#cmdList').innerHTML = tip + (cmdRows.map((c, i) =>
+    `<div class="cmd ${i === cmdSel ? 'sel' : ''}${c.agent ? ' agent' : ''}" role="option" id="cmd-${i}" aria-selected="${i === cmdSel}" data-i="${i}"><span class="cmd-ico" aria-hidden="true">${esc(c.ico || '•')}</span><span class="cmd-label">${esc(c.k)}</span>${c.s ? `<span class="k" aria-hidden="true">${esc(c.s)}</span><span class="sr-only">, shortcut ${c.s === 'Space' ? 'Space' : c.s}</span>` : ''}</div>`
+  ).join('') || '<div class="cmd" role="option" aria-disabled="true" style="color:var(--muted)">Nothing matches — try focus, plan, /ask brief me</div>');
   $$('#cmdList .cmd[data-i]').forEach(r => r.onclick = () => runCmd(+r.dataset.i));
   const sel = $('#cmd-' + cmdSel);
   $('#cmdInput').setAttribute('aria-activedescendant', sel ? sel.id : '');
@@ -3879,7 +3971,8 @@ const SHORTCUTS = [
   ['T', 'Start or stop the stopwatch on the session task'], ['B', 'Park a thought'], ['D', 'Log a distraction'],
   ['M', 'Sound mix on or off'], ['P', 'Sort unsorted tasks on the matrix'], ['A', 'Read the current task aloud'],
   ['1 – 0', 'Go to Focus, Plan, Tasks, Matrix, Notes, Sound, Calm, Mood, Stats, Setup'], ['?', 'Show these shortcuts'],
-  ['Ctrl or ⌘ + K', 'Command palette (always on)'], ['Esc', 'Close a dialog, the palette, or stop reading aloud']
+  ['Ctrl or ⌘ + K', 'Command palette (always on)'], ['/ask … or ai: …', 'Send a prompt to the study coach'],
+  ['Esc', 'Close a dialog, the palette, or stop reading aloud']
 ];
 const INTERACTIVE = 'button, a[href], input, textarea, select, summary, [role="button"], [role="option"], [role="tab"], [role="switch"], [role="checkbox"], [role="radio"], [contenteditable="true"]';
 document.addEventListener('keydown', e => {
@@ -4878,7 +4971,7 @@ const AB_FEATURES = [
   ['Mood log', 'M3 15c3-5 5.5-5 8.5-1.5S17 17 21 9', 'Mood, energy and stress in five seconds, charted against the hours you actually worked — so the pattern is evidence rather than a feeling.'],
   ['Sound and calm', 'M4 9v6M8 6v12M12 3v18M16 7v10M20 10v4', 'Synthesised focus sound with no streaming, a breathing pacer, and a 90-second grounding routine for the days it gets away from you.'],
   ['Built for how you read', 'M3 12h18M12 3v18', 'Five comfort profiles, text to 175%, high contrast, muted colour, a built-in voice, and full screen-reader support — ADHD by default, adjustable for needs that conflict with it.'],
-  ['Passport', 'M12 8a3 3 0 1 0 .01 0M8 17c.8-2.4 2.6-3.6 4-3.6s3.2 1.2 4 3.6M7 3h10v18H7z', 'A display name, a photo, and badges that unlock from finished focus blocks — First Spark through Focus Legend — with a short animation when you earn one.'],
+  ['Passport', 'M12 8a3 3 0 1 0 .01 0M8 17c.8-2.4 2.6-3.6 4-3.6s3.2 1.2 4 3.6M7 3h10v18H7z', 'A display name, a photo, and fifty FocusQuest milestones — First Spark through Focus Sovereign — unlocked from finished focus blocks, with a short animation when you earn one.'],
   ['Yours, wherever', 'M12 3v12M7 10l5 5 5-5M4 19h16', 'One file exports everything. Signed in it syncs across devices; signed out it stays in this browser and still works offline.']
 ];
 const AB_FLOW = [
@@ -5639,9 +5732,12 @@ function renderPassport() {
     </div>`;
   const nxt = $('#passportNext');
   if (nxt) {
-    const upcoming = ACHIEVEMENTS.find(a => achievementProgress(a, stats) < 1);
-    nxt.innerHTML = upcoming
-      ? `<p class="hint">Next: <strong>${esc(upcoming.title)}</strong> — ${esc(upcoming.description)} (${Math.round(achievementProgress(upcoming, stats) * 100)}%).</p>`
+    const upcoming = ACHIEVEMENTS.filter(a => achievementProgress(a, stats) < 1).slice(0, 3);
+    nxt.innerHTML = upcoming.length
+      ? `<ul class="passport-next-list">${upcoming.map(a => {
+          const pct = Math.round(achievementProgress(a, stats) * 100);
+          return `<li><span class="p-ico" aria-hidden="true">${esc(a.icon)}</span><div><strong>${esc(a.title)}</strong><span>${esc(a.description)} · ${pct}%</span></div></li>`;
+        }).join('')}</ul>`
       : `<p class="hint">Every badge is yours. Keep showing up.</p>`;
   }
 }
