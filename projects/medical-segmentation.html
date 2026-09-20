@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://formspree.io; form-action 'self' https://formspree.io; frame-src 'none'; manifest-src 'self'">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>Medical Image Segmentation | Aydin Ayanzadeh</title>
+    <meta name="description" content="Multi-task deep learning platform for automated medical image analysis with advanced handling of imbalanced datasets.">
+    <link rel="canonical" href="https://www.ayanzadeh.com/projects/medical-segmentation.html">
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://www.ayanzadeh.com/projects/medical-segmentation.html">
+    <meta property="og:title" content="Medical Image Segmentation">
+    <meta property="og:description" content="Multi-task deep learning platform for automated medical image analysis with advanced handling of imbalanced datasets.">
+    <meta property="og:image" content="https://www.ayanzadeh.com/images/profile-compressed.jpg">
+    <meta property="og:site_name" content="Aydin Ayanzadeh - Research Portfolio">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://www.ayanzadeh.com/projects/medical-segmentation.html">
+    <meta name="twitter:title" content="Medical Image Segmentation">
+    <meta name="twitter:description" content="Multi-task deep learning platform for automated medical image analysis with advanced handling of imbalanced datasets.">
+    <meta name="twitter:image" content="https://www.ayanzadeh.com/images/profile-compressed.jpg">
+    <meta name="twitter:creator" content="@ayanzadeh93">
+    <meta name="twitter:site" content="@ayanzadeh93">
+
+    <!-- Apply the saved (or system) theme before first paint to avoid a light-mode flash -->
+    <script>
+        (function () {
+            var saved = null;
+            try { saved = localStorage.getItem('theme'); } catch (e) { /* storage unavailable */ }
+            var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            var dark = saved === 'dark' || (!saved && prefersDark);
+            document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+        })();
+    </script>
+
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/project.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer"></noscript>
+    <!-- seo-schema -->
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Medical Image Segmentation",
+    "url": "https://www.ayanzadeh.com/projects/medical-segmentation.html",
+    "description": "Multi-task deep learning platform for medical image analysis on imbalanced datasets.",
+    "author": {
+        "@id": "https://www.ayanzadeh.com/#person"
+    },
+    "creator": {
+        "@id": "https://www.ayanzadeh.com/#person"
+    },
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "Web"
+}
+    </script>
+
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://www.ayanzadeh.com/"
+        },
+        {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Projects",
+            "item": "https://www.ayanzadeh.com/#projects"
+        },
+        {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Medical Image Segmentation",
+            "item": "https://www.ayanzadeh.com/projects/medical-segmentation.html"
+        }
+    ]
+}
+    </script>
+    <!-- /seo-schema -->
+</head>
+<body class="project-page">
+    <!-- Navigation -->
+    <nav class="project-nav">
+        <div class="container">
+            <a href="../index.html" class="back-link">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Portfolio</span>
+            </a>
+            <div class="nav-links">
+                <a href="../index.html#projects">All Projects</a>
+                <a href="../index.html#contact">Contact</a>
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Switch to dark theme">
+                    <i class="fas fa-moon" aria-hidden="true"></i> <span>Theme</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+    <nav class="schema-breadcrumbs" aria-label="Breadcrumb">
+        <ol>
+            <li><a href="https://www.ayanzadeh.com/">Home</a></li>
+            <li><a href="https://www.ayanzadeh.com/#projects">Projects</a></li>
+            <li aria-current="page">Medical Image Segmentation</li>
+        </ol>
+    </nav>
+    <main class="project-main">
+        <!-- Project Hero -->
+        <section class="project-hero">
+            <div class="container">
+                <div class="project-hero-content">
+                    <div class="project-badges">
+                        <span class="badge featured">Deep Learning</span>
+                        <span class="badge status">Published</span>
+                    </div>
+                    <h1>Medical Image Segmentation</h1>
+                    <p class="project-tagline">Multi-task Deep Learning for Automated Medical Image Analysis</p>
+                    <div class="project-meta-info">
+                        <div class="meta-item">
+                            <i class="fas fa-user"></i>
+                            <span><strong>Aydin Ayanzadeh</strong> et al.</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-university"></i>
+                            <span>Istanbul Technical University</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-calendar"></i>
+                            <span>2019 - 2021</span>
+                        </div>
+                    </div>
+                    <div class="project-actions">
+                        <a href="https://journals.tubitak.gov.tr/elektrik/vol29/iss8/18/" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+                            <i class="fas fa-external-link-alt"></i> View Paper
+                        </a>
+                        <a href="../index.html#publications" class="btn btn-secondary">
+                            <i class="fas fa-book"></i> All Publications
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Project Overview -->
+        <section class="project-section">
+            <div class="container">
+                <h2><i class="fas fa-eye"></i> Overview</h2>
+                <div class="overview-content">
+                    <p class="lead">
+                        This project developed advanced deep learning pipelines for cell segmentation in label-free optical microscopy images, achieving state-of-the-art accuracy in medical imaging applications.
+                    </p>
+                    <p>
+                        The work addresses critical challenges in medical image analysis, including handling imbalanced datasets, achieving high dice scores for segmentation tasks, and developing robust pipelines that can generalize across different imaging conditions and cell types.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Key Features -->
+        <section class="project-section alt-bg">
+            <div class="container">
+                <h2><i class="fas fa-star"></i> Key Features</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h3>Multi-task Learning</h3>
+                        <p>Simultaneous optimization of multiple segmentation objectives for improved accuracy.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-balance-scale"></i>
+                        </div>
+                        <h3>Imbalanced Data Handling</h3>
+                        <p>Advanced techniques to handle class imbalance common in medical imaging datasets.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-microscope"></i>
+                        </div>
+                        <h3>Label-Free Imaging</h3>
+                        <p>Works with phase-contrast microscopy without requiring fluorescent labels.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3>High Accuracy</h3>
+                        <p>Achieved 95%+ dice score on benchmark medical imaging datasets.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technologies -->
+        <section class="project-section">
+            <div class="container">
+                <h2><i class="fas fa-code"></i> Technologies Used</h2>
+                <div class="tech-stack">
+                    <span class="tech-item">PyTorch</span>
+                    <span class="tech-item">Python</span>
+                    <span class="tech-item">OpenCV</span>
+                    <span class="tech-item">U-Net</span>
+                    <span class="tech-item">ResNet</span>
+                    <span class="tech-item">CUDA</span>
+                    <span class="tech-item">NumPy</span>
+                    <span class="tech-item">Scikit-Image</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Publications -->
+        <section class="project-section alt-bg">
+            <div class="container">
+                <h2><i class="fas fa-book"></i> Related Publications</h2>
+                <div class="publications-list">
+                    <div class="publication-entry">
+                        <h3>Turkish Journal of Electrical Engineering and Computer Sciences (2021)</h3>
+                        <p>Improved cell segmentation using deep learning in label-free optical microscopy images.</p>
+                        <a href="https://journals.tubitak.gov.tr/elektrik/vol29/iss8/18/" target="_blank" rel="noopener noreferrer" class="pub-link">
+                            <i class="fas fa-external-link-alt"></i> View Paper
+                        </a>
+                    </div>
+                    <div class="publication-entry">
+                        <h3>IEEE SIU Conference 2020</h3>
+                        <p>Deep Learning based Segmentation Pipeline for Label-Free Phase-Contrast Microscopy Images.</p>
+                        <a href="https://ieeexplore.ieee.org/abstract/document/9302304" target="_blank" rel="noopener noreferrer" class="pub-link">
+                            <i class="fas fa-external-link-alt"></i> View Paper
+                        </a>
+                    </div>
+                    <div class="publication-entry">
+                        <h3>TIPTEKNO 2019</h3>
+                        <p>Cell Segmentation of 2D Phase-Contrast Microscopy Images with Deep Learning Method.</p>
+                        <a href="https://ieeexplore.ieee.org/document/8894978" target="_blank" rel="noopener noreferrer" class="pub-link">
+                            <i class="fas fa-external-link-alt"></i> View Paper
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact CTA -->
+        <section class="project-cta">
+            <div class="container">
+                <h2>Interested in Medical AI Research?</h2>
+                <p>I'm open to collaborations on medical imaging and computer vision projects.</p>
+                <a href="../index.html#contact" class="btn btn-primary btn-lg">
+                    <i class="fas fa-envelope"></i> Get in Touch
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="project-footer">
+        <div class="container">
+            <p>&copy; 2026 Aydin Ayanzadeh. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="../index.html">Home</a>
+                <a href="../index.html#projects">Projects</a>
+                <a href="../index.html#publications">Publications</a>
+            </div>
+        </div>
+    </footer>
+
+    <button type="button" id="backToTop" class="back-to-top" aria-label="Back to top" hidden>
+        <i class="fas fa-arrow-up" aria-hidden="true"></i>
+    </button>
+
+    <script src="../js/main.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CLI Catalog — moved</title>
+  <meta name="description" content="The Claude Code, Codex and GitHub CLI catalog now lives in the encyclopedia.">
+  <link rel="canonical" href="https://www.ayanzadeh.com/claude-code-encyclopedia/">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <style>
+    body { font-family: ui-sans-serif, system-ui, sans-serif; margin: 0; padding: 48px 24px; line-height: 1.5; color: #101720; background: #f4f6f9; }
+    main { max-width: 42rem; margin: 0 auto; }
+    a { color: #0969da; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>This catalog now lives in the encyclopedia</h1>
+    <p>Claude Code, Codex CLI and GitHub CLI share one searchable page. Filters in the address bar are kept.</p>
+    <p><a id="encyclopedia-link" href="./">Open the encyclopedia</a></p>
+  </main>
+  <script>
+    const dest = new URL('./', location.href);
+    dest.search = location.search;
+    dest.hash = location.hash;
+    if (!dest.search) dest.searchParams.set('family', 'github');
+    const fallback = document.getElementById('encyclopedia-link');
+    if (fallback) fallback.href = dest.pathname + dest.search + dest.hash;
+    location.replace(dest.pathname + dest.search + dest.hash);
+  </script>
+</body>
+</html>
