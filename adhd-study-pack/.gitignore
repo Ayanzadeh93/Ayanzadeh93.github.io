@@ -1,0 +1,12 @@
+.DS_Store
+._*
+Thumbs.db
+.env
+.env.*
+!.env.example
+node_modules/
+
+# Never commit Firebase Admin SDK credentials or local deploy state.
+service-account*.json
+firebase-adminsdk-*.json
+.firebase/

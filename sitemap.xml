@@ -91,6 +91,12 @@
         <priority>0.6</priority>
     </url>
     <url>
+        <loc>https://www.ayanzadeh.com/adhd-study-pack/</loc>
+        <lastmod>2026-09-20</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <url>
         <loc>https://www.ayanzadeh.com/contact.html</loc>
         <lastmod>2026-09-20</lastmod>
         <changefreq>yearly</changefreq>
