@@ -2,8 +2,8 @@
 
 const supportsIntersectionObserver = 'IntersectionObserver' in window;
 const REVEAL_FALLBACK_DELAY = 2000; // Fallback delay to reveal content if observers do not trigger.
-const REVEAL_PRIMARY_SELECTOR = '.experience-card, .timeline-item, .publication-item, .award-item';
-const REVEAL_SECONDARY_SELECTOR = '.project-card, .project-item, .news-card, .teaching-item, .course-item, .journal-item, .reviewer-category, .focus-item';
+const REVEAL_PRIMARY_SELECTOR = '.experience-item, .timeline-item, .publication-item, .award-item';
+const REVEAL_SECONDARY_SELECTOR = '.project-card, .project-item, .news-card, .journal-item, .reviewer-category, .focus-item, .mentoring-list > li';
 const REVEAL_FALLBACK_SELECTOR = `.section, ${REVEAL_PRIMARY_SELECTOR}, ${REVEAL_SECONDARY_SELECTOR}`;
 
 if (supportsIntersectionObserver) {
@@ -40,28 +40,93 @@ function escapeHtml(value) {
 
 window.escapeHtml = escapeHtml;
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize all components. Each initializer is isolated so a failure in one
-    // still leaves the others (and the loading overlay teardown) working.
-    const initializers = [
-        initMobileMenu,
-        initSmoothScrolling,
-        initIntersectionObserver,
-        initFormValidation,
-        initLoadingStates,
-        initLazyLoading,
-        initPerformanceOptimizations,
-        initAccessibilityFeatures,
-        initNavbarScroll,
-        initThemeToggle
-    ];
-
+// Pages share this bundle but not their markup, so isolate each module: a
+// failure in one must not stop the rest from initialising.
+function runInit(name, fn) {
     try {
-        initializers.forEach(initializer => safeInvoke(initializer.name, initializer));
-    } finally {
-        hideLoadingOverlay();
+        fn();
+    } catch (error) {
+        console.error(`Failed to initialize ${name}:`, error);
     }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    [
+        ['mobile menu', initMobileMenu],
+        ['smooth scrolling', initSmoothScrolling],
+        ['scroll reveal', initIntersectionObserver],
+        ['form validation', initFormValidation],
+        ['loading states', initLoadingStates],
+        ['lazy loading', initLazyLoading],
+        ['performance optimizations', initPerformanceOptimizations],
+        ['accessibility features', initAccessibilityFeatures],
+        ['navbar scroll', initNavbarScroll],
+        ['theme toggle', initThemeToggle],
+        ['back to top', initBackToTop],
+        ['reading progress', initReadingProgress],
+        ['footer info links', initFooterInfoLinks]
+    ].forEach(([name, fn]) => runInit(name, fn));
+
+    hideLoadingOverlay();
 });
+
+// Floating scroll-to-top control
+function initBackToTop() {
+    const button = document.getElementById('backToTop');
+    if (!button) return;
+
+    const SHOW_AFTER = 400;
+
+    button.hidden = false;
+
+    function syncVisibility() {
+        button.classList.toggle('is-visible', window.scrollY > SHOW_AFTER);
+    }
+
+    window.addEventListener('scroll', syncVisibility, { passive: true });
+    syncVisibility();
+
+    button.addEventListener('click', () => {
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+    });
+}
+
+// Reading progress indicator for long-form article pages
+function initReadingProgress() {
+    const bar = document.getElementById('readingProgressBar');
+    const article = document.querySelector('.blog-post-article');
+    if (!bar || !article) return;
+
+    const track = bar.parentElement;
+    let frame = null;
+
+    function update() {
+        frame = null;
+
+        const articleHeight = article.scrollHeight - window.innerHeight;
+        const scrolled = window.scrollY - article.offsetTop;
+        const percent = articleHeight > 0
+            ? Math.min(100, Math.max(0, (scrolled / articleHeight) * 100))
+            : 0;
+
+        bar.style.width = `${percent}%`;
+
+        if (track) {
+            track.setAttribute('aria-valuenow', String(Math.round(percent)));
+        }
+    }
+
+    function requestUpdate() {
+        if (frame === null) {
+            frame = window.requestAnimationFrame(update);
+        }
+    }
+
+    window.addEventListener('scroll', requestUpdate, { passive: true });
+    window.addEventListener('resize', requestUpdate, { passive: true });
+    update();
+}
 
 // Navbar scroll effect
 function initNavbarScroll() {
@@ -98,6 +163,9 @@ function initThemeToggle() {
 
     if (!themeToggleBtn) return;
 
+    // Keep the mobile browser chrome in step with the page surface
+    const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+
     const applyTheme = (theme) => {
         const isDark = theme === 'dark';
 
@@ -108,6 +176,10 @@ function initThemeToggle() {
         if (themeIcon) {
             themeIcon.classList.toggle('fa-sun', isDark);
             themeIcon.classList.toggle('fa-moon', !isDark);
+        }
+
+        if (themeColorMeta) {
+            themeColorMeta.setAttribute('content', isDark ? '#0f1729' : '#2563eb');
         }
     };
 
@@ -124,16 +196,67 @@ function initThemeToggle() {
     const initialTheme = savedTheme === 'dark' || (!savedTheme && prefersDark) ? 'dark' : 'light';
     applyTheme(initialTheme);
 
+    // A View Transition cross-fades the whole page instead of snapping every
+    // surface at once. Feature-detected and skipped under reduced motion, so
+    // the theme still switches instantly wherever it is unsupported or unwanted.
+    const swapTheme = (newTheme) => {
+        const reduceMotion = window.matchMedia
+            && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        if (!document.startViewTransition || reduceMotion) {
+            applyTheme(newTheme);
+            return;
+        }
+
+        root.dataset.viewTransition = 'theme';
+        const transition = document.startViewTransition(() => applyTheme(newTheme));
+        transition.finished
+            .catch(() => { /* a superseded transition is not an error */ })
+            .finally(() => { delete root.dataset.viewTransition; });
+    };
+
     themeToggleBtn.addEventListener('click', () => {
         const currentTheme = root.getAttribute('data-theme');
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        applyTheme(newTheme);
+        swapTheme(newTheme);
 
         try {
             localStorage.setItem('theme', newTheme);
         } catch (error) {
             // Storage can be unavailable (private mode, quota); keep the in-memory theme.
             reportError('Could not persist theme preference', error);
+        }
+
+        if (window.announceToScreenReader) {
+            window.announceToScreenReader(`${newTheme === 'dark' ? 'Dark' : 'Light'} theme enabled`);
+        }
+    });
+
+    // Track the system preference until the visitor makes an explicit choice
+    if (!savedTheme && window.matchMedia) {
+        const systemPreference = window.matchMedia('(prefers-color-scheme: dark)');
+        const followSystem = (event) => {
+            let hasChoice = false;
+            try {
+                hasChoice = Boolean(localStorage.getItem('theme'));
+            } catch (error) {
+                hasChoice = false;
+            }
+
+            if (!hasChoice) {
+                applyTheme(event.matches ? 'dark' : 'light');
+            }
+        };
+
+        if (typeof systemPreference.addEventListener === 'function') {
+            systemPreference.addEventListener('change', followSystem);
+        }
+    }
+
+    // Keep the theme consistent across open tabs
+    window.addEventListener('storage', (event) => {
+        if (event.key === 'theme' && event.newValue) {
+            applyTheme(event.newValue === 'dark' ? 'dark' : 'light');
         }
     });
 }
@@ -712,6 +835,25 @@ if (document.readyState === 'loading') {
     initResponsiveBehavior();
 }
 
+
+// Footer info links. The markup carries data-info instead of an inline
+// onclick, so the handler lives here with the rest of the page behaviour.
+function initFooterInfoLinks() {
+    const handlers = {
+        privacy: showPrivacyInfo,
+        accessibility: showAccessibilityInfo
+    };
+
+    document.querySelectorAll('[data-info]').forEach((link) => {
+        const handler = handlers[link.dataset.info];
+        if (!handler) return;
+
+        link.addEventListener('click', function(event) {
+            event.preventDefault();
+            handler();
+        });
+    });
+}
 
 // Privacy and Accessibility Info Functions
 window.showPrivacyInfo = function() {

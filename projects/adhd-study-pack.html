@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://formspree.io; form-action 'self' https://formspree.io; frame-src 'none'; manifest-src 'self'">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>ADHD Study Pack: Focus Tool for Study Sessions | Aydin Ayanzadeh</title>
+    <meta name="description" content="A Pomodoro workspace for ADHD study sessions: focus dial, Eisenhower priority matrix, a week planner that auto-schedules study blocks, synthesised focus sounds, breathing tools and honest statistics, with Google sign-in sync.">
+    <link rel="canonical" href="https://www.ayanzadeh.com/projects/adhd-study-pack.html">
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://www.ayanzadeh.com/projects/adhd-study-pack.html">
+    <meta property="og:title" content="ADHD Study Pack: Focus Tool for Study Sessions">
+    <meta property="og:description" content="A Pomodoro workspace for ADHD study sessions: focus dial, Eisenhower priority matrix, a week planner that auto-schedules study blocks, synthesised focus sounds, breathing tools and honest statistics, with Google sign-in sync.">
+    <meta property="og:image" content="https://www.ayanzadeh.com/images/profile-compressed.jpg">
+    <meta property="og:site_name" content="Aydin Ayanzadeh - Research Portfolio">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://www.ayanzadeh.com/projects/adhd-study-pack.html">
+    <meta name="twitter:title" content="ADHD Study Pack: Focus Tool for Study Sessions">
+    <meta name="twitter:description" content="A Pomodoro workspace for ADHD study sessions: focus dial, Eisenhower priority matrix, a week planner that auto-schedules study blocks, synthesised focus sounds, breathing tools and honest statistics, with Google sign-in sync.">
+    <meta name="twitter:image" content="https://www.ayanzadeh.com/images/profile-compressed.jpg">
+    <meta name="twitter:creator" content="@ayanzadeh93">
+    <meta name="twitter:site" content="@ayanzadeh93">
+
+    <!-- Apply the saved (or system) theme before first paint to avoid a light-mode flash -->
+    <script>
+        (function () {
+            var saved = null;
+            try { saved = localStorage.getItem('theme'); } catch (e) { /* storage unavailable */ }
+            var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            var dark = saved === 'dark' || (!saved && prefersDark);
+            document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+        })();
+    </script>
+
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/project.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer"></noscript>
+    <!-- seo-schema -->
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "ADHD Study Pack",
+    "url": "https://www.ayanzadeh.com/projects/adhd-study-pack.html",
+    "description": "Browser-based Pomodoro workspace and executive-function tool for ADHD study sessions.",
+    "author": {
+        "@id": "https://www.ayanzadeh.com/#person"
+    },
+    "creator": {
+        "@id": "https://www.ayanzadeh.com/#person"
+    },
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "Web",
+    "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+    }
+}
+    </script>
+
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://www.ayanzadeh.com/"
+        },
+        {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Projects",
+            "item": "https://www.ayanzadeh.com/#projects"
+        },
+        {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "ADHD Study Pack",
+            "item": "https://www.ayanzadeh.com/projects/adhd-study-pack.html"
+        }
+    ]
+}
+    </script>
+    <!-- /seo-schema -->
+</head>
+<body class="project-page">
+    <!-- Navigation -->
+    <nav class="project-nav">
+        <div class="container">
+            <a href="../index.html" class="back-link">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Portfolio</span>
+            </a>
+            <div class="nav-links">
+                <a href="../index.html#projects">All Projects</a>
+                <a href="../index.html#contact">Contact</a>
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Switch to dark theme">
+                    <i class="fas fa-moon" aria-hidden="true"></i> <span>Theme</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+    <nav class="schema-breadcrumbs" aria-label="Breadcrumb">
+        <ol>
+            <li><a href="https://www.ayanzadeh.com/">Home</a></li>
+            <li><a href="https://www.ayanzadeh.com/#projects">Projects</a></li>
+            <li aria-current="page">ADHD Study Pack</li>
+        </ol>
+    </nav>
+    <main class="project-main">
+        <!-- Project Hero -->
+        <section class="project-hero">
+            <div class="container">
+                <div class="project-hero-content">
+                    <div class="project-badges">
+                        <span class="badge featured">Assistive Tooling</span>
+                        <span class="badge status">Live &mdash; Google sync or local</span>
+                    </div>
+                    <h1>ADHD Study Pack</h1>
+                    <p class="project-tagline">A Pomodoro Workspace Built Around How a Study Session Actually Falls Apart</p>
+                    <div class="project-meta-info">
+                        <div class="meta-item">
+                            <i class="fas fa-user"></i>
+                            <span><strong>Aydin Ayanzadeh</strong></span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-shield-halved"></i>
+                            <span>Runs in the browser &middot; optional Google sync</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-calendar"></i>
+                            <span>2026</span>
+                        </div>
+                    </div>
+                    <div class="project-actions">
+                        <a href="https://www.ayanzadeh.com/adhd-study-pack/" class="btn btn-primary">
+                            <i class="fas fa-circle-half-stroke"></i> Open the Study Pack
+                        </a>
+                        <a href="../index.html#projects" class="btn btn-secondary">
+                            <i class="fas fa-th"></i> All Projects
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Overview -->
+        <section class="project-section">
+            <div class="container">
+                <h2><i class="fas fa-eye"></i> Overview</h2>
+                <div class="overview-content">
+                    <p class="lead">
+                        Most study tools assume the hard part is knowing what to do. For an ADHD
+                        working session it usually is not &mdash; the hard part is starting, staying
+                        started, and telling what is loud apart from what matters.
+                    </p>
+                    <p>
+                        The Study Pack is a Pomodoro workspace built for that. The focus dial runs
+                        whatever interval is survivable today, down to a two-minute start, and asks
+                        one sentence about what &ldquo;done&rdquo; looks like before it begins. An
+                        Eisenhower matrix makes the urgent-versus-important call once, in advance,
+                        instead of forty times a day under pressure. The planner turns &ldquo;I should
+                        study&rdquo; into blocks with a start time, and a distracting thought is one
+                        keystroke from parked rather than a new tab.
+                    </p>
+                    <p>
+                        Nothing is pre-filled. Every chart, streak and suggestion is computed from
+                        what you actually do, so the statistics are evidence about when you focus
+                        well and what pulls you off &mdash; not a scoreboard. The Passport badges
+                        are the same rule: they unlock from finished focus blocks, not from a
+                        separate identity product.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features -->
+        <section class="project-section alt-bg">
+            <div class="container">
+                <h2><i class="fas fa-star"></i> What It Does</h2>
+                <div class="overview-content">
+                    <p>
+                        <strong>Focus dial.</strong> Adjustable focus, short-break and long-break
+                        lengths with presets from &ldquo;Two-minute start&rdquo; to 90/20 ultradian
+                        blocks. The countdown tracks the wall clock, so a backgrounded tab cannot run
+                        it slow. A session intent, an activation rating, a one-tap distraction tally
+                        and a quiet body-double mode ride alongside.
+                    </p>
+                    <p>
+                        <strong>Priority matrix.</strong> Tasks sit in Q1&ndash;Q4 by urgency and
+                        importance, placed by drag-and-drop or two taps, with a one-at-a-time sorter
+                        for the unsorted pile. A balance card shows how much focus time really went
+                        to Q2, and the focus view nudges toward a Q2 task when the week is running
+                        on urgency.
+                    </p>
+                    <p>
+                        <strong>Tasks and planner.</strong> Every task carries a pomodoro estimate and
+                        an activation cost &mdash; how hard it is to start. Any task or calendar
+                        block can also be timed with a stopwatch: press start, work for as long as
+                        it runs, and the minutes land in your study time. A week calendar holds
+                        classes and study blocks; courses get weekly targets, and the auto-scheduler
+                        packs sessions into free hours, weighted by the hours you historically focus
+                        best. Connect Google Calendar and the sync runs both ways: your
+                        Google events appear in the planner as busy time, and the blocks you
+                        plan are added to Google, with edits and deletions following them.
+                        Calendars also come in and go out as <code>.ics</code>.
+                    </p>
+                    <p>
+                        <strong>Notes, sound and calm.</strong> A sticky-note wall where parked
+                        thoughts land; rain, brown and pink noise, caf&eacute; hum, fireplace and
+                        more, all synthesised live with the Web Audio API; breathing pacers, a
+                        5-4-3-2-1 grounding run, check-ins and movement prompts for the break.
+                    </p>
+                    <p>
+                        <strong>Mood, energy and stress.</strong> Three numbers and a couple of tags,
+                        logged in about five seconds from a two-dimensional pad &mdash; mood up the
+                        side, energy across &mdash; or from the sliders beside it. What makes it
+                        worth doing is the second half: the charts draw your focus minutes behind the
+                        mood line, so the view can say things like <em>mood runs 1.2 higher on days
+                        with at least 25 minutes of focus</em>, name your best and worst weekday, and
+                        surface which tags keep turning up on the rough days. A day-by-day grid shows
+                        a month at a glance and is built as a real table, so it reads as data to a
+                        screen reader rather than as colour.
+                    </p>
+                    <p>
+                        <strong>Statistics.</strong> Focus minutes per day, best hours, a consistency
+                        heatmap, what pulls you away, time by course, a session log with CSV export,
+                        and plain-language insights drawn from all of it.
+                    </p>
+                    <p>
+                        <strong>Habits and Help.</strong> A habit tracker for the things that fall
+                        apart between sessions: build habits with forgiving streaks, counters
+                        (water, coffee), and break habits with days-clean and an impulse pause.
+                        A dedicated Help tab holds the guides so the working screens stay quiet.
+                    </p>
+                    <p>
+                        <strong>Passport.</strong> The same Google or email sign-in now carries a
+                        profile card &mdash; display name, photo, a short bio &mdash; and achievement
+                        badges that unlock from focus sessions you actually finish. First Spark,
+                        Hour Hero, streaks and Focus Legend are the same history as Statistics, not
+                        a second app.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Privacy -->
+        <section class="project-section">
+            <div class="container">
+                <h2><i class="fas fa-lock"></i> Where the Data Lives</h2>
+                <div class="overview-content">
+                    <p class="lead">
+                        Two ways in: sign in with Google and the workspace syncs, or use a local
+                        profile and nothing leaves the browser.
+                    </p>
+                    <p>
+                        <strong>Google sign-in</strong> keeps the workspace in Cloud Firestore at
+                        <code>users/{uid}/workspace/state</code>. Firestore security rules let only
+                        the signed-in owner read or write it. Open tabs and devices update live, and
+                        the page keeps working offline, queueing writes until the connection is back.
+                        If the synced workspace cannot be loaded, the app signs back out rather than
+                        opening an empty one that could overwrite it.
+                    </p>
+                    <p>
+                        <strong>A local profile</strong> lives in this browser only. Its password is
+                        hashed before it is stored, but the page says plainly what that is: a
+                        courtesy lock on a shared laptop, not security. Either way, the whole
+                        workspace exports as JSON and imports back in one step.
+                    </p>
+                    <p>
+                        <strong>Two stores, because they grow differently.</strong> The working set
+                        &mdash; tasks, blocks, notes, settings &mdash; is small and bounded, so it
+                        travels as one document. History is not: focus sessions, check-ins and mood
+                        entries only ever accumulate, and a Firestore document stops at one mebibyte.
+                        So every time-stamped record is written on its own into a real database
+                        &mdash; an IndexedDB store signed out, a Firestore collection
+                        (<code>users/{uid}/journal</code>) signed in &mdash; indexed by kind and
+                        time. A record written on a phone and one written on a laptop now merge
+                        instead of overwriting each other, and the history can grow for years.
+                        Upgrading moves any inline history across before anything is dropped, and
+                        entries logged before you signed in are only folded into an account when you
+                        say so &mdash; on a shared computer they would otherwise land in whoever
+                        signed in first.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Design notes -->
+        <section class="project-section alt-bg">
+            <div class="container">
+                <h2><i class="fas fa-universal-access"></i> Design &amp; Accessibility</h2>
+                <div class="overview-content">
+                    <p>
+                        Every view and every timer action has a single-key shortcut, and a command
+                        palette (<kbd>Ctrl</kbd>/<kbd>&#8984;</kbd> + <kbd>K</kbd>) reaches the rest,
+                        so the mouse is never the thing standing between you and starting.
+                        <kbd>B</kbd> parks a thought and <kbd>D</kbd> logs a distraction without
+                        stopping the timer.
+                    </p>
+                    <p>
+                        Light and dark follow the system or can be pinned, with four accent colours.
+                        Under <code>prefers-reduced-motion</code> the breathing and pulse animations
+                        stop. On a phone the navigation becomes a scrolling strip and every view
+                        stacks to a single column.
+                    </p>
+                    <p>
+                        <strong>Settings that start simple.</strong> Every Setup section opens with
+                        the two or three things most people change and folds the rest behind one
+                        button that says how many are inside. Nothing is removed &mdash; a
+                        disclosure, not a second class of setting &mdash; and the choice of what is
+                        open stays put while you work.
+                    </p>
+                    <p>
+                        <strong>Comfort profiles.</strong> ADHD and autism often want opposite things
+                        from the same screen &mdash; quick rewards, streaks and nudges against muted
+                        colour, no surprises and a warning before every change. The defaults are
+                        ADHD-first; Setup offers five starting profiles (ADHD, Calm and predictable,
+                        Low vision, Easier reading, Screen reader) and then lets you change any single
+                        setting, at which point the profile is marked as customised and tells you
+                        exactly what differs. Text scales to 175% without a horizontal scrollbar,
+                        line and letter spacing loosen, the typeface can switch to Atkinson
+                        Hyperlegible, contrast can go high, colour can go muted or grey, and pop-up
+                        messages can be limited to the important ones or turned off entirely
+                        &mdash; they still reach screen readers either way.
+                    </p>
+                    <p>
+                        <strong>Screen readers and speech.</strong> Built and audited against WCAG 2.2
+                        AA: every view is a landmark with a heading, changing view moves focus to that
+                        heading, dialogs make the page behind <code>inert</code> and return focus when
+                        they close, the matrix and calendar blocks are keyboard buttons with names
+                        that say what and when, and two live regions carry news politely and
+                        interruptions assertively. Single-key shortcuts can be switched off
+                        (WCAG&nbsp;2.1.4) so they never clash with a reader&rsquo;s own keys, and the
+                        timer can announce the time left every few minutes. That works with NVDA,
+                        JAWS and Narrator on Windows, VoiceOver on macOS and iOS, and TalkBack on
+                        Android. For anyone who wants things read aloud without running a screen
+                        reader, there is a built-in voice using the speech synthesis already on the
+                        device &mdash; it reads the current task, the timer, or any text you select,
+                        and nothing is sent anywhere to do it.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technologies -->
+        <section class="project-section">
+            <div class="container">
+                <h2><i class="fas fa-code"></i> Technologies Used</h2>
+                <div class="tech-stack">
+                    <span class="tech-item">Vanilla JavaScript</span>
+                    <span class="tech-item">ES Modules</span>
+                    <span class="tech-item">Web Audio API</span>
+                    <span class="tech-item">SVG Charts</span>
+                    <span class="tech-item">Firebase Authentication</span>
+                    <span class="tech-item">Cloud Firestore</span>
+                    <span class="tech-item">CSS Custom Properties</span>
+                </div>
+                <div class="overview-content">
+                    <p>
+                        No framework, no bundler and no build step &mdash; the browser runs the
+                        source exactly as committed. The Firebase SDK is loaded only when the page is
+                        configured for it, from a pinned version, and the page&rsquo;s Content
+                        Security Policy allows no inline script.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="project-cta">
+            <div class="container">
+                <h2>Try the Study Pack</h2>
+                <p>Opens instantly. Use a local profile, or sign in with Google to keep it on every device.</p>
+                <a href="https://www.ayanzadeh.com/adhd-study-pack/" class="btn btn-primary btn-lg">
+                    <i class="fas fa-circle-half-stroke"></i> Open the Study Pack
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="project-footer">
+        <div class="container">
+            <p>&copy; 2026 Aydin Ayanzadeh. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="../index.html">Home</a>
+                <a href="../index.html#projects">Projects</a>
+                <a href="../index.html#publications">Publications</a>
+            </div>
+        </div>
+    </footer>
+
+    <button type="button" id="backToTop" class="back-to-top" aria-label="Back to top" hidden>
+        <i class="fas fa-arrow-up" aria-hidden="true"></i>
+    </button>
+
+    <script src="../js/main.js"></script>
+</body>
+</html>
