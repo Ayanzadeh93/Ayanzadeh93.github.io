@@ -32,10 +32,35 @@ Transitions) are fair game, because the browser runs the source files as written
 ├── js/blog.js              # Blog-only features (classic script)
 ├── js/lib/                 # Pure helpers: dom.js, citations.js, search.js
 ├── js/components/          # <pub-explorer>, <cite-dialog>, index.js entry
+├── apps/                   # Standalone reference apps
+├── data/                   # JSON content: projects.json
+├── tests/validate_content.py  # Schema + route validation, run in CI
 ├── projects/*.html         # One page per project
 ├── sitemap.xml / robots.txt
 └── manifest.json           # PWA manifest
 ```
+
+## Data-Backed Pages
+
+Two areas render from JSON rather than hand-written markup. For these, **content
+changes are data edits and must never require touching rendering code**:
+
+| Data file | Rendered by | Covers |
+|-----------|-------------|--------|
+| `data/projects.json` | `js/projects-index.js`, `js/project-detail.js` | The projects index and detail routes |
+| GitHub CLI catalog (standalone) | [`Ayanzadeh93/claude-code-encyclopedia`](https://github.com/Ayanzadeh93/claude-code-encyclopedia) | GitHub CLI entries live with the encyclopedia app. `apps/claude-code-*.html` in this repo are redirects. |
+
+`tests/validate_content.py` validates `data/projects.json` and lightweight
+route contracts on every push and pull request via
+`.github/workflows/content-validation.yml`. **Run it before committing a data change** —
+it is faster than a CI round trip:
+
+```bash
+python tests/validate_content.py
+```
+
+When you add a validation rule, check it actually fails on bad input. A rule
+that cannot fail is worse than no rule, because it reads like coverage.
 
 ## Core Principles
 
@@ -140,6 +165,15 @@ Copy checklists from [reference.md](reference.md) when executing these tasks.
 3. Ship the Cite control as `<button type="button" class="pub-link" data-cite hidden>`. The component unhides it, so no-JS readers never see a dead button.
 4. Verify DOIs before adding them (`https://doi.org/<doi>` or the Crossref API). A wrong identifier in a citation is worse than a missing one.
 
+### Add a CLI catalog entry
+
+GitHub CLI records live in the standalone encyclopedia repo, not this one.
+
+1. Add the record to [`Ayanzadeh93/claude-code-encyclopedia`](https://github.com/Ayanzadeh93/claude-code-encyclopedia) `data/catalog.json`.
+2. Required fields: `id`, `section`, `name`, `type`, `description`, `aliases`,
+   `examples`, `introducedVersion`, `tags`, `note`. Ids are `<section>-<slug>`.
+3. Run `python3 tests/validate_catalog.py` in that repo.
+
 ### Add a custom element
 
 1. Module in `js/components/`, pure helpers in `js/lib/`, styles in `css/components.css`.
@@ -155,7 +189,7 @@ Copy checklists from [reference.md](reference.md) when executing these tasks.
 ## SEO & Deployment
 
 - Update `sitemap.xml` `<lastmod>` when adding/removing pages.
-- Canonical URLs use `https://ayanzadeh93.github.io/` (or production domain if CNAME active).
+- Canonical URLs use `https://www.ayanzadeh.com/` (or production domain if CNAME active).
 - Deploy: push to `main` → GitHub Pages auto-deploys. See `DEPLOYMENT.md` for Netlify/custom domain.
 - Verify contact form in Formspree dashboard after deploy.
 

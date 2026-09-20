@@ -1,8 +1,20 @@
-# robots.txt for https://www.ayanzadeh.com
+# robots.txt for Aydin Ayanzadeh Research Portfolio
+# https://www.ayanzadeh.com/
+
 User-agent: *
 Allow: /
 
-# JS-only shells that duplicate or lack unique content
+Allow: /css/
+Allow: /js/
+Allow: /images/
+Allow: /index.html
+Allow: /favicon.svg
+Allow: /manifest.json
+Allow: /Aydin_Ayanzadeh_CV__final.pdf
+
+Disallow: /browserconfig.xml
+Disallow: /.git
+Disallow: /.cursor/
 Disallow: /projects/project.html
 Disallow: /apps/claude-code-catalog.html
 

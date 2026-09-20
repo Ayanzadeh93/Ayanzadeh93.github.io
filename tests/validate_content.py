@@ -53,37 +53,15 @@ def validate_projects():
             assert_true(target.is_file(), f"{project['id']} local link target does not exist: {href}")
 
 
-def validate_claude_catalog():
-    payload = read_json("data/claude-code/catalog.json")
-    assert_true(payload.get("schemaVersion") == 1, "Claude catalog schemaVersion must be 1")
-
-    sections = payload.get("sections", [])
-    entries = payload.get("entries", [])
-    section_ids = [section.get("id") for section in sections]
-    entry_ids = [entry.get("id") for entry in entries]
-
-    assert_true(section_ids and len(section_ids) == len(set(section_ids)), "Claude section ids must be unique")
-    assert_true(entry_ids and len(entry_ids) == len(set(entry_ids)), "Claude entry ids must be unique")
-    section_set = set(section_ids)
-
-    required = {"id", "section", "name", "type", "description", "aliases", "examples", "introducedVersion", "tags", "note"}
-    for entry in entries:
-        missing = required - entry.keys()
-        assert_true(not missing, f"Claude entry {entry.get('id')} missing fields: {sorted(missing)}")
-        assert_true(entry["section"] in section_set, f"Claude entry {entry['id']} references unknown section")
-        assert_true(entry["name"].strip(), f"Claude entry {entry['id']} needs a name")
-        assert_true(entry["description"].strip(), f"Claude entry {entry['id']} needs a description")
-
-
 def validate_routes_and_size_budgets():
     required_files = [
         "projects/index.html",
         "projects/project.html",
         "apps/claude-code-catalog.html",
+        "apps/claude-code-encyclopedia.html",
         "js/projects-index.js",
         "js/project-detail.js",
         "js/lib/project-data.js",
-        "js/claude-code-catalog.js",
         "css/projects-data.css",
     ]
     for relative in required_files:
@@ -94,13 +72,21 @@ def validate_routes_and_size_budgets():
     assert_true("getProjectById" in detail_js, "project detail route must use shared resolver")
     assert_true("project.html?id=" in helper_js, "shared route helper must build project detail URLs")
 
+    # Old app URLs must keep redirecting into the standalone Pages app.
+    for relative in ("apps/claude-code-encyclopedia.html", "apps/claude-code-catalog.html"):
+        html = (ROOT / relative).read_text(encoding="utf-8")
+        assert_true(
+            "https://www.ayanzadeh.com/claude-code-encyclopedia/" in html,
+            f"{relative} must redirect to the standalone encyclopedia",
+        )
+
     budgets = {
         "projects/index.html": 30_000,
         "projects/project.html": 30_000,
         "apps/claude-code-catalog.html": 30_000,
+        "apps/claude-code-encyclopedia.html": 30_000,
         "js/projects-index.js": 20_000,
         "js/project-detail.js": 20_000,
-        "js/claude-code-catalog.js": 20_000,
         "css/projects-data.css": 30_000,
     }
     for relative, limit in budgets.items():
@@ -110,7 +96,6 @@ def validate_routes_and_size_budgets():
 
 def main():
     validate_projects()
-    validate_claude_catalog()
     validate_routes_and_size_budgets()
     print("content validation: PASS")
 
