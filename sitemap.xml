@@ -2,92 +2,98 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
         <loc>https://www.ayanzadeh.com/</loc>
-        <lastmod>2026-09-10</lastmod>
+        <lastmod>2026-09-20</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
     </url>
     <url>
+        <loc>https://www.ayanzadeh.com/publications.html</loc>
+        <lastmod>2026-09-20</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
         <loc>https://www.ayanzadeh.com/blog.html</loc>
-        <lastmod>2026-09-09</lastmod>
+        <lastmod>2026-09-20</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
+        <loc>https://www.ayanzadeh.com/blog-post.html</loc>
+        <lastmod>2026-09-20</lastmod>
+        <changefreq>yearly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    <url>
+        <loc>https://www.ayanzadeh.com/projects/</loc>
+        <lastmod>2026-09-20</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
         <loc>https://www.ayanzadeh.com/projects/indoor-navigation.html</loc>
-        <lastmod>2026-09-09</lastmod>
+        <lastmod>2026-09-20</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>https://www.ayanzadeh.com/projects/wildfire-vlm.html</loc>
+        <lastmod>2026-09-20</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.9</priority>
     </url>
     <url>
         <loc>https://www.ayanzadeh.com/projects/medical-segmentation.html</loc>
-        <lastmod>2026-09-09</lastmod>
+        <lastmod>2026-09-20</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
         <loc>https://www.ayanzadeh.com/projects/knowledge-distillation.html</loc>
-        <lastmod>2026-09-09</lastmod>
+        <lastmod>2026-09-20</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
         <loc>https://www.ayanzadeh.com/projects/vision-language-medical.html</loc>
-        <lastmod>2026-09-09</lastmod>
+        <lastmod>2026-09-20</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
         <loc>https://www.ayanzadeh.com/projects/graph-autoencoder.html</loc>
-        <lastmod>2026-09-09</lastmod>
+        <lastmod>2026-09-20</lastmod>
         <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
+        <priority>0.7</priority>
     </url>
     <url>
         <loc>https://www.ayanzadeh.com/projects/ml-data-pipeline.html</loc>
-        <lastmod>2026-09-09</lastmod>
+        <lastmod>2026-09-20</lastmod>
         <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-    </url>
-    <url>
-        <loc>https://www.ayanzadeh.com/projects/wildfire-vlm.html</loc>
-        <lastmod>2026-09-09</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.9</priority>
+        <priority>0.6</priority>
     </url>
     <url>
         <loc>https://www.ayanzadeh.com/projects/claude-code-encyclopedia.html</loc>
-        <lastmod>2026-09-10</lastmod>
+        <lastmod>2026-09-20</lastmod>
         <changefreq>monthly</changefreq>
-        <priority>0.7</priority>
-    </url>
-    <url>
-        <loc>https://www.ayanzadeh.com/claude-code-encyclopedia/</loc>
-        <lastmod>2026-09-18</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.7</priority>
-    </url>
-    <url>
-        <loc>https://www.ayanzadeh.com/apps/claude-code-encyclopedia.html</loc>
-        <lastmod>2026-09-18</lastmod>
-        <changefreq>yearly</changefreq>
-        <priority>0.2</priority>
-    </url>
-    <url>
-        <loc>https://www.ayanzadeh.com/apps/claude-code-catalog.html</loc>
-        <lastmod>2026-09-18</lastmod>
-        <changefreq>yearly</changefreq>
-        <priority>0.2</priority>
+        <priority>0.6</priority>
     </url>
     <url>
         <loc>https://www.ayanzadeh.com/projects/adhd-study-pack.html</loc>
-        <lastmod>2026-09-11</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-    </url>
-    <url>
-        <loc>https://www.ayanzadeh.com/adhd-study-pack/</loc>
-        <lastmod>2026-09-18</lastmod>
+        <lastmod>2026-09-20</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
+    </url>
+    <url>
+        <loc>https://www.ayanzadeh.com/claude-code-encyclopedia/</loc>
+        <lastmod>2026-09-20</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    <url>
+        <loc>https://www.ayanzadeh.com/contact.html</loc>
+        <lastmod>2026-09-20</lastmod>
+        <changefreq>yearly</changefreq>
+        <priority>0.5</priority>
     </url>
 </urlset>
