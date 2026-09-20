@@ -4,14 +4,8 @@
 User-agent: *
 Allow: /
 
-Allow: /css/
-Allow: /js/
-Allow: /images/
-Allow: /index.html
-Allow: /favicon.svg
-Allow: /manifest.json
-Allow: /Aydin_Ayanzadeh_CV__final.pdf
-
+# Thin or duplicate utility URLs
+Disallow: /projects/project.html
 Disallow: /browserconfig.xml
 Disallow: /.git
 Disallow: /.cursor/
