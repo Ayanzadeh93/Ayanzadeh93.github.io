@@ -1,0 +1,18 @@
+{
+  "name": "ayanzadeh93.github.io",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Personal website of Aydin Ayanzadeh, Ph.D. Student in Computer Science at the University of Maryland, Baltimore County.",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "keywords": [],
+  "author": "Aydin Ayanzadeh",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^30.4.2",
+    "jest-environment-jsdom": "^30.4.1"
+  }
+}
