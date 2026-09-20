@@ -608,8 +608,13 @@
         text-align: center;
     }
     
-    .nav-links {
+    /* Collapse the text links but keep the theme toggle reachable */
+    .nav-links a {
         display: none;
+    }
+
+    .nav-links {
+        gap: 8px;
     }
 }
 
@@ -627,3 +632,91 @@
     }
 }
 
+
+/* ========================================
+   PROJECT PAGE DARK THEME
+   Token overrides cover most surfaces; the
+   rules below fix the hardcoded ones.
+   ======================================== */
+
+.nav-links {
+    align-items: center;
+}
+
+[data-theme="dark"] .project-nav {
+    background: rgba(26, 26, 26, 0.95);
+    border-bottom-color: var(--border-color);
+}
+
+[data-theme="dark"] .project-page {
+    background: var(--background-white);
+}
+
+[data-theme="dark"] .feature-card,
+[data-theme="dark"] .diagram-container,
+[data-theme="dark"] .tech-item {
+    background: var(--background-alt);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .diagram-container {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .diagram-wrapper {
+    background: var(--background-white);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .publication-entry,
+[data-theme="dark"] .publication-entry.planned {
+    background: var(--background-alt);
+}
+
+[data-theme="dark"] .project-section.alt-bg {
+    background: var(--background-alt);
+}
+
+[data-theme="dark"] .project-footer {
+    background: #0b1220;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Diagrams and screenshots are authored on light backgrounds, so soften
+   them slightly rather than letting them glare against a dark page. */
+[data-theme="dark"] .project-diagram.image-diagram {
+    filter: brightness(0.92) contrast(1.02);
+}
+
+/* ========================================
+   PROJECT PAGE REFINEMENTS
+   ======================================== */
+
+/* Anchor targets clear the fixed navigation */
+.project-section[id],
+.project-main [id] {
+    scroll-margin-top: calc(var(--nav-height) + 16px);
+}
+
+.project-nav.scrolled {
+    box-shadow: var(--shadow-sm);
+}
+
+.feature-card {
+    will-change: transform;
+}
+
+/* Skip offscreen section work until the section is near the viewport */
+.project-section {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 600px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .feature-card:hover,
+    .project-actions .btn-primary:hover,
+    .project-cta .btn-lg:hover,
+    .diagram-link:hover {
+        transform: none;
+    }
+}
