@@ -369,11 +369,14 @@ function initIntersectionObserver() {
 
     setTimeout(() => {
         const revealTargets = Array.from(document.querySelectorAll(REVEAL_FALLBACK_SELECTOR));
-        const hasAnimated = revealTargets.some(element => element.classList.contains('animate-in'));
-
-        if (!hasAnimated) {
-            revealTargets.forEach(element => element.classList.add('animate-in'));
-        }
+        // Reveal anything the observer missed. The old "if none animated, reveal
+        // all" check skipped the rest of the page once the hero/metrics sections
+        // (or the first sliver of About) had already gotten `.animate-in`.
+        revealTargets.forEach(element => {
+            if (!element.classList.contains('animate-in')) {
+                element.classList.add('animate-in');
+            }
+        });
     }, REVEAL_FALLBACK_DELAY);
 }
 
