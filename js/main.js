@@ -1,5 +1,4 @@
 // Enhanced main.js with performance optimizations and accessibility features
-// Shared helpers live in js/utils.js (window.SiteUtils).
 
 const supportsIntersectionObserver = 'IntersectionObserver' in window;
 const REVEAL_FALLBACK_DELAY = 2000; // Fallback delay to reveal content if observers do not trigger.
@@ -10,24 +9,6 @@ const REVEAL_FALLBACK_SELECTOR = `.section, ${REVEAL_PRIMARY_SELECTOR}, ${REVEAL
 if (supportsIntersectionObserver) {
     document.documentElement.classList.add('js-enabled');
 }
-
-// Report a failure without letting it abort the caller, so one broken feature
-// never takes down the rest of the page.
-function reportError(context, error) {
-    console.error(`[site] ${context}:`, error);
-}
-
-function safeInvoke(context, fn) {
-    try {
-        return fn();
-    } catch (error) {
-        reportError(context, error);
-        return undefined;
-    }
-}
-
-window.siteReportError = reportError;
-window.siteSafeInvoke = safeInvoke;
 
 // Escape text before it is interpolated into an HTML template string.
 function escapeHtml(value) {
@@ -184,7 +165,12 @@ function initThemeToggle() {
         }
     };
 
-    const savedTheme = SiteUtils.readStoredValue('theme');
+    let savedTheme = null;
+    try {
+        savedTheme = localStorage.getItem('theme');
+    } catch (error) {
+        savedTheme = null;
+    }
 
     // Saved choice wins; otherwise follow the operating system preference
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -218,8 +204,7 @@ function initThemeToggle() {
         try {
             localStorage.setItem('theme', newTheme);
         } catch (error) {
-            // Storage can be unavailable (private mode, quota); keep the in-memory theme.
-            reportError('Could not persist theme preference', error);
+            // Ignore storage errors and continue with in-memory theme state.
         }
 
         if (window.announceToScreenReader) {
@@ -354,29 +339,50 @@ function initIntersectionObserver() {
         return;
     }
 
-    SiteUtils.observeReveal(
-        ['section', REVEAL_PRIMARY_SELECTOR, REVEAL_SECONDARY_SELECTOR],
-        {
-            threshold: 0.15,
-            rootMargin: '-40px 0px',
-            onReveal: (target) => {
+    const observerOptions = {
+        threshold: 0.15,
+        rootMargin: '-40px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate-in');
+                
                 // Update active navigation link
-                const id = target.getAttribute('id');
+                const id = entry.target.getAttribute('id');
                 if (id) updateActiveNavLink(`#${id}`);
+
             }
-        }
+        });
+    }, observerOptions);
+
+    // Observe all sections
+    document.querySelectorAll('section').forEach(section => {
+        observer.observe(section);
+    });
+
+    const observeElements = (elements) => {
+        elements.forEach((element) => {
+            observer.observe(element);
+        });
+    };
+
+    observeElements(
+        document.querySelectorAll(REVEAL_PRIMARY_SELECTOR)
+    );
+
+    observeElements(
+        document.querySelectorAll(REVEAL_SECONDARY_SELECTOR)
     );
 
     setTimeout(() => {
         const revealTargets = Array.from(document.querySelectorAll(REVEAL_FALLBACK_SELECTOR));
-        // Reveal anything the observer missed. The old "if none animated, reveal
-        // all" check skipped the rest of the page once the hero/metrics sections
-        // (or the first sliver of About) had already gotten `.animate-in`.
-        revealTargets.forEach(element => {
-            if (!element.classList.contains('animate-in')) {
-                element.classList.add('animate-in');
-            }
-        });
+        const hasAnimated = revealTargets.some(element => element.classList.contains('animate-in'));
+
+        if (!hasAnimated) {
+            revealTargets.forEach(element => element.classList.add('animate-in'));
+        }
     }, REVEAL_FALLBACK_DELAY);
 }
 
@@ -424,7 +430,7 @@ function validateField(field) {
 
     // Remove existing error states
     field.classList.remove('error');
-    SiteUtils.removeFieldError(field);
+    removeFieldError(field);
 
     // Validation rules
     switch (fieldName) {
@@ -435,7 +441,8 @@ function validateField(field) {
             }
             break;
         case 'email':
-            if (!SiteUtils.isValidEmail(value)) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(value)) {
                 errorMessage = 'Please enter a valid email address.';
                 isValid = false;
             }
@@ -450,10 +457,28 @@ function validateField(field) {
 
     if (!isValid) {
         field.classList.add('error');
-        SiteUtils.showFieldError(field, errorMessage);
+        showFieldError(field, errorMessage);
     }
 
     return isValid;
+}
+
+function showFieldError(field, message) {
+    let errorElement = field.parentNode.querySelector('.field-error');
+    if (!errorElement) {
+        errorElement = document.createElement('div');
+        errorElement.className = 'field-error';
+        errorElement.setAttribute('role', 'alert');
+        field.parentNode.appendChild(errorElement);
+    }
+    errorElement.textContent = message;
+}
+
+function removeFieldError(field) {
+    const errorElement = field.parentNode.querySelector('.field-error');
+    if (errorElement) {
+        errorElement.remove();
+    }
 }
 
 // Loading states
@@ -473,11 +498,13 @@ function hideLoadingSpinner() {
 }
 
 function showLoadingOverlay() {
-    SiteUtils.setLoadingOverlay(true);
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) overlay.classList.add('active');
 }
 
 function hideLoadingOverlay() {
-    SiteUtils.setLoadingOverlay(false);
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) overlay.classList.remove('active');
 }
 
 // Lazy loading for images
@@ -496,18 +523,9 @@ function initLazyLoading() {
                 if (entry.isIntersecting) {
                     const img = entry.target;
                     img.src = img.dataset.src;
-                    img.removeAttribute('data-src');
                     img.classList.add('loaded');
                     imageObserver.unobserve(img);
                 }
-
-                img.addEventListener('load', () => img.classList.add('loaded'), { once: true });
-                img.addEventListener('error', () => {
-                    img.classList.add('load-failed');
-                    reportError(`Lazy image failed to load: ${source}`, null);
-                }, { once: true });
-
-                img.src = source;
             });
         });
 
@@ -520,124 +538,6 @@ function initLazyLoading() {
 // Performance optimizations
 function initPerformanceOptimizations() {
     initHeroParallax();
-    initHeroVizPlayback();
-    initScrollProgress();
-    initMetricCounters();
-}
-
-// Returns true when either the OS setting or the site's own Reduce Motion
-// toggle is asking us to hold still.
-function prefersLessMotion() {
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches
-        || document.body.classList.contains('reduce-motion');
-}
-
-// The "research at a glance" figures are recounted from the page's own markup
-// rather than hard-coded, so adding a publication updates the tile for free and
-// the number can never contradict the section it links to. The value written in
-// the HTML is the no-JS fallback and is only replaced once a count succeeds.
-function initMetricCounters() {
-    const counters = document.querySelectorAll('.metric__value[data-count-of]');
-    if (!counters.length) return;
-
-    const targets = new Map();
-
-    counters.forEach(el => {
-        const total = document.querySelectorAll(el.dataset.countOf).length;
-        // A selector that matches nothing means the section was renamed or
-        // removed — keep the authored fallback rather than showing a zero.
-        if (total > 0) targets.set(el, total);
-    });
-
-    const settle = (el) => {
-        el.textContent = String(targets.get(el));
-    };
-
-    const countUp = (el) => {
-        const total = targets.get(el);
-        const duration = 900;
-        const started = performance.now();
-
-        const step = (now) => {
-            const progress = Math.min((now - started) / duration, 1);
-            const eased = 1 - Math.pow(1 - progress, 3);
-            el.textContent = String(Math.round(total * eased));
-            if (progress < 1) requestAnimationFrame(step);
-            else settle(el);
-        };
-
-        requestAnimationFrame(step);
-    };
-
-    if (!supportsIntersectionObserver || prefersLessMotion()) {
-        targets.forEach((_, el) => settle(el));
-        return;
-    }
-
-    // Start from zero only for counters we are about to animate, so a counter
-    // that never scrolls into view still shows its real figure.
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (!entry.isIntersecting) return;
-            observer.unobserve(entry.target);
-            if (prefersLessMotion()) settle(entry.target);
-            else countUp(entry.target);
-        });
-    }, { threshold: 0.4 });
-
-    targets.forEach((_, el) => observer.observe(el));
-}
-
-// The hero visualization animates stroke offsets, which repaint rather than
-// composite. Park it whenever nobody can see it: scrolled past, or tab hidden.
-function initHeroVizPlayback() {
-    const viz = document.querySelector('.hero-viz');
-    if (!viz) return;
-
-    let onScreen = true;
-
-    const sync = () => {
-        viz.classList.toggle('is-paused', document.hidden || !onScreen);
-    };
-
-    if (supportsIntersectionObserver) {
-        new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                onScreen = entry.isIntersecting;
-            });
-            sync();
-        }, { threshold: 0 }).observe(viz);
-    }
-
-    document.addEventListener('visibilitychange', sync);
-    sync();
-}
-
-// Reading progress bar. Scaled rather than resized so the browser can keep it
-// on the compositor, and left decorative — the scrollbar already tells
-// assistive technology where we are in the document.
-function initScrollProgress() {
-    const bar = document.getElementById('scroll-progress-bar');
-    if (!bar) return;
-
-    let ticking = false;
-
-    const update = () => {
-        const scrollable = document.documentElement.scrollHeight - window.innerHeight;
-        const progress = scrollable > 0 ? Math.min(window.scrollY / scrollable, 1) : 0;
-        bar.style.transform = `scaleX(${progress})`;
-        ticking = false;
-    };
-
-    const request = () => {
-        if (ticking) return;
-        ticking = true;
-        requestAnimationFrame(update);
-    };
-
-    window.addEventListener('scroll', request, { passive: true });
-    window.addEventListener('resize', request, { passive: true });
-    update();
 }
 
 // Subtle parallax on the hero background only, driven by requestAnimationFrame
@@ -666,11 +566,25 @@ function initHeroParallax() {
 
 // Accessibility features
 function initAccessibilityFeatures() {
-    // Single announcement channel shared by every page script
-    window.announceToScreenReader = announceToScreenReader;
+    // Announce dynamic content changes
+    initAriaLiveRegions();
 
     // High contrast mode detection
     detectHighContrastMode();
+}
+
+function initAriaLiveRegions() {
+    // Create live region for announcements
+    const liveRegion = document.createElement('div');
+    liveRegion.setAttribute('aria-live', 'polite');
+    liveRegion.setAttribute('aria-atomic', 'true');
+    liveRegion.className = 'sr-only';
+    document.body.appendChild(liveRegion);
+    
+    window.announceToScreenReader = function(message) {
+        liveRegion.textContent = message;
+        setTimeout(() => liveRegion.textContent = '', 1000);
+    };
 }
 
 function detectHighContrastMode() {
@@ -696,10 +610,9 @@ function submitForm(form) {
     
     // Disable submit button to prevent double submission
     const submitButton = form.querySelector('button[type="submit"]');
-    const restoreButton = SiteUtils.setButtonBusy(
-        submitButton,
-        '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Sending...'
-    );
+    const originalText = submitButton.innerHTML;
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Sending...';
     
     // Keep reply-to synced with the email field for easier responses.
     const emailInput = form.querySelector('input[name="email"]');
@@ -721,7 +634,8 @@ function submitForm(form) {
     })
     .then(response => {
         hideLoadingSpinner();
-        restoreButton();
+        submitButton.disabled = false;
+        submitButton.innerHTML = originalText;
         
         if (response.ok) {
         showSuccessMessage('Thank you for your message! I will get back to you soon.');
@@ -740,24 +654,22 @@ function submitForm(form) {
                 window.announceToScreenReader('Message sent successfully!');
             }
         } else {
-            reportError(`Form submission rejected with status ${response.status}`, null);
-
-            return response.json().then(data => {
-                if (data && data.errors) {
+            response.json().then(data => {
+                if (data.errors) {
                     const errorMessages = data.errors.map(error => error.message).join(', ');
                     showErrorMessage(`Error: ${errorMessages}`);
                 } else {
                     showErrorMessage('There was a problem sending your message. Please try again.');
                 }
-            }).catch(parseError => {
-                reportError('Could not parse form submission error response', parseError);
+            }).catch(() => {
                 showErrorMessage('There was a problem sending your message. Please try again.');
             });
         }
     })
     .catch(error => {
         hideLoadingSpinner();
-        restoreButton();
+        submitButton.disabled = false;
+        submitButton.innerHTML = originalText;
         console.error('Form submission error:', error);
         showErrorMessage('There was a problem sending your message. Please check your connection and try again, or email me directly at a.ayanzadeh@gmail.com.');
     });
@@ -777,10 +689,10 @@ function showMessage(message, type) {
         msg.remove();
     });
     
-    const messageEl = SiteUtils.createDismissibleMessage(`${type}-message show`, message, 5000, (element) => {
-        element.classList.remove('show');
-        setTimeout(() => element.remove(), 300);
-    });
+    const messageEl = document.createElement('div');
+    messageEl.className = `${type}-message show`;
+    messageEl.textContent = message;
+    messageEl.setAttribute('role', 'alert');
     
     const contactForm = document.getElementById('contactForm');
     if (contactForm) {
@@ -792,6 +704,12 @@ function showMessage(message, type) {
         }
 
         contactForm.insertBefore(messageEl, contactForm.firstChild);
+        
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            messageEl.classList.remove('show');
+            setTimeout(() => messageEl.remove(), 300);
+        }, 5000);
     }
     
     // Announce to screen readers
@@ -802,11 +720,13 @@ function showMessage(message, type) {
 
 // Error handling
 window.addEventListener('error', function(e) {
-    reportError(`Uncaught error at ${e.filename || 'unknown'}:${e.lineno || 0}`, e.error || e.message);
+    console.error('JavaScript error:', e.error);
+    // Could implement error reporting here
 });
 
 window.addEventListener('unhandledrejection', function(e) {
-    reportError('Unhandled promise rejection', e.reason);
+    console.error('Unhandled promise rejection:', e.reason);
+    // Could implement error reporting here
 });
 
 // Screen reader only class for accessibility
@@ -859,12 +779,7 @@ function updateLayoutForScreenSize() {
     if (!isMobile && topNavMenu && topNavMenu.classList.contains('active')) {
         // Close mobile menu on desktop
         topNavMenu.classList.remove('active');
-
-        const mobileToggle = document.querySelector('.mobile-menu-toggle');
-        if (mobileToggle) {
-            mobileToggle.classList.remove('active');
-        }
-
+        document.querySelector('.mobile-menu-toggle').classList.remove('active');
         document.body.style.overflow = '';
     }
 }
@@ -963,11 +878,7 @@ function showCustomModal(title, content) {
     const firstElement = focusableElements[0];
     const lastElement = focusableElements[focusableElements.length - 1];
     
-    if (firstElement) {
-        firstElement.focus();
-    } else {
-        reportError('Modal opened without focusable elements', title);
-    }
+    firstElement.focus();
     
     modal.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
@@ -993,15 +904,13 @@ window.closeCustomModal = function() {
 
 // Advanced Accessibility Features
 function initializeAccessibilityFeatures() {
-    [
-        ensureAccessibilityStructure,
-        initializeAccessibilityMenu,
-        initializeKeyboardEnhancements,
-        initializeScreenReaderSupport,
-        initializeReadingGuide,
-        initializePageReader,
-        loadAccessibilityPreferences
-    ].forEach(initializer => safeInvoke(initializer.name, initializer));
+    ensureAccessibilityStructure();
+    initializeAccessibilityMenu();
+    initializeKeyboardEnhancements();
+    initializeScreenReaderSupport();
+    initializeReadingGuide();
+    initializePageReader();
+    loadAccessibilityPreferences();
 }
 
 function ensureAccessibilityStructure() {
@@ -1347,51 +1256,72 @@ function initializeScreenReaderSupport() {
 }
 
 function announceToScreenReader(message, priority = 'polite') {
-    SiteUtils.announce(message, priority);
+    const announcer = document.getElementById(priority === 'assertive' ? 'sr-alerts' : 'sr-status');
+    if (announcer) {
+        // Clear previous message
+        announcer.textContent = '';
+        
+        // Add new message after a brief delay to ensure it's announced
+        setTimeout(() => {
+            announcer.textContent = message;
+        }, 100);
+        
+        // Clear message after it's been announced
+        setTimeout(() => {
+            announcer.textContent = '';
+        }, 3000);
+    }
 }
 
 // Accessibility Preferences
-const ACCESSIBILITY_PREFERENCES_KEY = 'accessibilityPreferences';
-
 function saveAccessibilityPreference(key, value) {
-    const preferences = SiteUtils.readStoredJSON(ACCESSIBILITY_PREFERENCES_KEY, {});
-    preferences[key] = value;
-    SiteUtils.writeStoredJSON(ACCESSIBILITY_PREFERENCES_KEY, preferences);
+    try {
+        const preferences = JSON.parse(localStorage.getItem('accessibilityPreferences') || '{}');
+        preferences[key] = value;
+        localStorage.setItem('accessibilityPreferences', JSON.stringify(preferences));
+    } catch (e) {
+        console.warn('Could not save accessibility preference:', e);
+    }
 }
 
 function loadAccessibilityPreferences() {
-    const preferences = SiteUtils.readStoredJSON(ACCESSIBILITY_PREFERENCES_KEY, {});
-
-    Object.entries(preferences).forEach(([key, value]) => {
-        const toggleId = key.replace(/([A-Z])/g, '-$1').toLowerCase() + '-toggle';
-        const toggle = document.getElementById(toggleId);
-
-        if (toggle) {
-            toggle.checked = value;
-            // Trigger the change event to apply the setting
-            toggle.dispatchEvent(new Event('change'));
-        }
-    });
+    try {
+        const preferences = JSON.parse(localStorage.getItem('accessibilityPreferences') || '{}');
+        
+        // Apply saved preferences
+        Object.entries(preferences).forEach(([key, value]) => {
+            const toggleId = key.replace(/([A-Z])/g, '-$1').toLowerCase() + '-toggle';
+            const toggle = document.getElementById(toggleId);
+            
+            if (toggle) {
+                toggle.checked = value;
+                // Trigger the change event to apply the setting
+                toggle.dispatchEvent(new Event('change'));
+            }
+        });
+    } catch (e) {
+        console.warn('Could not load accessibility preferences:', e);
+    }
 }
 
 function resetAccessibilitySettings() {
     // Reset all toggles
     const toggles = document.querySelectorAll('#accessibility-menu input[type="checkbox"]');
     toggles.forEach(toggle => {
-        safeInvoke(`Resetting accessibility toggle "${toggle.id || 'unknown'}"`, () => {
-            toggle.checked = false;
-            toggle.dispatchEvent(new Event('change'));
-        });
+        toggle.checked = false;
+        toggle.dispatchEvent(new Event('change'));
     });
     
-    SiteUtils.removeStoredValue(ACCESSIBILITY_PREFERENCES_KEY);
+    // Clear localStorage
+    try {
+        localStorage.removeItem('accessibilityPreferences');
+    } catch (e) {
+        console.warn('Could not clear accessibility preferences:', e);
+    }
 
     stopPageReader();
     
-    announceToScreenReader(cleared
-        ? 'All accessibility settings have been reset'
-        : 'Accessibility settings were reset for this page, but could not be cleared from storage.',
-        cleared ? 'polite' : 'assertive');
+    announceToScreenReader('All accessibility settings have been reset');
 }
 
 function initializePageReader() {
@@ -1461,30 +1391,20 @@ function startPageReader() {
     };
 
     utterance.onerror = (event) => {
-        reportError('Speech synthesis failed', event.error || event);
+        console.warn('Speech synthesis failed:', event.error || event);
         updatePageReaderButtons(false);
         announceToScreenReader('Unable to read the page aloud.', 'assertive');
     };
 
     window.activeReaderUtterance = utterance;
-
-    try {
-        window.speechSynthesis.speak(utterance);
-    } catch (error) {
-        window.activeReaderUtterance = null;
-        reportError('Speech synthesis could not start', error);
-        updatePageReaderButtons(false);
-        announceToScreenReader('Unable to read the page aloud.', 'assertive');
-        return;
-    }
-
+    window.speechSynthesis.speak(utterance);
     updatePageReaderButtons(true);
     announceToScreenReader('Reading page content aloud.');
 }
 
 function stopPageReader() {
     if ('speechSynthesis' in window && window.speechSynthesis.speaking) {
-        safeInvoke('Cancelling speech synthesis', () => window.speechSynthesis.cancel());
+        window.speechSynthesis.cancel();
     }
 
     window.activeReaderUtterance = null;
@@ -1503,7 +1423,7 @@ function updatePageReaderButtons(isReading) {
 // Initialize accessibility features when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     // Add to existing initialization
-    safeInvoke('initializeAccessibilityFeatures', initializeAccessibilityFeatures);
+    initializeAccessibilityFeatures();
 
     // Add keyboard shortcut to toggle accessibility menu (Alt + A)
     document.addEventListener('keydown', function(e) {
@@ -1538,13 +1458,41 @@ document.addEventListener('DOMContentLoaded', function() {
 // ========================================
 
 function copyToClipboard(text) {
-    SiteUtils.copyText(text).then(copied => {
-        if (copied) {
+    // Try using the modern Clipboard API first
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(function() {
+            showCitationNotification('Citation copied to clipboard!');
+        }).catch(function(err) {
+            fallbackCopyTextToClipboard(text);
+        });
+    } else {
+        // Fallback for older browsers or non-HTTPS
+        fallbackCopyTextToClipboard(text);
+    }
+}
+
+function fallbackCopyTextToClipboard(text) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.position = "fixed";
+    textArea.style.top = "-9999px";
+    textArea.style.left = "-9999px";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+        const successful = document.execCommand('copy');
+        if (successful) {
             showCitationNotification('Citation copied to clipboard!');
         } else {
             showCitationNotification('Failed to copy citation', 'error');
         }
-    });
+    } catch (err) {
+        showCitationNotification('Failed to copy citation', 'error');
+    }
+    
+    document.body.removeChild(textArea);
 }
 
 function showCitationNotification(message, type = 'success') {
@@ -1576,57 +1524,4 @@ function showCitationNotification(message, type = 'success') {
             notification.remove();
         }, 300);
     }, 3000);
-}
-
-// Exposed for unit tests; browsers ignore this because `module` is undefined there.
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        initNavbarScroll,
-        initThemeToggle,
-        initMobileMenu,
-        initSmoothScrolling,
-        initFormValidation,
-        initIntersectionObserver,
-        initLazyLoading,
-        initHeroParallax,
-        initAriaLiveRegions,
-        initializeAccessibilityFeatures,
-        ensureAccessibilityStructure,
-        initializeAccessibilityMenu,
-        openAccessibilityMenu,
-        closeAccessibilityMenu,
-        initializeKeyboardEnhancements,
-        initializeScreenReaderSupport,
-        initializeReadingGuide,
-        initializeReadingGuideTracking,
-        removeReadingGuideTracking,
-        updateReadingGuide,
-        initializePageReader,
-        showCustomModal,
-        validateField,
-        showFieldError,
-        removeFieldError,
-        showLoadingSpinner,
-        hideLoadingSpinner,
-        showLoadingOverlay,
-        hideLoadingOverlay,
-        updateActiveNavLink,
-        submitForm,
-        showMessage,
-        showErrorMessage,
-        showSuccessMessage,
-        updateLayoutForScreenSize,
-        announceToScreenReader,
-        saveAccessibilityPreference,
-        loadAccessibilityPreferences,
-        resetAccessibilitySettings,
-        getPageReaderText,
-        startPageReader,
-        stopPageReader,
-        updatePageReaderButtons,
-        copyToClipboard,
-        fallbackCopyTextToClipboard,
-        showCitationNotification,
-        detectHighContrastMode
-    };
 }

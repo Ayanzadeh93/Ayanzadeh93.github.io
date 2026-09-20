@@ -1,25 +1,5 @@
 // Blog listing and article behaviour: browsing, newsletter, sharing, code copy
 
-// main.js is always loaded first on blog pages; keep local fallbacks so blog.js
-// still degrades gracefully if it is used on its own.
-function blogReportError(context, error) {
-    if (typeof window.siteReportError === 'function') {
-        window.siteReportError(context, error);
-        return;
-    }
-
-    console.error(`[blog] ${context}:`, error);
-}
-
-function blogSafeInvoke(context, fn) {
-    try {
-        return fn();
-    } catch (error) {
-        blogReportError(context, error);
-        return undefined;
-    }
-}
-
 document.addEventListener('DOMContentLoaded', function () {
     // The listing and article pages share this file, so isolate each module.
     [
@@ -245,18 +225,19 @@ function initNewsletterForm() {
 
 function validateEmail(emailInput) {
     const email = emailInput.value.trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     emailInput.classList.remove('error', 'valid');
-    SiteUtils.removeFieldError(emailInput);
+    removeFieldError(emailInput);
 
     if (!email) {
-        SiteUtils.showFieldError(emailInput, 'Email is required.');
+        showFieldError(emailInput, 'Email is required.');
         emailInput.classList.add('error');
         return false;
     }
 
-    if (!SiteUtils.isValidEmail(email)) {
-        SiteUtils.showFieldError(emailInput, 'Please enter a valid email address.');
+    if (!emailRegex.test(email)) {
+        showFieldError(emailInput, 'Please enter a valid email address.');
         emailInput.classList.add('error');
         return false;
     }
@@ -376,7 +357,6 @@ function showFormMessage(form, message, type) {
     messageElement.textContent = message;
     messageElement.setAttribute('role', type === 'error' ? 'alert' : 'status');
 
-    const messageElement = SiteUtils.createDismissibleMessage(`form-message ${type}-message`, message);
     form.insertBefore(messageElement, form.firstChild);
 
     // Errors name a fallback email address, so leave them up to be read.
