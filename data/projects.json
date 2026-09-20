@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updated": "2026-09-18",
+  "updated": "2026-09-20",
   "projects": [
     {
       "id": "indoor-navigation",
@@ -144,14 +144,16 @@
       "status": "Live",
       "featured": true,
       "year": 2026,
-      "summary": "A browser-based Pomodoro workspace built around how an ADHD study session actually falls apart: a focus dial with intervals you can shrink to a two-minute start, an Eisenhower matrix that separates loud from important, a week planner that auto-schedules study blocks into your free hours, one keystroke to park a distracting thought, and statistics that show when you actually focus well.",
+      "summary": "A browser-based Pomodoro workspace built around how an ADHD study session actually falls apart: a focus dial with intervals you can shrink to a two-minute start, an Eisenhower matrix, a week planner, habits, a Help centre, and a Passport of focus achievements — with Google sign-in that syncs the workspace.",
       "highlights": [
         "Eisenhower priority matrix with drag-and-drop, one-at-a-time triage and a check on where focus time really went.",
         "Week planner with courses, weekly targets and an auto-scheduler that favours your historically best hours; .ics import and export.",
         "Focus dial with interval presets, activation rating, distraction tally, brain dump and a body-double mode.",
         "Synthesised focus sounds, breathing and grounding tools, and Google sign-in that syncs the workspace across devices.",
-        "Comfort profiles for conflicting needs \u2014 ADHD by default, with Calm and predictable, Low vision, Easier reading and Screen reader as starting points, then every setting adjustable: WCAG 2.2 AA, NVDA, JAWS, Narrator, VoiceOver and TalkBack, and a built-in voice for reading aloud.",
-        "Mood, energy and stress logged in seconds and charted against the hours actually worked, on a journal database (IndexedDB locally, one Firestore document per record when signed in) that scales past the single-document ceiling."
+        "Comfort profiles for conflicting needs — ADHD by default, with Calm and predictable, Low vision, Easier reading and Screen reader as starting points, then every setting adjustable: WCAG 2.2 AA, NVDA, JAWS, Narrator, VoiceOver and TalkBack, and a built-in voice for reading aloud.",
+        "Mood, energy and stress logged in seconds and charted against the hours actually worked, on a journal database (IndexedDB locally, one Firestore document per record when signed in) that scales past the single-document ceiling.",
+        "Help centre and a habit tracker (build, counters, break) with forgiving streaks and optional calendar reminders.",
+        "Passport: display name, photo and bio on the same Google or email account, plus animated badges earned from finished focus sessions (First Spark through Focus Legend)."
       ],
       "methods": [
         "Vanilla JavaScript",
@@ -168,9 +170,21 @@
       ],
       "legacyPage": "adhd-study-pack.html",
       "links": [
-        {"label": "Project page", "href": "adhd-study-pack.html", "kind": "page"},
-        {"label": "Open the Study Pack", "href": "https://www.ayanzadeh.com/adhd-study-pack/", "kind": "app"},
-        {"label": "Source", "href": "https://github.com/Ayanzadeh93/adhd-study-pack", "kind": "repo"}
+        {
+          "label": "Project page",
+          "href": "adhd-study-pack.html",
+          "kind": "page"
+        },
+        {
+          "label": "Open the Study Pack",
+          "href": "https://www.ayanzadeh.com/adhd-study-pack/",
+          "kind": "app"
+        },
+        {
+          "label": "Source",
+          "href": "https://github.com/Ayanzadeh93/adhd-study-pack",
+          "kind": "repo"
+        }
       ],
       "related": [
         "indoor-navigation",
@@ -260,7 +274,7 @@
       "status": "Project",
       "featured": false,
       "year": null,
-      "summary": "Hint-based knowledge-distillation framework reported on the existing project page as achieving 2.5\u00d7 model compression with minimal accuracy loss.",
+      "summary": "Hint-based knowledge-distillation framework reported on the existing project page as achieving 2.5× model compression with minimal accuracy loss.",
       "highlights": [
         "Focuses on efficient transfer from larger teacher models to smaller students.",
         "Targets reduced deployment cost while retaining predictive quality."
