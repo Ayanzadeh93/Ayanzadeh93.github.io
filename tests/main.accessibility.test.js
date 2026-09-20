@@ -63,14 +63,14 @@ describe('main.js reveal and media behaviour', () => {
             jest.useRealTimers();
         });
 
-        it('skips the fallback when the observer already revealed content', () => {
+        it('still reveals remaining cards through the fallback after a partial observer fire', () => {
             jest.useFakeTimers();
             loadMain().initIntersectionObserver();
             lastObserver().trigger([document.querySelector('.experience-card')]);
 
             jest.advanceTimersByTime(2000);
 
-            expect(document.querySelector('.project-card').classList.contains('animate-in')).toBe(false);
+            expect(document.querySelector('.project-card').classList.contains('animate-in')).toBe(true);
             jest.useRealTimers();
         });
 
