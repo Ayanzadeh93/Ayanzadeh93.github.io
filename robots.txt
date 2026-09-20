@@ -15,5 +15,7 @@ Allow: /Aydin_Ayanzadeh_CV__final.pdf
 Disallow: /browserconfig.xml
 Disallow: /.git
 Disallow: /.cursor/
+Disallow: /projects/project.html
+Disallow: /apps/claude-code-catalog.html
 
 Sitemap: https://www.ayanzadeh.com/sitemap.xml
