@@ -1,23 +1,21 @@
+# robots.txt for Aydin Ayanzadeh Research Portfolio
+# https://www.ayanzadeh.com/
+
 User-agent: *
 Allow: /
 
-# Sitemap
-Sitemap: https://ayanzadeh93.github.io/sitemap.xml
-
-# Crawl-delay for respectful crawling
-Crawl-delay: 1
-
-# Disallow crawling of certain file types that are not useful for SEO
-Disallow: *.pdf$
-Disallow: *.doc$
-Disallow: *.docx$
-
-# Allow CSS and JS files for proper rendering
 Allow: /css/
 Allow: /js/
 Allow: /images/
+Allow: /index.html
+Allow: /favicon.svg
+Allow: /manifest.json
+Allow: /Aydin_Ayanzadeh_CV__final.pdf
 
-# High-priority pages
-# Main portfolio page
-# Blog page
-# Contact information 
+Disallow: /browserconfig.xml
+Disallow: /.git
+Disallow: /.cursor/
+Disallow: /projects/project.html
+Disallow: /apps/claude-code-catalog.html
+
+Sitemap: https://www.ayanzadeh.com/sitemap.xml

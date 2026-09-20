@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Claude Code Encyclopedia — moved</title>
+  <meta name="description" content="This reference now lives in its own GitHub Pages app.">
+  <link rel="canonical" href="https://www.ayanzadeh.com/claude-code-encyclopedia/">
+  <meta http-equiv="refresh" content="0;url=https://www.ayanzadeh.com/claude-code-encyclopedia/">
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+  <style>
+    body { font-family: ui-sans-serif, system-ui, sans-serif; margin: 0; padding: 48px 24px; line-height: 1.5; color: #101720; background: #f4f6f9; }
+    main { max-width: 42rem; margin: 0 auto; }
+    a { color: #0969da; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Moved</h1>
+    <p>The encyclopedia now lives at <a id="to" href="https://www.ayanzadeh.com/claude-code-encyclopedia/">https://www.ayanzadeh.com/claude-code-encyclopedia/</a>.</p>
+  </main>
+  <script>
+    const dest = new URL('https://www.ayanzadeh.com/claude-code-encyclopedia/');
+    dest.search = location.search;
+    dest.hash = location.hash;
+    const a = document.getElementById('to');
+    if (a) a.href = dest.href;
+    location.replace(dest.href);
+  </script>
+</body>
+</html>
