@@ -11,6 +11,24 @@ if (supportsIntersectionObserver) {
     document.documentElement.classList.add('js-enabled');
 }
 
+// Report a failure without letting it abort the caller, so one broken feature
+// never takes down the rest of the page.
+function reportError(context, error) {
+    console.error(`[site] ${context}:`, error);
+}
+
+function safeInvoke(context, fn) {
+    try {
+        return fn();
+    } catch (error) {
+        reportError(context, error);
+        return undefined;
+    }
+}
+
+window.siteReportError = reportError;
+window.siteSafeInvoke = safeInvoke;
+
 // Escape text before it is interpolated into an HTML template string.
 function escapeHtml(value) {
     return String(value)
@@ -200,7 +218,8 @@ function initThemeToggle() {
         try {
             localStorage.setItem('theme', newTheme);
         } catch (error) {
-            // Ignore storage errors and continue with in-memory theme state.
+            // Storage can be unavailable (private mode, quota); keep the in-memory theme.
+            reportError('Could not persist theme preference', error);
         }
 
         if (window.announceToScreenReader) {
@@ -478,6 +497,14 @@ function initLazyLoading() {
                     img.classList.add('loaded');
                     imageObserver.unobserve(img);
                 }
+
+                img.addEventListener('load', () => img.classList.add('loaded'), { once: true });
+                img.addEventListener('error', () => {
+                    img.classList.add('load-failed');
+                    reportError(`Lazy image failed to load: ${source}`, null);
+                }, { once: true });
+
+                img.src = source;
             });
         });
 
@@ -592,14 +619,17 @@ function submitForm(form) {
                 window.announceToScreenReader('Message sent successfully!');
             }
         } else {
-            response.json().then(data => {
-                if (data.errors) {
+            reportError(`Form submission rejected with status ${response.status}`, null);
+
+            return response.json().then(data => {
+                if (data && data.errors) {
                     const errorMessages = data.errors.map(error => error.message).join(', ');
                     showErrorMessage(`Error: ${errorMessages}`);
                 } else {
                     showErrorMessage('There was a problem sending your message. Please try again.');
                 }
-            }).catch(() => {
+            }).catch(parseError => {
+                reportError('Could not parse form submission error response', parseError);
                 showErrorMessage('There was a problem sending your message. Please try again.');
             });
         }
@@ -651,13 +681,11 @@ function showMessage(message, type) {
 
 // Error handling
 window.addEventListener('error', function(e) {
-    console.error('JavaScript error:', e.error);
-    // Could implement error reporting here
+    reportError(`Uncaught error at ${e.filename || 'unknown'}:${e.lineno || 0}`, e.error || e.message);
 });
 
 window.addEventListener('unhandledrejection', function(e) {
-    console.error('Unhandled promise rejection:', e.reason);
-    // Could implement error reporting here
+    reportError('Unhandled promise rejection', e.reason);
 });
 
 // Screen reader only class for accessibility
@@ -710,7 +738,12 @@ function updateLayoutForScreenSize() {
     if (!isMobile && topNavMenu && topNavMenu.classList.contains('active')) {
         // Close mobile menu on desktop
         topNavMenu.classList.remove('active');
-        document.querySelector('.mobile-menu-toggle').classList.remove('active');
+
+        const mobileToggle = document.querySelector('.mobile-menu-toggle');
+        if (mobileToggle) {
+            mobileToggle.classList.remove('active');
+        }
+
         document.body.style.overflow = '';
     }
 }
@@ -809,7 +842,11 @@ function showCustomModal(title, content) {
     const firstElement = focusableElements[0];
     const lastElement = focusableElements[focusableElements.length - 1];
     
-    firstElement.focus();
+    if (firstElement) {
+        firstElement.focus();
+    } else {
+        reportError('Modal opened without focusable elements', title);
+    }
     
     modal.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
@@ -835,13 +872,15 @@ window.closeCustomModal = function() {
 
 // Advanced Accessibility Features
 function initializeAccessibilityFeatures() {
-    ensureAccessibilityStructure();
-    initializeAccessibilityMenu();
-    initializeKeyboardEnhancements();
-    initializeScreenReaderSupport();
-    initializeReadingGuide();
-    initializePageReader();
-    loadAccessibilityPreferences();
+    [
+        ensureAccessibilityStructure,
+        initializeAccessibilityMenu,
+        initializeKeyboardEnhancements,
+        initializeScreenReaderSupport,
+        initializeReadingGuide,
+        initializePageReader,
+        loadAccessibilityPreferences
+    ].forEach(initializer => safeInvoke(initializer.name, initializer));
 }
 
 function ensureAccessibilityStructure() {
@@ -1218,15 +1257,20 @@ function resetAccessibilitySettings() {
     // Reset all toggles
     const toggles = document.querySelectorAll('#accessibility-menu input[type="checkbox"]');
     toggles.forEach(toggle => {
-        toggle.checked = false;
-        toggle.dispatchEvent(new Event('change'));
+        safeInvoke(`Resetting accessibility toggle "${toggle.id || 'unknown'}"`, () => {
+            toggle.checked = false;
+            toggle.dispatchEvent(new Event('change'));
+        });
     });
     
     SiteUtils.removeStoredValue(ACCESSIBILITY_PREFERENCES_KEY);
 
     stopPageReader();
     
-    announceToScreenReader('All accessibility settings have been reset');
+    announceToScreenReader(cleared
+        ? 'All accessibility settings have been reset'
+        : 'Accessibility settings were reset for this page, but could not be cleared from storage.',
+        cleared ? 'polite' : 'assertive');
 }
 
 function initializePageReader() {
@@ -1296,20 +1340,30 @@ function startPageReader() {
     };
 
     utterance.onerror = (event) => {
-        console.warn('Speech synthesis failed:', event.error || event);
+        reportError('Speech synthesis failed', event.error || event);
         updatePageReaderButtons(false);
         announceToScreenReader('Unable to read the page aloud.', 'assertive');
     };
 
     window.activeReaderUtterance = utterance;
-    window.speechSynthesis.speak(utterance);
+
+    try {
+        window.speechSynthesis.speak(utterance);
+    } catch (error) {
+        window.activeReaderUtterance = null;
+        reportError('Speech synthesis could not start', error);
+        updatePageReaderButtons(false);
+        announceToScreenReader('Unable to read the page aloud.', 'assertive');
+        return;
+    }
+
     updatePageReaderButtons(true);
     announceToScreenReader('Reading page content aloud.');
 }
 
 function stopPageReader() {
     if ('speechSynthesis' in window && window.speechSynthesis.speaking) {
-        window.speechSynthesis.cancel();
+        safeInvoke('Cancelling speech synthesis', () => window.speechSynthesis.cancel());
     }
 
     window.activeReaderUtterance = null;
@@ -1328,7 +1382,7 @@ function updatePageReaderButtons(isReading) {
 // Initialize accessibility features when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     // Add to existing initialization
-    initializeAccessibilityFeatures();
+    safeInvoke('initializeAccessibilityFeatures', initializeAccessibilityFeatures);
 
     // Add keyboard shortcut to toggle accessibility menu (Alt + A)
     document.addEventListener('keydown', function(e) {

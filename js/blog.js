@@ -1,5 +1,25 @@
 // Blog listing and article behaviour: browsing, newsletter, sharing, code copy
 
+// main.js is always loaded first on blog pages; keep local fallbacks so blog.js
+// still degrades gracefully if it is used on its own.
+function blogReportError(context, error) {
+    if (typeof window.siteReportError === 'function') {
+        window.siteReportError(context, error);
+        return;
+    }
+
+    console.error(`[blog] ${context}:`, error);
+}
+
+function blogSafeInvoke(context, fn) {
+    try {
+        return fn();
+    } catch (error) {
+        blogReportError(context, error);
+        return undefined;
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     // The listing and article pages share this file, so isolate each module.
     [
