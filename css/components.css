@@ -1,0 +1,569 @@
+/* ============================================================
+   components.css — styles for the site's custom elements.
+
+   Loaded after style.css and deliberately NOT wrapped in @layer:
+   style.css is unlayered too, so keeping both in the same origin
+   means ordinary specificity decides, and a component rule does
+   not silently lose to an unrelated page rule.
+
+   Every colour here comes from the tokens in style.css, so light
+   and dark themes are inherited rather than re-declared.
+   ============================================================ */
+
+/* ---------- shared primitives ---------- */
+
+.publication-item[hidden],
+.pub-explorer__empty[hidden],
+.publications-list[hidden],
+[data-cite][hidden] {
+    display: none !important;
+}
+
+/* ============================================================
+   <pub-explorer>
+   ============================================================ */
+
+pub-explorer {
+    display: block;
+    container-type: inline-size;
+    container-name: pub-explorer;
+}
+
+.pub-explorer__toolbar {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-width: 1000px;
+    margin: 0 auto 16px;
+    padding: 16px 18px;
+    background: var(--card-surface);
+    border: 1px solid var(--surface-border);
+    border-radius: 14px;
+    box-shadow: var(--shadow-sm);
+}
+
+/* Row one: find. Row two: narrow. Splitting them keeps the sort control
+   beside the search box instead of wrapping under a long row of chips. */
+.pub-explorer__row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* ---------- search field ---------- */
+
+.pub-explorer__search {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 1 1 260px;
+    min-width: 0;
+}
+
+.pub-explorer__search-icon {
+    position: absolute;
+    left: 14px;
+    font-size: 0.85rem;
+    color: var(--text-light);
+    pointer-events: none;
+    transition: color 0.2s ease;
+}
+
+.pub-explorer__search:focus-within .pub-explorer__search-icon {
+    color: var(--primary-color);
+}
+
+.pub-explorer__input {
+    width: 100%;
+    padding: 10px 14px 10px 38px;
+    font: inherit;
+    font-size: 0.92rem;
+    color: var(--text-dark);
+    background: var(--background-white);
+    border: 1px solid var(--border-color);
+    border-radius: 24px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.pub-explorer__input::placeholder {
+    color: var(--text-light);
+}
+
+.pub-explorer__input:focus-visible {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+/* The UA's own clear button, restyled rather than hidden. */
+.pub-explorer__input::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+    background: currentColor;
+    opacity: 0.45;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 4l8 8M12 4l-8 8' stroke='black' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.pub-explorer__input::-webkit-search-cancel-button:hover {
+    opacity: 0.8;
+}
+
+/* ---------- type facets ---------- */
+
+.pub-explorer__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.pub-explorer__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 14px;
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--primary-color);
+    background: var(--accent-soft);
+    border: 1px solid transparent;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease,
+                border-color 0.2s ease, transform 0.2s var(--ease-out-soft);
+}
+
+.pub-explorer__chip:hover {
+    border-color: var(--primary-light);
+    transform: translateY(-1px);
+}
+
+.pub-explorer__chip:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.pub-explorer__chip[aria-pressed="true"] {
+    color: #fff;
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    box-shadow: 0 2px 10px rgba(37, 99, 235, 0.28);
+}
+
+.pub-explorer__chip-count {
+    padding: 1px 7px;
+    font-size: 0.72rem;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.5;
+    background: rgba(255, 255, 255, 0.55);
+    border-radius: 10px;
+}
+
+.pub-explorer__chip[aria-pressed="true"] .pub-explorer__chip-count {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+[data-theme="dark"] .pub-explorer__chip-count {
+    background: rgba(15, 23, 41, 0.45);
+}
+
+/* ---------- sort ---------- */
+
+.pub-explorer__sort-field {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+}
+
+.pub-explorer__sort {
+    padding: 8px 12px;
+    font: inherit;
+    font-size: 0.85rem;
+    color: var(--text-medium);
+    background: var(--background-white);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+}
+
+.pub-explorer__sort:hover {
+    border-color: var(--primary-light);
+}
+
+.pub-explorer__sort:focus-visible {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+/* ---------- result count & empty state ---------- */
+
+.pub-explorer__count {
+    max-width: 1000px;
+    margin: 0 auto 14px;
+    padding-left: 4px;
+    font-size: 0.84rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-light);
+}
+
+.pub-explorer__empty {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 44px 24px;
+    text-align: center;
+    color: var(--text-light);
+    background: var(--card-surface);
+    border: 1px dashed var(--surface-border);
+    border-radius: 14px;
+}
+
+.pub-explorer__empty p {
+    margin-bottom: 16px;
+}
+
+.pub-explorer__reset {
+    padding: 9px 20px;
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #fff;
+    background: var(--primary-color);
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s var(--ease-out-soft);
+}
+
+.pub-explorer__reset:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+}
+
+.pub-explorer__reset:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* ---------- match highlighting ---------- */
+
+.pub-explorer__mark {
+    padding: 0 2px;
+    color: inherit;
+    background: linear-gradient(180deg, transparent 58%, var(--accent-soft) 58%);
+    border-radius: 2px;
+}
+
+[data-theme="dark"] .pub-explorer__mark {
+    background: linear-gradient(180deg, transparent 58%, rgba(96, 165, 250, 0.32) 58%);
+}
+
+/* ---------- container queries: the toolbar responds to its own width,
+     not the viewport, so it stays correct wherever it is placed ---------- */
+
+@container pub-explorer (max-width: 640px) {
+    .pub-explorer__row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .pub-explorer__sort {
+        width: 100%;
+    }
+}
+
+@container pub-explorer (max-width: 420px) {
+    .pub-explorer__chips {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 4px;
+        scrollbar-width: thin;
+    }
+
+    .pub-explorer__chip {
+        flex: 0 0 auto;
+    }
+}
+
+/* Cards keep their hover lift out of the way while a search is running,
+   so the list does not shift under the reader's pointer mid-typing. */
+pub-explorer[data-query="active"] .publication-item:hover {
+    transform: none;
+}
+
+/* ============================================================
+   <cite-dialog>
+   ============================================================ */
+
+.cite-dialog {
+    width: min(92vw, 680px);
+    max-height: min(86vh, 720px);
+    padding: 0;
+    /* The universal reset in style.css zeroes every margin, including the
+       UA's `margin: auto` that centres a modal dialog in its inset-0 box.
+       Restore it here or the dialog pins itself to the top-left corner. */
+    margin: auto;
+    color: var(--text-dark);
+    background: var(--background-white);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+}
+
+.cite-dialog::backdrop {
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(3px);
+}
+
+.cite-dialog[open] {
+    display: flex;
+    flex-direction: column;
+    animation: cite-dialog-in 0.24s var(--ease-out-expo);
+}
+
+@keyframes cite-dialog-in {
+    from { opacity: 0; transform: translateY(12px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.cite-dialog__header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 22px 24px 16px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.cite-dialog__title {
+    flex: 1;
+    margin: 0;
+    font-size: 1.02rem;
+    font-weight: 600;
+    line-height: 1.45;
+    color: var(--text-dark);
+}
+
+.cite-dialog__close {
+    flex: 0 0 auto;
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    font-size: 0.95rem;
+    color: var(--text-light);
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.cite-dialog__close:hover {
+    color: var(--text-dark);
+    background: var(--background-alt);
+}
+
+.cite-dialog__close:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.cite-dialog__tabs {
+    display: flex;
+    gap: 4px;
+    padding: 14px 24px 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.cite-dialog__tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.cite-dialog__tab {
+    flex: 0 0 auto;
+    padding: 8px 16px;
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-light);
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.cite-dialog__tab:hover {
+    color: var(--text-dark);
+}
+
+.cite-dialog__tab:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: -2px;
+    border-radius: 6px 6px 0 0;
+}
+
+.cite-dialog__tab[aria-selected="true"] {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+.cite-dialog__output {
+    flex: 1;
+    min-height: 150px;
+    margin: 14px 24px 0;
+    padding: 18px;
+    font-size: 0.86rem;
+    line-height: 1.65;
+    color: var(--text-medium);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    overflow-y: auto;
+    background: var(--background-alt);
+    border: 1px solid var(--border-light);
+    border-radius: 10px;
+    /* Selecting the whole entry is the most common next action. */
+    user-select: all;
+}
+
+.cite-dialog__output:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.cite-dialog__output--mono {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+                 "Liberation Mono", monospace;
+    font-size: 0.8rem;
+}
+
+.cite-dialog__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 16px 24px 8px;
+}
+
+.cite-dialog__action {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 18px;
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--primary-color);
+    text-decoration: none;
+    background: var(--accent-soft);
+    border: 1px solid transparent;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease,
+                transform 0.2s var(--ease-out-soft);
+}
+
+.cite-dialog__action:hover {
+    border-color: var(--primary-light);
+    transform: translateY(-1px);
+}
+
+.cite-dialog__action:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.cite-dialog__action--primary {
+    color: #fff;
+    background: var(--primary-color);
+}
+
+.cite-dialog__action--primary:hover {
+    background: var(--primary-dark);
+}
+
+.cite-dialog__status {
+    min-height: 1.3em;
+    margin: 0;
+    padding: 0 24px 20px;
+    font-size: 0.82rem;
+    color: var(--text-light);
+}
+
+.cite-dialog__status--error {
+    color: #dc2626;
+}
+
+[data-theme="dark"] .cite-dialog__status--error {
+    color: #f87171;
+}
+
+@media (max-width: 520px) {
+    .cite-dialog {
+        width: 100vw;
+        max-width: 100vw;
+        max-height: 92vh;
+        margin: auto 0 0;
+        border-radius: 16px 16px 0 0;
+    }
+
+    .cite-dialog__actions .cite-dialog__action {
+        flex: 1 1 auto;
+        justify-content: center;
+    }
+}
+
+/* ============================================================
+   View Transitions — the list cross-fades on re-sort instead of
+   snapping. Purely decorative, and skipped under reduced motion.
+   ============================================================ */
+
+@media (prefers-reduced-motion: no-preference) {
+    ::view-transition-group(*) {
+        animation-duration: 0.28s;
+        animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cite-dialog[open] {
+        animation: none;
+    }
+
+    .pub-explorer__chip,
+    .pub-explorer__reset,
+    .cite-dialog__action {
+        transition: none;
+    }
+
+    .pub-explorer__chip:hover,
+    .pub-explorer__reset:hover,
+    .cite-dialog__action:hover {
+        transform: none;
+    }
+}
+
+/* Windows high-contrast mode: borders must survive forced colours. */
+@media (forced-colors: active) {
+    .pub-explorer__chip,
+    .pub-explorer__input,
+    .pub-explorer__sort,
+    .cite-dialog,
+    .cite-dialog__output {
+        border: 1px solid CanvasText;
+    }
+
+    .pub-explorer__chip[aria-pressed="true"] {
+        background: Highlight;
+        color: HighlightText;
+    }
+
+    .pub-explorer__mark {
+        background: Highlight;
+        color: HighlightText;
+    }
+}

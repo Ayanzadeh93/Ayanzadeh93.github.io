@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://formspree.io; form-action 'self' https://formspree.io; frame-src 'none'; manifest-src 'self'">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>PURSUhInT: Knowledge Distillation | Aydin Ayanzadeh</title>
+    <meta name="description" content="Novel hint-based knowledge distillation framework achieving 2.5x model compression with minimal accuracy loss.">
+    <link rel="canonical" href="https://www.ayanzadeh.com/projects/knowledge-distillation.html">
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://www.ayanzadeh.com/projects/knowledge-distillation.html">
+    <meta property="og:title" content="PURSUhInT: Knowledge Distillation">
+    <meta property="og:description" content="Novel hint-based knowledge distillation framework achieving 2.5x model compression with minimal accuracy loss.">
+    <meta property="og:image" content="https://www.ayanzadeh.com/images/profile-compressed.jpg">
+    <meta property="og:site_name" content="Aydin Ayanzadeh - Research Portfolio">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://www.ayanzadeh.com/projects/knowledge-distillation.html">
+    <meta name="twitter:title" content="PURSUhInT: Knowledge Distillation">
+    <meta name="twitter:description" content="Novel hint-based knowledge distillation framework achieving 2.5x model compression with minimal accuracy loss.">
+    <meta name="twitter:image" content="https://www.ayanzadeh.com/images/profile-compressed.jpg">
+    <meta name="twitter:creator" content="@ayanzadeh93">
+    <meta name="twitter:site" content="@ayanzadeh93">
+
+    <!-- Apply the saved (or system) theme before first paint to avoid a light-mode flash -->
+    <script>
+        (function () {
+            var saved = null;
+            try { saved = localStorage.getItem('theme'); } catch (e) { /* storage unavailable */ }
+            var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            var dark = saved === 'dark' || (!saved && prefersDark);
+            document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+        })();
+    </script>
+
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/project.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer"></noscript>
+    <!-- seo-schema -->
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "PURSUhInT",
+    "url": "https://www.ayanzadeh.com/projects/knowledge-distillation.html",
+    "description": "Hint-based knowledge distillation framework for compressing deep models with limited accuracy loss.",
+    "author": {
+        "@id": "https://www.ayanzadeh.com/#person"
+    },
+    "creator": {
+        "@id": "https://www.ayanzadeh.com/#person"
+    },
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "Web"
+}
+    </script>
+
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://www.ayanzadeh.com/"
+        },
+        {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Projects",
+            "item": "https://www.ayanzadeh.com/#projects"
+        },
+        {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "PURSUhInT",
+            "item": "https://www.ayanzadeh.com/projects/knowledge-distillation.html"
+        }
+    ]
+}
+    </script>
+    <!-- /seo-schema -->
+</head>
+<body class="project-page">
+    <!-- Navigation -->
+    <nav class="project-nav">
+        <div class="container">
+            <a href="../index.html" class="back-link">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Portfolio</span>
+            </a>
+            <div class="nav-links">
+                <a href="../index.html#projects">All Projects</a>
+                <a href="../index.html#contact">Contact</a>
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Switch to dark theme">
+                    <i class="fas fa-moon" aria-hidden="true"></i> <span>Theme</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+    <nav class="schema-breadcrumbs" aria-label="Breadcrumb">
+        <ol>
+            <li><a href="https://www.ayanzadeh.com/">Home</a></li>
+            <li><a href="https://www.ayanzadeh.com/#projects">Projects</a></li>
+            <li aria-current="page">PURSUhInT</li>
+        </ol>
+    </nav>
+    <main class="project-main">
+        <!-- Project Hero -->
+        <section class="project-hero">
+            <div class="container">
+                <div class="project-hero-content">
+                    <div class="project-badges">
+                        <span class="badge featured">Optimization</span>
+                        <span class="badge status">Expert Systems with Applications</span>
+                    </div>
+                    <h1>PURSUhInT: Knowledge Distillation Framework</h1>
+                    <p class="project-tagline">In Search of Informative Hint Points Based on Layer Clustering</p>
+                    <div class="project-meta-info">
+                        <div class="meta-item">
+                            <i class="fas fa-user"></i>
+                            <span>Reyhan K. Keser, <strong>Aydin Ayanzadeh</strong> et al.</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-university"></i>
+                            <span>Istanbul Technical University</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-calendar"></i>
+                            <span>2023</span>
+                        </div>
+                    </div>
+                    <div class="project-actions">
+                        <a href="https://www.sciencedirect.com/science/article/abs/pii/S0957417422020589" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+                            <i class="fas fa-external-link-alt"></i> View Paper
+                        </a>
+                        <a href="https://codeocean.com/capsule/4245746/tree/v1" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+                            <i class="fas fa-code"></i> View Code
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Project Overview -->
+        <section class="project-section">
+            <div class="container">
+                <h2><i class="fas fa-eye"></i> Overview</h2>
+                <div class="overview-content">
+                    <p class="lead">
+                        PURSUhInT introduces a novel approach to knowledge distillation by identifying informative hint points based on layer clustering, enabling efficient transfer of knowledge from large teacher models to smaller student models.
+                    </p>
+                    <p>
+                        The framework achieves significant model compression (up to 2.5x) while maintaining minimal accuracy loss. By carefully selecting which intermediate representations to transfer, PURSUhInT outperforms traditional knowledge distillation methods on multiple benchmark datasets.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Methodology -->
+        <section class="project-section alt-bg">
+            <div class="container">
+                <h2><i class="fas fa-cogs"></i> Methodology</h2>
+                <div class="approach-layout">
+                    <div class="approach-content">
+                        <div class="approach-item">
+                            <h3>(a) Feature Extraction</h3>
+                            <p>The framework begins by extracting features from input images through successive neural network layers. These layers progressively reduce spatial dimensions while increasing feature depth, creating rich representations that capture hierarchical patterns in the data.</p>
+                        </div>
+                        <div class="approach-item">
+                            <h3>(b) Hint Point Selection</h3>
+                            <p>Layer representations are clustered to identify the most informative features. The clustering algorithm groups similar layer activations, and from these clusters, specific hint points (HP1, HP2, HP3) are selected. These hint points represent the most valuable intermediate representations for knowledge transfer.</p>
+                        </div>
+                        <div class="approach-item">
+                            <h3>(c) Knowledge Distillation Training</h3>
+                            <p>The Student model is trained using three loss components: <strong>L_hint</strong> (matching intermediate features with Teacher), <strong>L_logit</strong> (matching final predictions with Teacher), and <strong>L_cls</strong> (matching predictions with ground truth). This multi-objective approach ensures the Student learns both from the Teacher's knowledge and the true labels.</p>
+                        </div>
+                    </div>
+                    <div class="approach-visual">
+                        <div class="diagram-container">
+                            <h3>PURSUhInT Framework</h3>
+                            <div class="diagram-wrapper">
+                                <img src="images/elsevier_knowledge_distillation.jpg" alt="PURSUhInT Knowledge Distillation Framework: Feature Extraction, Hint Point Selection, and Knowledge Distillation Training" class="project-diagram image-diagram" />
+                            </div>
+                            <p class="diagram-caption">The PURSUhInT framework showing (a) feature extraction, (b) hint point selection through clustering, and (c) knowledge distillation training with Teacher-Student architecture.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Key Features -->
+        <section class="project-section">
+            <div class="container">
+                <h2><i class="fas fa-star"></i> Key Contributions</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-compress-arrows-alt"></i>
+                        </div>
+                        <h3>2.5x Model Compression</h3>
+                        <p>Achieve significant reduction in model size while preserving performance.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <h3>Layer Clustering</h3>
+                        <p>Novel clustering approach to identify the most informative layers for knowledge transfer.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-bullseye"></i>
+                        </div>
+                        <h3>Informative Hint Points</h3>
+                        <p>Automatic selection of optimal hint points for efficient knowledge distillation.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-tachometer-alt"></i>
+                        </div>
+                        <h3>Minimal Accuracy Loss</h3>
+                        <p>Maintains high accuracy even with significant model compression.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technologies -->
+        <section class="project-section">
+            <div class="container">
+                <h2><i class="fas fa-code"></i> Technologies Used</h2>
+                <div class="tech-stack">
+                    <span class="tech-item">PyTorch</span>
+                    <span class="tech-item">Python</span>
+                    <span class="tech-item">Clustering Algorithms</span>
+                    <span class="tech-item">ResNet</span>
+                    <span class="tech-item">VGG</span>
+                    <span class="tech-item">CIFAR-10/100</span>
+                    <span class="tech-item">ImageNet</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Publication -->
+        <section class="project-section alt-bg">
+            <div class="container">
+                <h2><i class="fas fa-book"></i> Publication</h2>
+                <div class="publications-list">
+                    <div class="publication-entry">
+                        <h3>Expert Systems with Applications (Impact Factor: 8.5)</h3>
+                        <p>PURSUhInT: In Search of Informative Hint Points Based on Layer Clustering for Knowledge Distillation. Volume 213, 2023.</p>
+                        <a href="https://www.sciencedirect.com/science/article/abs/pii/S0957417422020589" target="_blank" rel="noopener noreferrer" class="pub-link">
+                            <i class="fas fa-external-link-alt"></i> View Paper
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact CTA -->
+        <section class="project-cta">
+            <div class="container">
+                <h2>Interested in Model Optimization?</h2>
+                <p>Let's discuss efficient deep learning and model compression techniques.</p>
+                <a href="../index.html#contact" class="btn btn-primary btn-lg">
+                    <i class="fas fa-envelope"></i> Get in Touch
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="project-footer">
+        <div class="container">
+            <p>&copy; 2026 Aydin Ayanzadeh. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="../index.html">Home</a>
+                <a href="../index.html#projects">Projects</a>
+                <a href="../index.html#publications">Publications</a>
+            </div>
+        </div>
+    </footer>
+
+    <button type="button" id="backToTop" class="back-to-top" aria-label="Back to top" hidden>
+        <i class="fas fa-arrow-up" aria-hidden="true"></i>
+    </button>
+
+    <script src="../js/main.js"></script>
+</body>
+</html>
+
