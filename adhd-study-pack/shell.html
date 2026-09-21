@@ -4,13 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- Firebase is only loaded once js/firebase-config.js holds a config:
-       script  www.gstatic.com = SDK, apis.google.com = Google sign-in helper
-       connect firestore / identitytoolkit / securetoken = data and auth APIs
-       frame   *.firebaseapp.com = the auth handler iframe on the authDomain
-       Google Calendar sync: accounts.google.com = Google Identity Services (the
-       consent popup, its script and styles); the Calendar API is www.googleapis.com.
-       Fonts come from Google Fonts; every sound is synthesised in the page. -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' https://www.gstatic.com https://apis.google.com https://accounts.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://accounts.google.com; form-action 'self'; frame-src https://*.firebaseapp.com https://accounts.google.com">
+       script  www.gstatic.com = SDK; www.google.com = App Check reCAPTCHA + phone
+       connect firestore / identitytoolkit / securetoken / installations /
+               appcheck / remoteconfig / firebaselogging = Spark extras
+       frame   *.firebaseapp.com = auth; google.com + recaptcha.google.com = checks
+       Google Calendar sync: accounts.google.com = Google Identity Services.
+       Fonts come from Google Fonts; every sound is synthesised in the page.
+       Analytics / Hosting / Storage / Functions stay off (Blaze or CSP). -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' https://www.gstatic.com https://www.google.com https://apis.google.com https://accounts.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://accounts.google.com https://firebaseinstallations.googleapis.com https://firebaseappcheck.googleapis.com https://content-firebaseappcheck.googleapis.com https://firebaseremoteconfig.googleapis.com https://firebaselogging.googleapis.com https://firebaselogging-pa.googleapis.com https://www.google.com https://www.gstatic.com; form-action 'self'; frame-src https://*.firebaseapp.com https://accounts.google.com https://www.google.com https://recaptcha.google.com">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="color-scheme" content="light dark">
   <title>ADHD Study Pack</title>
@@ -20,7 +21,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
   <!-- ?v= busts GitHub Pages' 10-minute cache when the app changes; bump it with VERSION in the script. -->
-  <link rel="stylesheet" href="css/adhd-study-pack.css?v=3.9.0">
+  <link rel="stylesheet" href="css/adhd-study-pack.css?v=3.10.0">
   <!-- Read by js/adhd-study-pack.js (never executed). The Firebase project
        comes from js/firebase-config.js, so it is not repeated here. -->
   <script type="application/json" id="focus-dial-config">
@@ -34,6 +35,7 @@
     "migrateFrom": [],
     "auth":        "auto",
     "emailSignIn": true,
+    "phoneSignIn": "auto",
     "seedAdmin":   false,
     "demo":        true,
     "embedDocs":   false,
@@ -719,6 +721,19 @@
       <div class="gate-or"><span>or</span></div>
       <button class="btn" id="googleBtn" style="width:100%;justify-content:center;padding:10px">Continue with Google</button>
     </div>
+    <div id="gatePhone" hidden>
+      <div class="gate-or"><span>or phone</span></div>
+      <div class="field"><label for="gatePhoneNum">Phone number</label>
+        <input type="tel" id="gatePhoneNum" autocomplete="tel" inputmode="tel" placeholder="+1 410 555 0100" spellcheck="false"></div>
+      <button class="btn" type="button" id="phoneSend" style="width:100%;justify-content:center;padding:10px">Send SMS code</button>
+      <div id="phoneCodeStep" hidden style="margin-top:10px">
+        <div class="field"><label for="gatePhoneCode">SMS code</label>
+          <input type="text" id="gatePhoneCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="123456" spellcheck="false"></div>
+        <button class="btn primary" type="button" id="phoneConfirm" style="width:100%;justify-content:center;padding:10px">Verify and sign in</button>
+      </div>
+      <div id="gateRecaptcha"></div>
+      <p class="gate-note" style="margin-top:8px">Spark sends about ten SMS per day. Prefer Google when you can.</p>
+    </div>
     <div class="gate-foot">
       <button class="btn sm ghost" id="gateLocal">Use a local profile instead</button>
       <button class="btn sm ghost" id="gateTheme">Theme</button>
@@ -750,6 +765,6 @@
     Nothing is sent anywhere unless you choose to sign in with Google.
   </p>
 </noscript>
-<script type="module" src="js/adhd-study-pack.js?v=3.7.3"></script>
+<script type="module" src="js/adhd-study-pack.js?v=3.10.0"></script>
 </body>
 </html>

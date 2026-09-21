@@ -30,7 +30,7 @@
     <header>
       <p class="meta">ADHD Study Pack</p>
       <h1>Privacy</h1>
-      <p class="lede">What is stored, who can read it, and what Google is asked for. Last updated 20 September 2026.</p>
+      <p class="lede">What is stored, who can read it, and what Google is asked for. Last updated 21 September 2026.</p>
     </header>
 
     <h2>In one sentence</h2>
@@ -67,9 +67,10 @@
     <h2>What is not collected</h2>
     <ul>
       <li>No advertising identifiers, no marketing email list, no sale of data</li>
-      <li>No third-party analytics scripts</li>
+      <li>No Google Analytics / A/B Testing scripts (CSP would block them anyway)</li>
       <li>No Gmail, Drive, contacts, or location</li>
       <li>No calendar data unless you connect Calendar yourself</li>
+      <li>No Cloud Storage or Cloud Functions backends</li>
     </ul>
 
     <h2>How long it is kept</h2>
@@ -77,6 +78,12 @@
 
     <h2>Email and password</h2>
     <p>If email sign-in is enabled, Firebase stores the hashed password. The pack never sees the raw password. Local profiles (not Google) exist only in this browser; that password is a courtesy lock, not cloud security.</p>
+
+    <h2>Phone (SMS) sign-in</h2>
+    <p>Phone sign-in is optional and off by default. When the operator publishes the Remote Config flag <code>feature_phone_signin</code>, the sign-in card can send a one-time SMS code through Firebase Authentication. Spark allows roughly ten SMS per day. The pack stores only the verified phone number Firebase returns — not a contact list.</p>
+
+    <h2>App Check and Performance (Spark)</h2>
+    <p>The pack uses Firebase App Check with an invisible reCAPTCHA Enterprise score check so Auth and Firestore can confirm requests come from this site. The site key is public; the secret stays in Google Cloud. App Check enforcement is a Console switch — leave it off until metrics look healthy. Performance Monitoring sends anonymised page-load and network timings to the same Firebase project so the operator can see real-user speed. Neither product is advertising analytics, and Google Analytics stays off.</p>
 
     <h2>Children</h2>
     <p>The pack is not directed at children under 13. Do not create an account for a child that age.</p>
