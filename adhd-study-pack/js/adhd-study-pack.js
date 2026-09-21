@@ -10,7 +10,7 @@
    js/firebase-config.js; the rest of the host config is the JSON block in
    the page.
    ===================================================================== */
-import { firebaseConfig } from './firebase-config.js';
+import { firebaseConfig, appCheckSiteKey, remoteConfigDefaults } from './firebase-config.js';
 import { COMFORT_PRESETS, COMFORT_DEFAULTS, presetComfort, changesFromProfile, normaliseComfort,
          applyComfort, announce, speech } from './lib/comfort.js?v=3.8.1';   // versioned like the page's own assets: GitHub Pages caches for ten minutes
 import { journal } from './lib/records.js?v=3.8.1';
@@ -18,7 +18,8 @@ import { ACHIEVEMENTS, emptyPassport, normalisePassport, initialsOf as passportI
          computeStats as passportStats, achievementProgress, earnedKeys, freshKeys, adoptKeys,
          getAchievement } from './lib/passport.js?v=3.9.0';
 import { RELEASES, AWAY_MS, whatsNewPayload, mergeWhatsNewRecord,
-         readWhatsNewRecord, writeWhatsNewRecord, cmpVersion, whatsNewDeviceKey } from './lib/whatsnew.js?v=3.9.0';
+         readWhatsNewRecord, writeWhatsNewRecord, cmpVersion, whatsNewDeviceKey } from './lib/whatsnew.js?v=3.10.0';
+import { shouldShowPhoneSignIn, normalisePhoneE164, isAppCheckDebugHost } from './lib/firebase-spark.js?v=3.10.0';
 const $  = (s, r) => (r || (typeof document !== 'undefined' ? document : null))?.querySelector?.(s) || null;
 const $$ = (s, r) => Array.from((r || (typeof document !== 'undefined' ? document : null))?.querySelectorAll?.(s) || []);
 const uid = () => Math.random().toString(36).slice(2, 10);
@@ -42,7 +43,7 @@ const DOW = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
    defaults, then a <script type="application/json" id="focus-dial-config">
    block, then window.FOCUS_DIAL_CONFIG.
    ===================================================================== */
-const VERSION = '3.9.0';
+const VERSION = '3.10.0';
 const DEFAULT_CONFIG = {
   storageKey: 'focusdial.v3',
   storage:    'local',            // 'local' | 'session' | 'memory' | 'rest'
@@ -58,6 +59,7 @@ const DEFAULT_CONFIG = {
   auth:       'auto',             // 'auto' → firebase when configured, else 'local'. Also 'none'.
   firebase:   null,               // the config object from the Firebase console
   emailSignIn:true,               // firebase mode: offer email + password (needs that provider enabled)
+  phoneSignIn:'auto',             // true | false | 'auto' (Remote Config feature_phone_signin)
   embedDocs:  true,               // show the "embedding this on your own site" card in Setup
   googleClientId: null,           // OAuth web client id: turns on two-way Google Calendar sync
   seedAdmin:  true                // first run on a device with no accounts creates admin / admin
@@ -494,9 +496,19 @@ function seedAdmin() {
 /* ---------- firebase (loaded only when configured) ----------
    The modular SDK from gstatic, pinned so a Firebase release can never
    change the page underneath it; the page's CSP allows www.gstatic.com for
-   exactly this. FB.auth wraps it in the few calls the rest of the app makes. */
+   exactly this. FB.auth wraps it in the few calls the rest of the app makes.
+
+   Spark extras (still $0 at personal scale): App Check (reCAPTCHA Enterprise
+   site key), Remote Config (feature_phone_signin), Performance Monitoring.
+   Storage / Functions / Analytics stay off — those need Blaze or break CSP. */
 const FB_SDK = 'https://www.gstatic.com/firebasejs/12.19.0';
-const FB = { app:null, auth:null, db:null, fs:null, err:null };
+const FB = {
+  app:null, auth:null, authRaw:null, authSdk:null, db:null, fs:null,
+  appCheck:null, remote:null, perf:null, recaptcha:null, err:null
+};
+const FEATURES = { phoneSignIn: false };
+let phoneConfirm = null;
+
 async function fbInit() {
   if (FB.auth) return true;
   const [appSdk, authSdk, fs] = await Promise.all([
@@ -505,6 +517,33 @@ async function fbInit() {
     import(`${FB_SDK}/firebase-firestore.js`)
   ]);
   FB.app = appSdk.getApps().length ? appSdk.getApp() : appSdk.initializeApp(CFG.firebase);
+  FB.authSdk = authSdk;
+
+  /* Spark extras — soft-fail so a blocked CDN path never takes down sign-in. */
+  try {
+    if (appCheckSiteKey && !FB.appCheck) {
+      const appCheckSdk = await import(`${FB_SDK}/firebase-app-check.js`);
+      if (isAppCheckDebugHost(location.hostname)) {
+        try { self.FIREBASE_APPCHECK_DEBUG_TOKEN = true; } catch (e) {}
+      }
+      FB.appCheck = appCheckSdk.initializeAppCheck(FB.app, {
+        provider: new appCheckSdk.ReCaptchaEnterpriseProvider(appCheckSiteKey),
+        isTokenAutoRefreshEnabled: true
+      });
+    }
+  } catch (err) {
+    console.warn('Study pack: App Check did not start', err);
+  }
+
+  try {
+    if (!FB.perf) {
+      const perfSdk = await import(`${FB_SDK}/firebase-performance.js`);
+      FB.perf = perfSdk.getPerformance(FB.app);
+    }
+  } catch (err) {
+    console.warn('Study pack: Performance Monitoring did not start', err);
+  }
+
   FB.fs = fs;
   FB.db = fs.initializeFirestore(FB.app, {
     ignoreUndefinedProperties: true,
@@ -514,6 +553,7 @@ async function fbInit() {
     localCache: fs.persistentLocalCache({ tabManager: fs.persistentMultipleTabManager() })
   });
   const auth = authSdk.getAuth(FB.app);
+  FB.authRaw = auth;
   FB.auth = {
     onAuthStateChanged: cb => authSdk.onAuthStateChanged(auth, cb),
     signOut: () => authSdk.signOut(auth),
@@ -530,9 +570,55 @@ async function fbInit() {
       const provider = new authSdk.GoogleAuthProvider();
       provider.setCustomParameters({ prompt:'select_account' });
       return authSdk.signInWithPopup(auth, provider);
-    }
+    },
+    async sendPhoneCode(e164) {
+      const host = document.getElementById('gateRecaptcha');
+      if (!host) throw new Error('Phone sign-in UI is missing');
+      if (FB.recaptcha) {
+        try { FB.recaptcha.clear(); } catch (e) {}
+        FB.recaptcha = null;
+      }
+      FB.recaptcha = new authSdk.RecaptchaVerifier(auth, 'gateRecaptcha', { size: 'invisible' });
+      return authSdk.signInWithPhoneNumber(auth, e164, FB.recaptcha);
+    },
+    confirmPhoneCode: (confirmation, code) => confirmation.confirm(code)
   };
+
+  await fbRefreshRemoteConfig();
   return true;
+}
+
+async function fbRefreshRemoteConfig(remoteSdk) {
+  try {
+    const sdk = remoteSdk || await import(`${FB_SDK}/firebase-remote-config.js`);
+    if (!FB.app) return;
+    const rc = sdk.getRemoteConfig(FB.app);
+    rc.settings = Object.assign({}, rc.settings, {
+      minimumFetchIntervalMillis: location.hostname === 'localhost' ? 60 * 1000 : 12 * 60 * 60 * 1000
+    });
+    rc.defaultConfig = Object.assign({}, remoteConfigDefaults);
+    FB.remote = rc;
+    try { await sdk.fetchAndActivate(rc); } catch (err) {
+      console.warn('Study pack: Remote Config fetch skipped', err);
+    }
+    const flag = sdk.getBoolean(rc, 'feature_phone_signin');
+    FEATURES.phoneSignIn = shouldShowPhoneSignIn(flag, CFG.phoneSignIn === 'auto' ? undefined : CFG.phoneSignIn);
+  } catch (err) {
+    console.warn('Study pack: Remote Config did not start', err);
+    FEATURES.phoneSignIn = shouldShowPhoneSignIn(false, CFG.phoneSignIn === 'auto' ? undefined : CFG.phoneSignIn);
+  }
+  syncPhoneGate();
+}
+
+function syncPhoneGate() {
+  const box = $('#gatePhone');
+  if (!box) return;
+  const show = AUTH.mode === 'firebase' && FEATURES.phoneSignIn;
+  box.hidden = !show;
+  if (!show) {
+    phoneConfirm = null;
+    const step = $('#phoneCodeStep'); if (step) step.hidden = true;
+  }
 }
 const fbDoc = (...path) => FB.fs.doc(FB.db, 'users', AUTH.user.id, ...(path.length ? path : ['workspace', 'state']));
 /* Last JSON known to be in Firestore: lets writes skip no-op saves and lets
@@ -593,7 +679,13 @@ const FB_ERRORS = {
   'auth/unauthorized-domain':'Add this domain under Firebase → Authentication → Settings → Authorized domains.',
   'auth/operation-not-allowed':'Enable that sign-in method in the Firebase console first.',
   'auth/too-many-requests':'Too many attempts. Please try again later.',
-  'auth/missing-email':'Please enter your email address.'
+  'auth/missing-email':'Please enter your email address.',
+  'auth/invalid-phone-number':'That does not look like a valid phone number. Use + and country code, e.g. +14105550100.',
+  'auth/missing-phone-number':'Enter a phone number with country code.',
+  'auth/invalid-verification-code':'That SMS code is wrong or expired. Request a new one.',
+  'auth/code-expired':'That SMS code expired. Request a new one.',
+  'auth/captcha-check-failed':'The reCAPTCHA check failed. Refresh and try again.',
+  'auth/quota-exceeded':'SMS quota for today is used up (Spark allows about ten). Try Google or email, or wait until tomorrow.'
 };
 const fbMsg = e => (e && FB_ERRORS[e.code]) || (e && e.message) || 'Something went wrong.';
 function authResetErrorMsg(err) {
@@ -731,6 +823,7 @@ function persistWhatsNew(patch) {
 function whatsNewLede(payload) {
   const provider = AUTH.user && AUTH.user.provider;
   const how = provider === 'google' ? 'Signed in with Google.'
+    : provider === 'phone' ? 'Signed in with phone.'
     : provider === 'firebase' ? 'Signed in with email.'
     : provider === 'local' ? 'Local profile on this device.'
     : 'You are signed in.';
@@ -5147,6 +5240,7 @@ function renderAccountCard() {
   const u = AUTH.user;
   const how = !u ? 'Not signed in'
     : u.provider === 'google' ? 'Google account'
+    : u.provider === 'phone' ? 'Phone number, verified by Firebase SMS'
     : u.provider === 'firebase' ? 'Email and password, verified by Firebase'
     : u.provider === 'none' ? 'Authentication handled by the host page'
     : 'Local profile on this device';
@@ -5309,6 +5403,7 @@ function showGate(msg, tone) {
   $('#googleBtn').classList.toggle('primary', !form);
   $('#gateLocal').textContent = cloud ? 'Use a local profile instead' : 'Use Google sign-in instead';
   $('#gateLocal').hidden = !cloud && !CFG.firebase;
+  syncPhoneGate();
   $('#gateNote').innerHTML = cloud
     ? (form ? 'Google sign-in only asks for your name and email. Your workspace stays in your own Firebase account, readable only by you. Calendar sync is optional later, from Plan.'
             : 'Signing in with Google only asks for your name and email, and keeps your workspace in this site’s Firebase database under your account. Calendar access is a separate, optional step.')
@@ -5328,8 +5423,10 @@ function renderWho() {
   c.innerHTML = av
     ? `<span class="av"><img src="${esc(av)}" alt=""></span><span class="nm">${esc(name)}</span>`
     : `<span class="av">${esc(passportInitials(name, initials(u.name || u.email)))}</span><span class="nm">${esc(name)}</span>`;
-  c.dataset.tip = (u.provider === 'google' ? 'Signed in with Google' : u.provider === 'firebase' ? 'Signed in with email' : 'Local profile on this device')
-    + (u.email ? ' · ' + u.email : '') + ' · workspace in ' + STORE.label() + ' · open Passport';
+  c.dataset.tip = (u.provider === 'google' ? 'Signed in with Google'
+    : u.provider === 'phone' ? 'Signed in with phone'
+    : u.provider === 'firebase' ? 'Signed in with email' : 'Local profile on this device')
+    + (u.email ? ' · ' + u.email : (u.phone ? ' · ' + u.phone : '')) + ' · workspace in ' + STORE.label() + ' · open Passport';
 }
 function renderSiteNav() {
   const n = $('#siteNav'); if (!n) return;
@@ -5629,6 +5726,37 @@ function wireGate() {
       if (!['auth/popup-closed-by-user', 'auth/cancelled-popup-request', 'auth/user-cancelled'].includes(err && err.code)) gateMsg(fbMsg(err));
     } finally { btn.disabled = false; }
   };
+  const phoneSend = $('#phoneSend');
+  if (phoneSend) phoneSend.onclick = async () => {
+    if (AUTH.busy || AUTH.mode !== 'firebase') return;
+    const e164 = normalisePhoneE164($('#gatePhoneNum') && $('#gatePhoneNum').value);
+    if (!e164) { gateMsg('Use a full number with country code, e.g. +14105550100.', 'warn'); return; }
+    gateBusy(true, 'Sending…');
+    try {
+      await fbInit();
+      phoneConfirm = await FB.auth.sendPhoneCode(e164);
+      const step = $('#phoneCodeStep'); if (step) step.hidden = false;
+      gateMsg('SMS sent. Enter the code below.', 'ok');
+      const code = $('#gatePhoneCode'); if (code) code.focus();
+    } catch (err) {
+      phoneConfirm = null;
+      gateMsg(fbMsg(err));
+      if (FB.recaptcha) { try { FB.recaptcha.clear(); } catch (e) {} FB.recaptcha = null; }
+    } finally { gateBusy(false); }
+  };
+  const phoneConfirmBtn = $('#phoneConfirm');
+  if (phoneConfirmBtn) phoneConfirmBtn.onclick = async () => {
+    if (AUTH.busy || !phoneConfirm) { gateMsg('Request an SMS code first.', 'warn'); return; }
+    const code = String(($('#gatePhoneCode') && $('#gatePhoneCode').value) || '').trim();
+    if (!/^\d{6}$/.test(code)) { gateMsg('Enter the 6-digit SMS code.', 'warn'); return; }
+    gateBusy(true, 'Checking…');
+    try {
+      await FB.auth.confirmPhoneCode(phoneConfirm, code);
+      phoneConfirm = null;
+    } catch (err) {
+      gateMsg(fbMsg(err));
+    } finally { gateBusy(false); }
+  };
   $('#gateLocal').onclick = async () => {
     if (AUTH.mode === 'local' && CFG.firebase) {       // back to Google
       try { await fbInit(); AUTH.mode = 'firebase'; applyBrand(); showGate(); gateMsg(''); }
@@ -5876,9 +6004,17 @@ if (typeof window !== 'undefined') {
       FB.auth.onAuthStateChanged(u => {
         if (u) {
           AUTH.mode = 'firebase';
-          const isGoogle = (u.providerData && u.providerData[0] && u.providerData[0].providerId === 'google.com');
-          enterApp({ id:u.uid, name:u.displayName || (u.email || '').split('@')[0], email:u.email,
-                     provider:isGoogle ? 'google' : 'firebase' });
+          const ids = (u.providerData || []).map(p => p && p.providerId);
+          const provider = ids.includes('google.com') ? 'google'
+            : ids.includes('phone') ? 'phone'
+            : 'firebase';
+          enterApp({
+            id: u.uid,
+            name: u.displayName || (u.email || '').split('@')[0] || (u.phoneNumber || 'You'),
+            email: u.email || null,
+            phone: u.phoneNumber || null,
+            provider
+          });
           return;
         }
         if (AUTH.user && AUTH.user.provider === 'local') return;   // a local profile is open; not ours to close

@@ -6,6 +6,16 @@ export const AWAY_MS = 7 * 86400000;
 
 export const RELEASES = [
   {
+    version: '3.10.0',
+    name: 'Spark Firebase extras',
+    date: '2026-09-21',
+    highlights: [
+      'App Check (reCAPTCHA Enterprise) and Performance Monitoring sit on the free Spark plan — monitoring only until you flip enforcement in Console.',
+      'Remote Config reads feature_phone_signin; keep it false until you want SMS sign-in on the gate (~10 SMS/day on Spark).',
+      'Email + Google stay as they were. Storage, Functions, Analytics, and Hosting stay off on purpose.'
+    ]
+  },
+  {
     version: '3.9.0',
     name: 'Fifty milestones & quieter search',
     date: '2026-09-20',
