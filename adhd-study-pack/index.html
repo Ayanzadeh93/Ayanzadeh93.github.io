@@ -3,17 +3,84 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' 'wasm-unsafe-eval' https://www.gstatic.com https://www.google.com https://www.gstatic.com/recaptcha/ https://apis.google.com https://accounts.google.com https://cdn.jsdelivr.net https://esm.run; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; media-src 'self' blob: https://upload.wikimedia.org https://commons.wikimedia.org; connect-src 'self' blob: https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://accounts.google.com https://firebaseinstallations.googleapis.com https://firebaseappcheck.googleapis.com https://content-firebaseappcheck.googleapis.com https://firebaseremoteconfig.googleapis.com https://firebaselogging.googleapis.com https://firebaselogging-pa.googleapis.com https://www.google.com https://www.google.com/recaptcha/ https://www.gstatic.com https://cdn.jsdelivr.net https://data.jsdelivr.net https://esm.run https://huggingface.co https://*.huggingface.co https://*.hf.co https://cas-bridge.xethub.hf.co https://raw.githubusercontent.com https://*.githubusercontent.com https://upload.wikimedia.org https://commons.wikimedia.org; worker-src 'self' blob:; form-action 'self'; frame-src https://*.firebaseapp.com https://accounts.google.com https://www.google.com https://www.google.com/recaptcha/ https://recaptcha.google.com">
-  <meta name="referrer" content="strict-origin-when-cross-origin">
-  <meta name="color-scheme" content="light dark">
-  <title>ADHD Study Pack</title>
+  <title>ADHD Study Pack — moved</title>
+  <meta name="description" content="The ADHD Study Pack has moved. It now lives at ayanzadeh93.github.io/adhd-study-pack/.">
+  <!-- The app used to be kept as a second copy in this repository, which drifted
+       from the real one: this domain was serving a build from months earlier.
+       There is now one copy, in the adhd-study-pack repository, and this page
+       points at it. GitHub Pages cannot issue a 301, so this is a canonical
+       link plus a refresh. -->
+  <link rel="canonical" href="https://ayanzadeh93.github.io/adhd-study-pack/">
+  <!-- No <meta refresh>: it would fire before the script below could offer to
+       rescue a workspace saved on this origin. The script redirects at once
+       when there is nothing to rescue; without scripting, the link does it. -->
+  <meta name="robots" content="noindex, follow">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="stylesheet" href="css/adhd-study-pack.css?v=3.10.0">
-  <link rel="stylesheet" href="css/webllm-coach.css?v=7">
-  <link rel="stylesheet" href="css/guide-studio.css?v=1">
+  <style>
+    :root { color-scheme: light dark; --ink:#141B19; --muted:#5B6865; --bg:#EDF0EE; --card:#F8FAF8; --line:#D4DCD8; --accent:#CC4520; }
+    @media (prefers-color-scheme: dark) {
+      :root { --ink:#E7EDEA; --muted:#8C9A96; --bg:#0D1114; --card:#141A1D; --line:#263034; --accent:#EE6033; }
+    }
+    body { margin:0; min-height:100vh; display:grid; place-items:center; padding:24px;
+           background:var(--bg); color:var(--ink);
+           font:16px/1.6 'Archivo', system-ui, -apple-system, sans-serif; }
+    .card { max-width:34rem; background:var(--card); border:1px solid var(--line);
+            border-radius:18px; padding:28px; }
+    h1 { font-size:1.35rem; margin:0 0 10px; }
+    p { margin:0 0 14px; color:var(--muted); }
+    a.go { display:inline-block; background:var(--accent); color:#fff; text-decoration:none;
+           padding:11px 18px; border-radius:10px; font-weight:600; }
+    button { font:inherit; font-weight:600; padding:10px 16px; border-radius:10px;
+             border:1px solid var(--line); background:transparent; color:var(--ink); cursor:pointer; }
+    #keep { display:none; margin-top:20px; padding-top:18px; border-top:1px solid var(--line); }
+    #keep.on { display:block; }
+  </style>
 </head>
 <body>
-  <p id="bootNote" style="max-width:36rem;margin:4rem auto;padding:0 1rem;font:16px/1.5 system-ui,sans-serif;color:#6b7280">Loading the study pack…</p>
-  <script type="module" src="js/boot.js?v=3.10.0"></script>
+  <main class="card">
+    <h1>The Study Pack has moved</h1>
+    <p>It is now at <strong>ayanzadeh93.github.io/adhd-study-pack</strong>. You should arrive there in a moment.</p>
+    <p><a class="go" href="https://ayanzadeh93.github.io/adhd-study-pack/">Open the Study Pack</a></p>
+
+    <!-- A workspace saved without an account lives in this domain's storage and
+         cannot follow the person to another origin. If there is one here, offer
+         it as a file before sending them on; Import at the other end takes it
+         back. Signed-in accounts need none of this — their workspace is in the
+         account, not the browser. -->
+    <div id="keep">
+      <p><strong>One thing first.</strong> This browser has a Study Pack workspace saved on this address that will not follow you automatically. Save it, then use <em>Setup → Account and data → Import a backup</em> once you arrive.</p>
+      <button type="button" id="save">Save my workspace</button>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      var DEST = 'https://ayanzadeh93.github.io/adhd-study-pack/';
+      var raw = null;
+      try { raw = localStorage.getItem('adhd-study-pack.v1'); } catch (e) {}
+
+      // Nothing stored here, or nothing worth keeping: just go.
+      if (!raw || raw.length < 40) { location.replace(DEST); return; }
+
+      document.getElementById('keep').className = 'on';
+      document.getElementById('save').addEventListener('click', function () {
+        try {
+          var blob = new Blob([raw], { type: 'application/json' });
+          var a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = 'adhd-study-pack-workspace.json';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(function () { location.href = DEST; }, 1200);
+        } catch (e) {
+          location.href = DEST;
+        }
+      });
+    })();
+  </script>
+  <noscript>
+    <p style="text-align:center"><a href="https://ayanzadeh93.github.io/adhd-study-pack/">Continue to the Study Pack</a></p>
+  </noscript>
 </body>
 </html>
