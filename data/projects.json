@@ -169,8 +169,7 @@
       "legacyPage": "adhd-study-pack.html",
       "links": [
         {"label": "Project page", "href": "adhd-study-pack.html", "kind": "page"},
-        {"label": "Open the Study Pack", "href": "https://www.ayanzadeh.com/adhd-study-pack/", "kind": "app"},
-        {"label": "Source", "href": "https://github.com/Ayanzadeh93/adhd-study-pack", "kind": "repo"}
+        {"label": "Open the Study Pack", "href": "https://www.ayanzadeh.com/adhd-study-pack/", "kind": "app"}
       ],
       "related": [
         "indoor-navigation",
