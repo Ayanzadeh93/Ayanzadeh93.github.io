@@ -7,6 +7,10 @@ data stays in the browser.
 
 **Live:** [https://www.ayanzadeh.com/adhd-study-pack/](https://www.ayanzadeh.com/adhd-study-pack/)
 
+Version **3.11.0** adds category **tags** (Reading, Lab, and your own) on tasks and
+plan blocks. Tags are not the priority matrix. A tag and a quadrant can be
+on together, and Merge folds one tag into another without moving Q1–Q4.
+
 Version **3.10.0** wires Spark-plan Firebase extras that stay $0 at personal
 scale: **App Check** (reCAPTCHA Enterprise site key, monitoring only until you
 flip enforcement), **Remote Config** (`feature_phone_signin`, published false),

@@ -18,8 +18,10 @@ import { ACHIEVEMENTS, emptyPassport, normalisePassport, initialsOf as passportI
          computeStats as passportStats, achievementProgress, earnedKeys, freshKeys, adoptKeys,
          getAchievement } from './lib/passport.js?v=3.9.0';
 import { RELEASES, AWAY_MS, whatsNewPayload, mergeWhatsNewRecord,
-         readWhatsNewRecord, writeWhatsNewRecord, cmpVersion, whatsNewDeviceKey } from './lib/whatsnew.js?v=3.10.0';
+         readWhatsNewRecord, writeWhatsNewRecord, cmpVersion, whatsNewDeviceKey } from './lib/whatsnew.js?v=3.11.0';
 import { shouldShowPhoneSignIn, normalisePhoneE164, isAppCheckDebugHost } from './lib/firebase-spark.js?v=3.10.0';
+import { TAG_COLORS, slugTag, nameFromSlug, normaliseCatalog, parseTagInput,
+         normaliseItemTags, matchesTagAndPriority, mergeTagIds } from './lib/tags.js?v=3.11.0';
 const $  = (s, r) => (r || (typeof document !== 'undefined' ? document : null))?.querySelector?.(s) || null;
 const $$ = (s, r) => Array.from((r || (typeof document !== 'undefined' ? document : null))?.querySelectorAll?.(s) || []);
 const uid = () => Math.random().toString(36).slice(2, 10);
@@ -43,7 +45,7 @@ const DOW = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
    defaults, then a <script type="application/json" id="focus-dial-config">
    block, then window.FOCUS_DIAL_CONFIG.
    ===================================================================== */
-const VERSION = '3.10.0';
+const VERSION = '3.11.0';
 const DEFAULT_CONFIG = {
   storageKey: 'focusdial.v3',
   storage:    'local',            // 'local' | 'session' | 'memory' | 'rest'
@@ -135,6 +137,7 @@ const DEFAULTS = () => ({
      grow, so they live in the journal database (js/lib/records.js) and are held
      here in memory for rendering. saveSnapshot() leaves them out of the write. */
   tasks: [], events: [], notes: [], habits: [], sessions: [], checkins: [], moods: [], subjects: [], links: [],
+  tags: normaliseCatalog(),       // starters until a saved catalog exists; [] stays empty
   sound: { master:60, layers:{}, beat:10, carrier:180, presets:{} },
   gcal: { on:false, cals:[], hideDeclined:true, push:true, target:'primary', links:{} },
   timer: { phase:'focus', cycle:1, taskId:null, intent:'', activation:null },
@@ -358,7 +361,21 @@ function migrate(raw) {
   if (!ACCENT_IDS.includes(out.settings.accent)) out.settings.accent = 'focus';
   if (!GRADIENT_IDS.includes(out.settings.accentGradient)) out.settings.accentGradient = 'off';
   ['tasks','events','notes','habits','sessions','checkins','moods','subjects','links'].forEach(k => { if (!Array.isArray(out[k])) out[k] = []; });
-  out.tasks.forEach(t => { if (!('quad' in t)) t.quad = null; if (!t.id) t.id = uid(); });
+  out.tags = normaliseCatalog(raw.tags);
+  const tagIds = new Set(out.tags.map(t => t.id));
+  const absorbTags = item => {
+    (Array.isArray(item.tags) ? item.tags : []).forEach(rawId => {
+      const id = slugTag(rawId);
+      if (!id || tagIds.has(id)) return;
+      out.tags.push({ id, name: nameFromSlug(id), color: TAG_COLORS[out.tags.length % TAG_COLORS.length] });
+      tagIds.add(id);
+    });
+    item.tags = normaliseItemTags(item.tags, tagIds);
+  };
+  out.tasks.forEach(t => { if (!('quad' in t)) t.quad = null; if (!t.id) t.id = uid(); absorbTags(t); });
+  out.events.forEach(absorbTags);
+  out.notes.forEach(absorbTags);
+  if (out.tags.length > 40) out.tags = out.tags.slice(0, 40);
   out.habits = out.habits.map(normaliseHabit).filter(Boolean);
   out.schema = 4;
   return out;
@@ -1956,6 +1973,7 @@ function mxChip(t) {
     <span class="energy ${t.energy}" aria-hidden="true" style="width:4px;border-radius:2px;align-self:stretch"></span>
     <span class="mx-t">${esc(t.title)}</span>
     ${sub ? `<span class="dot" aria-hidden="true" style="margin-top:5px;background:${sub.color}"></span>` : ''}
+    ${(t.tags || []).slice(0, 2).map(id => { const tag = tagById(id); return tag ? `<span class="ltag tiny" style="--q:${tag.color}">${esc(tag.name)}</span>` : ''; }).join('')}
     <span class="m" aria-hidden="true">${t.done_pomos || 0}/${t.est}</span></div>`;
 }
 let mxDrag = null;
@@ -1982,8 +2000,9 @@ function wireMx(root) {
   });
 }
 function renderMatrix() {
+  renderTaskLens();
   const root = $('#view-matrix'); if (!root) return;
-  const open = S.tasks.filter(t => !t.done);
+  const open = S.tasks.filter(t => !t.done && matchesTagAndPriority(t, { tag:taskLens.tag, quad:'' }));
   QORDER.forEach(k => {
     const cell = $(`.mx-cell[data-quad="${k}"]`, root); if (!cell) return;
     const q = QUADS[k], list = open.filter(t => qOf(t) === k);
@@ -2076,6 +2095,92 @@ $('#mxTriage').onclick = triage;
 $('#triageBtn').onclick = triage;
 
 const ENERGY_LABEL = { low:'Low activation', med:'Medium', high:'High activation' };
+/* Tag lens is separate from the matrix. Both can be on: the list keeps only
+   tasks that match the tag AND the quadrant. */
+let taskLens = { quad:'', tag:'' };
+function tagById(id) { return S.tags.find(t => t.id === id) || null; }
+function adoptTags(text) {
+  const ids = parseTagInput(text);
+  ids.forEach(id => {
+    if (S.tags.some(t => t.id === id)) return;
+    if (S.tags.length >= 40) return;
+    S.tags.push({ id, name: nameFromSlug(id), color: TAG_COLORS[S.tags.length % TAG_COLORS.length] });
+  });
+  return ids.filter(id => S.tags.some(t => t.id === id));
+}
+function tagChips(item, editable) {
+  const ids = (item && item.tags) || [];
+  const chips = ids.map(id => {
+    const tag = tagById(id); if (!tag) return '';
+    return `<button type="button" class="ltag" data-filtertag="${esc(id)}" style="--q:${tag.color}" aria-label="Show ${esc(tag.name)} with the current priority">${esc(tag.name)}</button>`;
+  }).join('');
+  const add = editable
+    ? `<button type="button" class="ltag add" data-edittags="${esc(item.id)}" aria-label="Edit tags">+</button>`
+    : '';
+  return chips + add;
+}
+function tagNames(item, n) {
+  return ((item && item.tags) || []).map(id => (tagById(id) || {}).name).filter(Boolean).slice(0, n || 2);
+}
+function renderTaskLens() {
+  const quads = [['','All'],['q1','Q1'],['q2','Q2'],['q3','Q3'],['q4','Q4'],['none','Unsorted']];
+  const priority = `<div class="lens-row"><span class="lens-k">Priority</span>${quads.map(([v, l]) =>
+      `<button type="button" class="lens-chip ${taskLens.quad === v ? 'on' : ''}" data-lens-q="${v}">${l}</button>`).join('')}</div>`;
+  const tags = `<div class="lens-row"><span class="lens-k">Tags</span>
+      <button type="button" class="lens-chip ${taskLens.tag === '' ? 'on' : ''}" data-lens-t="">All</button>
+      ${S.tags.map(t => `<button type="button" class="lens-chip ${taskLens.tag === t.id ? 'on' : ''}" data-lens-t="${esc(t.id)}" style="--q:${t.color}">${esc(t.name)}</button>`).join('')}
+      <button type="button" class="lens-chip ghost" data-tag-merge>Merge</button>
+    </div>`;
+  const bind = box => {
+    $$('[data-lens-q]', box).forEach(b => b.onclick = () => { taskLens.quad = b.dataset.lensQ || ''; renderTasks(); });
+    $$('[data-lens-t]', box).forEach(b => b.onclick = () => { taskLens.tag = b.dataset.lensT || ''; renderTasks(); });
+    const merge = $('[data-tag-merge]', box); if (merge) merge.onclick = mergeTagsModal;
+  };
+  const taskBox = $('#taskLens');
+  if (taskBox) {
+    taskBox.innerHTML = priority + tags
+      + `<p class="lens-note">Tags are categories. Priority is the matrix. Turn both on and the list keeps only what matches both.</p>`;
+    bind(taskBox);
+  }
+  const mxBox = $('#mxLens');
+  if (mxBox) {
+    mxBox.innerHTML = tags
+      + `<p class="lens-note">This row narrows every box to one category. The boxes themselves stay priority — merging tags does not move Q1–Q4.</p>`;
+    bind(mxBox);
+  }
+}
+function taskTagsModal(id) {
+  const t = S.tasks.find(x => x.id === id); if (!t) return;
+  const have = new Set(t.tags || []);
+  openModal('Tags', `
+    <p class="hint" style="margin-top:0">Categories for this task. The matrix quadrant is separate and stays put.</p>
+    <div class="tag-pick">${S.tags.length ? S.tags.map(tag =>
+      `<label class="lens-chip ${have.has(tag.id) ? 'on' : ''}" style="--q:${tag.color}"><input type="checkbox" value="${esc(tag.id)}" ${have.has(tag.id) ? 'checked' : ''}>${esc(tag.name)}</label>`).join('')
+      : '<p class="hint">No tags yet — type one below.</p>'}</div>
+    <div class="field"><label for="newTag">Add tags</label><input id="newTag" type="text" placeholder="deep work, email" autocomplete="off"></div>`,
+    [{ label:'Cancel' }, { label:'Save', primary:true, onClick: () => {
+      const picked = $$('#modalBody .tag-pick input:checked').map(i => i.value);
+      const extra = adoptTags($('#newTag').value);
+      t.tags = normaliseItemTags(picked.concat(extra), S.tags.map(x => x.id));
+      save(); renderTasks();
+    }}]);
+}
+function mergeTagsModal() {
+  if (S.tags.length < 2) { toast('Add at least two tags before merging'); return; }
+  const opts = S.tags.map(t => `<option value="${esc(t.id)}">${esc(t.name)}</option>`).join('');
+  openModal('Merge tags', `
+    <p class="hint" style="margin-top:0">Fold one category into another. Tasks, blocks, and notes move over. Priority quadrants do not change.</p>
+    <div class="field"><label for="tagFrom">Fold this tag</label><select id="tagFrom">${opts}</select></div>
+    <div class="field"><label for="tagInto">Into this tag</label><select id="tagInto">${opts}</select></div>`,
+    [{ label:'Cancel' }, { label:'Merge', primary:true, onClick: () => {
+      const from = $('#tagFrom').value, into = $('#tagInto').value;
+      if (!from || !into || from === into) { toast('Pick two different tags'); return false; }
+      ['tasks', 'events', 'notes'].forEach(k => { S[k] = mergeTagIds(S[k], from, into); });
+      S.tags = S.tags.filter(t => t.id !== from);
+      if (taskLens.tag === from) taskLens.tag = into;
+      save(); renderTasks(); toast('Tags merged');
+    }}]);
+}
 function taskRow(t, opts) {
   const o = opts || {};
   const sub = S.subjects.find(s => s.id === t.subjectId);
@@ -2091,6 +2196,7 @@ function taskRow(t, opts) {
         ${sub ? `<span class="m qcol" style="--q:${sub.color}">${esc(sub.name)}</span>` : ''}
         ${q ? `<button type="button" class="qtag" data-qtask="${t.id}" style="--q:${QUADS[q].color}" aria-label="Matrix: ${QUADS[q].n}, ${QUADS[q].name}. Change" data-tip="${QUADS[q].n} · ${QUADS[q].name} — ${QUADS[q].axis}">${QUADS[q].n}</button>`
             : `<button type="button" class="qtag" data-qtask="${t.id}" aria-label="Not placed on the matrix. Place it" data-tip="Not placed on the matrix yet">?</button>`}
+        ${tagChips(t, true)}
         <span class="m">${t.done_pomos || 0}/${t.est} pomos</span>
         <span class="sr-only">${ENERGY_LABEL[t.energy]}.</span>
         ${t.tracked_min ? `<span class="m" data-tip="Time logged on this task with the stopwatch"><span aria-hidden="true">⏱</span><span class="sr-only">Timed:</span> ${minsToHM(t.tracked_min)}</span>` : ''}
@@ -2126,6 +2232,12 @@ function wireTasks(root) {
     stopTracking(); keepFocus(list, id ? `[data-track="${id}"]` : null);
   });
   $$('[data-qtask]', root).forEach(el => el.onclick = e => { e.stopPropagation(); taskQuadModal(el.dataset.qtask); });
+  $$('[data-edittags]', root).forEach(el => el.onclick = e => { e.stopPropagation(); taskTagsModal(el.dataset.edittags); });
+  $$('[data-filtertag]', root).forEach(el => el.onclick = e => {
+    e.stopPropagation();
+    taskLens.tag = taskLens.tag === el.dataset.filtertag ? '' : el.dataset.filtertag;
+    renderTasks();
+  });
   $$('[data-deltask]', root).forEach(b => b.onclick = () => {
     const t = S.tasks.find(x => x.id === b.dataset.deltask);
     const list = b.closest('.stack') && b.closest('.stack').id;
@@ -2154,20 +2266,24 @@ function setActiveTask(id) {
   if (view !== 'focus') go('focus');
 }
 function renderTasks() {
-  const open = S.tasks.filter(t => !t.done), done = S.tasks.filter(t => t.done);
+  const match = t => matchesTagAndPriority(t, taskLens);
+  const open = S.tasks.filter(t => !t.done && match(t)), done = S.tasks.filter(t => t.done && match(t));
+  const allOpen = S.tasks.filter(t => !t.done);
   const list = $('#taskList');
   if (list) {
-    list.innerHTML = (open.length ? open.map(t => taskRow(t)).join('') : '<div class="empty">Nothing queued. Add the smallest next action, not the project.</div>')
+    const narrowed = taskLens.tag || taskLens.quad;
+    list.innerHTML = (open.length ? open.map(t => taskRow(t)).join('')
+      : `<div class="empty">${narrowed ? 'Nothing in this priority and tag together. Clear a chip above, or add a task that fits both.' : 'Nothing queued. Add the smallest next action, not the project.'}</div>`)
       + (done.length ? `<div class="eyebrow" style="margin:14px 0 6px">Finished — ${done.length}</div>` + done.map(t => taskRow(t)).join('') : '');
     wireTasks(list);
     const dread = open.filter(t => t.energy === 'high').slice(0, 4);
     $('#dreadList').innerHTML = dread.length ? dread.map(t => taskRow(t, { noFocus:false })).join('') : '<div class="empty">No dreaded tasks flagged. Suspicious.</div>';
     wireTasks($('#dreadList'));
-    const totalPomos = open.reduce((a, t) => a + Math.max(0, t.est - (t.done_pomos || 0)), 0);
+    const totalPomos = allOpen.reduce((a, t) => a + Math.max(0, t.est - (t.done_pomos || 0)), 0);
     const hrs = (totalPomos * S.settings.focus / 60);
     const perWeek = weekCapacityHours();
     $('#loadCheck').innerHTML = `
-      <div style="display:flex;justify-content:space-between"><span>Open tasks</span><strong class="num">${open.length}</strong></div>
+      <div style="display:flex;justify-content:space-between"><span>Open tasks</span><strong class="num">${allOpen.length}</strong></div>
       <div style="display:flex;justify-content:space-between"><span>Pomodoros left</span><strong class="num">${totalPomos}</strong></div>
       <div style="display:flex;justify-content:space-between"><span>That is</span><strong class="num">${hrs.toFixed(1)} h</strong></div>
       <div style="display:flex;justify-content:space-between"><span>Free this week</span><strong class="num">${perWeek.toFixed(1)} h</strong></div>
@@ -2184,8 +2300,9 @@ $('#taskForm').onsubmit = e => {
   const title = $('#taskTitle').value.trim(); if (!title) return;
   S.tasks.unshift({ id:uid(), title, est:+$('#taskEst').value || 1, energy:$('#taskEnergy').value,
                     subjectId:$('#taskSubject').value || null, quad:$('#taskQuad').value || null,
+                    tags:adoptTags($('#taskTags') && $('#taskTags').value),
                     done:false, done_pomos:0, created:Date.now() });
-  $('#taskTitle').value = ''; save(); renderTasks(); toast('Added');
+  $('#taskTitle').value = ''; if ($('#taskTags')) $('#taskTags').value = ''; save(); renderTasks(); toast('Added');
 };
 $('#clearDone').onclick = () => { const n = S.tasks.filter(t => t.done).length; S.tasks = S.tasks.filter(t => !t.done); save(); renderTasks(); toast(n + ' cleared'); };
 $('#pasteTasks').onclick = () => openModal('Paste a list', `
@@ -2194,7 +2311,7 @@ $('#pasteTasks').onclick = () => openModal('Paste a list', `
   <p style="font-size:calc(12px*var(--ts,1));color:var(--muted);margin:0">Everything lands as 2 pomodoros, medium activation. Adjust after — or don't.</p>`,
   [{ label:'Cancel' }, { label:'Add them', primary:true, onClick: () => {
     const lines = $('#pasteBox').value.split('\n').map(l => l.replace(/^\s*(?:[-*•]|\d+[.)]|\[[ xX]\])\s*/, '').trim()).filter(Boolean);
-    lines.reverse().forEach(t => S.tasks.unshift({ id:uid(), title:t, est:2, energy:'med', subjectId:null, quad:null, done:false, done_pomos:0, created:Date.now() }));
+    lines.reverse().forEach(t => S.tasks.unshift({ id:uid(), title:t, est:2, energy:'med', subjectId:null, quad:null, tags:[], done:false, done_pomos:0, created:Date.now() }));
     save(); renderTasks(); toast(lines.length + ' tasks added — unsorted on the matrix');
   } }]);
 
@@ -2205,7 +2322,7 @@ function renderFocusSide() {
   const t = S.tasks.find(x => x.id === S.timer.taskId);
   $('#activeTaskBox').innerHTML = t
     ? `<div class="t-title" style="font-size:calc(14px*var(--ts,1));margin-bottom:6px">${esc(t.title)}</div>
-       <div class="t-meta"><span class="m">${t.done_pomos || 0}/${t.est} pomos</span><span class="m">${ENERGY_LABEL[t.energy]}</span></div>
+       <div class="t-meta"><span class="m">${t.done_pomos || 0}/${t.est} pomos</span><span class="m">${ENERGY_LABEL[t.energy]}</span>${tagChips(t, true)}</div>
        <div style="height:6px;border-radius:99px;background:var(--surface-3);margin-top:9px;overflow:hidden">
          <div style="height:100%;width:${clamp((t.done_pomos || 0) / t.est * 100, 0, 100)}%;background:var(--accent);border-radius:99px"></div></div>
        ${isTracking('taskId', t.id)
@@ -2254,7 +2371,8 @@ function renderFocusSide() {
   $$('#parkedList [data-delpark]').forEach(b => b.onclick = () => { S.notes = S.notes.filter(n => n.id !== b.dataset.delpark); save(); renderFocusSide(); renderBoard(); });
   $$('#parkedList [data-topark]').forEach(b => b.onclick = () => {
     const n = S.notes.find(x => x.id === b.dataset.topark); if (!n) return;
-    S.tasks.unshift({ id:uid(), title:n.text, est:1, energy:'med', subjectId:null, quad:null, done:false, done_pomos:0, created:Date.now() });
+    S.tasks.unshift({ id:uid(), title:n.text, est:1, energy:'med', subjectId:null, quad:null,
+      tags:normaliseItemTags(n.tags, S.tags.map(t => t.id)), done:false, done_pomos:0, created:Date.now() });
     S.notes = S.notes.filter(x => x.id !== n.id); save(); renderFocusSide(); renderTasks(); renderBoard(); toast('Now a task');
   });
   if (document.activeElement !== $('#intentInput')) $('#intentInput').value = S.timer.intent || '';   // never under the cursor
@@ -2392,7 +2510,10 @@ function renderCalendar() {
     let inner = Array.from({ length:n }, () => '<div class="hour" aria-hidden="true"></div>').join('');
     const dayName = d.toLocaleDateString(undefined, { weekday:'long', month:'long', day:'numeric' });
     // Blocks are keyboard buttons whose name says what, when and whose they are.
-    const evName = (e, when) => esc(`${e.title}, ${dayName}, ${when}, ${e.source === 'google' ? 'Google Calendar event' + (e.free ? ', marked free' : '') : (EV_KINDS[e.kind] || 'block')}${isTracking('eventId', e.id) ? ', being timed' : ''}`);
+    const evName = (e, when) => {
+      const cats = tagNames(e, 8);
+      return esc(`${e.title}, ${dayName}, ${when}, ${e.source === 'google' ? 'Google Calendar event' + (e.free ? ', marked free' : '') : (EV_KINDS[e.kind] || 'block')}${cats.length ? ', tags ' + cats.join(', ') : ''}${isTracking('eventId', e.id) ? ', being timed' : ''}`);
+    };
     allDay.forEach((e, i) => {
       inner += `<div class="ev allday ${e.source === 'google' ? 'gcal' : (e.kind || 'other')}" ${e.source === 'google' ? `data-glink="${esc(e.link || '')}" data-gid="${esc(e.id)}"` : `data-ev="${e.id}"`}
         role="button" tabindex="0" aria-label="${evName(e, 'all day')}"
@@ -2410,9 +2531,11 @@ function renderCalendar() {
       const cls = (e.source === 'google' ? (e.kind === 'gfocus' ? 'gfocus' : 'gcal') + (e.free ? ' free' : '') : (e.kind || 'other'))
         + (isTracking('eventId', e.id) ? ' tracking' : '');
       const attr = e.source === 'google' ? `data-glink="${esc(e.link || '')}" data-gid="${esc(e.id)}"` : `data-ev="${e.id}"`;
+      const cats = tagNames(e);
       inner += `<div class="ev ${cls}" ${attr} role="button" tabindex="0" aria-label="${evName(e, hhmm(s0) + ' to ' + hhmm(en))}" style="top:${Math.max(0, top)}px;height:${h}px;left:calc(${left}% + 3px);width:calc(${w}% - 6px);z-index:${2 + lane}"
-          data-tip="${esc(e.title)} · ${hhmm(s0)}–${hhmm(en)}${e.source === 'google' ? ' · from Google Calendar' + (e.free ? ', marked free' : '') : ''}">
+          data-tip="${esc(e.title)} · ${hhmm(s0)}–${hhmm(en)}${cats.length ? ' · ' + esc(cats.join(', ')) : ''}${e.source === 'google' ? ' · from Google Calendar' + (e.free ? ', marked free' : '') : ''}">
         <div class="ttl" aria-hidden="true">${esc(e.title)}</div><div class="tm" aria-hidden="true">${hhmm(s0)}–${hhmm(en)}</div>
+        ${cats.length && h > 52 ? `<div class="tm" aria-hidden="true">${esc(cats.join(' · '))}</div>` : ''}
         ${e.source === 'google' && h > 40 ? '<div class="src" aria-hidden="true">google</div>' : ''}</div>`;
     });
     if (k === todayK) {
@@ -2455,10 +2578,12 @@ function eventForm(e) {
     <div class="field" style="width:110px"><label for="evS">Start</label><input type="time" id="evS" value="${e.s}"></div>
     <div class="field" style="width:110px"><label for="evE">End</label><input type="time" id="evE" value="${e.e}"></div>
   </div>
-  <div style="display:flex;gap:10px">
-    <div class="field" style="flex:1"><label for="evK">Kind</label><select id="evK">${Object.entries(EV_KINDS).map(([k, v]) => `<option value="${k}" ${e.kind === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>
-    <div class="field" style="flex:1"><label for="evSub">Course</label><select id="evSub"><option value="">—</option>${S.subjects.map(s => `<option value="${s.id}" ${e.subjectId === s.id ? 'selected' : ''}>${esc(s.name)}</option>`).join('')}</select></div>
-  </div>`;
+  <div style="display:flex;gap:10px;flex-wrap:wrap">
+    <div class="field" style="flex:1;min-width:140px"><label for="evK">Kind</label><select id="evK">${Object.entries(EV_KINDS).map(([k, v]) => `<option value="${k}" ${e.kind === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>
+    <div class="field" style="flex:1;min-width:140px"><label for="evSub">Course</label><select id="evSub"><option value="">—</option>${S.subjects.map(s => `<option value="${s.id}" ${e.subjectId === s.id ? 'selected' : ''}>${esc(s.name)}</option>`).join('')}</select></div>
+    <div class="field" style="flex:1;min-width:140px"><label for="evTags">Tags</label><input type="text" id="evTags" value="${esc(e.tags || '')}" placeholder="reading, lab" autocomplete="off"></div>
+  </div>
+  <p class="hint" style="margin:0">Tags are categories. They are not the priority matrix.</p>`;
 }
 function readEventForm() {
   const d = $('#evD').value, s = $('#evS').value, e = $('#evE').value;
@@ -2466,7 +2591,7 @@ function readEventForm() {
   const start = new Date(`${d}T${s}`), end = new Date(`${d}T${e}`);
   if (end <= start) { toast('The end time has to come after the start'); return null; }
   return { title:$('#evT').value.trim() || 'Untitled block', start:start.toISOString(), end:end.toISOString(),
-           kind:$('#evK').value, subjectId:$('#evSub').value || null };
+           kind:$('#evK').value, subjectId:$('#evSub').value || null, tags:adoptTags($('#evTags') && $('#evTags').value) };
 }
 function newEvent(dateKeyStr, timeStr) {
   const endH = pad2(clamp(parseInt(timeStr) + 1, 0, 23)) + ':00';
@@ -2480,7 +2605,8 @@ function editEvent(id) {
   const ev = S.events.find(x => x.id === id); if (!ev) return;
   const s = new Date(ev.start), e = new Date(ev.end);
   const timing = isTracking('eventId', id);
-  openModal('Edit block', eventForm({ title:ev.title, date:dayKey(s), s:hhmm(s), e:hhmm(e), kind:ev.kind, subjectId:ev.subjectId }),
+  openModal('Edit block', eventForm({ title:ev.title, date:dayKey(s), s:hhmm(s), e:hhmm(e), kind:ev.kind, subjectId:ev.subjectId,
+    tags:(ev.tags || []).map(id => (tagById(id) || {}).name || id).join(', ') }),
     [{ label:'Delete', onClick: () => { S.events = S.events.filter(x => x.id !== id); save(); renderCalendar(); renderFocusSide(); } },
      // With live sync on, blocks already reach Google on their own; the template link is for when it is off.
      ...(S.gcal.on ? [] : [{ label:'Add to Google', onClick: () => { gcalLink(ev); return false; } }]),
@@ -3944,6 +4070,7 @@ const COMMANDS = () => [
   { k:'Go to Focus', a:'home dial pomodoro timer 1', ico:'◉', s:'1', run:() => go('focus'), view:'focus' },
   { k:'Go to Plan', a:'calendar week schedule ics gcal 2', ico:'📅', s:'2', run:() => go('plan'), view:'plan' },
   { k:'Go to Tasks', a:'todo inbox list 3', ico:'☑', s:'3', run:() => go('tasks'), view:'tasks' },
+  { k:'Merge two tags', a:'combine categories labels fold', ico:'🏷', s:'', run:() => { go('tasks'); mergeTagsModal(); } },
   { k:'Go to Priority matrix', a:'eisenhower quadrant urgent important 4', ico:'▦', s:'4', run:() => go('matrix'), view:'matrix' },
   { k:'Go to Notes', a:'sticky board memo 5', ico:'🗒', s:'5', run:() => go('notes'), view:'notes' },
   { k:'Go to Sound', a:'rain brown noise cafe fireplace 6', ico:'🎧', s:'6', run:() => go('sound'), view:'sound' },
@@ -4105,6 +4232,7 @@ function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0;
 function seedDemo() {
   const r = rng(20260903);
   const pick = a => a[Math.floor(r() * a.length)];
+  S.tags = normaliseCatalog();
   S.subjects = [
     { id:'s1', name:'Vision-Language Models', targetHours:8, priority:3, color:SUB_COLORS[0] },
     { id:'s2', name:'Convex Optimization',    targetHours:5, priority:2, color:SUB_COLORS[1] },
@@ -4112,14 +4240,14 @@ function seedDemo() {
     { id:'s4', name:'Reading group',          targetHours:2, priority:1, color:SUB_COLORS[3] }
   ];
   S.tasks = [
-    { id:'t1', title:'Re-run the floorplan grounding eval on the held-out split', est:3, energy:'high', subjectId:'s1', quad:'q2', done:false, done_pomos:1, created:Date.now() },
-    { id:'t2', title:'Write the related-work paragraph on spatial graph construction', est:4, energy:'high', subjectId:'s3', quad:'q2', done:false, done_pomos:0, created:Date.now() },
-    { id:'t3', title:'Problem set 4 — duality, questions 1–3', est:2, energy:'med', subjectId:'s2', quad:'q1', done:false, done_pomos:0, created:Date.now() },
-    { id:'t4', title:'Skim the two nav-instruction papers for Thursday', est:1, energy:'low', subjectId:'s4', quad:'q3', done:false, done_pomos:0, created:Date.now() },
-    { id:'t5', title:'Clean up the YOLO inference wrapper and pin versions', est:2, energy:'low', subjectId:'s1', quad:null, done:false, done_pomos:0, created:Date.now() },
-    { id:'t6', title:'Email the committee about the proposal date', est:1, energy:'high', subjectId:'s3', quad:'q1', done:false, done_pomos:0, created:Date.now() },
-    { id:'t8', title:'Re-tag the whole reference manager library', est:3, energy:'low', subjectId:null, quad:'q4', done:false, done_pomos:0, created:Date.now() },
-    { id:'t7', title:'Redo figure 3 with the corrected axis labels', est:1, energy:'med', subjectId:'s3', quad:'q1', done:true, done_pomos:1, created:Date.now() }
+    { id:'t1', title:'Re-run the floorplan grounding eval on the held-out split', est:3, energy:'high', subjectId:'s1', quad:'q2', tags:['lab'], done:false, done_pomos:1, created:Date.now() },
+    { id:'t2', title:'Write the related-work paragraph on spatial graph construction', est:4, energy:'high', subjectId:'s3', quad:'q2', tags:['writing'], done:false, done_pomos:0, created:Date.now() },
+    { id:'t3', title:'Problem set 4 — duality, questions 1–3', est:2, energy:'med', subjectId:'s2', quad:'q1', tags:['review'], done:false, done_pomos:0, created:Date.now() },
+    { id:'t4', title:'Skim the two nav-instruction papers for Thursday', est:1, energy:'low', subjectId:'s4', quad:'q3', tags:['reading'], done:false, done_pomos:0, created:Date.now() },
+    { id:'t5', title:'Clean up the YOLO inference wrapper and pin versions', est:2, energy:'low', subjectId:'s1', quad:null, tags:['lab'], done:false, done_pomos:0, created:Date.now() },
+    { id:'t6', title:'Email the committee about the proposal date', est:1, energy:'high', subjectId:'s3', quad:'q1', tags:['admin'], done:false, done_pomos:0, created:Date.now() },
+    { id:'t8', title:'Re-tag the whole reference manager library', est:3, energy:'low', subjectId:null, quad:'q4', tags:['errand'], done:false, done_pomos:0, created:Date.now() },
+    { id:'t7', title:'Redo figure 3 with the corrected axis labels', est:1, energy:'med', subjectId:'s3', quad:'q1', tags:['writing'], done:true, done_pomos:1, created:Date.now() }
   ];
   const wk = startOfWeek(new Date());
   const at = (day, h, m, dur, title, kind, sub) => {
@@ -4952,11 +5080,11 @@ const HELP_DOCS = [
   { id:'focus', title:'Focus dial', category:'Focus', view:'focus', viewLabel:'Focus',
     body:'Pomodoro intervals with a visual ring and cycles you can shrink to two minutes on a bad day. Write one sentence in Session intent — what "done" looks like. Rate activation before you start; low offers a short run instead of twenty-five minutes. Park distracting thoughts without stopping the clock; they stay until the break. Body double runs quiet co-working prompts. The distraction tally logs drift without shame.' },
   { id:'plan', title:'Week planner', category:'Planning', view:'plan', viewLabel:'Plan',
-    body:'Your week, your courses, and blocks with start times. Auto-schedule packs sessions into free hours, weights by priority and how far each course is from its weekly target, and puts the heaviest course in your best hours. Google Calendar syncs two-way; .ics import and export work when the connector is not available.' },
+    body:'Your week, your courses, and blocks with start times. A block can carry the same category tags as tasks — they are not the priority matrix. Auto-schedule packs sessions into free hours, weights by priority and how far each course is from its weekly target, and puts the heaviest course in your best hours. Google Calendar syncs two-way; .ics import and export work when the connector is not available.' },
   { id:'tasks', title:'Task list', category:'Planning', view:'tasks', viewLabel:'Tasks',
-    body:'Every task carries a pomodoro estimate and an activation cost — how hard it is to start, which is the part that actually stalls. Start with the dread: one ten-minute run at a high-activation task beats an hour on easy ones. Paste a list, triage unsorted items onto the matrix, or clear finished tasks in one click.' },
+    body:'Every task carries a pomodoro estimate and an activation cost — how hard it is to start, which is the part that actually stalls. Tags (Reading, Lab, and your own) are categories, not priority: the matrix quadrant stays separate. Turn a tag and a quadrant on together and the list keeps only what matches both. Merge folds two tags into one without moving Q1–Q4. Start with the dread: one ten-minute run at a high-activation task beats an hour on easy ones. Paste a list, triage unsorted items onto the matrix, or clear finished tasks in one click.' },
   { id:'matrix', title:'Eisenhower priority matrix', category:'Planning', view:'matrix', viewLabel:'Matrix',
-    body:'Urgency and importance are different axes; an attention system that runs on urgency cannot tell them apart from the inside. Urgent is a clock — someone is waiting today or tomorrow. Important is a consequence — finishing changes the thesis, the grade, the health. Two taps per task separates loud from matters before the day gets a vote. Drag between quadrants or click a task. One protected Q2 block a day is the entire intervention.' },
+    body:'Urgency and importance are different axes; an attention system that runs on urgency cannot tell them apart from the inside. Urgent is a clock — someone is waiting today or tomorrow. Important is a consequence — finishing changes the thesis, the grade, the health. Two taps per task separates loud from matters before the day gets a vote. Drag between quadrants or click a task. A tag chip above the boxes narrows every quadrant to that category; it does not change which box a task sits in. One protected Q2 block a day is the entire intervention.' },
   { id:'notes', title:'Sticky notes', category:'Planning', view:'notes', viewLabel:'Notes',
     body:'Drag notes anywhere on the board. Pinned notes ride along in the Focus view; parked ones came from a session you refused to abandon. Search filters as you type.' },
   { id:'sound', title:'Procedural sounds and presets', category:'Focus', view:'sound', viewLabel:'Sound',
@@ -5947,8 +6075,10 @@ window.FocusDial = {
   subscribe(fn) { (HOOKS.change = HOOKS.change || []).push(fn); return () => { HOOKS.change = HOOKS.change.filter(f => f !== fn); }; },
   on(name, fn) { (HOOKS[name] = HOOKS[name] || []).push(fn); return () => { HOOKS[name] = HOOKS[name].filter(f => f !== fn); }; },
   addTask(t) {
-    const task = Object.assign({ id:uid(), title:'Untitled', est:1, energy:'med', subjectId:null, quad:null,
+    const task = Object.assign({ id:uid(), title:'Untitled', est:1, energy:'med', subjectId:null, quad:null, tags:[],
                                  done:false, done_pomos:0, created:Date.now() }, t || {});
+    if (typeof task.tags === 'string') task.tags = adoptTags(task.tags);
+    else task.tags = normaliseItemTags(adoptTags((task.tags || []).join(',')), S.tags.map(x => x.id));
     S.tasks.unshift(task); save(); renderTasks(); emit('task', task); return clone(task);
   },
   addEvent(e) {

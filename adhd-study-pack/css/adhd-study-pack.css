@@ -1393,6 +1393,25 @@ kbd{font-family:var(--font-mono); font-size:.9em; padding:0 4px; border:1px soli
 .passport-next-list .p-ico{font-size:20px;line-height:1.2}
 .passport-next-list strong{display:block;font-size:calc(13px*var(--ts,1))}
 .passport-next-list span{display:block;font-size:calc(12px*var(--ts,1));color:var(--muted);line-height:1.35}
+
+/* ---------- category tags (not priority) ---------- */
+.tag-lens{display:flex;flex-direction:column;gap:6px;margin:0 0 12px}
+.lens-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.lens-k{font-size:calc(11px*var(--ts,1));letter-spacing:.06em;text-transform:uppercase;color:var(--muted);min-width:4.5rem}
+.lens-chip,.ltag{
+  border:1px solid var(--line);background:var(--surface);color:var(--ink-2);
+  border-radius:999px;padding:2px 8px;font:inherit;font-size:calc(12px*var(--ts,1));cursor:pointer;line-height:1.4
+}
+.lens-chip.on,.ltag{border-color:color-mix(in srgb, var(--q, var(--accent)) 55%, var(--line));color:var(--ink)}
+.lens-chip.on{background:color-mix(in srgb, var(--q, var(--accent)) 14%, var(--surface))}
+.lens-chip.ghost{background:transparent}
+.lens-note{margin:0;font-size:calc(12px*var(--ts,1));color:var(--muted);max-width:62ch}
+.ltag.add{padding:0 7px;color:var(--muted)}
+.ltag.tiny{font-size:calc(10px*var(--ts,1));padding:0 6px;cursor:default}
+.tag-pick{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 12px}
+.tag-pick .lens-chip{display:inline-flex;align-items:center;gap:6px}
+.tag-pick input{margin:0}
+.mx-chip .ltag.tiny{align-self:center}
 .passport-hero{gap:16px}
 .passport-photo{width:96px;height:96px;font-size:28px}
 .card.pad{padding:14px 16px}

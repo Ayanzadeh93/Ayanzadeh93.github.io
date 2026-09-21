@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
   <!-- ?v= busts GitHub Pages' 10-minute cache when the app changes; bump it with VERSION in the script. -->
-  <link rel="stylesheet" href="css/adhd-study-pack.css?v=3.10.0">
+  <link rel="stylesheet" href="css/adhd-study-pack.css?v=3.11.0">
   <!-- Read by js/adhd-study-pack.js (never executed). The Firebase project
        comes from js/firebase-config.js, so it is not repeated here. -->
   <script type="application/json" id="focus-dial-config">
@@ -242,8 +242,10 @@
               <option value="q2">Q2 — schedule</option>
               <option value="q3">Q3 — trim</option>
               <option value="q4">Q4 — drop</option></select></div>
+            <div class="field" style="flex:1;min-width:140px"><label for="taskTags">Tags</label><input type="text" id="taskTags" placeholder="reading, lab" autocomplete="off"></div>
             <button class="btn primary" type="submit">Add</button>
           </form>
+          <div id="taskLens" class="tag-lens" aria-label="Filter by priority and tags"></div>
           <div class="stack" id="taskList"></div>
         </div>
         <div class="side-stack">
@@ -267,6 +269,7 @@
         <span class="top-sp"></span>
         <button class="btn sm primary" id="mxTriage">Sort the unsorted <span class="num" id="mxUnsortedN">0</span></button>
       </div>
+      <div id="mxLens" class="tag-lens" aria-label="Filter the matrix by tag"></div>
       <div class="grid side">
         <div class="card pad">
           <div class="mx-frame">
@@ -765,6 +768,6 @@
     Nothing is sent anywhere unless you choose to sign in with Google.
   </p>
 </noscript>
-<script type="module" src="js/adhd-study-pack.js?v=3.10.0"></script>
+<script type="module" src="js/adhd-study-pack.js?v=3.11.0"></script>
 </body>
 </html>

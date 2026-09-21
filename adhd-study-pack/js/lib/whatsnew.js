@@ -6,6 +6,16 @@ export const AWAY_MS = 7 * 86400000;
 
 export const RELEASES = [
   {
+    version: '3.11.0',
+    name: 'Tags beside priority',
+    date: '2026-09-21',
+    highlights: [
+      'Tasks and plan blocks can carry category tags (Reading, Lab, and your own). Tags are not the priority matrix.',
+      'Turn a tag and a quadrant on together — the task list keeps only what matches both. The matrix still groups by Q1–Q4 and only narrows by tag.',
+      'Merge folds one tag into another without moving anything between Q1–Q4.'
+    ]
+  },
+  {
     version: '3.10.0',
     name: 'Spark Firebase extras',
     date: '2026-09-21',
