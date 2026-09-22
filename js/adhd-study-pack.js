@@ -111,7 +111,7 @@ const DEFAULTS = () => ({
      the workspace document. sessions, checkins and moods are history: they only
      grow, so they live in the journal database (js/lib/records.js) and are held
      here in memory for rendering. saveSnapshot() leaves them out of the write. */
-  tasks: [], events: [], notes: [], sessions: [], checkins: [], moods: [], subjects: [], links: [],
+  tasks: [], events: [], notes: [], habits: [], exams: [], flashcards: [], sessions: [], checkins: [], moods: [], subjects: [], links: [],
   sound: { master:60, layers:{}, beat:10, carrier:180, presets:{} },
   gcal: { on:false, cals:[], hideDeclined:true, push:true, target:'primary', links:{} },
   timer: { phase:'focus', cycle:1, taskId:null, intent:'', activation:null },
@@ -330,7 +330,7 @@ function migrate(raw) {
   ['settings','lists','sound','gcal','timer','meta'].forEach(k => out[k] = Object.assign(DEFAULTS()[k], raw[k] || {}));
   if (!out.sound.presets || typeof out.sound.presets !== 'object') out.sound.presets = {};
   out.settings.comfort = normaliseComfort(out.settings.comfort);      // keys added since it was saved
-  ['tasks','events','notes','sessions','checkins','moods','subjects','links'].forEach(k => { if (!Array.isArray(out[k])) out[k] = []; });
+  ['tasks','events','notes','habits','exams','flashcards','sessions','checkins','moods','subjects','links'].forEach(k => { if (!Array.isArray(out[k])) out[k] = []; });
   out.tasks.forEach(t => { if (!('quad' in t)) t.quad = null; if (!t.id) t.id = uid(); });
   out.schema = 5;
   return out;
@@ -628,24 +628,39 @@ function toast(msg, ms, level) {
    readers as the element's description. */
 const tipEl = () => $('#tip');
 function showTip(host, x, y) {
-  const t = tipEl(); t.textContent = host.dataset.tip; t.classList.add('on');
+  const t = tipEl(); if (!t) return;
+  const content = host && host.dataset ? host.dataset.tip : '';
+  if (!content || !content.trim()) { t.classList.remove('on'); return; }
+  t.textContent = content; t.classList.add('on');
+  t.setAttribute('role', 'tooltip');
+  if (t.id && host && host.setAttribute) host.setAttribute('aria-describedby', t.id);
   const r = t.getBoundingClientRect();
-  t.style.left = clamp(x + 12, 8, innerWidth - r.width - 8) + 'px';
-  t.style.top = clamp(y - r.height - 10, 8, innerHeight - r.height - 8) + 'px';
+  const hostRect = host && host.getBoundingClientRect ? host.getBoundingClientRect() : { bottom: y + 20 };
+  t.style.left = clamp(x + 12, 8, Math.max(8, innerWidth - r.width - 8)) + 'px';
+  let topPos = y - r.height - 10;
+  if (topPos < 8) topPos = (hostRect.bottom != null ? hostRect.bottom + 8 : y + 24);
+  t.style.top = clamp(topPos, 8, Math.max(8, innerHeight - r.height - 8)) + 'px';
+}
+function hideTip(host) {
+  const t = tipEl(); if (t) t.classList.remove('on');
+  if (host && host.removeAttribute) host.removeAttribute('aria-describedby');
 }
 document.addEventListener('mouseover', e => {
   const host = e.target.closest && e.target.closest('[data-tip]');
   if (!host) return;
   const move = ev => showTip(host, ev.clientX, ev.clientY);
   move(e); host.addEventListener('mousemove', move);
-  host.addEventListener('mouseleave', () => { tipEl().classList.remove('on'); host.removeEventListener('mousemove', move); }, { once:true });
+  host.addEventListener('mouseleave', () => { hideTip(host); host.removeEventListener('mousemove', move); }, { once:true });
 });
 document.addEventListener('focusin', e => {
   const host = e.target.closest && e.target.closest('[data-tip]');
-  if (!host || !host.matches(':focus-visible')) return;
+  if (!host || (!host.matches(':focus-visible') && host.tagName !== 'BUTTON')) return;
   const r = host.getBoundingClientRect(); showTip(host, r.left, r.top);
 });
-document.addEventListener('focusout', () => tipEl().classList.remove('on'));
+document.addEventListener('focusout', e => {
+  const host = e.target.closest && e.target.closest('[data-tip]');
+  hideTip(host);
+});
 if (typeof MutationObserver !== 'undefined' && typeof document !== 'undefined' && document.body) {
   new MutationObserver(() => {
     $$('[data-tip]:not([aria-description])').forEach(el => {
@@ -678,7 +693,8 @@ function openModal(title, bodyHTML, actions, onMount) {
   (actions || [{ label:'Close' }]).forEach(a => {
     const b = document.createElement('button');
     b.type = 'button'; b.className = 'btn' + (a.primary ? ' primary' : ''); b.textContent = a.label;
-    b.onclick = () => { if (!a.onClick || a.onClick() !== false) closeModal(); };
+    const fn = a.onClick || a.run;
+    b.onclick = () => { if (!fn || fn() !== false) closeModal(); };
     foot.appendChild(b);
   });
   $('#scrim').classList.add('on'); syncInert();
@@ -686,6 +702,7 @@ function openModal(title, bodyHTML, actions, onMount) {
   const f = $('#modalBody').querySelector('input,textarea,select,button,[tabindex="0"]') || foot.querySelector('.primary') || foot.querySelector('button');
   setTimeout(() => { if (f) f.focus(); }, 40);
 }
+const modal = openModal;
 function closeModal() {
   if (!$('#scrim').classList.contains('on')) return;
   $('#scrim').classList.remove('on'); syncInert();
@@ -726,6 +743,8 @@ function go(v, opts) {
   $$('.view').forEach(s => s.classList.toggle('on', s.id === 'view-' + v));
   $$('.rail-btn[data-view]').forEach(b => { if (b.dataset.view === v) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
   $('#miniTimer').hidden = (v === 'focus');
+  const viewEl = $('#view-' + v);
+  if (viewEl) viewEl.scrollTop = 0;
   if (v === 'stats') renderStats();
   if (v === 'plan') renderCalendar();
   if (v === 'notes') renderBoard();
@@ -736,6 +755,8 @@ function go(v, opts) {
   if (v === 'matrix') renderMatrix();
   if (v === 'mood') renderMood();
   if (v === 'about') renderAbout();
+  if (v === 'habits') renderHabits();
+  if (v === 'help') renderHelp();
   syncSoundVisualizer();
   if (moved && !(opts && opts.quiet)) {
     const h = $('#view-' + v + ' .view-head h2') || $('#view-' + v + ' h2');
@@ -744,7 +765,7 @@ function go(v, opts) {
   }
 }
 $$('.rail-btn[data-view]').forEach(b => b.onclick = () => go(b.dataset.view));
-document.addEventListener('click', e => { const g = e.target.closest('[data-goto]'); if (g) go(g.dataset.goto); });
+document.addEventListener('click', e => { const g = e.target && typeof e.target.closest === 'function' ? e.target.closest('[data-goto]') : null; if (g) go(g.dataset.goto); });
 
 /* =====================================================================
    TIMER — wall-clock anchored so background tab throttling can't drift it
@@ -2033,6 +2054,9 @@ function taskRow(t, opts) {
   const o = opts || {};
   const sub = S.subjects.find(s => s.id === t.subjectId);
   const timing = isTracking('taskId', t.id), q = qOf(t), title = esc(t.title);
+  const stepCount = (t.steps && t.steps.length) || 0;
+  const doneSteps = (t.steps && t.steps.filter(s => s.done).length) || 0;
+  const nextStep = t.steps && t.steps.find(s => !s.done);
   // Each row is a named group; every control says which task it acts on, and
   // nothing is conveyed by colour alone (the activation bar has text too).
   return `<div class="task ${t.done ? 'done' : ''} ${S.timer.taskId === t.id ? 'active' : ''} ${timing ? 'tracking' : ''}" data-task="${t.id}" role="group" aria-label="${title}">
@@ -2040,17 +2064,24 @@ function taskRow(t, opts) {
     <button type="button" class="box" data-done="${t.id}" role="checkbox" aria-checked="${!!t.done}" aria-label="Done: ${title}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
     <div class="t-body">
       <div class="t-title">${title}${S.timer.taskId === t.id ? '<span class="sr-only"> (session task)</span>' : ''}</div>
+      ${nextStep
+        ? `<div class="t-next-step" style="font-size:calc(11px*var(--ts,1));color:var(--focus);margin-top:2px;font-weight:600">↳ Next: ${esc(nextStep.label)}</div>`
+        : (stepCount > 0 && doneSteps === stepCount)
+        ? `<div class="t-next-step" style="font-size:calc(11px*var(--ts,1));color:var(--good);margin-top:2px;font-weight:600">✓ All ${stepCount} micro-steps complete!</div>`
+        : ''}
       <div class="t-meta">
         ${sub ? `<span class="m qcol" style="--q:${sub.color}">${esc(sub.name)}</span>` : ''}
         ${q ? `<button type="button" class="qtag" data-qtask="${t.id}" style="--q:${QUADS[q].color}" aria-label="Matrix: ${QUADS[q].n}, ${QUADS[q].name}. Change" data-tip="${QUADS[q].n} · ${QUADS[q].name} — ${QUADS[q].axis}">${QUADS[q].n}</button>`
             : `<button type="button" class="qtag" data-qtask="${t.id}" aria-label="Not placed on the matrix. Place it" data-tip="Not placed on the matrix yet">?</button>`}
         <span class="m">${t.done_pomos || 0}/${t.est} pomos</span>
         <span class="sr-only">${ENERGY_LABEL[t.energy]}.</span>
+        ${stepCount ? `<span class="m" style="color:var(--focus);font-weight:600" data-tip="${doneSteps} of ${stepCount} micro-steps completed">${doneSteps}/${stepCount} steps</span>` : ''}
         ${t.tracked_min ? `<span class="m" data-tip="Time logged on this task with the stopwatch"><span aria-hidden="true">⏱</span><span class="sr-only">Timed:</span> ${minsToHM(t.tracked_min)}</span>` : ''}
         ${t.due ? `<span class="m">due ${esc(t.due)}</span>` : ''}
       </div>
     </div>
     <div class="t-actions">
+      <button type="button" class="btn sm ghost" data-subtasks="${t.id}" aria-label="Micro-steps for ${title}" data-tip="Decompose into bite-sized micro-steps">⚡ Steps${stepCount ? ` (${doneSteps}/${stepCount})` : ''}</button>
       ${timing ? `<button type="button" class="btn sm primary" data-trackstop aria-label="Stop the stopwatch on ${title} and log the time" data-tip="Stop and log the time"><span aria-hidden="true">■</span> <span class="num" data-track-clock>${fmtElapsed(trackElapsed())}</span></button>`
         : t.done || o.noFocus ? '' : `<button type="button" class="btn sm ghost" data-track="${t.id}" aria-label="Start a stopwatch on ${title}" data-tip="Start a stopwatch on this task — the time counts as study time"><span aria-hidden="true">▶</span> Time</button>`}
       ${o.noFocus ? '' : `<button type="button" class="btn sm ghost" data-focus="${t.id}" aria-label="Make ${title} the session task" data-tip="Make this the session task">Focus</button>`}
@@ -2065,6 +2096,10 @@ function wireTasks(root) {
     save(); renderTasks(); renderFocusSide();
     announce(t.done ? `Done: ${t.title}` : `Reopened: ${t.title}`);
     keepFocus(list, `[data-done="${t.id}"]`);
+  });
+  $$('[data-subtasks]', root).forEach(b => b.onclick = e => {
+    e.stopPropagation();
+    taskSubtasksModal(b.dataset.subtasks);
   });
   $$('[data-focus]', root).forEach(b => b.onclick = () => setActiveTask(b.dataset.focus));
   const listOf = b => (b.closest('[id]') || {}).id;
@@ -2161,12 +2196,62 @@ function renderFocusSide() {
        <div class="t-meta"><span class="m">${t.done_pomos || 0}/${t.est} pomos</span><span class="m">${ENERGY_LABEL[t.energy]}</span></div>
        <div style="height:6px;border-radius:99px;background:var(--surface-3);margin-top:9px;overflow:hidden">
          <div style="height:100%;width:${clamp((t.done_pomos || 0) / t.est * 100, 0, 100)}%;background:var(--accent);border-radius:99px"></div></div>
+       ${(t.steps && t.steps.length) ? `
+         <div class="next-step-card" style="margin-top:10px;padding:8px 10px;background:var(--surface-2);border-radius:var(--radius-sm);border:1px solid var(--line)">
+           <div style="font-size:calc(11px*var(--ts,1));font-weight:700;color:var(--focus);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:6px">Next Physical Action</div>
+           <div class="step-list" style="display:flex;flex-direction:column;gap:5px">
+             ${t.steps.map((s, idx) => `
+               <label class="step-item" style="display:flex;align-items:center;gap:7px;font-size:calc(12px*var(--ts,1));cursor:pointer">
+                 <input type="checkbox" class="step-check" data-step-task="${t.id}" data-step-idx="${idx}" ${s.done ? 'checked' : ''}>
+                 <span style="${s.done ? 'text-decoration:line-through;color:var(--muted)' : 'font-weight:500'}">${esc(s.label)}</span>
+               </label>
+             `).join('')}
+           </div>
+         </div>
+       ` : ''}
+       <div style="margin-top:8px;display:flex;gap:4px">
+         <input type="text" id="addStepInput" placeholder="Add micro-step…" style="flex:1;font-size:calc(11.5px*var(--ts,1));padding:3px 6px">
+         <button type="button" class="btn sm ghost" id="addStepBtn" style="font-size:calc(11px*var(--ts,1))">+ Step</button>
+       </div>
        ${isTracking('taskId', t.id)
          ? `<button type="button" class="btn sm primary" data-trackstop style="width:100%;justify-content:center;margin-top:10px" aria-label="Stop the stopwatch and log the time"><span aria-hidden="true">■</span> Stop stopwatch · <span class="num" data-track-clock>${fmtElapsed(trackElapsed())}</span></button>`
          : `<button type="button" class="btn sm" data-track="${t.id}" style="width:100%;justify-content:center;margin-top:10px" data-tip="Count up instead of down: no interval, just the time you actually put in"><span aria-hidden="true">▶</span> Time it with a stopwatch instead</button>`}
        <button type="button" class="btn sm ghost" data-readaloud style="width:100%;justify-content:center;margin-top:6px" aria-keyshortcuts="A"><span aria-hidden="true">🔊</span> Read aloud</button>`
     : `<div class="empty">Nothing selected. A named task beats "study" — pick one below.</div>`;
   wireTasks($('#activeTaskBox'));
+  if (t) {
+    $$('#activeTaskBox .step-check').forEach(ck => {
+      ck.onchange = () => {
+        const taskId = ck.dataset.stepTask;
+        const idx = +ck.dataset.stepIdx;
+        const task = S.tasks.find(x => x.id === taskId);
+        if (task && task.steps && task.steps[idx]) {
+          task.steps[idx].done = ck.checked;
+          save();
+          if (ck.checked) {
+            triggerDopamineCelebration(`Micro-step complete: "${task.steps[idx].label}"!`);
+          }
+          renderFocusSide();
+          renderTasks();
+        }
+      };
+    });
+    const addStepBtn = $('#addStepBtn');
+    const addStepInput = $('#addStepInput');
+    if (addStepBtn && addStepInput) {
+      const doAddStep = () => {
+        const val = addStepInput.value.trim();
+        if (!val) return;
+        if (!t.steps) t.steps = [];
+        t.steps.push({ label: val, done: false });
+        save();
+        renderFocusSide();
+        renderTasks();
+      };
+      addStepBtn.onclick = doAddStep;
+      addStepInput.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); doAddStep(); } };
+    }
+  }
   const ra = $('#activeTaskBox [data-readaloud]'); if (ra) { ra.hidden = !speech.supported; ra.onclick = readFocusAloud; }
   const queue = S.tasks.filter(x => !x.done && x.id !== S.timer.taskId)
     .sort((a, b) => qRank(a) - qRank(b)).slice(0, 4);   // Q1 then Q2 float to the top of the queue
@@ -2265,6 +2350,7 @@ function renderBoard() {
       <div class="s-foot">
         <span class="s-tag">${n.tag === 'parked' ? 'parked mid-session' : new Date(n.at).toLocaleDateString(undefined, { month:'short', day:'numeric' })}</span>
         <span style="display:flex;gap:2px">
+          <button type="button" class="s-btn" data-totask aria-label="Convert note to task" data-tip="Convert note to task"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
           <button type="button" class="s-btn" data-color aria-label="Change note colour" data-tip="Change colour"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg></button>
           <button type="button" class="s-btn" data-pin aria-pressed="${!!n.pinned}" aria-label="Pin note" data-tip="Pin to the top"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 17v5M9 3h6l-1 7 3 3H7l3-3z"/></svg></button>
           <button type="button" class="s-btn" data-del aria-label="Delete note" data-tip="Delete"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 7h14M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button>
@@ -2276,6 +2362,52 @@ function renderBoard() {
     $('[data-del]', el).onclick = () => { S.notes = S.notes.filter(x => x.id !== n.id); save(); renderBoard(); renderFocusSide(); };
     $('[data-pin]', el).onclick = () => { n.pinned = !n.pinned; save(); renderBoard(); };
     $('[data-color]', el).onclick = () => { n.color = NOTE_COLORS[(NOTE_COLORS.indexOf(n.color) + 1) % NOTE_COLORS.length]; save(); renderBoard(); };
+    const toTask = $('[data-totask]', el);
+    if (toTask) {
+      toTask.onclick = () => {
+        const text = n.text.trim();
+        if (!text) {
+          toast('Note is empty — type some thoughts first');
+          return;
+        }
+        const lines = text.split('\n').map(l => l.replace(/^\s*(?:[-*•]|\d+[.)]|\[[ xX]\])\s*/, '').trim()).filter(Boolean);
+        if (lines.length > 1) {
+          const title = lines[0];
+          const steps = lines.slice(1).map(stepLabel => ({ label: stepLabel, done: false }));
+          S.tasks.unshift({
+            id: uid(),
+            title,
+            steps,
+            est: Math.min(6, Math.max(1, lines.length)),
+            energy: 'med',
+            subjectId: null,
+            quad: null,
+            done: false,
+            done_pomos: 0,
+            created: Date.now()
+          });
+        } else {
+          S.tasks.unshift({
+            id: uid(),
+            title: text,
+            steps: [],
+            est: 1,
+            energy: 'med',
+            subjectId: null,
+            quad: null,
+            done: false,
+            done_pomos: 0,
+            created: Date.now()
+          });
+        }
+        S.notes = S.notes.filter(x => x.id !== n.id);
+        save();
+        renderBoard();
+        renderTasks();
+        renderFocusSide();
+        triggerDopamineCelebration('Converted note to actionable task! 🎯');
+      };
+    }
     el.addEventListener('pointerdown', e => {
       if (e.target.closest('textarea,button')) return;
       const r = el.getBoundingClientRect(), br = board.getBoundingClientRect();
@@ -2467,6 +2599,7 @@ function renderCalendar() {
   const mode = S.settings.calendarView || 'week';
   $$('.cal-view').forEach(b => { const on = b.dataset.calview === mode; b.classList.toggle('active', on); b.setAttribute('aria-selected', on); });
   if (mode === 'day') renderDayCalendar(); else if (mode === 'month') renderMonthCalendar(); else if (mode === 'list') renderAgendaCalendar(); else renderWeekCalendar();
+  renderExamTracker();
 }
 $$('[data-calview]').forEach(b => b.onclick = () => { S.settings.calendarView = b.dataset.calview; save(); renderCalendar(); });
 function moveCalendar(dir) {
@@ -3524,7 +3657,7 @@ const TIMER_PRESETS = Object.assign({
    ===================================================================== */
 const SET_SECTIONS = ['profile','seeing','motion','focus','speech','keys','timer','prompts','data'];
 let setSec = (() => { try { return sessionStorage.getItem(CFG.storageKey + '.setup') || 'profile'; } catch (e) { return 'profile'; } })();
-const HIDEABLE_VIEWS = [['plan','Plan'],['matrix','Matrix'],['notes','Notes'],['sound','Sound'],['calm','Calm'],['mood','Mood'],['stats','Stats'],['about','About']];
+const HIDEABLE_VIEWS = [['plan','Plan'],['matrix','Matrix'],['habits','Habits'],['notes','Notes'],['sound','Sound'],['calm','Calm'],['mood','Mood'],['stats','Stats'],['help','Help'],['about','About']];
 const COMFORT_LABELS = {
   textSize:'Text size', spacing:'Spacing', font:'Typeface', contrast:'Contrast', color:'Colour', focusRing:'Focus outline',
   underlineLinks:'Underlined links', motion:'Motion', messages:'Pop-up messages', messageTime:'Message duration', coaching:'Coaching',
@@ -3536,7 +3669,8 @@ const COMFORT_LABELS = {
 const bindVal = ([kind, key]) => kind === 'cf' ? CF()[key] : S.settings[key];
 function rowSwitch(bind, label, hint, attrs) {
   const id = bind.join('_');
-  return `<div class="set-row"><div class="set-text"><label class="set-label" for="${id}">${label}</label>${hint ? `<p class="set-hint" id="${id}_h">${hint}</p>` : ''}</div>
+  const tipBtn = hint ? `<button type="button" class="tip-btn" aria-label="Info: ${esc(label)}" data-tip="${esc(hint)}" tabindex="0">ℹ</button>` : '';
+  return `<div class="set-row"><div class="set-text"><label class="set-label" for="${id}">${label}</label>${tipBtn}${hint ? `<p class="set-hint" id="${id}_h">${hint}</p>` : ''}</div>
     <div class="set-control"><input type="checkbox" role="switch" class="switch" id="${id}" data-${bind[0]}="${bind[1]}" ${bindVal(bind) ? 'checked' : ''} ${hint ? `aria-describedby="${id}_h"` : ''} ${attrs || ''}></div></div>`;
 }
 /* A radio group. aria-label carries the name rather than a <legend>: a legend
@@ -3870,38 +4004,44 @@ function loadDemo() {
    COMMAND PALETTE + KEYBOARD
    ===================================================================== */
 const COMMANDS = () => [
-  { k:'Start / pause timer', s:'Space', run:toggleRun },
-  { k:'Skip to next interval', s:'N', run:skipPhase },
-  { k:'Reset this interval', s:'R', run:resetInterval },
-  { k:'Start / stop the stopwatch on the session task', s:'T', run:toggleTracking },
-  { k:'Park a thought', s:'B', run:brainDump },
-  { k:'Log a distraction', s:'D', run:() => $('#tallyBtn').click() },
-  { k:'Toggle the sound mix', s:'M', run:() => $('#soundBtn').click() },
-  { k:'Silence all sound', s:'', run:silenceAll },
-  { k:'Sort unsorted tasks on the matrix', s:'P', run:triage },
-  { k:'Go to Focus', s:'1', run:() => go('focus') },
-  { k:'Go to Plan', s:'2', run:() => go('plan') },
-  { k:'Go to Tasks', s:'3', run:() => go('tasks') },
-  { k:'Go to Priority matrix', s:'4', run:() => go('matrix') },
-  { k:'Go to Notes', s:'5', run:() => go('notes') },
-  { k:'Go to Sound', s:'6', run:() => go('sound') },
-  { k:'Go to Calm', s:'7', run:() => go('calm') },
-  { k:'Go to Mood', s:'8', run:() => go('mood') },
-  { k:'Go to Statistics', s:'9', run:() => go('stats') },
-  { k:'Go to Setup', s:'0', run:() => go('settings') },
-  { k:'Log how you feel right now', s:'', run:() => { go('mood'); const f = document.getElementById('md_mood'); if (f) f.focus(); } },
-  { k:'About the Study Pack', s:'', run:() => go('about') },
-  { k:'Auto-schedule this week', s:'', run:() => { go('plan'); $('#autoPlan').click(); } },
-  { k:'Sync Google Calendar now', s:'', run:() => { go('plan'); gcalSyncNow(); } },
-  { k:'Import an .ics file', s:'', run:() => { go('plan'); $('#icsImportBtn').click(); } },
-  { k:'Export everything (JSON)', s:'', run:() => $('#exportBtn').click() },
-  { k:'Start a breathing round', s:'', run:() => { go('calm'); $('#breathBtn').click(); } },
-  { k:'Switch theme', s:'', run:() => $('#themeBtn').click() },
-  { k:'Read the current task aloud', s:'A', run:readFocusAloud },
-  { k:'Read the selected text aloud', s:'', run:readSelectionAloud },
-  { k:'Stop reading aloud', s:'Esc', run:() => speech.stop() },
-  { k:'Comfort and accessibility settings', s:'', run:() => openSetup('profile') },
-  { k:'Show keyboard shortcuts', s:'?', run:() => openSetup('keys') }
+  { id:'timer:toggle', title:'Start / pause timer', k:'Start / pause timer', s:'Space', run:toggleRun },
+  { id:'timer:skip', title:'Skip to next interval', k:'Skip to next interval', s:'N', run:skipPhase },
+  { id:'timer:reset', title:'Reset this interval', k:'Reset this interval', s:'R', run:resetInterval },
+  { id:'timer:track', title:'Start / stop the stopwatch', k:'Start / stop the stopwatch on the session task', s:'T', run:toggleTracking },
+  { id:'note:dump', title:'Park a thought', k:'Park a thought', s:'B', run:brainDump },
+  { id:'timer:tally', title:'Log a distraction', k:'Log a distraction', s:'D', run:() => $('#tallyBtn').click() },
+  { id:'sound:toggle', title:'Toggle the sound mix', k:'Toggle the sound mix', s:'M', run:() => $('#soundBtn').click() },
+  { id:'sound:silence', title:'Silence all sound', k:'Silence all sound', s:'', run:silenceAll },
+  { id:'tasks:triage', title:'Sort unsorted tasks on the matrix', k:'Sort unsorted tasks on the matrix', s:'P', run:triage },
+  { id:'view:focus', title:'Go to Focus dial', k:'Go to Focus', s:'1', run:() => go('focus') },
+  { id:'view:plan', title:'Go to Plan', k:'Go to Plan', s:'2', run:() => go('plan') },
+  { id:'view:tasks', title:'Go to Tasks', k:'Go to Tasks', s:'3', run:() => go('tasks') },
+  { id:'view:matrix', title:'Go to Priority matrix', k:'Go to Priority matrix', s:'4', run:() => go('matrix') },
+  { id:'view:habits', title:'Go to Habits & Routines', k:'Go to Habits & Routines', s:'H', run:() => go('habits') },
+  { id:'view:notes', title:'Go to Notes', k:'Go to Notes', s:'5', run:() => go('notes') },
+  { id:'view:sound', title:'Go to Sound', k:'Go to Sound', s:'6', run:() => go('sound') },
+  { id:'view:calm', title:'Go to Calm', k:'Go to Calm', s:'7', run:() => go('calm') },
+  { id:'view:mood', title:'Go to Mood', k:'Go to Mood', s:'8', run:() => go('mood') },
+  { id:'view:stats', title:'Go to Statistics', k:'Go to Statistics', s:'9', run:() => go('stats') },
+  { id:'view:help', title:'Go to Help & Guide', k:'Go to Help & Guide', s:'?', run:() => go('help') },
+  { id:'view:settings', title:'Go to Setup', k:'Go to Setup', s:'0', run:() => go('settings') },
+  { id:'mood:log', title:'Log how you feel right now', k:'Log how you feel right now', s:'', run:() => { go('mood'); const f = document.getElementById('md_mood'); if (f) f.focus(); } },
+  { id:'view:about', title:'About the Study Pack', k:'About the Study Pack', s:'', run:() => go('about') },
+  { id:'plan:auto', title:'Auto-schedule this week', k:'Auto-schedule this week', s:'', run:() => { go('plan'); $('#autoPlan').click(); } },
+  { id:'gcal:sync', title:'Sync Google Calendar now', k:'Sync Google Calendar now', s:'', run:() => { go('plan'); gcalSyncNow(); } },
+  { id:'plan:ics-import', title:'Import an .ics file', k:'Import an .ics file', s:'', run:() => { go('plan'); $('#icsImportBtn').click(); } },
+  { id:'data:export', title:'Export everything (JSON)', k:'Export everything (JSON)', s:'', run:() => $('#exportBtn').click() },
+  { id:'calm:breathe', title:'Start a breathing round', k:'Start a breathing round', s:'', run:() => { go('calm'); $('#breathBtn').click(); } },
+  { id:'theme:switch', title:'Switch theme', k:'Switch theme', s:'', run:() => $('#themeBtn').click() },
+  { id:'speech:read-task', title:'Read the current task aloud', k:'Read the current task aloud', s:'A', run:readFocusAloud },
+  { id:'speech:read-sel', title:'Read the selected text aloud', k:'Read the selected text aloud', s:'', run:readSelectionAloud },
+  { id:'speech:stop', title:'Stop reading aloud', k:'Stop reading aloud', s:'Esc', run:() => speech.stop() },
+  { id:'study:flashcards', title:'Active recall flashcards', k:'Active recall flashcards', s:'', run:flashcardModal },
+  { id:'study:bionic', title:'Bionic focus reader', k:'Bionic focus reader', s:'', run:() => bionicReaderModal() },
+  { id:'tasks:decompose', title:'Decompose task (ADHD smart decomposer)', k:'Decompose task (ADHD smart decomposer)', s:'', run:() => smartDecomposerModal() },
+  { id:'timer:micro', title:'2-minute micro launch (barrier buster)', k:'2-minute micro launch (barrier buster)', s:'', run:startMicroTimer },
+  { id:'setup:profile', title:'Comfort and accessibility settings', k:'Comfort and accessibility settings', s:'', run:() => openSetup('profile') },
+  { id:'setup:keys', title:'Show keyboard shortcuts', k:'Show keyboard shortcuts', s:'', run:() => openSetup('keys') }
 ];
 let cmdSel = 0, cmdRows = [], cmdOpener = null;
 /* The palette is a combobox driving a listbox: the input keeps focus and
@@ -4405,6 +4545,1213 @@ function renderMoodList() {
     announce('Entry deleted');
   });
 }
+
+/* =====================================================================
+   HABIT TRACKER, HELP CENTER & STUDENT ACCELERATION ENGINE
+   ===================================================================== */
+function calculateStreak(history, todayDateStr) {
+  if (!history || typeof history !== 'object') return 0;
+  const todayStr = todayDateStr || dayKey(new Date());
+  const today = keyToDate(todayStr);
+  let streak = 0;
+  let checkDate = new Date(today);
+
+  if (history[todayStr]) {
+    streak++;
+    checkDate.setDate(checkDate.getDate() - 1);
+  } else {
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = dayKey(yesterday);
+    if (!history[yesterdayStr]) {
+      return 0;
+    }
+    checkDate = yesterday;
+  }
+
+  while (true) {
+    const k = dayKey(checkDate);
+    if (history[k]) {
+      streak++;
+      checkDate.setDate(checkDate.getDate() - 1);
+    } else {
+      break;
+    }
+  }
+  return streak;
+}
+
+function calculateDaysClean(lastRelapseIso) {
+  if (!lastRelapseIso) return 0;
+  const diff = Date.now() - new Date(lastRelapseIso).getTime();
+  return Math.max(0, Math.floor(diff / DAY));
+}
+
+let activeCelebrationAnim = null;
+function triggerDopamineCelebration(message) {
+  if (S.settings.chime) chime('up');
+  toast(message || '🎉 Milestone reached! +1 Focus Win', 0, 'coach');
+  const reduceMotion = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduceMotion || (typeof CF === 'function' && CF().motion === 'reduced')) return;
+
+  const canvas = document.getElementById('celebrationCanvas');
+  if (!canvas || !canvas.getContext) return;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  if (activeCelebrationAnim && typeof cancelAnimationFrame !== 'undefined') {
+    cancelAnimationFrame(activeCelebrationAnim);
+    activeCelebrationAnim = null;
+  }
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  canvas.style.display = 'block';
+
+  const particles = [];
+  const colors = ['#CC4520', '#0A7F5F', '#5B4FD1', '#B8851F', '#23A48D', '#EE6033'];
+  for (let i = 0; i < 48; i++) {
+    particles.push({
+      x: window.innerWidth / 2 + (Math.random() - 0.5) * 120,
+      y: window.innerHeight / 2 + (Math.random() - 0.5) * 60,
+      vx: (Math.random() - 0.5) * 14,
+      vy: (Math.random() - 0.8) * 16,
+      size: Math.random() * 6 + 4,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      alpha: 1
+    });
+  }
+
+  let startT = null;
+  function anim(t) {
+    if (!startT) startT = t;
+    const progress = (t - startT) / 1200;
+    if (progress >= 1) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      canvas.style.display = 'none';
+      activeCelebrationAnim = null;
+      return;
+    }
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.35;
+      p.alpha = Math.max(0, 1 - progress);
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = p.alpha;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+    if (typeof requestAnimationFrame !== 'undefined') {
+      activeCelebrationAnim = requestAnimationFrame(anim);
+    }
+  }
+  if (typeof requestAnimationFrame !== 'undefined') {
+    activeCelebrationAnim = requestAnimationFrame(anim);
+  }
+}
+
+let activeImpulseTimer = null;
+let impulseRemain = 0;
+
+function startImpulseTimer(seconds) {
+  if (activeImpulseTimer) clearInterval(activeImpulseTimer);
+  impulseRemain = seconds * 1000;
+  activeImpulseTimer = setInterval(() => {
+    impulseRemain -= 1000;
+    if (impulseRemain <= 0) {
+      clearInterval(activeImpulseTimer);
+      activeImpulseTimer = null;
+      triggerDopamineCelebration('🎉 Impulse pause complete! You allowed the urge to crest and subside.');
+    }
+    renderHabits();
+  }, 1000);
+  renderHabits();
+  toast(`Impulse pause timer started (${seconds}s) — breathe slowly and ride the wave.`, 0, 'coach');
+}
+
+function renderHabits() {
+  const container = $('#habitsContainer');
+  if (!container) return;
+  if (!Array.isArray(S.habits)) S.habits = [];
+
+  const todayStr = dayKey(new Date());
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = dayKey(yesterday);
+
+  const goodHabits = S.habits.filter(h => h.type !== 'bad');
+  const badHabits = S.habits.filter(h => h.type === 'bad');
+
+  goodHabits.forEach(h => {
+    if (!h.history) h.history = {};
+    const strk = calculateStreak(h.history, todayStr);
+    h.streak = strk;
+    if (strk > (h.bestStreak || 0)) h.bestStreak = strk;
+  });
+
+  let html = `<div class="habits-wrap">`;
+
+  if (activeImpulseTimer) {
+    html += `<div class="card pad impulse-timer-box" role="region" aria-label="Impulse Pause Timer">
+      <h3 style="color:var(--focus);font-size:calc(16px*var(--ts,1));margin:0 0 6px">⏸️ Impulse Pause: Ride the Urge Wave</h3>
+      <div class="clock num" style="font-size:calc(28px*var(--ts,1));font-weight:700;margin:6px 0">${fmtClock(impulseRemain)}</div>
+      <p style="font-size:calc(12.5px*var(--ts,1));color:var(--ink-2);max-width:55ch;margin:0 auto 12px">
+        Dopamine cravings peak in 60–90 seconds. You do not need to resist forever — just pause for this clock and take slow, grounding breaths.
+      </p>
+      <div style="display:flex;gap:10px;justify-content:center">
+        <button class="btn primary sm" id="impulseDoneBtn">Urge Passed! 🎉</button>
+        <button class="btn ghost sm" id="impulseCancelBtn">Stop pause</button>
+      </div>
+    </div>`;
+  }
+
+  html += `<div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+      <h3 style="font-size:calc(16px*var(--ts,1));font-weight:700">Dopamine Micro-Routines (${goodHabits.length})</h3>
+      <span class="eyebrow">Forgiving Streaks Active</span>
+    </div>
+    <div class="habits-grid">`;
+
+  if (!goodHabits.length) {
+    html += `<div class="card pad" style="grid-column:1/-1;text-align:center;padding:32px">
+      <p style="color:var(--muted);margin:0 0 10px">No micro-routines set yet. In ADHD, habit momentum is created by micro-commitments small enough to bypass executive freeze.</p>
+      <button class="btn primary sm" id="addFirstHabitBtn">+ Create your first micro-habit</button>
+    </div>`;
+  } else {
+    goodHabits.forEach(h => {
+      const doneToday = !!(h.history && h.history[todayStr]);
+      const forgivingActive = !doneToday && h.history && h.history[yesterdayStr];
+      html += `<div class="card habit-card" data-habit-id="${h.id}">
+        <div class="habit-head">
+          <div>
+            <h4 class="habit-title">${esc(h.title)}</h4>
+            ${h.cue ? `<div class="habit-cue">Cue: ${esc(h.cue)}</div>` : ''}
+          </div>
+          <span class="chip ${h.streak > 0 ? 'on' : ''} streak-chip" title="Forgiving streak: missing today preserves yesterday's streak">🔥 <span class="num">${h.streak}</span>d</span>
+        </div>
+        ${h.micro ? `<div class="habit-micro"><span class="eyebrow" style="color:var(--focus)">Micro-step:</span> ${esc(h.micro)}</div>` : ''}
+        <div class="habit-meta">
+          <span class="chip" style="font-size:calc(11px*var(--ts,1))">Target: ${h.target || 7}d/wk</span>
+          <span class="chip" style="font-size:calc(11px*var(--ts,1))">Best: ${h.bestStreak || h.streak}d</span>
+          ${forgivingActive ? `<span class="chip forgiving-chip" title="You haven't checked in today yet, but yesterday was completed so your streak is safe!">🛡️ Forgiving grace</span>` : ''}
+        </div>
+        <div class="habit-actions">
+          <button class="btn sm ${doneToday ? 'primary' : ''} habit-check-btn" data-habit-id="${h.id}">
+            ${doneToday ? '✓ Done today!' : '○ Check in today'}
+          </button>
+          <div style="display:flex;gap:6px">
+            <button class="btn sm ghost habit-edit-btn" data-habit-id="${h.id}">Edit</button>
+            <button class="btn sm ghost habit-del-btn" data-habit-id="${h.id}" aria-label="Delete habit">✕</button>
+          </div>
+        </div>
+      </div>`;
+    });
+  }
+  html += `</div></div>`;
+
+  html += `<div style="margin-top:24px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+      <h3 style="font-size:calc(16px*var(--ts,1));font-weight:700">Impulse Breakers & Urge Logging (${badHabits.length})</h3>
+      <span class="eyebrow">Shame-Free Tracking</span>
+    </div>
+    <div class="habits-grid">`;
+
+  if (!badHabits.length) {
+    html += `<div class="card pad" style="grid-column:1/-1;text-align:center;padding:32px">
+      <p style="color:var(--muted);margin:0 0 10px">No impulse breakers added. Track phone checking, social media loops, or late-night gaming without judgment.</p>
+      <button class="btn sm" id="addFirstBadHabitBtn">+ Add impulse to break</button>
+    </div>`;
+  } else {
+    badHabits.forEach(b => {
+      const days = calculateDaysClean(b.lastRelapse);
+      html += `<div class="card habit-card bad-habit-card" data-habit-id="${b.id}">
+        <div class="habit-head">
+          <div>
+            <h4 class="habit-title">${esc(b.title)}</h4>
+            ${b.replacement ? `<div style="font-size:calc(12px*var(--ts,1));color:var(--muted);margin-top:2px">Replacement: ${esc(b.replacement)}</div>` : ''}
+          </div>
+          <div class="clean-counter" title="Days clean since last slip">✨ <span class="num">${days}</span><span style="font-size:calc(12px*var(--ts,1));font-weight:600;color:var(--muted)">days</span></div>
+        </div>
+        <div class="habit-actions" style="margin-top:10px">
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="btn sm habit-pause-btn" data-habit-id="${b.id}" data-sec="60" title="Start a 60-second impulse pause">⏸️ Pause (60s)</button>
+            <button class="btn sm habit-pause-btn" data-habit-id="${b.id}" data-sec="120" title="Start a 2-minute impulse pause">120s</button>
+            <button class="btn sm habit-urge-btn" data-habit-id="${b.id}">📝 Log urge</button>
+          </div>
+          <button class="btn sm ghost habit-slip-btn" data-habit-id="${b.id}" style="color:var(--crit)">I slipped</button>
+        </div>
+        ${b.urges && b.urges.length ? `<div style="font-size:calc(11.5px*var(--ts,1));color:var(--muted);margin-top:6px">
+          <strong>Recent urge note:</strong> ${esc(b.urges[b.urges.length - 1].note || 'Urge paused')}
+        </div>` : ''}
+      </div>`;
+    });
+  }
+  html += `</div></div></div>`;
+
+  container.innerHTML = html;
+
+  $('#addFirstHabitBtn')?.addEventListener('click', () => habitModal(null, 'good'));
+  $('#addFirstBadHabitBtn')?.addEventListener('click', () => habitModal(null, 'bad'));
+  $('#impulseDoneBtn')?.addEventListener('click', () => {
+    clearInterval(activeImpulseTimer);
+    activeImpulseTimer = null;
+    triggerDopamineCelebration('🎉 Urge successfully surfed! Dopamine win.');
+    renderHabits();
+  });
+  $('#impulseCancelBtn')?.addEventListener('click', () => {
+    clearInterval(activeImpulseTimer);
+    activeImpulseTimer = null;
+    renderHabits();
+  });
+
+  $$('.habit-check-btn', container).forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.dataset.habitId;
+      const h = S.habits.find(x => x.id === id);
+      if (!h) return;
+      if (!h.history) h.history = {};
+      if (h.history[todayStr]) {
+        delete h.history[todayStr];
+        h.streak = calculateStreak(h.history, todayStr);
+        save(); renderHabits();
+      } else {
+        h.history[todayStr] = true;
+        h.streak = calculateStreak(h.history, todayStr);
+        if (h.streak > (h.bestStreak || 0)) h.bestStreak = h.streak;
+        save();
+        triggerDopamineCelebration(`Habit "${h.title}" complete! 🔥 ${h.streak}-day streak.`);
+        renderHabits();
+      }
+    };
+  });
+
+  $$('.habit-del-btn', container).forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.dataset.habitId;
+      S.habits = S.habits.filter(x => x.id !== id);
+      save(); renderHabits();
+      toast('Habit deleted');
+    };
+  });
+
+  $$('.habit-edit-btn', container).forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.dataset.habitId;
+      const h = S.habits.find(x => x.id === id);
+      if (h) habitModal(h, h.type || 'good');
+    };
+  });
+
+  $$('.habit-slip-btn', container).forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.dataset.habitId;
+      const h = S.habits.find(x => x.id === id);
+      if (!h) return;
+      modal('Reset Days Clean', `
+        <p style="line-height:1.6">Slipping is not failure — it is biological feedback. Reflect on what caused the drop in cognitive bandwidth, reset cleanly, and move forward without shame.</p>
+        <div class="field" style="margin-top:10px">
+          <label for="slipReflection">What triggered this slip? (Optional)</label>
+          <input type="text" id="slipReflection" placeholder="High cognitive fatigue, hunger, emotional stress…">
+        </div>
+      `, [
+        { label: 'Cancel', run: closeModal },
+        { label: 'Compassionate Reset', primary: true, run: () => {
+          const note = $('#slipReflection')?.value?.trim();
+          h.daysClean = 0;
+          h.lastRelapse = new Date().toISOString();
+          if (note) {
+            if (!h.urges) h.urges = [];
+            h.urges.push({ date: new Date().toISOString(), note: 'Slip: ' + note });
+          }
+          save(); closeModal(); renderHabits();
+          toast('Clean slate. Your next streak begins right now.', 0, 'coach');
+        }}
+      ]);
+    };
+  });
+
+  $$('.habit-urge-btn', container).forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.dataset.habitId;
+      const h = S.habits.find(x => x.id === id);
+      if (!h) return;
+      modal('Log Urge & Reflection', `
+        <div class="field">
+          <label for="urgeNote">What thought or feeling is present?</label>
+          <textarea id="urgeNote" rows="3" placeholder="I feel an overwhelming impulse to open YouTube because this homework problem feels impossible…"></textarea>
+        </div>
+        <p style="font-size:calc(12px*var(--ts,1));color:var(--muted);margin-top:8px">Externalizing the impulse disarms emotional reactivity.</p>
+      `, [
+        { label: 'Cancel', run: closeModal },
+        { label: 'Log & Start 60s Pause', primary: true, run: () => {
+          const note = $('#urgeNote')?.value?.trim();
+          if (!h.urges) h.urges = [];
+          h.urges.push({ date: new Date().toISOString(), note: note || 'Urge logged' });
+          save(); closeModal();
+          startImpulseTimer(60);
+        }}
+      ]);
+    };
+  });
+
+  $$('.habit-pause-btn', container).forEach(btn => {
+    btn.onclick = () => {
+      const sec = Number(btn.dataset.sec || 60);
+      startImpulseTimer(sec);
+    };
+  });
+}
+
+function habitModal(existing, defaultType) {
+  const isGood = (existing ? existing.type !== 'bad' : defaultType !== 'bad');
+  modal(existing ? 'Edit Habit' : (isGood ? 'New Micro-Habit' : 'Break Impulsive Habit'), `
+    <div class="stack" style="gap:12px">
+      <div class="field">
+        <label for="h_title">Habit title</label>
+        <input type="text" id="h_title" value="${esc(existing ? existing.title : '')}" placeholder="${isGood ? 'e.g. Open textbook and read 1 page' : 'e.g. Doomscrolling on phone during study'}">
+      </div>
+      ${isGood ? `
+        <div class="field">
+          <label for="h_micro">Micro-commitment (2-minute entry barrier)</label>
+          <input type="text" id="h_micro" value="${esc(existing ? existing.micro : '')}" placeholder="e.g. Just open textbook to page 1">
+        </div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <div class="field" style="flex:1;min-width:180px">
+            <label for="h_cue">Habit Cue / Stack Anchor</label>
+            <input type="text" id="h_cue" value="${esc(existing ? existing.cue : '')}" placeholder="e.g. After morning coffee / sit at desk">
+          </div>
+          <div class="field" style="width:120px">
+            <label for="h_target">Target days / wk</label>
+            <input type="number" id="h_target" min="1" max="7" value="${existing ? existing.target || 7 : 7}">
+          </div>
+        </div>
+      ` : `
+        <div class="field">
+          <label for="h_replacement">Replacement Behavior</label>
+          <input type="text" id="h_replacement" value="${esc(existing ? existing.replacement : '')}" placeholder="e.g. Drink full glass of cold water or 5 cyclic sighs">
+        </div>
+      `}
+    </div>
+  `, [
+    { label: 'Cancel', run: closeModal },
+    { label: 'Save', primary: true, run: () => {
+      const title = $('#h_title')?.value?.trim();
+      if (!title) { toast('Please enter a habit title'); return; }
+      if (existing) {
+        existing.title = title;
+        if (isGood) {
+          existing.micro = $('#h_micro')?.value?.trim() || '';
+          existing.cue = $('#h_cue')?.value?.trim() || '';
+          existing.target = Number($('#h_target')?.value || 7);
+        } else {
+          existing.replacement = $('#h_replacement')?.value?.trim() || '';
+        }
+      } else {
+        if (!S.habits) S.habits = [];
+        if (isGood) {
+          S.habits.push({
+            id: 'h_' + uid(),
+            type: 'good',
+            title,
+            micro: $('#h_micro')?.value?.trim() || '',
+            cue: $('#h_cue')?.value?.trim() || '',
+            target: Number($('#h_target')?.value || 7),
+            history: {},
+            streak: 0,
+            bestStreak: 0,
+            createdAt: new Date().toISOString()
+          });
+        } else {
+          S.habits.push({
+            id: 'b_' + uid(),
+            type: 'bad',
+            title,
+            replacement: $('#h_replacement')?.value?.trim() || '',
+            daysClean: 0,
+            lastRelapse: new Date().toISOString(),
+            urges: [],
+            createdAt: new Date().toISOString()
+          });
+        }
+      }
+      save(); closeModal(); renderHabits();
+      toast('Habit saved!');
+    }}
+  ]);
+}
+
+const HELP_ARTICLES = [
+  { id:'focus', title:'Focus Dial & Task Initiation', category:'Focus', view:'focus',
+    body:'The hardest obstacle for ADHD brains is overcoming the "Wall of Awful" — the friction of starting. The Focus Dial reduces this friction by anchoring your intent to one concrete sentence and offering low-pressure 2-minute micro-starts.',
+    adhdTip:'When executive dysfunction hits, do not attempt 25 minutes. Click "2-Min launch" and commit only to opening the document. Momentum almost always takes over once the threshold is crossed.' },
+  { id:'plan', title:'Week Planner & Time Blocking', category:'Planning', view:'plan',
+    body:'ADHD creates "time blindness," where future deadlines feel unreal until they are immediate emergencies. The Week Planner visualizes free vs. committed hours and distributes study blocks across your optimal focus windows.',
+    adhdTip:'Auto-schedule balances course weights and places demanding study sessions in your peak energy hours instead of letting work pile up on Sunday night.' },
+  { id:'tasks', title:'Task List & Micro-Step Decomposition', category:'Planning', view:'tasks',
+    body:'Large tasks paralyze executive functioning. Breaking tasks into micro-steps ("Next Physical Action") gives immediate dopamine hits for every checked step and keeps your working memory from dropping the ball.',
+    adhdTip:'Never write "Study for Biology." Write "Open textbook to Chapter 5" followed by "Write 3 active recall cards." Always work on the single active subtask.' },
+  { id:'matrix', title:'Eisenhower Priority Matrix', category:'Planning', view:'matrix',
+    body:'Because ADHD attention runs on novelty and urgency rather than importance, non-urgent but vital study tasks get neglected. The matrix separates what is loud from what truly matters in advance.',
+    adhdTip:'Aim to spend 60% of your weekly study time in Quadrant 2 (Important, Not Urgent). That is where deep understanding and stress-free mastery happen.' },
+  { id:'habits', title:'ADHD Habit Tracker & Urge Resistor', category:'Habits', view:'habits',
+    body:'Traditional habit trackers cause shame spirals when a streak breaks. Our forgiving streaks engine never resets your streak for missing a single day. The urge pause timer helps you surf out dopamine cravings.',
+    adhdTip:'When you feel an impulse to pick up your phone, start a 60s pause. Urge neurochemistry peaks at 90 seconds. Waiting it out trains prefrontal control.' },
+  { id:'sound', title:'Procedural Audio & Acoustic Resonance', category:'Focus', view:'sound',
+    body:'Stochastic resonance (adding subtle auditory noise like brown noise or binaural frequencies) helps ADHD brains achieve optimal neural arousal and filters out disruptive ambient sounds.',
+    adhdTip:'Try "Deep brown" noise layered with rain or 40Hz gamma beats during heavy reading. If sensory-sensitive, adjust individual layer gains in the mixer.' },
+  { id:'calm', title:'Calm Breathing & Grounding Tools', category:'Wellness', view:'calm',
+    body:'When academic anxiety spikes, the prefrontal cortex shuts down. Cyclic physiological sighs (two quick inhales through the nose, one long exhale through the mouth) rapidly down-regulate the sympathetic nervous system.',
+    adhdTip:'Run the 5-4-3-2-1 sensory grounding pacer when feeling overwhelmed before an exam to re-engage present sensory awareness.' },
+  { id:'mood', title:'Mood & Energy Pattern Journal', category:'Wellness', view:'mood',
+    body:'ADHD fluctuates with sleep quality, hydration, circadian peaks, and medication timing. Logging daily focus and energy patterns turns intuitive feelings into objective data.',
+    adhdTip:'Notice which times of day yield high focus versus high agitation. Schedule your highest-activation study blocks during your proven high-energy windows.' },
+  { id:'stats', title:'Honest Statistics & Estimation Calibration', category:'Wellness', view:'stats',
+    body:'Honest metrics celebrate cumulative effort without moral judgment. Track total focus minutes, completion rates, and distraction tallies to build self-compassion and realistic expectations.',
+    adhdTip:'Use the distraction counter not to criticize yourself, but as objective data. Catching a distraction and returning to the task is the definition of focus training.' },
+  { id:'sync', title:'Google Calendar & Cloud Auto-Sync', category:'Sync', view:'plan',
+    body:'Two-way calendar sync imports your lecture schedules and campus commitments directly into your week planner, ensuring study blocks never clash with real-world obligations.',
+    adhdTip:'Enable Google sign-in to keep your custom presets, study plans, and habit streaks synchronized across your phone, tablet, and laptop seamlessly.' }
+];
+
+let helpSearchQuery = '';
+let helpActiveCategory = 'all';
+
+function renderHelp() {
+  const grid = $('#helpGrid');
+  if (!grid) return;
+
+  const q = (helpSearchQuery || '').toLowerCase().trim();
+  const cat = helpActiveCategory;
+
+  const filtered = HELP_ARTICLES.filter(item => {
+    const matchCat = (cat === 'all' || item.category === cat);
+    if (!matchCat) return false;
+    if (!q) return true;
+    return item.title.toLowerCase().includes(q) ||
+           item.body.toLowerCase().includes(q) ||
+           item.category.toLowerCase().includes(q) ||
+           (item.adhdTip && item.adhdTip.toLowerCase().includes(q));
+  });
+
+  if (!filtered.length) {
+    grid.innerHTML = `<div class="card pad" style="grid-column:1/-1;text-align:center;padding:32px">
+      <p style="color:var(--muted);margin:0">No guidance articles match your search. Try searching for "initiation", "sound", "planner", or clear your filter.</p>
+    </div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(item => `
+    <article class="help-card" data-help-id="${item.id}">
+      <div class="help-card-head">
+        <h3>${esc(item.title)}</h3>
+        <span class="help-cat-badge">${esc(item.category)}</span>
+      </div>
+      <p class="help-body">${esc(item.body)}</p>
+      <div class="help-adhd-box">
+        <strong>💡 ADHD Science Strategy</strong>
+        ${esc(item.adhdTip)}
+      </div>
+      <div style="margin-top:auto;padding-top:8px">
+        <button class="btn sm primary" data-goto="${item.view}">Open ${esc(item.title.split('&')[0].trim())} ›</button>
+      </div>
+    </article>
+  `).join('');
+}
+
+function renderExamTracker() {
+  const box = $('#examTracker');
+  if (!box) return;
+  if (!Array.isArray(S.exams)) S.exams = [];
+
+  const exams = S.exams.slice().sort((a, b) => {
+    if (a.completed && !b.completed) return 1;
+    if (!a.completed && b.completed) return -1;
+    return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+  });
+
+  let html = `<div class="panel-head">
+    <h3>Upcoming Exams & Deadlines</h3>
+    <button class="btn sm ghost" id="addExamBtn">+ Add</button>
+  </div>`;
+
+  if (!exams.length) {
+    html += `<p style="font-size:calc(12px*var(--ts,1));color:var(--muted);margin:8px 0 0">
+      No exam or paper deadlines logged. Add deadlines to auto-calculate daily study chunks and eliminate cramming panic.
+    </p>`;
+  } else {
+    html += `<div class="exam-grid">`;
+    exams.forEach(ex => {
+      const now = Date.now();
+      const due = new Date(ex.dueDate).getTime();
+      const diffDays = Math.ceil((due - now) / DAY);
+      const isOverdue = diffDays < 0;
+      const isCrunch = diffDays <= 2 && diffDays >= 0;
+      const isUrgent = diffDays > 2 && diffDays <= 7;
+      const isDone = !!ex.completed;
+
+      const badgeClass = isDone ? 'good' : isOverdue ? 'crit' : isCrunch ? 'crit' : isUrgent ? 'warn' : 'good';
+      const badgeText = isDone ? 'Completed 🎉' : isOverdue ? 'Passed' : diffDays === 0 ? 'Today!' : diffDays === 1 ? 'Tomorrow!' : `${diffDays} days left`;
+
+      const targetHours = Math.max(1, Math.min(200, Number(ex.targetHours || 8)));
+      const dailyMinutes = Math.max(15, Math.ceil((targetHours * 60) / Math.max(1, diffDays)));
+
+      html += `<div class="exam-item ${isDone ? 'done-exam' : ''}" data-exam-id="${ex.id}">
+        <div class="exam-item-head">
+          <div>
+            <div class="exam-item-title" style="${isDone ? 'text-decoration:line-through;color:var(--muted)' : ''}">${esc(ex.title)}</div>
+            <div style="font-size:calc(11.5px*var(--ts,1));color:var(--muted)">${esc(ex.course || 'Academic')} · ${hhmm(new Date(ex.dueDate))} ${new Date(ex.dueDate).toLocaleDateString(undefined, { month:'short', day:'numeric' })}</div>
+          </div>
+          <span class="chip urgency-badge" style="background:var(--${badgeClass}-wash, var(--surface));color:var(--${badgeClass});border:1px solid currentColor">${badgeText}</span>
+        </div>
+        ${(!isOverdue && !isDone) ? `
+          <div class="exam-plan-chunk">
+            <span>Daily prep target: <strong>${minsToHM(dailyMinutes)}/day</strong> (${targetHours}h total)</span>
+            <button class="btn sm primary schedule-exam-btn" data-exam-id="${ex.id}" data-mins="${dailyMinutes}">+ Schedule today</button>
+          </div>
+        ` : ''}
+        <div style="display:flex;gap:6px;justify-content:flex-end;margin-top:6px">
+          <button class="btn sm ghost exam-done-btn" data-exam-id="${ex.id}" title="${isDone ? 'Reopen exam' : 'Mark exam complete'}">${isDone ? '↺ Reopen' : '✓ Completed'}</button>
+          <button class="btn sm ghost exam-edit-btn" data-exam-id="${ex.id}">Edit</button>
+          <button class="btn sm ghost exam-del-btn" data-exam-id="${ex.id}" aria-label="Delete exam">✕</button>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  box.innerHTML = html;
+
+  $('#addExamBtn')?.addEventListener('click', () => examModal(null));
+
+  $$('.exam-done-btn', box).forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.dataset.examId;
+      const ex = S.exams.find(x => x.id === id);
+      if (!ex) return;
+      ex.completed = !ex.completed;
+      save();
+      if (ex.completed) triggerDopamineCelebration(`Exam "${ex.title}" conquered! Huge milestone!`);
+      renderExamTracker();
+    };
+  });
+
+  $$('.exam-edit-btn', box).forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.dataset.examId;
+      const ex = S.exams.find(x => x.id === id);
+      if (ex) examModal(ex);
+    };
+  });
+
+  $$('.exam-del-btn', box).forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.dataset.examId;
+      S.exams = S.exams.filter(x => x.id !== id);
+      save();
+      renderExamTracker();
+      toast('Exam deleted');
+    };
+  });
+
+  $$('.schedule-exam-btn', box).forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.dataset.examId;
+      const ex = S.exams.find(x => x.id === id);
+      if (!ex) return;
+      if (!Array.isArray(S.events)) S.events = [];
+      const mins = Number(btn.dataset.mins || 45);
+      const startT = new Date();
+      startT.setMinutes(startT.getMinutes() + 15);
+      const endT = new Date(startT.getTime() + mins * 60000);
+      S.events.push({
+        id: 'ev_' + uid(),
+        title: 'Study: ' + ex.title,
+        kind: 'study',
+        subjectId: ex.subjectId || null,
+        start: startT.toISOString(),
+        end: endT.toISOString()
+      });
+      save(); renderCalendar(); renderFocusSide();
+      toast(`Scheduled ${mins}m study block for "${ex.title}"!`);
+      go('plan');
+    };
+  });
+}
+
+function examModal(existing) {
+  const subjects = S.subjects || [];
+  modal(existing ? 'Edit Exam / Deadline' : 'New Exam / Deadline', `
+    <div class="stack" style="gap:12px">
+      <div class="field">
+        <label for="ex_title">Exam or assignment title</label>
+        <input type="text" id="ex_title" value="${esc(existing ? existing.title : '')}" placeholder="e.g. Cognitive Psychology Midterm">
+      </div>
+      <div class="field">
+        <label for="ex_course">Course / Subject</label>
+        <select id="ex_course">
+          <option value="">General Academic</option>
+          ${subjects.map(s => `<option value="${esc(s.name)}" data-id="${s.id}" ${existing && existing.subjectId === s.id ? 'selected' : ''}>${esc(s.name)}</option>`).join('')}
+        </select>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <div class="field" style="flex:1;min-width:180px">
+          <label for="ex_date">Exam date & time</label>
+          <input type="datetime-local" id="ex_date" value="${existing && existing.dueDate ? existing.dueDate.slice(0, 16) : ''}">
+        </div>
+        <div class="field" style="width:130px">
+          <label for="ex_hours">Total prep hours</label>
+          <input type="number" id="ex_hours" min="1" max="200" value="${existing ? existing.targetHours || 8 : 8}">
+        </div>
+      </div>
+    </div>
+  `, [
+    { label: 'Cancel', run: closeModal },
+    { label: 'Save', primary: true, run: () => {
+      const title = $('#ex_title')?.value?.trim();
+      const dateVal = $('#ex_date')?.value;
+      if (!title || !dateVal) { toast('Please enter a title and exam date'); return; }
+      const selOpt = $('#ex_course')?.selectedOptions?.[0];
+      const subjectId = selOpt?.dataset?.id || null;
+      const course = selOpt?.value || 'Academic';
+      const rawHours = Number($('#ex_hours')?.value);
+      const targetHours = (Number.isFinite(rawHours) && rawHours >= 1) ? Math.min(200, Math.floor(rawHours)) : 8;
+
+      if (existing) {
+        existing.title = title;
+        existing.dueDate = new Date(dateVal).toISOString();
+        existing.course = course;
+        existing.subjectId = subjectId;
+        existing.targetHours = targetHours;
+      } else {
+        if (!Array.isArray(S.exams)) S.exams = [];
+        S.exams.push({
+          id: 'ex_' + uid(),
+          title,
+          dueDate: new Date(dateVal).toISOString(),
+          course,
+          subjectId,
+          targetHours,
+          completed: false
+        });
+      }
+      save(); closeModal(); renderExamTracker();
+      toast('Exam deadline saved!');
+    }}
+  ]);
+}
+
+function startMicroTimer() {
+  ensureAudio();
+  T.phase = 'focus';
+  S.timer.phase = 'focus';
+  T.planned = 2;
+  T.remain = 2 * 60000;
+  T.running = true;
+  T.endsAt = Date.now() + T.remain;
+  T.startedAt = Date.now();
+  T.distractions = [];
+  paintPhase(); renderDial();
+  toast('⚡ 2-Minute Micro-Start running! Just open the document. Zero pressure.', 0, 'coach');
+}
+
+const DECOMPOSE_TEMPLATES = {
+  essay: {
+    name: '📝 Essay / Paper',
+    steps: [
+      'Open blank document and write working title',
+      'Paste assignment prompt & grading rubric into doc',
+      'Find 3 credible research sources or quotes',
+      'Outline introduction, 3 body points, and conclusion',
+      'Draft messy first paragraph without self-editing',
+      'Complete rough draft and cite sources'
+    ]
+  },
+  math: {
+    name: '📐 Problem Set / Math',
+    steps: [
+      'Clear desk and gather formula sheet & calculator',
+      'Skim all questions and circle easiest problem',
+      'Solve problem #1 completely',
+      'Attempt next 2 problems (take notes on blockers)',
+      'Verify solutions against textbook examples'
+    ]
+  },
+  reading: {
+    name: '📖 Textbook Reading',
+    steps: [
+      'Skim chapter summary, headings & bold terms (5m)',
+      'Read section 1 and write 2 bullet summaries',
+      'Read section 2 and highlight 1 core concept',
+      'Answer 1 end-of-chapter review question'
+    ]
+  },
+  cram: {
+    name: '🎯 Exam Prep / Active Recall',
+    steps: [
+      'Review study guide and mark weakest concepts',
+      'Write 5 active recall flashcards for weak topics',
+      'Solve 1 timed practice exam question',
+      'Review mistakes and formulate cheatsheet'
+    ]
+  },
+  lab: {
+    name: '🔬 Lab Report / Project',
+    steps: [
+      'Open lab report template & state objective',
+      'Insert data tables, formulas, and graphs',
+      'Write 3-sentence summary of experimental findings',
+      'Detail experimental error and final conclusions'
+    ]
+  }
+};
+
+function taskSubtasksModal(taskId) {
+  const task = S.tasks.find(x => x.id === taskId);
+  if (!task) return;
+  if (!Array.isArray(task.steps)) task.steps = [];
+
+  const renderModalContent = () => {
+    const total = task.steps.length;
+    const doneCount = task.steps.filter(s => s.done).length;
+    const pct = total ? Math.round((doneCount / total) * 100) : 0;
+    const nextStep = task.steps.find(s => !s.done);
+
+    return `
+      <div class="decomposer-modal-body" style="display:flex;flex-direction:column;gap:14px">
+        <div style="background:var(--surface-2);border-radius:var(--radius-sm);padding:10px 12px;border:1px solid var(--line)">
+          <div style="font-size:calc(11px*var(--ts,1));text-transform:uppercase;color:var(--muted);letter-spacing:0.04em">Parent Task</div>
+          <div style="font-weight:700;font-size:calc(14px*var(--ts,1));color:var(--ink);margin-top:2px">${esc(task.title)}</div>
+          ${nextStep ? `<div style="margin-top:6px;font-size:calc(12px*var(--ts,1));color:var(--focus);font-weight:600">↳ Next Physical Action: <span style="color:var(--ink)">${esc(nextStep.label)}</span></div>` : ''}
+          <div style="display:flex;align-items:center;gap:10px;margin-top:8px">
+            <div style="flex:1;height:6px;background:var(--surface-3);border-radius:99px;overflow:hidden">
+              <div style="height:100%;width:${pct}%;background:var(--focus);border-radius:99px;transition:width .2s"></div>
+            </div>
+            <span style="font-family:var(--font-mono);font-size:calc(11px*var(--ts,1));font-weight:600;color:var(--muted)">${doneCount}/${total} (${pct}%)</span>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size:calc(12px*var(--ts,1));font-weight:700;margin-bottom:6px">Micro-Action Steps</div>
+          <div id="modalStepList" style="display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto;padding-right:4px">
+            ${task.steps.length ? task.steps.map((s, idx) => `
+              <div style="display:flex;align-items:center;gap:8px;padding:6px 8px;background:var(--surface);border:1px solid var(--line);border-radius:6px">
+                <input type="checkbox" class="m-step-ck" data-step-idx="${idx}" ${s.done ? 'checked' : ''} style="cursor:pointer">
+                <span style="flex:1;font-size:calc(12.5px*var(--ts,1));${s.done ? 'text-decoration:line-through;color:var(--muted)' : 'font-weight:500'}">${esc(s.label)}</span>
+                <button type="button" class="btn sm ghost m-step-del" data-step-idx="${idx}" style="padding:2px 6px;line-height:1;color:var(--muted)" aria-label="Delete step">✕</button>
+              </div>
+            `).join('') : '<div style="font-size:calc(12px*var(--ts,1));color:var(--muted);font-style:italic;padding:8px 0">No micro-steps added yet. Pick a template below or type a custom step.</div>'}
+          </div>
+        </div>
+
+        <div style="display:flex;gap:6px">
+          <input type="text" id="mAddStepInput" placeholder="Add single physical step (e.g. Open doc, write 1 sentence)…" style="flex:1;font-size:calc(12px*var(--ts,1));padding:6px 8px">
+          <button type="button" class="btn sm primary" id="mAddStepBtn">+ Step</button>
+        </div>
+
+        <div style="border-top:1px solid var(--line);padding-top:10px">
+          <div style="font-size:calc(11.5px*var(--ts,1));font-weight:700;color:var(--muted);margin-bottom:8px">⚡ 1-Click ADHD Smart Decomposer Templates:</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            ${Object.entries(DECOMPOSE_TEMPLATES).map(([key, tpl]) => `
+              <button type="button" class="btn sm ghost m-template-btn" data-template="${key}" style="font-size:calc(11px*var(--ts,1))">${tpl.name}</button>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+  };
+
+  const bindEvents = () => {
+    $$('.m-step-ck').forEach(ck => {
+      ck.onchange = () => {
+        const idx = +ck.dataset.stepIdx;
+        if (task.steps[idx]) {
+          task.steps[idx].done = ck.checked;
+          if (ck.checked) triggerDopamineCelebration(`Micro-step complete: "${task.steps[idx].label}"!`);
+          save();
+          updateView();
+        }
+      };
+    });
+
+    $$('.m-step-del').forEach(btn => {
+      btn.onclick = () => {
+        const idx = +btn.dataset.stepIdx;
+        task.steps.splice(idx, 1);
+        save();
+        updateView();
+      };
+    });
+
+    const addInput = $('#mAddStepInput');
+    const addBtn = $('#mAddStepBtn');
+    const doAdd = () => {
+      const val = addInput?.value?.trim();
+      if (!val) return;
+      task.steps.push({ label: val, done: false });
+      save();
+      updateView();
+    };
+    if (addBtn) addBtn.onclick = doAdd;
+    if (addInput) addInput.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); doAdd(); } };
+
+    $$('.m-template-btn').forEach(btn => {
+      btn.onclick = () => {
+        const key = btn.dataset.template;
+        const tpl = DECOMPOSE_TEMPLATES[key];
+        if (!tpl) return;
+        tpl.steps.forEach(st => {
+          if (!task.steps.some(existing => existing.label === st)) {
+            task.steps.push({ label: st, done: false });
+          }
+        });
+        save();
+        toast(`Applied "${tpl.name}" micro-steps!`);
+        updateView();
+      };
+    });
+  };
+
+  const updateView = () => {
+    const body = $('#modalBody');
+    if (body) {
+      body.innerHTML = renderModalContent();
+      bindEvents();
+    }
+    renderTasks();
+    renderFocusSide();
+  };
+
+  modal('⚡ Decompose Task into Micro-Steps', renderModalContent(), [
+    { label: 'Close', primary: true, run: () => { closeModal(); renderTasks(); renderFocusSide(); } }
+  ], () => {
+    bindEvents();
+  });
+}
+
+function smartDecomposerModal(defaultTaskId) {
+  const openTasks = S.tasks.filter(t => !t.done);
+  if (!openTasks.length) {
+    modal('⚡ Smart Task Decomposer', `
+      <p style="line-height:1.6">You have no open tasks. Create a new task below and we will automatically decompose it into micro-steps.</p>
+      <div class="field" style="margin-top:10px">
+        <label for="new_decomp_title">Task title</label>
+        <input type="text" id="new_decomp_title" placeholder="e.g. Write Literature Review">
+      </div>
+    `, [
+      { label: 'Cancel', run: closeModal },
+      { label: 'Create & Decompose', primary: true, run: () => {
+        const title = $('#new_decomp_title')?.value?.trim();
+        if (!title) { toast('Please enter a task title'); return; }
+        const newTask = {
+          id: uid(),
+          title,
+          est: 2,
+          energy: 'med',
+          subjectId: null,
+          quad: null,
+          done: false,
+          done_pomos: 0,
+          steps: [],
+          created: Date.now()
+        };
+        S.tasks.unshift(newTask);
+        save();
+        renderTasks();
+        taskSubtasksModal(newTask.id);
+      }}
+    ]);
+    return;
+  }
+
+  const selTaskId = defaultTaskId || openTasks[0].id;
+  taskSubtasksModal(selTaskId);
+}
+
+const ADHD_STUDY_CARDS = [
+  { q: 'What is the 2-Minute Rule for ADHD task initiation?', a: 'Commit to engaging with the task for only 120 seconds (e.g. open document, write 1 sentence). Over 80% of executive freeze vanishes once physical momentum starts.', subject: 'ADHD Science' },
+  { q: 'What is Stochastic Resonance in study acoustics?', a: 'Adding subtle background auditory noise (like brown or pink noise) elevates sub-threshold neural arousal to optimal levels, shielding against mind-wandering.', subject: 'Focus Acoustics' },
+  { q: 'What are the 4 Quadrants of the Eisenhower Matrix?', a: 'Q1: Urgent & Important (Firefighting)\nQ2: Not Urgent but Important (Deep Work & Mastery)\nQ3: Urgent not Important (Distractions)\nQ4: Neither (Waste / Avoidance)', subject: 'Planning' },
+  { q: 'What is a Physiological Sigh and how does it help?', a: 'Two quick inhales through the nose followed by a long, slow mouth exhale. Re-inflates lung alveoli and rapidly activates the parasympathetic nervous system to arrest exam anxiety.', subject: 'Neurobiology' },
+  { q: 'Why do traditional habit streaks fail ADHD brains?', a: 'Traditional trackers punish a single off-day by resetting streaks to zero, triggering shame and abandonment. Forgiving streaks preserve momentum across off-days.', subject: 'Habit Formation' }
+];
+
+function flashcardModal() {
+  if (!Array.isArray(S.flashcards)) S.flashcards = [];
+  if (S.flashcards.length === 0) {
+    ADHD_STUDY_CARDS.forEach(c => {
+      S.flashcards.push({
+        id: 'fc_' + uid(),
+        question: c.q,
+        answer: c.a,
+        subject: c.subject,
+        reps: 0,
+        interval: 1,
+        due: Date.now()
+      });
+    });
+    save();
+  }
+
+  let curIdx = 0;
+  let showingAnswer = false;
+  let reviewQueue = S.flashcards.slice();
+
+  const renderCardUI = () => {
+    if (!reviewQueue.length || curIdx >= reviewQueue.length) {
+      return `
+        <div style="text-align:center;padding:24px 10px">
+          <div style="font-size:36px;margin-bottom:8px">🎉</div>
+          <h3 style="font-size:calc(16px*var(--ts,1));font-weight:700">All Flashcards Reviewed!</h3>
+          <p style="font-size:calc(13px*var(--ts,1));color:var(--ink-2);margin:8px auto 16px;max-width:45ch">
+            Active retrieval practice directly strengthens long-term synaptic consolidation.
+          </p>
+          <div style="display:flex;gap:8px;justify-content:center">
+            <button class="btn primary sm" id="restartCardsBtn">Review Deck Again</button>
+            <button class="btn sm" id="addNewCardBtn">+ Add Custom Card</button>
+          </div>
+        </div>
+      `;
+    }
+
+    const card = reviewQueue[curIdx];
+    return `
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span class="chip" style="font-size:calc(11px*var(--ts,1))">${esc(card.subject || 'Academic')}</span>
+          <span style="font-family:var(--font-mono);font-size:calc(11px*var(--ts,1));color:var(--muted)">Card ${curIdx + 1} of ${reviewQueue.length}</span>
+        </div>
+
+        <div class="flashcard-stage" id="cardStage" role="region" aria-label="Flashcard surface" tabindex="0">
+          <div class="flashcard-q">${esc(card.question)}</div>
+          ${showingAnswer ? `
+            <div class="flashcard-a">${esc(card.answer).replace(/\n/g, '<br>')}</div>
+          ` : `
+            <div class="flashcard-flip-hint">👆 Click or press Space to reveal answer</div>
+          `}
+        </div>
+
+        ${showingAnswer ? `
+          <div class="flashcard-rating-bar">
+            <button class="btn sm ghost" data-rate="again" style="color:var(--crit);border-color:color-mix(in srgb,var(--crit) 40%,var(--line))">↺ Again (Repeat)</button>
+            <button class="btn sm ghost" data-rate="hard" style="color:var(--warn);border-color:color-mix(in srgb,var(--warn) 40%,var(--line))">Shaky / Hard</button>
+            <button class="btn sm primary" data-rate="good" style="background:var(--good);border-color:var(--good)">✓ Good / Mastered</button>
+          </div>
+        ` : `
+          <div style="display:flex;justify-content:center;gap:8px">
+            <button class="btn primary sm" id="showAnswerBtn">Show Answer</button>
+            <button class="btn sm ghost" id="addNewCardBtn">+ Add Card</button>
+          </div>
+        `}
+      </div>
+    `;
+  };
+
+  const bindEvents = () => {
+    const stage = $('#cardStage');
+    const showBtn = $('#showAnswerBtn');
+    const flip = () => {
+      if (!showingAnswer) {
+        showingAnswer = true;
+        updateModal();
+      }
+    };
+    if (stage) stage.onclick = flip;
+    if (showBtn) showBtn.onclick = flip;
+
+    $$('[data-rate]').forEach(b => {
+      b.onclick = () => {
+        const rating = b.dataset.rate;
+        const card = reviewQueue[curIdx];
+        if (card) {
+          card.reps = (card.reps || 0) + 1;
+          if (rating === 'again') {
+            card.interval = 1;
+            reviewQueue.push(card);
+          } else if (rating === 'hard') {
+            card.interval = Math.max(1, (card.interval || 1) * 1.5);
+          } else {
+            card.interval = Math.max(2, (card.interval || 1) * 2.5);
+            triggerDopamineCelebration('+1 Recall Win! 🧠');
+          }
+          card.due = Date.now() + card.interval * 86400000;
+          save();
+        }
+        curIdx++;
+        showingAnswer = false;
+        updateModal();
+      };
+    });
+
+    $('#restartCardsBtn')?.addEventListener('click', () => {
+      reviewQueue = S.flashcards.slice();
+      curIdx = 0;
+      showingAnswer = false;
+      updateModal();
+    });
+
+    $('#addNewCardBtn')?.addEventListener('click', () => {
+      newCardPrompt();
+    });
+  };
+
+  const updateModal = () => {
+    const body = $('#modalBody');
+    if (body) {
+      body.innerHTML = renderCardUI();
+      bindEvents();
+    }
+  };
+
+  const newCardPrompt = () => {
+    modal('Add Study Flashcard', `
+      <div class="stack" style="gap:10px">
+        <div class="field">
+          <label for="fc_q">Question or Concept Prompt</label>
+          <input type="text" id="fc_q" placeholder="e.g. What is the rate-limiting step of glycolysis?">
+        </div>
+        <div class="field">
+          <label for="fc_a">Answer or Core Key Points</label>
+          <textarea id="fc_a" rows="3" placeholder="Phosphofructokinase-1 (PFK-1)..."></textarea>
+        </div>
+        <div class="field">
+          <label for="fc_sub">Subject / Course (Optional)</label>
+          <input type="text" id="fc_sub" placeholder="e.g. Biochemistry">
+        </div>
+      </div>
+    `, [
+      { label: 'Back to Cards', run: () => flashcardModal() },
+      { label: 'Save Card', primary: true, run: () => {
+        const q = $('#fc_q')?.value?.trim();
+        const a = $('#fc_a')?.value?.trim();
+        const subject = $('#fc_sub')?.value?.trim() || 'General';
+        if (!q || !a) { toast('Please enter both question and answer'); return; }
+        S.flashcards.push({
+          id: 'fc_' + uid(),
+          question: q,
+          answer: a,
+          subject,
+          reps: 0,
+          interval: 1,
+          due: Date.now()
+        });
+        save();
+        toast('Flashcard saved!');
+        flashcardModal();
+      }}
+    ]);
+  };
+
+  modal('🧠 Active Recall & Spaced Micro-Quizzer', renderCardUI(), [
+    { label: 'Close', primary: true, run: closeModal }
+  ], () => {
+    bindEvents();
+  });
+}
+
+function bionicReaderModal(initialText) {
+  let text = initialText || '';
+  if (!text) {
+    const activeT = S.tasks.find(x => x.id === S.timer.taskId);
+    if (activeT) text = activeT.title;
+    else if (S.notes && S.notes.length) text = S.notes[0].text;
+  }
+
+  function bionicFormat(raw) {
+    if (!raw) return '<p style="color:var(--muted);font-style:italic">Paste study text or lecture notes above to engage bionic fixation points.</p>';
+    return raw.split('\n').filter(Boolean).map(para => {
+      const formatted = para.split(' ').map(w => {
+        if (w.length <= 1) return esc(w);
+        const fix = Math.ceil(w.length * 0.45);
+        return `<b>${esc(w.slice(0, fix))}</b>${esc(w.slice(fix))}`;
+      }).join(' ');
+      return `<p style="margin:0 0 12px">${formatted}</p>`;
+    }).join('');
+  }
+
+  modal('📖 Bionic Focus Reader & Reading Ruler', `
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <p style="font-size:calc(12px*var(--ts,1));color:var(--ink-2);margin:0">
+        Bionic reading bolds the first 40–50% of every word (fixation points). This eliminates saccadic wandering and allows ADHD/dyslexic brains to read with higher speed and zero line-jumping confusion.
+      </p>
+      <div class="bionic-toolbar">
+        <div style="display:flex;gap:6px;align-items:center">
+          <button type="button" class="btn sm ghost" id="bionicToggleRuler">Toggle Reading Ruler</button>
+          <button type="button" class="btn sm ghost" id="bionicTextLarger">A+</button>
+          <button type="button" class="btn sm ghost" id="bionicTextSmaller">A-</button>
+        </div>
+        <button type="button" class="btn sm ghost" id="bionicPasteBtn">Paste from Clipboard</button>
+      </div>
+      <div class="field">
+        <label for="bionicInput">Source Text</label>
+        <textarea id="bionicInput" rows="3" placeholder="Paste textbook paragraph or study guide text here…">${esc(text)}</textarea>
+      </div>
+      <div style="font-size:calc(12px*var(--ts,1));font-weight:700">Bionic Guided View</div>
+      <div class="bionic-reading-area" id="bionicOutput" tabindex="0">
+        <div class="reading-ruler" id="readingRuler"></div>
+        <div id="bionicTextBody">${bionicFormat(text)}</div>
+      </div>
+    </div>
+  `, [
+    { label: 'Close', primary: true, run: closeModal }
+  ], () => {
+    const input = $('#bionicInput');
+    const outBody = $('#bionicTextBody');
+    const area = $('#bionicOutput');
+    const ruler = $('#readingRuler');
+    let rulerOn = true;
+    if (ruler) ruler.style.display = 'block';
+
+    if (input && outBody) {
+      input.addEventListener('input', e => {
+        outBody.innerHTML = bionicFormat(e.target.value);
+      });
+    }
+
+    $('#bionicToggleRuler')?.addEventListener('click', () => {
+      rulerOn = !rulerOn;
+      if (ruler) ruler.style.display = rulerOn ? 'block' : 'none';
+    });
+
+    let currentScale = 1;
+    $('#bionicTextLarger')?.addEventListener('click', () => {
+      currentScale = Math.min(1.5, currentScale + 0.1);
+      if (area) area.style.fontSize = `calc(15px * var(--ts, 1) * ${currentScale})`;
+    });
+
+    $('#bionicTextSmaller')?.addEventListener('click', () => {
+      currentScale = Math.max(0.8, currentScale - 0.1);
+      if (area) area.style.fontSize = `calc(15px * var(--ts, 1) * ${currentScale})`;
+    });
+
+    $('#bionicPasteBtn')?.addEventListener('click', async () => {
+      if (navigator.clipboard && navigator.clipboard.readText) {
+        try {
+          const clip = await navigator.clipboard.readText();
+          if (clip && input && outBody) {
+            input.value = clip;
+            outBody.innerHTML = bionicFormat(clip);
+          }
+        } catch (e) {
+          toast('Clipboard access unavailable — paste with Cmd+V');
+        }
+      }
+    });
+
+    if (area && ruler) {
+      area.addEventListener('mousemove', e => {
+        if (!rulerOn) return;
+        const rect = area.getBoundingClientRect();
+        const y = e.clientY - rect.top - 16;
+        ruler.style.top = Math.max(0, y) + 'px';
+      });
+    }
+  });
+}
+
 
 /* =====================================================================
    ABOUT — the one showy screen.
@@ -5097,6 +6444,7 @@ function renderAll() {
   applyTheme(); renderPips(); renderDial(); renderFocusSide(); renderTasks();
   renderCalendar(); renderBoard(); renderSound(); renderCalm(); renderMood(); renderSettings(); renderStats(); renderGcal();
   renderBanner(); renderQuickStart(); renderStoreChip(); renderWho(); renderTracking();
+  renderHabits(); renderHelp(); renderExamTracker();
   $('#dayStart').value = S.settings.dayStart; $('#dayEnd').value = S.settings.dayEnd;
 }
 window.FocusDial = {
@@ -5150,7 +6498,10 @@ window.FocusDial = {
     : Promise.reject(new Error('Local profiles exist only on this device. You can reset your password directly from device settings.')),
   forgotPassword: forgotPasswordModal,
   async wipe() { clearTimeout(saveT); await STORE.clear(); await journal.clear(); S = DEFAULTS(); save(); setPhase('focus', false); renderAll(); },
-  saveCustomPreset, loadPreset, deleteCustomPreset, applyPreset, getAnalyserNode
+  saveCustomPreset, loadPreset, deleteCustomPreset, applyPreset, getAnalyserNode,
+  calculateStreak, calculateDaysClean, renderHabits, renderHelp, renderExamTracker,
+  triggerDopamineCelebration, startMicroTimer, startImpulseTimer, habitModal, examModal,
+  taskSubtasksModal, smartDecomposerModal, flashcardModal, bionicReaderModal
 };
 if (typeof window !== 'undefined') {
   window.saveCustomPreset = saveCustomPreset;
@@ -5158,9 +6509,75 @@ if (typeof window !== 'undefined') {
   window.deleteCustomPreset = deleteCustomPreset;
   window.applyPreset = applyPreset;
   window.getAnalyserNode = getAnalyserNode;
+  window.calculateStreak = calculateStreak;
+  window.calculateDaysClean = calculateDaysClean;
+  window.renderHabits = renderHabits;
+  window.renderHelp = renderHelp;
+  window.renderExamTracker = renderExamTracker;
+  window.triggerDopamineCelebration = triggerDopamineCelebration;
+  window.startMicroTimer = startMicroTimer;
+  window.startImpulseTimer = startImpulseTimer;
+  window.habitModal = habitModal;
+  window.examModal = examModal;
+  window.taskSubtasksModal = taskSubtasksModal;
+  window.smartDecomposerModal = smartDecomposerModal;
+  window.flashcardModal = flashcardModal;
+  window.bionicReaderModal = bionicReaderModal;
+}
+function wireAppExtras() {
+  const microBtn = $('#microStartBtn');
+  if (microBtn && !microBtn._wired) {
+    microBtn._wired = true;
+    microBtn.onclick = () => startMicroTimer();
+  }
+  const fcBtn = $('#flashcardsBtn');
+  if (fcBtn && !fcBtn._wired) {
+    fcBtn._wired = true;
+    fcBtn.onclick = () => flashcardModal();
+  }
+  const bioBtn = $('#bionicReaderBtn');
+  if (bioBtn && !bioBtn._wired) {
+    bioBtn._wired = true;
+    bioBtn.onclick = () => bionicReaderModal();
+  }
+  const decompBtn = $('#decomposeHelperBtn');
+  if (decompBtn && !decompBtn._wired) {
+    decompBtn._wired = true;
+    decompBtn.onclick = () => smartDecomposerModal();
+  }
+  const newHb = $('#newHabitBtn');
+  if (newHb && !newHb._wired) {
+    newHb._wired = true;
+    newHb.onclick = () => habitModal(null, 'good');
+  }
+  const newBadHb = $('#newBadHabitBtn');
+  if (newBadHb && !newBadHb._wired) {
+    newBadHb._wired = true;
+    newBadHb.onclick = () => habitModal(null, 'bad');
+  }
+  const helpSearch = $('#helpSearch');
+  if (helpSearch && !helpSearch._wired) {
+    helpSearch._wired = true;
+    helpSearch.addEventListener('input', e => {
+      helpSearchQuery = e.target.value;
+      renderHelp();
+    });
+  }
+  const helpCats = $('#helpCategories');
+  if (helpCats && !helpCats._wired) {
+    helpCats._wired = true;
+    helpCats.addEventListener('click', e => {
+      const btn = e.target.closest('button[data-category]');
+      if (!btn) return;
+      helpActiveCategory = btn.dataset.category;
+      $$('#helpCategories button').forEach(b => b.classList.remove('on'));
+      btn.classList.add('on');
+      renderHelp();
+    });
+  }
 }
 (async function init() {
-  renderTicks(); applyTheme(); renderSiteNav(); applyBrand(); wireGate();
+  renderTicks(); applyTheme(); renderSiteNav(); applyBrand(); wireGate(); wireAppExtras();
   setInterval(() => { if (view === 'plan') renderCalendar(); renderTopStats(); }, 60000);
   window.addEventListener('beforeunload', () => { clearTimeout(saveT); if (AUTH.user || AUTH.mode === 'none') STORE.writeSync(saveSnapshot()); });
   document.addEventListener('visibilitychange', () => { if (!document.hidden) { tickRemain(); renderDial(); } });
@@ -5228,5 +6645,19 @@ export {
   DEFAULTS,
   sendPasswordResetEmail,
   forgotPasswordModal,
-  enterApp
+  enterApp,
+  calculateStreak,
+  calculateDaysClean,
+  renderHabits,
+  renderHelp,
+  renderExamTracker,
+  triggerDopamineCelebration,
+  startMicroTimer,
+  startImpulseTimer,
+  habitModal,
+  examModal,
+  taskSubtasksModal,
+  smartDecomposerModal,
+  flashcardModal,
+  bionicReaderModal
 };

@@ -75,6 +75,7 @@ button,input,select,textarea{font:inherit; color:inherit}
 .rail{
   background:var(--surface); border-right:1px solid var(--line);
   display:flex; flex-direction:column; align-items:center; gap:4px; padding:14px 0 12px;
+  overflow-y:auto; overflow-x:hidden;
 }
 .brand{
   width:38px;height:38px;border-radius:11px;display:grid;place-items:center;margin-bottom:10px;
@@ -1142,3 +1143,131 @@ kbd{font-family:var(--font-mono); font-size:.9em; padding:0 4px; border:1px soli
 .adv-body{padding-bottom:6px}
 .adv-body .set-row:first-of-type{border-top:0}
 .adv-lead{margin:0 0 4px; max-width:62ch}
+
+/* ---------- Tip Buttons & Decluttered Hints ---------- */
+.tip-btn{
+  background:transparent; border:0; padding:1px 5px; color:var(--muted);
+  cursor:pointer; border-radius:4px; font-size:calc(11.5px*var(--ts,1));
+  display:inline-flex; align-items:center; justify-content:center;
+  line-height:1; vertical-align:middle; transition:background .15s, color .15s;
+}
+.tip-btn:hover, .tip-btn:focus-visible{
+  color:var(--ink); background:var(--surface-2);
+}
+
+/* ---------- Habits & Routines View ---------- */
+.habits-wrap{display:flex; flex-direction:column; gap:22px}
+.habits-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:14px}
+.habit-card{
+  background:var(--surface); border:1px solid var(--line); border-radius:var(--r-l);
+  padding:16px 18px; display:flex; flex-direction:column; gap:10px; box-shadow:var(--shadow-1);
+  transition:border-color .15s, transform .1s;
+}
+.habit-card:hover{border-color:var(--line-2)}
+.habit-head{display:flex; align-items:flex-start; justify-content:space-between; gap:10px}
+.habit-title{font-size:calc(14.5px*var(--ts,1)); font-weight:700; margin:0}
+.habit-meta{display:flex; flex-wrap:wrap; gap:6px; align-items:center}
+.habit-cue{font-size:calc(12px*var(--ts,1)); color:var(--muted); font-style:italic}
+.habit-micro{
+  background:var(--surface-2); border:1px solid var(--line); border-radius:8px;
+  padding:6px 10px; font-size:calc(12px*var(--ts,1)); color:var(--ink-2); display:flex; align-items:center; gap:6px;
+}
+.habit-actions{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:4px; flex-wrap:wrap}
+.streak-chip{font-family:var(--font-mono); font-weight:700}
+.forgiving-chip{background:var(--rest-wash); color:var(--rest); border:1px solid currentColor}
+
+/* Bad habits */
+.bad-habit-card{border-left:4px solid var(--warn)}
+.clean-counter{
+  font-family:var(--font-mono); font-size:calc(20px*var(--ts,1)); font-weight:700;
+  color:var(--good); display:flex; align-items:center; gap:8px;
+}
+.impulse-panel{
+  background:var(--surface-2); border:1px solid var(--line); border-radius:var(--r-m);
+  padding:14px; margin-top:8px; display:flex; flex-direction:column; gap:8px;
+}
+.impulse-timer-box{
+  background:var(--focus-wash); border:1px solid var(--focus); border-radius:var(--r-m);
+  padding:16px; text-align:center; animation:pulse 2s infinite ease-in-out;
+}
+@keyframes pulse{0%,100%{opacity:1} 50%{opacity:.85}}
+
+/* ---------- Interactive Help Center View ---------- */
+.help-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:16px}
+.help-card{
+  background:var(--surface); border:1px solid var(--line); border-radius:var(--r-l);
+  padding:18px; display:flex; flex-direction:column; gap:12px; box-shadow:var(--shadow-1);
+}
+.help-card-head{display:flex; align-items:center; justify-content:space-between; gap:8px}
+.help-card h3{font-size:calc(15px*var(--ts,1)); font-weight:700; margin:0}
+.help-cat-badge{
+  font-family:var(--font-mono); font-size:calc(10px*var(--ts,1)); text-transform:uppercase;
+  padding:2px 7px; border-radius:99px; background:var(--surface-2); border:1px solid var(--line);
+}
+.help-body{font-size:calc(12.5px*var(--ts,1)); color:var(--ink-2); line-height:1.6}
+.help-adhd-box{
+  background:var(--surface-2); border-left:3px solid var(--accent); border-radius:0 8px 8px 0;
+  padding:8px 12px; font-size:calc(12px*var(--ts,1)); line-height:1.55; color:var(--ink-2);
+}
+.help-adhd-box strong{color:var(--ink); display:block; margin-bottom:2px}
+
+/* ---------- Subtasks / Next Physical Action ---------- */
+.next-step-card{
+  background:color-mix(in srgb, var(--accent) 8%, var(--surface));
+  border:1px solid color-mix(in srgb, var(--accent) 30%, var(--line));
+  border-radius:var(--r-m); padding:12px 14px; margin-top:10px;
+}
+.step-item{
+  display:flex; align-items:center; gap:8px; padding:6px 0;
+  border-bottom:1px solid var(--line); font-size:calc(12.5px*var(--ts,1));
+}
+.step-item:last-child{border-bottom:0}
+.step-item.done{text-decoration:line-through; color:var(--muted); opacity:.75}
+
+/* ---------- Exams & Deadlines Countdown Tracker ---------- */
+.exam-grid{display:grid; gap:10px; margin-top:10px}
+.exam-item{
+  background:var(--surface-2); border:1px solid var(--line); border-radius:var(--r-m);
+  padding:12px 14px; display:flex; flex-direction:column; gap:6px;
+}
+.exam-item-head{display:flex; align-items:center; justify-content:space-between; gap:8px}
+.exam-item-title{font-size:calc(13.5px*var(--ts,1)); font-weight:700}
+.urgency-badge{font-family:var(--font-mono); font-weight:700; font-size:calc(11px*var(--ts,1))}
+.exam-plan-chunk{
+  font-size:calc(11.5px*var(--ts,1)); color:var(--muted);
+  display:flex; align-items:center; justify-content:space-between; gap:8px;
+}
+.exam-item.done-exam{opacity:.75; border-color:var(--good); background:color-mix(in srgb, var(--good) 6%, var(--surface-2))}
+
+/* ---------- Active Recall Flashcards Modal ---------- */
+.flashcard-stage{
+  background:var(--surface); border:1px solid var(--line); border-radius:var(--r-m);
+  padding:24px 20px; text-align:center; min-height:170px; display:flex; flex-direction:column;
+  justify-content:center; align-items:center; gap:12px; cursor:pointer; user-select:none;
+  box-shadow:var(--shadow-1); transition:transform .15s, border-color .15s;
+}
+.flashcard-stage:hover{border-color:var(--focus); transform:translateY(-1px)}
+.flashcard-q{font-size:calc(15.5px*var(--ts,1)); font-weight:700; color:var(--ink); max-width:55ch}
+.flashcard-a{
+  font-size:calc(14.5px*var(--ts,1)); color:var(--ink-2); line-height:1.6; max-width:55ch;
+  border-top:1px dashed var(--line); padding-top:12px; margin-top:4px;
+}
+.flashcard-flip-hint{font-size:calc(11.5px*var(--ts,1)); color:var(--muted); letter-spacing:.02em}
+.flashcard-rating-bar{display:flex; gap:8px; justify-content:center; margin-top:12px; flex-wrap:wrap}
+
+/* ---------- Bionic Reading Sanctuary & Ruler ---------- */
+.bionic-reading-area{
+  background:var(--surface); border:1px solid var(--line); border-radius:var(--r-m);
+  padding:20px 22px; font-size:calc(15px*var(--ts,1)); line-height:1.8; color:var(--ink-2);
+  position:relative; max-height:360px; overflow-y:auto;
+}
+.bionic-reading-area b{color:var(--ink); font-weight:800}
+.reading-ruler{
+  position:absolute; left:0; width:100%; height:32px; pointer-events:none;
+  background:color-mix(in srgb, var(--focus) 12%, transparent);
+  border-top:1px solid color-mix(in srgb, var(--focus) 30%, transparent);
+  border-bottom:1px solid color-mix(in srgb, var(--focus) 30%, transparent);
+  transition:top .08s ease-out; display:none;
+}
+.bionic-toolbar{display:flex; gap:10px; align-items:center; justify-content:space-between; margin-bottom:10px; flex-wrap:wrap}
+

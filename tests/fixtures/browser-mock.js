@@ -349,6 +349,25 @@ export class MockDOMTokenList {
   }
 }
 
+export class MockCSSStyleDeclaration {
+  constructor() {
+    this._props = {};
+  }
+  setProperty(prop, value) {
+    this._props[prop] = String(value);
+    this[prop] = String(value);
+  }
+  getPropertyValue(prop) {
+    return this._props[prop] || this[prop] || '';
+  }
+  removeProperty(prop) {
+    const val = this._props[prop] || '';
+    delete this._props[prop];
+    delete this[prop];
+    return val;
+  }
+}
+
 export class MockElement {
   constructor(tagName = 'div', doc = null) {
     this.tagName = tagName.toUpperCase();
@@ -357,13 +376,13 @@ export class MockElement {
     this._className = '';
     this.classList = new MockDOMTokenList(this);
     this.dataset = {};
-    this.style = {};
+    this.style = new MockCSSStyleDeclaration();
     this.attributes = new Map();
     this.children = [];
     this.parentElement = null;
     this._listeners = new Map();
     this._innerHTML = '';
-    this.textContent = '';
+    this._text = '';
     this.value = '';
     this.checked = false;
     this.hidden = false;
@@ -373,13 +392,26 @@ export class MockElement {
   }
 
   get innerHTML() {
-    return this._innerHTML;
+    return this._innerHTML || this.textContent;
   }
 
   set innerHTML(html) {
     this._innerHTML = String(html || '');
     this.children = [];
     parseHtmlToElements(this._innerHTML, this.ownerDocument || this, this);
+  }
+
+  get textContent() {
+    let text = this._text || '';
+    for (const child of this.children) {
+      text += child.textContent;
+    }
+    return text;
+  }
+
+  set textContent(v) {
+    this._text = String(v || '');
+    this.children = [];
   }
 
   get className() {
@@ -501,9 +533,26 @@ export class MockElement {
     }
   }
 
+  matches(selector) {
+    return matchesSelector(this, selector);
+  }
+
+  closest(selector) {
+    let curr = this;
+    while (curr && curr.tagName !== '#DOCUMENT') {
+      if (matchesSelector(curr, selector)) return curr;
+      curr = curr.parentElement;
+    }
+    return null;
+  }
+
   dispatchEvent(event) {
-    event.target = this;
+    if (!event.target) event.target = this;
     event.currentTarget = this;
+    const onHandler = this['on' + event.type];
+    if (typeof onHandler === 'function') {
+      onHandler.call(this, event);
+    }
     const listeners = this._listeners.get(event.type) || [];
     for (const fn of listeners) {
       fn.call(this, event);
@@ -513,6 +562,8 @@ export class MockElement {
     }
     return !event.defaultPrevented;
   }
+
+  scrollIntoView() {}
 
   click() {
     this.dispatchEvent(new MockEvent('click', { bubbles: true }));
@@ -524,6 +575,22 @@ export class MockElement {
 
   blur() {
     this.dispatchEvent(new MockEvent('blur', { bubbles: false }));
+  }
+
+  getContext(type) {
+    if (type === '2d') {
+      return {
+        clearRect: () => {},
+        beginPath: () => {},
+        arc: () => {},
+        fill: () => {},
+        stroke: () => {},
+        fillRect: () => {},
+        fillStyle: '#000',
+        globalAlpha: 1
+      };
+    }
+    return null;
   }
 }
 
@@ -566,7 +633,7 @@ export function parseHtmlToElements(html, doc, parent = null) {
     const [full, tagName, attrString, selfClose, text] = match;
     if (text) {
       if (stack.length > 0) {
-        stack[stack.length - 1].textContent += text;
+        stack[stack.length - 1]._text = (stack[stack.length - 1]._text || '') + text;
       }
       continue;
     }

@@ -509,15 +509,15 @@ function hideLoadingOverlay() {
 
 // Lazy loading for images
 function initLazyLoading() {
-    if ('loading' in HTMLImageElement.prototype) {
+    if (typeof HTMLImageElement !== 'undefined' && 'loading' in HTMLImageElement.prototype) {
         // Native lazy loading supported
         document.querySelectorAll('img[loading="lazy"]').forEach(img => {
             img.addEventListener('load', function() {
                 this.classList.add('loaded');
             });
         });
-    } else {
-        // Fallback for browsers without native lazy loading
+    } else if (typeof IntersectionObserver !== 'undefined') {
+        // Fallback for browsers without native lazy loading but with IntersectionObserver
         const imageObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -531,6 +531,11 @@ function initLazyLoading() {
 
         document.querySelectorAll('img[data-src]').forEach(img => {
             imageObserver.observe(img);
+        });
+    } else {
+        document.querySelectorAll('img[data-src]').forEach(img => {
+            img.src = img.dataset.src;
+            img.classList.add('loaded');
         });
     }
 }
@@ -812,7 +817,7 @@ function initFooterInfoLinks() {
 }
 
 // Privacy and Accessibility Info Functions
-window.showPrivacyInfo = function() {
+function showPrivacyInfo() {
     const message = `
 Privacy Notice:
 • This website uses no tracking cookies
@@ -822,9 +827,10 @@ Privacy Notice:
 • All external links use proper security attributes
     `;
     showCustomModal('Privacy Information', message);
-};
+}
+window.showPrivacyInfo = showPrivacyInfo;
 
-window.showAccessibilityInfo = function() {
+function showAccessibilityInfo() {
     const message = `
 Accessibility Features:
 • Fully keyboard navigable
@@ -839,7 +845,8 @@ Accessibility Features:
 If you encounter any accessibility issues, please contact me at a.ayanzadeh@gmail.com
     `;
     showCustomModal('Accessibility Information', message);
-};
+}
+window.showAccessibilityInfo = showAccessibilityInfo;
 
 function showCustomModal(title, content) {
     // Remove existing modal if any
@@ -914,6 +921,7 @@ function initializeAccessibilityFeatures() {
 }
 
 function ensureAccessibilityStructure() {
+    if (!document.body || typeof document.body.insertAdjacentHTML !== 'function') return;
     if (!document.getElementById('accessibility-menu-toggle')) {
         document.body.insertAdjacentHTML('beforeend', `
             <button id="accessibility-menu-toggle" class="accessibility-toggle show" type="button"
@@ -1236,6 +1244,7 @@ function initializeKeyboardEnhancements() {
 
 // Screen Reader Support
 function initializeScreenReaderSupport() {
+    if (typeof IntersectionObserver === 'undefined') return;
     // Announce page sections when they come into view
     const sections = document.querySelectorAll('section[id]');
     
