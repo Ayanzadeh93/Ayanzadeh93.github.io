@@ -101,10 +101,10 @@ function rememberComfort(settings) {
 }
 
 const DEFAULTS = () => ({
-  schema: 4,
+  schema: 5,
   settings: Object.assign({ focus:25, short:5, long:15, cycles:4, autoBreak:true, autoFocus:false, titleClock:true,
               chime:true, chimeVol:70, notify:false, checkinAfter:true, moveBreak:true, hideSeconds:false,
-              theme:deviceRecord().theme || 'auto', accent:deviceRecord().accent || 'focus', dayStart:'08:00', dayEnd:'21:00',
+              theme:deviceRecord().theme || 'auto', accent:deviceRecord().accent || 'focus', dayStart:'08:00', dayEnd:'21:00', calendarView:'week',
               comfort:deviceComfort() }, CFG.settings || {}),
   lists: Object.assign(clone(DEFAULT_LISTS), CFG.lists || {}),
   /* tasks, events, notes, subjects and links are the working set and travel in
@@ -332,7 +332,7 @@ function migrate(raw) {
   out.settings.comfort = normaliseComfort(out.settings.comfort);      // keys added since it was saved
   ['tasks','events','notes','sessions','checkins','moods','subjects','links'].forEach(k => { if (!Array.isArray(out[k])) out[k] = []; });
   out.tasks.forEach(t => { if (!('quad' in t)) t.quad = null; if (!t.id) t.id = uid(); });
-  out.schema = 4;
+  out.schema = 5;
   return out;
 }
 async function load() {
@@ -2137,8 +2137,8 @@ $('#taskForm').onsubmit = e => {
   const title = $('#taskTitle').value.trim(); if (!title) return;
   S.tasks.unshift({ id:uid(), title, est:+$('#taskEst').value || 1, energy:$('#taskEnergy').value,
                     subjectId:$('#taskSubject').value || null, quad:$('#taskQuad').value || null,
-                    done:false, done_pomos:0, created:Date.now() });
-  $('#taskTitle').value = ''; save(); renderTasks(); toast('Added');
+                    due:$('#taskDue').value || null, done:false, done_pomos:0, created:Date.now() });
+  $('#taskTitle').value = ''; $('#taskDue').value = ''; save(); renderTasks(); renderCalendar(); toast('Added');
 };
 $('#clearDone').onclick = () => { const n = S.tasks.filter(t => t.done).length; S.tasks = S.tasks.filter(t => !t.done); save(); renderTasks(); toast(n + ' cleared'); };
 $('#pasteTasks').onclick = () => openModal('Paste a list', `
@@ -2298,7 +2298,8 @@ $('#noteSearch').oninput = renderBoard;
    CALENDAR — week grid, .ics both directions, and the auto-scheduler
    ===================================================================== */
 let weekAnchor = startOfWeek(new Date());
-const EV_KINDS = { study:'Study', class:'Class or meeting', break:'Recovery', other:'Other' };
+let calendarDate = new Date();
+const EV_KINDS = { study:'Study', class:'Class or meeting', deadline:'Deadline or exam', break:'Recovery', other:'Other' };
 function winHours() {
   const a = Math.floor(parseHM(S.settings.dayStart) / 60), b = Math.ceil(parseHM(S.settings.dayEnd) / 60);
   return { a, b, n: Math.max(1, b - a) };
@@ -2327,7 +2328,7 @@ function layoutDay(evs) {
   flush();
   return out;
 }
-function renderCalendar() {
+function renderWeekCalendar() {
   // Row height follows the text size (capped) so larger type still fits on the
   // hour lines; the stylesheet reads the same number back through --calh.
   const { a, b, n } = winHours();
@@ -2374,6 +2375,7 @@ function renderCalendar() {
     }
     html += `<div class="cal-body" data-day="${k}" role="group" aria-label="${esc(dayName)}: ${all.length ? all.length + ' block' + (all.length === 1 ? '' : 's') : 'nothing planned'}" style="height:${n * H + offset}px">${inner}</div>`;
   });
+  $('#calGrid').className = 'cal';
   $('#calGrid').style.setProperty('--calh', H + 'px');
   $('#calGrid').innerHTML = html;
   $$('#calGrid .ev[data-ev]').forEach(el => el.onclick = ev => { ev.stopPropagation(); editEvent(el.dataset.ev); });
@@ -2395,12 +2397,89 @@ function renderCalendar() {
     const hour = a + Math.floor(ev.offsetY / H);
     newEvent(el.dataset.day, pad2(clamp(hour, a, b - 1)) + ':00');
   });
-  renderSubjects(); renderGcal();
+  renderSubjects(); renderGcal(); renderStudentPulse();
 }
-$('#weekPrev').onclick = () => { weekAnchor = new Date(weekAnchor - 7 * DAY); renderCalendar(); gcalSubscribe(); };
-$('#weekNext').onclick = () => { weekAnchor = new Date(+weekAnchor + 7 * DAY); renderCalendar(); gcalSubscribe(); };
-$('#weekToday').onclick = () => { weekAnchor = startOfWeek(new Date()); renderCalendar(); gcalSubscribe(); };
-$('#addEventBtn').onclick = () => newEvent(dayKey(new Date()), '09:00');
+
+function calendarEventButton(e, compact) {
+  const d = new Date(e.start), end = new Date(e.end), local = e.source !== 'google';
+  const when = e.allDay ? 'All day' : `${hhmm(d)}–${hhmm(end)}`;
+  return `<button class="agenda-event ${e.source === 'google' ? 'gcal' : (e.kind || 'other')}" ${local ? `data-ev="${e.id}"` : `data-gid="${esc(e.id)}"`}>
+    <span class="agenda-time">${when}</span><span class="agenda-title">${esc(e.title)}</span>${compact ? '' : `<span class="agenda-kind">${e.source === 'google' ? 'Google Calendar' : (EV_KINDS[e.kind] || 'Block')}</span>`}</button>`;
+}
+function openGoogleCalendarEvent(id) {
+  const g = Object.values(GCAL.events).flat().find(x => x.id === id); if (!g) return;
+  const s0 = new Date(g.start), e0 = new Date(g.end), timing = isTracking('eventId', g.id);
+  openModal(g.title, `<p style="font-size:calc(12.5px*var(--ts,1));color:var(--ink-2);margin:0">${g.allDay ? 'All day' : hhmm(s0) + '–' + hhmm(e0)} · ${s0.toLocaleDateString(undefined, { weekday:'long', month:'short', day:'numeric' })} · from Google Calendar</p>
+    <p style="font-size:calc(12px*var(--ts,1));color:var(--muted);margin:0">Timing it logs the minutes you actually spend as study time, like any focus session.</p>`,
+    [{ label:'Close' }].concat(g.link ? [{ label:'Open in Google', onClick: () => window.open(g.link, '_blank', 'noopener') }] : [])
+      .concat([timing ? { label:'■ Stop timing', primary:true, onClick: () => stopTracking() } : { label:'▶ Start timing', primary:true, onClick: () => startTracking({ eventId:g.id, title:g.title }) }]));
+}
+function wireAgendaEvents(root) {
+  $$('[data-ev]', root).forEach(el => el.onclick = () => editEvent(el.dataset.ev));
+  $$('[data-gid]', root).forEach(el => el.onclick = () => openGoogleCalendarEvent(el.dataset.gid));
+}
+function renderDayCalendar() {
+  const d = new Date(calendarDate), k = dayKey(d), events = dayEvents(k);
+  $('#weekLbl').textContent = d.toLocaleDateString(undefined, { weekday:'long', month:'long', day:'numeric', year:'numeric' });
+  $('#calGrid').className = 'cal day-cal';
+  $('#calGrid').innerHTML = `<div class="agenda-day-head"><span>${d.toLocaleDateString(undefined, { weekday:'long' })}</span><strong>${d.getDate()}</strong><em>${events.length ? events.length + ' block' + (events.length === 1 ? '' : 's') : 'Open day'}</em></div>
+    <div class="agenda-stack">${events.length ? events.map(e => calendarEventButton(e)).join('') : `<div class="empty">Nothing is scheduled yet. Give this day one small study block.</div>`}</div>`;
+  wireAgendaEvents($('#calGrid')); renderSubjects(); renderGcal(); renderStudentPulse();
+}
+function renderMonthCalendar() {
+  const focus = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), 1);
+  const start = startOfWeek(focus), today = dayKey(new Date());
+  $('#weekLbl').textContent = focus.toLocaleDateString(undefined, { month:'long', year:'numeric' });
+  let html = DOW.map(d => `<div class="month-dow">${d}</div>`).join('');
+  for (let i = 0; i < 42; i++) {
+    const d = new Date(+start + i * DAY), k = dayKey(d), events = dayEvents(k), muted = d.getMonth() !== focus.getMonth();
+    html += `<button class="month-day ${muted ? 'muted' : ''} ${k === today ? 'today' : ''}" data-daypick="${k}"><span>${d.getDate()}</span><div>${events.slice(0, 3).map(e => `<i class="${e.source === 'google' ? 'gcal' : (e.kind || 'other')}" title="${esc(e.title)}">${esc(e.title)}</i>`).join('')}${events.length > 3 ? `<small>+${events.length - 3} more</small>` : ''}</div></button>`;
+  }
+  $('#calGrid').className = 'cal month-cal'; $('#calGrid').innerHTML = html;
+  $$('[data-daypick]', $('#calGrid')).forEach(b => b.onclick = () => { calendarDate = new Date(b.dataset.daypick + 'T12:00'); S.settings.calendarView = 'day'; save(); renderCalendar(); });
+  renderSubjects(); renderGcal(); renderStudentPulse();
+}
+function renderAgendaCalendar() {
+  const start = new Date(calendarDate); start.setHours(12, 0, 0, 0);
+  const days = Array.from({ length:14 }, (_, i) => new Date(+start + i * DAY));
+  $('#weekLbl').textContent = `${start.toLocaleDateString(undefined, { month:'short', day:'numeric' })} — ${days[13].toLocaleDateString(undefined, { month:'short', day:'numeric', year:'numeric' })}`;
+  $('#calGrid').className = 'cal agenda-cal';
+  $('#calGrid').innerHTML = days.map(d => { const events = dayEvents(dayKey(d)); return `<section class="agenda-day"><header><strong>${d.toLocaleDateString(undefined, { weekday:'long' })}</strong><span>${d.toLocaleDateString(undefined, { month:'short', day:'numeric' })}</span></header>${events.length ? events.map(e => calendarEventButton(e)).join('') : '<p>Open for deep work</p>'}</section>`; }).join('');
+  wireAgendaEvents($('#calGrid')); renderSubjects(); renderGcal(); renderStudentPulse();
+}
+function renderStudentPulse() {
+  const box = $('#studentPulse'); if (!box) return;
+  const now = new Date(); now.setHours(0,0,0,0);
+  const nextWeek = new Date(+now + 7 * DAY);
+  const due = S.tasks.filter(t => !t.done && t.due).sort((a,b) => a.due.localeCompare(b.due));
+  const soon = due.filter(t => new Date(t.due + 'T12:00') <= nextWeek);
+  const planned = S.events.filter(e => new Date(e.start) >= now && new Date(e.start) < nextWeek);
+  const target = S.subjects.reduce((sum, s) => sum + (+s.targetHours || 0), 0);
+  const plannedHours = planned.filter(e => e.kind === 'study').reduce((sum,e) => sum + (+new Date(e.end) - +new Date(e.start)) / 3600000, 0);
+  box.innerHTML = `<div class="panel-head"><h3>Student pulse</h3><span class="eyebrow">next 7 days</span></div>
+    <div class="student-metrics"><div><strong>${soon.length}</strong><span>due soon</span></div><div><strong>${plannedHours.toFixed(plannedHours % 1 ? 1 : 0)}h</strong><span>study planned</span></div><div><strong>${target ? Math.round(plannedHours / target * 100) : '—'}${target ? '%' : ''}</strong><span>target covered</span></div></div>
+    ${soon.length ? `<div class="deadline-runway">${soon.slice(0,3).map(t => `<button data-taskjump="${t.id}"><span>${esc(t.title)}</span><small>${new Date(t.due + 'T12:00').toLocaleDateString(undefined,{month:'short',day:'numeric'})}</small></button>`).join('')}</div>` : '<p class="student-note">Add due dates to tasks and your deadline runway will appear here.</p>'}
+    <button class="btn sm ghost" id="studentQuickBlock" style="width:100%;justify-content:center;margin-top:9px">+ Protect a study block</button>`;
+  $$('[data-taskjump]', box).forEach(b => b.onclick = () => { S.timer.taskId = b.dataset.taskjump; save(); go('tasks'); });
+  $('#studentQuickBlock').onclick = () => newEvent(dayKey(calendarDate), '09:00');
+}
+function renderCalendar() {
+  const mode = S.settings.calendarView || 'week';
+  $$('.cal-view').forEach(b => { const on = b.dataset.calview === mode; b.classList.toggle('active', on); b.setAttribute('aria-selected', on); });
+  if (mode === 'day') renderDayCalendar(); else if (mode === 'month') renderMonthCalendar(); else if (mode === 'list') renderAgendaCalendar(); else renderWeekCalendar();
+}
+$$('[data-calview]').forEach(b => b.onclick = () => { S.settings.calendarView = b.dataset.calview; save(); renderCalendar(); });
+function moveCalendar(dir) {
+  const mode = S.settings.calendarView || 'week';
+  if (mode === 'day' || mode === 'list') calendarDate.setDate(calendarDate.getDate() + dir * (mode === 'list' ? 14 : 1));
+  else if (mode === 'month') calendarDate = new Date(calendarDate.getFullYear(), calendarDate.getMonth() + dir, 1);
+  else { weekAnchor = new Date(+weekAnchor + dir * 7 * DAY); calendarDate = new Date(weekAnchor); }
+  weekAnchor = startOfWeek(calendarDate); renderCalendar(); gcalSubscribe();
+}
+$('#weekPrev').onclick = () => moveCalendar(-1);
+$('#weekNext').onclick = () => moveCalendar(1);
+$('#weekToday').onclick = () => { calendarDate = new Date(); weekAnchor = startOfWeek(calendarDate); renderCalendar(); gcalSubscribe(); };
+$('#addEventBtn').onclick = () => newEvent(dayKey(calendarDate), '09:00');
 function eventForm(e) {
   return `<div class="field"><label for="evT">Title</label><input type="text" id="evT" value="${esc(e.title || '')}" placeholder="Optimization — problem set"></div>
   <div style="display:flex;gap:10px">

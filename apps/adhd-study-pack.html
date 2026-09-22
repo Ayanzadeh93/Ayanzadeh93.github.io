@@ -169,23 +169,29 @@
     <!-- ============ PLAN ============ -->
     <section class="view" id="view-plan">
       <div class="view-head">
-        <div><h2>Plan</h2><p>Your week, your courses, and the auto-scheduler that turns "I should study" into blocks with a start time.</p></div>
+        <div><h2>Plan</h2><p>A student-friendly calendar with a clear day, week, month, and agenda view — all connected to your courses and study blocks.</p></div>
         <span class="top-sp"></span>
         <button class="btn sm" id="weekPrev">‹ Prev</button>
-        <button class="btn sm" id="weekToday">This week</button>
+        <button class="btn sm" id="weekToday">Today</button>
         <button class="btn sm" id="weekNext">Next ›</button>
       </div>
       <div class="grid side wide">
         <div class="card" style="overflow:hidden">
           <div class="pad" style="display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line);flex-wrap:wrap">
             <strong id="weekLbl" style="font-family:var(--font-display);font-size:calc(15px*var(--ts,1))">—</strong>
+            <div class="cal-views" role="tablist" aria-label="Calendar view">
+              <button class="cal-view active" data-calview="day" role="tab" aria-selected="true">Day</button>
+              <button class="cal-view" data-calview="week" role="tab" aria-selected="false">Week</button>
+              <button class="cal-view" data-calview="month" role="tab" aria-selected="false">Month</button>
+              <button class="cal-view" data-calview="list" role="tab" aria-selected="false">Agenda</button>
+            </div>
             <span class="chip"><span class="dot" style="background:var(--focus)"></span>Study</span>
             <span class="chip"><span class="dot" style="background:var(--long)"></span>Class</span>
             <span class="chip"><span class="dot" style="background:var(--rest)"></span>Recovery</span>
             <span class="top-sp"></span>
             <button class="btn sm primary" id="addEventBtn">+ Block</button>
           </div>
-          <div style="max-height:calc(100dvh - 260px); overflow:auto" tabindex="0" role="region" aria-label="Week calendar">
+          <div class="plan-calendar-scroll" tabindex="0" role="region" aria-label="Calendar">
             <div class="cal" id="calGrid"></div>
           </div>
         </div>
@@ -216,6 +222,7 @@
               <div class="field"><label for="dayEnd">Latest</label><input type="time" id="dayEnd" value="21:00"></div>
             </div>
           </div>
+          <div class="card pad" id="studentPulse"></div>
         </div>
       </div>
     </section>
@@ -236,6 +243,7 @@
             <div class="field" style="width:96px"><label for="taskEst">Pomos</label><input type="number" id="taskEst" min="1" max="16" value="2"></div>
             <div class="field" style="width:130px"><label for="taskEnergy">Activation</label><select id="taskEnergy"><option value="low">Low — easy start</option><option value="med" selected>Medium</option><option value="high">High — dreaded</option></select></div>
             <div class="field" style="width:150px"><label for="taskSubject">Course</label><select id="taskSubject"></select></div>
+            <div class="field" style="width:138px"><label for="taskDue">Due date</label><input type="date" id="taskDue"></div>
             <div class="field" style="width:150px"><label for="taskQuad">Matrix</label><select id="taskQuad">
               <option value="">Unsorted</option>
               <option value="q1">Q1 — do first</option>
