@@ -9,18 +9,19 @@
        frame   *.firebaseapp.com = the auth handler iframe on the authDomain
        Google Calendar sync: accounts.google.com = Google Identity Services (the
        consent popup, its script and styles); the Calendar API is www.googleapis.com.
-       Fonts come from Google Fonts; every sound is synthesised in the page. -->
+       Fonts come from Google Fonts. Sound uses local public-domain field
+       recordings plus layers synthesised in the page. -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' https://www.gstatic.com https://apis.google.com https://accounts.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://accounts.google.com; form-action 'self'; frame-src https://*.firebaseapp.com https://accounts.google.com">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="color-scheme" content="light dark">
   <title>ADHD Study Pack</title>
-  <meta name="description" content="A Pomodoro workspace built for an ADHD attention system: focus dial, Eisenhower priority matrix, week planner with an auto-scheduler, sticky notes, synthesised focus sounds, breathing and grounding tools, and honest statistics.">
+  <meta name="description" content="A Pomodoro workspace built for an ADHD attention system: focus dial, priority planning, local nature soundscapes, generated focus noise, breathing and grounding tools, and honest statistics.">
   <link rel="icon" type="image/svg+xml" href="../favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
   <!-- ?v= busts GitHub Pages' 10-minute cache when the app changes; bump it with VERSION in the script. -->
-  <link rel="stylesheet" href="../css/adhd-study-pack.css?v=3.4.0">
+  <link rel="stylesheet" href="../css/adhd-study-pack.css?v=3.5.0">
   <!-- Read by js/adhd-study-pack.js (never executed). The Firebase project
        comes from js/firebase-config.js, so it is not repeated here. -->
   <script type="application/json" id="focus-dial-config">
@@ -304,32 +305,72 @@
     <!-- ============ SOUND ============ -->
     <section class="view" id="view-sound">
       <div class="view-head">
-        <div><h2>Sound</h2><p>Every layer is synthesised live in your browser — no files, no streaming, works offline. Stack them, then save the stack as a preset.</p></div>
+        <div><h2>Sound studio</h2><p>Mix real public-domain nature recordings with generated noise and gentle tones. Everything plays locally after the page loads.</p></div>
         <span class="top-sp"></span>
         <button class="btn sm" id="soundStop">Silence all</button>
       </div>
-      <div class="grid side">
+      <div class="sound-hero card" aria-label="Live sound visualization">
+        <canvas id="soundVisualizer" width="1200" height="320" aria-hidden="true"></canvas>
+        <div class="sound-hero-glow" aria-hidden="true"></div>
+        <div class="sound-hero-copy">
+          <span class="sound-live"><span class="sound-live-dot"></span><span id="soundStatus">Studio quiet</span></span>
+          <div>
+            <p class="sound-kicker">Now playing</p>
+            <h3 id="soundNow">Choose a preset or build a mix</h3>
+            <p id="soundNowMeta">Recorded ambience, generated textures, and binaural tone can be layered together.</p>
+          </div>
+          <div class="sound-meter" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        </div>
+      </div>
+      <div class="grid side sound-layout">
         <div class="stack" style="gap:16px">
           <div class="card pad">
             <div class="panel-head" style="align-items:flex-start;flex-wrap:wrap;gap:10px">
               <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-                <h3 style="margin:0">Layers</h3>
+                <div><h3 style="margin:0">Sound layers</h3><p class="sound-sub">Combine up to a few quiet layers; more is not always calmer.</p></div>
                 <button type="button" class="btn sm ghost" id="savePresetBtn" title="Save current mix as a custom preset">Save Current Mix</button>
               </div>
               <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center" id="soundPresets"></div>
             </div>
+            <div class="sound-filters" id="soundFilters" role="group" aria-label="Filter sound layers">
+              <button type="button" class="sound-filter on" data-sound-filter="all" aria-pressed="true">All</button>
+              <button type="button" class="sound-filter" data-sound-filter="recorded" aria-pressed="false">Field recordings</button>
+              <button type="button" class="sound-filter" data-sound-filter="generated" aria-pressed="false">Generated</button>
+              <button type="button" class="sound-filter" data-sound-filter="tone" aria-pressed="false">Frequency</button>
+            </div>
             <div class="mix" id="mixGrid"></div>
           </div>
-          <div class="card pad">
-            <div class="panel-head"><h3>Binaural carrier</h3><span class="eyebrow">Headphones required</span></div>
-            <p style="font-size:calc(12px*var(--ts,1));color:var(--muted);margin:0 0 12px">Two tones, one per ear, a few hertz apart. Evidence for entrainment is thin and mixed — treat it as a texture you either like or don't, not medicine.</p>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-              <div class="field"><label for="beatFreq">Beat <span class="num" id="beatVal">10</span> Hz — <span id="beatBand">alpha</span></label><input type="range" id="beatFreq" min="2" max="20" step="0.5" value="10"></div>
-              <div class="field"><label for="carrierFreq">Carrier <span class="num" id="carrierVal">180</span> Hz</label><input type="range" id="carrierFreq" min="80" max="400" step="10" value="180"></div>
+          <div class="card pad frequency-card">
+            <div class="panel-head"><div><h3>Binaural frequency lab</h3><p class="sound-sub">A controllable stereo texture—not a medical treatment.</p></div><span class="eyebrow">Headphones · low volume</span></div>
+            <div class="frequency-stage">
+              <div class="ear-card"><span>Left ear</span><strong class="num" id="leftFreq">175</strong><small>Hz</small></div>
+              <div class="beat-orbit" aria-hidden="true"><span></span><strong class="num" id="beatOrbitVal">10 Hz</strong></div>
+              <div class="ear-card"><span>Right ear</span><strong class="num" id="rightFreq">185</strong><small>Hz</small></div>
             </div>
+            <div class="freq-presets" id="freqPresets" role="group" aria-label="Binaural beat presets">
+              <button type="button" data-beat="2.5"><strong>Delta</strong><span>2.5 Hz · very slow</span></button>
+              <button type="button" data-beat="6"><strong>Theta</strong><span>6 Hz · drifting</span></button>
+              <button type="button" data-beat="10"><strong>Alpha</strong><span>10 Hz · relaxed</span></button>
+              <button type="button" data-beat="16"><strong>Beta</strong><span>16 Hz · alert</span></button>
+            </div>
+            <div class="frequency-controls">
+              <div class="field"><label for="beatFreq">Beat difference <span class="num" id="beatVal">10</span> Hz — <span id="beatBand">alpha</span></label><input type="range" id="beatFreq" min="2" max="20" step="0.5" value="10"></div>
+              <div class="field"><label for="carrierFreq">Carrier pitch <span class="num" id="carrierVal">180</span> Hz</label><input type="range" id="carrierFreq" min="80" max="400" step="10" value="180"></div>
+            </div>
+            <div class="frequency-foot"><button class="btn primary" type="button" id="freqToggle">Start binaural tone</button><p>Each ear receives a slightly different pitch. Research on attention or “entrainment” is limited and mixed, so use it only if the sound feels comfortable.</p></div>
           </div>
         </div>
         <div class="side-stack">
+          <div class="card pad source-card">
+            <div class="panel-head"><h3>Recorded in the world</h3><span class="eyebrow">Public domain</span></div>
+            <p class="sound-sub">Four local field recordings; no account, tracking, or stream required.</p>
+            <div class="source-list">
+              <a href="https://commons.wikimedia.org/wiki/File:Rain_against_the_window.ogg" target="_blank" rel="noopener noreferrer"><span>Window rain</span><small>cori · England</small></a>
+              <a href="https://commons.wikimedia.org/wiki/File:Rain_and_thunder.ogg" target="_blank" rel="noopener noreferrer"><span>Rain + thunder</span><small>Caesar · Sweden</small></a>
+              <a href="https://commons.wikimedia.org/wiki/File:Beach_sounds_South_Carolina.ogg" target="_blank" rel="noopener noreferrer"><span>Atlantic shore</span><small>Anthropic42 · USA</small></a>
+              <a href="https://commons.wikimedia.org/wiki/File:20090610_0_ambience.ogg" target="_blank" rel="noopener noreferrer"><span>Forest morning</span><small>nille · woodland</small></a>
+            </div>
+          </div>
           <div class="card pad">
             <div class="panel-head"><h3>Your playlists</h3><button class="btn sm ghost" id="addLink">+ Link</button></div>
             <p style="font-size:calc(12px*var(--ts,1));color:var(--muted);margin:0 0 10px">Spotify, YouTube, anything. Saved here and opened in a new tab — the sandbox won't let them play inside the page.</p>
@@ -345,34 +386,45 @@
     <!-- ============ CALM ============ -->
     <section class="view" id="view-calm">
       <div class="view-head">
-        <div><h2>Calm</h2><p>Regulation tools for the two failure modes: too wound up to start, and too wound up to stop.</p></div>
+        <div><h2>Calm</h2><p>A quieter place to regulate, re-orient, and choose one small next step.</p></div>
       </div>
       <div class="grid side calm-split">
-        <div class="card pad">
-          <div class="panel-head"><h3>Breathing pacer</h3><div class="scale-row" style="width:230px" id="breathModes"></div></div>
-          <div class="breath-stage">
+        <div class="card calm-card">
+          <div class="calm-head">
+            <div><span class="calm-kicker">Follow the light, never force the breath</span><h3>Breathing pacer</h3></div>
+            <div class="scale-row" id="breathModes"></div>
+          </div>
+          <div class="breath-stage" id="breathStage" data-phase="ready">
+            <div class="calm-sky" aria-hidden="true"><i></i><i></i><i></i></div>
             <div class="orb" id="orb">
-              <div class="ring"></div>
-              <div class="core"></div>
-              <div class="orb-txt" id="orbTxt">Ready</div>
+              <div class="ring ring-a"></div>
+              <div class="ring ring-b"></div>
+              <div class="ring ring-c"></div>
+              <div class="core"><span></span></div>
+              <div class="orb-txt"><span id="orbTxt">Ready</span><strong class="num" id="phaseCount">—</strong></div>
             </div>
-            <div class="orb-count num" id="orbCount" style="margin:0">0 cycles · 0:00</div>
-            <div style="display:flex;gap:8px">
+            <div class="breath-session">
+              <div><span>Session</span><strong class="num" id="orbCount">0 cycles · 0:00</strong></div>
+              <div><span>Pattern</span><strong id="breathPatternName">Box 4-4-4-4</strong></div>
+            </div>
+            <div class="breath-timeline" id="breathTimeline" aria-label="Breathing pattern phases"></div>
+            <div class="breath-actions">
               <button class="btn primary" id="breathBtn">Start breathing</button>
               <button class="btn" id="breathStop">Stop</button>
             </div>
-            <p style="font-size:calc(12px*var(--ts,1));color:var(--muted);max-width:46ch;text-align:center;margin:0" id="breathHint"></p>
+            <p class="breath-hint" id="breathHint"></p>
           </div>
         </div>
         <div class="side-stack">
-          <div class="card pad">
+          <div class="card pad checkin-card">
             <div class="panel-head"><h3>Check in</h3><span class="eyebrow" id="lastCheckin"></span></div>
+            <p class="calm-copy">Notice the signal without grading it. This takes about 20 seconds.</p>
             <div class="stack" style="gap:12px" id="checkinSliders"></div>
             <div class="field" style="margin-top:10px"><label for="checkNote">Anything worth remembering?</label><input type="text" id="checkNote" placeholder="Slept 5h, coffee at 3pm, room too warm"></div>
             <button class="btn primary" id="saveCheckin" style="width:100%;justify-content:center;margin-top:10px">Save check-in</button>
           </div>
-          <div class="card pad">
-            <div class="panel-head"><h3>90-second reset</h3></div>
+          <div class="card pad grounding-card">
+            <div class="panel-head"><div><h3>90-second reset</h3><p class="calm-copy">Move attention from thought back to the room.</p></div><span class="eyebrow">5 · 4 · 3 · 2 · 1</span></div>
             <div class="stack" id="groundList"></div>
             <button class="btn" id="groundStart" style="width:100%;justify-content:center;margin-top:10px">Run 5-4-3-2-1</button>
           </div>
@@ -656,6 +708,6 @@
     Nothing is sent anywhere unless you choose to sign in with Google.
   </p>
 </noscript>
-<script type="module" src="../js/adhd-study-pack.js?v=3.4.0"></script>
+  <script type="module" src="../js/adhd-study-pack.js?v=3.5.0"></script>
 </body>
 </html>

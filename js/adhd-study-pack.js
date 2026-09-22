@@ -12,8 +12,8 @@
    ===================================================================== */
 import { firebaseConfig } from './firebase-config.js';
 import { COMFORT_PRESETS, COMFORT_DEFAULTS, presetComfort, changesFromProfile, normaliseComfort,
-         applyComfort, announce, speech } from './lib/comfort.js?v=3.4.0';   // versioned like the page's own assets: GitHub Pages caches for ten minutes
-import { journal } from './lib/records.js?v=3.4.0';
+         applyComfort, announce, speech } from './lib/comfort.js?v=3.5.0';   // versioned like the page's own assets: GitHub Pages caches for ten minutes
+import { journal } from './lib/records.js?v=3.5.0';
 const $  = (s, r) => (r || (typeof document !== 'undefined' ? document : null))?.querySelector?.(s) || null;
 const $$ = (s, r) => Array.from((r || (typeof document !== 'undefined' ? document : null))?.querySelectorAll?.(s) || []);
 const uid = () => Math.random().toString(36).slice(2, 10);
@@ -37,7 +37,7 @@ const DOW = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
    defaults, then a <script type="application/json" id="focus-dial-config">
    block, then window.FOCUS_DIAL_CONFIG.
    ===================================================================== */
-const VERSION = '3.4.0';
+const VERSION = '3.5.0';
 const DEFAULT_CONFIG = {
   storageKey: 'focusdial.v3',
   storage:    'local',            // 'local' | 'session' | 'memory' | 'rest'
@@ -736,6 +736,7 @@ function go(v, opts) {
   if (v === 'matrix') renderMatrix();
   if (v === 'mood') renderMood();
   if (v === 'about') renderAbout();
+  syncSoundVisualizer();
   if (moved && !(opts && opts.quiet)) {
     const h = $('#view-' + v + ' .view-head h2') || $('#view-' + v + ' h2');
     if (h) { h.tabIndex = -1; h.focus({ preventScroll:true }); }
@@ -1060,7 +1061,7 @@ $('#bodyDoubleBtn').onclick = () => {
 function movementSnack() { const m = LIST('moves'); return 'Break: ' + m[Math.floor(Math.random() * m.length)]; }
 
 /* =====================================================================
-   AUDIO — every layer is synthesised: no files, no network, works offline
+   AUDIO — local public-domain field recordings + generated Web Audio
    ===================================================================== */
 let AC = null, MASTER = null, NOISE = {};
 const LIVE = {};            // id -> { gain, stop() }
@@ -1185,6 +1186,39 @@ function tickSound(dest, atTime = null, isOdd = false) {
   o.start(t);
   o.stop(t + 0.04);
 }
+function fieldRecording(file, fallbackType = 'pink') {
+  return out => {
+    /* Unit-test and older-browser fallback: preserve a usable quiet texture
+       even when MediaElementSource is not available. */
+    if (typeof Audio !== 'function' || !AC.createMediaElementSource) {
+      const fallback = src(fallbackType);
+      fallback.connect(out);
+      return () => fallback.stop();
+    }
+    const audio = new Audio('../audio/adhd-study-pack/' + file);
+    audio.loop = true;
+    audio.preload = 'auto';
+    audio.playsInline = true;
+    const node = AC.createMediaElementSource(audio);
+    node.connect(out);
+    audio.addEventListener('error', () => toast('That recording could not be loaded'), { once:true });
+    const started = audio.play();
+    if (started && typeof started.catch === 'function') started.catch(() => toast('Press the layer switch again to allow audio'));
+    return () => {
+      audio.pause();
+      try { audio.currentTime = 0; } catch (e) {}
+      try { node.disconnect(); } catch (e) {}
+      audio.removeAttribute('src');
+      audio.load();
+    };
+  };
+}
+const RECORDED_LAYERS = [
+  { id:'rain-real', name:'Window rain', source:'recorded', color:'#4A9DC7', hint:'Real wind-driven rain against an English window.', build:fieldRecording('rain-window.mp3','pink') },
+  { id:'storm-real', name:'Distant thunder', source:'recorded', color:'#6978B8', hint:'A real Swedish rainstorm with occasional thunder.', build:fieldRecording('rain-thunder.mp3','brown') },
+  { id:'shore-real', name:'Atlantic shore', source:'recorded', color:'#258E91', hint:'Natural surf recorded at a South Carolina beach.', build:fieldRecording('ocean-beach.mp3','pink') },
+  { id:'woods-real', name:'Forest morning', source:'recorded', color:'#4C956C', hint:'Woodland air, leaves, birds, and distant crows.', build:fieldRecording('forest.mp3','pink') }
+];
 const LAYERS = [
   { id:'rain',  name:'Rain on glass', hint:'Broadband and unpredictable — the classic default for a reason.',
     build(out) {
@@ -1330,6 +1364,7 @@ const LAYERS = [
       return () => clearInterval(iv);
     } },
   { id:'bin',   name:'Binaural tones', hint:'Two carriers a few hertz apart, one per ear. Headphones only.',
+    source:'tone', color:'#8B7DE8',
     build(out) {
       const o1 = AC.createOscillator(), o2 = AC.createOscillator();
       const p1 = AC.createStereoPanner ? AC.createStereoPanner() : AC.createGain();
@@ -1350,9 +1385,10 @@ const LAYERS = [
       return () => { o1.stop(); o2.stop(); delete LIVE._binSet; };
     } }
 ];
+const MIX_LAYERS = [...RECORDED_LAYERS, ...LAYERS];
 function layerOn(id, on) {
   if (!ensureAudio()) { toast('This browser blocked audio'); return; }
-  const def = LAYERS.find(l => l.id === id); if (!def) return;
+  const def = MIX_LAYERS.find(l => l.id === id); if (!def) return;
   if (on && !LIVE[id]) {
     const g = AC.createGain();
     g.gain.value = ((S.sound.layers[id] != null ? S.sound.layers[id] : 55) / 100) * 0.5;
@@ -1391,7 +1427,9 @@ function notify(msg) {
 }
 const SOUND_PRESETS = Object.assign({
   'Rain café': { rain:60, cafe:35 }, 'Deep brown': { brown:70 }, 'Ocean night': { ocean:65, pink:20 },
-  'Library tick': { tick:40, brown:35 }, 'Hearth': { fire:60, forest:25 }
+  'Library tick': { tick:40, brown:35 }, 'Hearth': { fire:60, forest:25 },
+  'Real rain': { 'rain-real':68, brown:14 }, 'Shore focus': { 'shore-real':66, pink:12 },
+  'Forest hush': { 'woods-real':58, brown:12 }
 }, CFG.soundPresets || {});
 
 /* =====================================================================
@@ -1410,7 +1448,7 @@ function saveCustomPreset(name, layers) {
       if (typeof v === 'number' && v > 0) map[k] = Math.min(100, Math.max(0, Math.round(v)));
     });
   } else {
-    LAYERS.forEach(l => {
+    MIX_LAYERS.forEach(l => {
       if (LIVE[l.id]) {
         const v = S.sound.layers[l.id] != null ? S.sound.layers[l.id] : 55;
         if (v > 0) map[l.id] = v;
@@ -1431,7 +1469,7 @@ function applyPreset(layers) {
   if (!layers || typeof layers !== 'object') return false;
   ensureAudio();
   const layerMap = layers.layers || layers;
-  LAYERS.forEach(l => {
+  MIX_LAYERS.forEach(l => {
     const vol = layerMap[l.id];
     if (vol == null || vol <= 0) {
       if (LIVE[l.id]) {
@@ -1444,7 +1482,7 @@ function applyPreset(layers) {
   Object.entries(layerMap).forEach(([id, vol]) => {
     if (vol > 0) {
       S.sound.layers[id] = vol;
-      const def = LAYERS.find(l => l.id === id);
+      const def = MIX_LAYERS.find(l => l.id === id);
       if (def) {
         if (!LIVE[id]) {
           const g = AC.createGain();
@@ -1508,8 +1546,76 @@ function getAnalyserNode() {
   return ANALYSER;
 }
 
+let soundVisualFrame = null;
+let soundFilter = 'all';
+function prefersLessMotion() {
+  const motion = CF().motion;
+  if (motion === 'reduce') return true;
+  if (motion === 'full') return false;
+  try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; }
+}
+function drawSoundVisualizer(now, still) {
+  const canvas = $('#soundVisualizer');
+  if (!canvas || typeof canvas.getContext !== 'function') return;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+  const rect = canvas.getBoundingClientRect ? canvas.getBoundingClientRect() : { width:canvas.width, height:canvas.height };
+  const cssW = Math.max(1, Math.round(rect.width || 1200));
+  const cssH = Math.max(1, Math.round(rect.height || 320));
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  if (canvas.width !== Math.round(cssW * dpr) || canvas.height !== Math.round(cssH * dpr)) {
+    canvas.width = Math.round(cssW * dpr); canvas.height = Math.round(cssH * dpr);
+  }
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, cssW, cssH);
+
+  const active = MIX_LAYERS.filter(l => LIVE[l.id]);
+  let energy = active.length ? 0.2 : 0.055;
+  let bins = null;
+  if (active.length && AC) {
+    const analyser = getAnalyserNode();
+    if (analyser) {
+      bins = new Uint8Array(analyser.frequencyBinCount);
+      analyser.getByteFrequencyData(bins);
+      energy = bins.reduce((sum, value) => sum + value, 0) / Math.max(1, bins.length) / 255;
+      energy = Math.max(.08, energy);
+    }
+  }
+  const t = still ? 0 : now / 1000;
+  const colors = ['rgba(64,214,178,.55)','rgba(90,143,224,.38)','rgba(147,112,226,.30)'];
+  colors.forEach((color, band) => {
+    ctx.beginPath();
+    const baseline = cssH * (.54 + band * .105);
+    const amp = (18 + band * 8) * (.65 + energy * 2.4);
+    for (let x = 0; x <= cssW; x += 6) {
+      const n = bins && bins.length ? bins[Math.min(bins.length - 1, Math.floor((x / cssW) * bins.length))] / 255 : .18;
+      const y = baseline + Math.sin(x * (.011 + band * .003) + t * (.5 + band * .17)) * amp * (.48 + n);
+      if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.2 + band * .45;
+    ctx.stroke();
+  });
+  const glow = ctx.createRadialGradient(cssW * .74, cssH * .45, 0, cssW * .74, cssH * .45, cssW * .34);
+  glow.addColorStop(0, `rgba(63,216,178,${.04 + energy * .13})`); glow.addColorStop(1, 'rgba(63,216,178,0)');
+  ctx.fillStyle = glow; ctx.fillRect(0, 0, cssW, cssH);
+}
+function soundVisualizerLoop(now) {
+  drawSoundVisualizer(now || 0, false);
+  soundVisualFrame = window.requestAnimationFrame(soundVisualizerLoop);
+}
+function syncSoundVisualizer() {
+  if (soundVisualFrame != null && typeof window.cancelAnimationFrame === 'function') {
+    window.cancelAnimationFrame(soundVisualFrame); soundVisualFrame = null;
+  }
+  const canvas = $('#soundVisualizer');
+  if (!canvas || view !== 'sound') return;
+  if (prefersLessMotion() || typeof window.requestAnimationFrame !== 'function') { drawSoundVisualizer(0, true); return; }
+  soundVisualFrame = window.requestAnimationFrame(soundVisualizerLoop);
+}
+
 function promptSavePreset() {
-  const activeCount = LAYERS.filter(l => LIVE[l.id]).length;
+  const activeCount = MIX_LAYERS.filter(l => LIVE[l.id]).length;
   if (!activeCount) {
     toast('Turn on at least one sound layer first');
     return;
@@ -1576,11 +1682,51 @@ function renderPresets() {
 /* =====================================================================
    SOUND VIEW
    ===================================================================== */
+function layerColor(layer) {
+  if (layer.color) return layer.color;
+  const palette = { rain:'#4A9DC7', ocean:'#258E91', brown:'#A87751', pink:'#C87895', fire:'#D2713D', cafe:'#B0855A', forest:'#4C956C', tick:'#8A7D6C' };
+  return palette[layer.id] || 'var(--accent)';
+}
+function updateSoundHero() {
+  const active = MIX_LAYERS.filter(l => LIVE[l.id]);
+  const hero = $('.sound-hero');
+  if (hero) hero.classList.toggle('playing', active.length > 0);
+  const status = $('#soundStatus'), now = $('#soundNow'), meta = $('#soundNowMeta');
+  if (!status || !now || !meta) return;
+  status.textContent = active.length ? `${active.length} ${active.length === 1 ? 'layer' : 'layers'} live` : 'Studio quiet';
+  now.textContent = active.length ? (S.sound.activePreset || active.map(l => l.name).join(' + ')) : 'Choose a preset or build a mix';
+  meta.textContent = active.length
+    ? active.map(l => `${l.name} · ${S.sound.layers[l.id] != null ? S.sound.layers[l.id] : 55}%`).join('   /   ')
+    : 'Recorded ambience, generated textures, and binaural tone can be layered together.';
+}
+function updateFrequencyUI() {
+  const beat = +S.sound.beat, carrier = +S.sound.carrier;
+  const left = carrier - beat / 2, right = carrier + beat / 2;
+  const fmt = n => Number.isInteger(n) ? String(n) : n.toFixed(1);
+  if ($('#beatVal')) $('#beatVal').textContent = fmt(beat);
+  if ($('#carrierVal')) $('#carrierVal').textContent = fmt(carrier);
+  if ($('#leftFreq')) $('#leftFreq').textContent = fmt(left);
+  if ($('#rightFreq')) $('#rightFreq').textContent = fmt(right);
+  if ($('#beatOrbitVal')) $('#beatOrbitVal').textContent = fmt(beat) + ' Hz';
+  if ($('#beatBand')) $('#beatBand').textContent = beat < 4 ? 'delta' : beat < 8 ? 'theta' : beat < 13 ? 'alpha' : 'beta';
+  if ($('#beatFreq')) $('#beatFreq').value = beat;
+  if ($('#carrierFreq')) $('#carrierFreq').value = carrier;
+  $$('#freqPresets [data-beat]').forEach(b => b.classList.toggle('on', Math.abs(+b.dataset.beat - beat) < .01));
+  const toggle = $('#freqToggle');
+  if (toggle) {
+    const on = !!LIVE.bin;
+    toggle.textContent = on ? 'Stop binaural tone' : 'Start binaural tone';
+    toggle.classList.toggle('primary', !on);
+    toggle.setAttribute('aria-pressed', String(on));
+  }
+}
 function renderSound() {
-  $('#mixGrid').innerHTML = LAYERS.map(l => {
+  const visibleLayers = MIX_LAYERS.filter(l => soundFilter === 'all' || (l.source || 'generated') === soundFilter);
+  $('#mixGrid').innerHTML = visibleLayers.map(l => {
     const on = !!LIVE[l.id], v = S.sound.layers[l.id] != null ? S.sound.layers[l.id] : 55;
-    return `<div class="layer ${on ? 'on' : ''}" data-layer="${l.id}">
-      <div class="lh"><span class="nm">${esc(l.name)}</span><button class="pwr" aria-label="Toggle ${esc(l.name)}" aria-pressed="${on}"></button></div>
+    const source = l.source === 'recorded' ? 'Field recording' : l.source === 'tone' ? 'Stereo frequency' : 'Generated locally';
+    return `<div class="layer ${on ? 'on' : ''}" data-layer="${l.id}" style="--layer-color:${layerColor(l)}">
+      <div class="lh"><span class="layer-title"><span class="layer-art" aria-hidden="true"><i></i><i></i><i></i></span><span><span class="nm">${esc(l.name)}</span><span class="layer-kind">${source}</span></span></span><button class="pwr" aria-label="Toggle ${esc(l.name)}" aria-pressed="${on}"></button></div>
       <div class="hint">${esc(l.hint)}</div>
       <input type="range" min="0" max="100" value="${v}" aria-label="${esc(l.name)} volume">
     </div>`;
@@ -1595,18 +1741,30 @@ function renderSound() {
       S.sound.activePreset = null;
       layerVol(id, +e.target.value);
       renderPresets();
+      updateSoundHero();
     };
+  });
+  $$('#soundFilters [data-sound-filter]').forEach(b => {
+    const on = b.dataset.soundFilter === soundFilter;
+    b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on));
+    b.onclick = () => { soundFilter = b.dataset.soundFilter; renderSound(); };
   });
   renderPresets();
   const saveBtn = $('#savePresetBtn');
   if (saveBtn) saveBtn.onclick = () => promptSavePreset();
-  $('#beatVal').textContent = S.sound.beat; $('#carrierVal').textContent = S.sound.carrier;
-  $('#beatFreq').value = S.sound.beat; $('#carrierFreq').value = S.sound.carrier;
-  $('#beatBand').textContent = S.sound.beat < 4 ? 'delta' : S.sound.beat < 8 ? 'theta' : S.sound.beat < 13 ? 'alpha' : 'beta';
+  $$('#freqPresets [data-beat]').forEach(b => b.onclick = () => {
+    S.sound.beat = +b.dataset.beat;
+    if (LIVE._binSet) LIVE._binSet();
+    updateFrequencyUI(); save();
+  });
+  updateFrequencyUI();
+  updateSoundHero();
   renderLinks();
+  syncSoundVisualizer();
 }
-$('#beatFreq').oninput = e => { S.sound.beat = +e.target.value; if (LIVE._binSet) LIVE._binSet(); renderSound(); save(); };
-$('#carrierFreq').oninput = e => { S.sound.carrier = +e.target.value; if (LIVE._binSet) LIVE._binSet(); renderSound(); save(); };
+$('#beatFreq').oninput = e => { S.sound.beat = +e.target.value; if (LIVE._binSet) LIVE._binSet(); updateFrequencyUI(); save(); };
+$('#carrierFreq').oninput = e => { S.sound.carrier = +e.target.value; if (LIVE._binSet) LIVE._binSet(); updateFrequencyUI(); save(); };
+$('#freqToggle').onclick = () => layerOn('bin', !LIVE.bin);
 $('#soundStop').onclick = () => { silenceAll(); toast('Silence'); };
 $('#masterVol').oninput = e => {
   S.sound.master = +e.target.value; $('#masterVal').textContent = e.target.value;
@@ -1618,7 +1776,7 @@ $('#soundBtn').onclick = () => {
   else { loadPreset('Rain café'); }
 };
 function renderMiniMix() {
-  $('#miniMix').innerHTML = LAYERS.slice(0, 5).map(l => {
+  $('#miniMix').innerHTML = MIX_LAYERS.slice(0, 5).map(l => {
     const on = !!LIVE[l.id];
     return `<button type="button" class="btn sm" data-mini="${l.id}" aria-pressed="${on}" style="justify-content:space-between;${on ? 'border-color:var(--accent);color:var(--ink)' : ''}">
       <span>${esc(l.name)}</span><span class="dot" style="background:${on ? 'var(--accent)' : 'var(--line-2)'}"></span></button>`;
@@ -2546,11 +2704,20 @@ const BREATH = Object.assign({
 }, CFG.breathPatterns || {});
 let breathMode = BREATH.box ? 'box' : Object.keys(BREATH)[0];   // integer-like keys sort first, so name the default
 let breathTimer = null, breathStep = 0, breathCycles = 0, breathStart = 0;
+let breathPhaseStarted = 0, breathPhaseDuration = 0;
+function renderBreathTimeline() {
+  const pattern = BREATH[breathMode];
+  if ($('#breathPatternName')) $('#breathPatternName').textContent = pattern.name;
+  if (!$('#breathTimeline')) return;
+  $('#breathTimeline').innerHTML = pattern.steps.map(([label, secs], i) =>
+    `<span class="breath-step" data-breath-step="${i}" style="--step:${secs}" title="${esc(label)} · ${secs}s"><span>${esc(label)}, ${secs} seconds</span></span>`).join('');
+}
 function renderCalm() {
   $('#breathModes').innerHTML = Object.entries(BREATH).map(([k, v]) =>
     `<button type="button" class="scale-btn ${breathMode === k ? 'on' : ''}" data-bm="${k}" aria-pressed="${breathMode === k}">${esc(v.name)}</button>`).join('');
   $$('#breathModes [data-bm]').forEach(b => b.onclick = () => { breathMode = b.dataset.bm; stopBreath(); renderCalm(); });
   $('#breathHint').textContent = BREATH[breathMode].hint;
+  renderBreathTimeline();
   const last = S.checkins[S.checkins.length - 1];
   $('#lastCheckin').textContent = last ? 'last ' + new Date(last.at).toLocaleDateString(undefined, { month:'short', day:'numeric' }) : '';
   $('#checkinSliders').innerHTML = [['energy','Energy','flat','buzzing'],['stress','Stress','calm','fried'],['focus','Focus','scattered','locked in']]
@@ -2560,15 +2727,25 @@ function renderCalm() {
       <div style="display:flex;justify-content:space-between;font-size:calc(10.5px*var(--ts,1));color:var(--muted)"><span>${lo}</span><span>${hi}</span></div></div>`).join('');
   ['energy','stress','focus'].forEach(k => { const i = $('#ck_' + k); i.oninput = () => $('#ckv_' + k).textContent = i.value; });
   const gr = LIST('ground');
-  $('#groundList').innerHTML = gr.map((g, i) => `<div style="display:flex;gap:8px;padding:5px 0;font-size:calc(12.5px*var(--ts,1))"><span class="num" style="color:var(--muted)">${gr.length - i}</span><span>${esc(g)}</span></div>`).join('');
+  $('#groundList').innerHTML = gr.map((g, i) => `<div class="ground-row"><span class="ground-num">${gr.length - i}</span><span>${esc(g)}</span></div>`).join('');
   $('#moveList').innerHTML = LIST('moves').map(m => `<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--line);font-size:calc(12.5px*var(--ts,1))"><span class="dot" style="margin-top:6px;background:var(--rest)"></span><span>${esc(m)}</span></div>`).join('');
 }
 function stepBreath() {
   const steps = BREATH[breathMode].steps, [label, secs] = steps[breathStep % steps.length];
   const orb = $('#orb');
+  breathPhaseStarted = Date.now(); breathPhaseDuration = secs * 1000;
   orb.style.setProperty('--bt', secs + 's');
   orb.classList.toggle('expand', /in/i.test(label) || (/hold/i.test(label) && orb.classList.contains('expand')));
   $('#orbTxt').textContent = label;
+  if ($('#phaseCount')) $('#phaseCount').textContent = secs;
+  const stage = $('#breathStage');
+  if (stage) stage.dataset.phase = /in/i.test(label) ? 'inhale' : /out/i.test(label) ? 'exhale' : 'hold';
+  $$('#breathTimeline [data-breath-step]').forEach((el, i) => {
+    const current = breathStep % steps.length;
+    el.classList.toggle('active', i === current);
+    el.classList.toggle('done', i < current);
+    el.style.setProperty('--phase-progress', i < current ? 1 : 0);
+  });
   breathTimer = setTimeout(() => {
     breathStep++;
     if (breathStep % steps.length === 0) breathCycles++;
@@ -2577,7 +2754,11 @@ function stepBreath() {
 }
 function stopBreath() {
   clearTimeout(breathTimer); breathTimer = null;
+  breathPhaseStarted = 0; breathPhaseDuration = 0;
   $('#orb').classList.remove('expand'); $('#orbTxt').textContent = 'Ready';
+  if ($('#phaseCount')) $('#phaseCount').textContent = '—';
+  if ($('#breathStage')) $('#breathStage').dataset.phase = 'ready';
+  $$('#breathTimeline [data-breath-step]').forEach(el => { el.classList.remove('active','done'); el.style.setProperty('--phase-progress',0); });
   $('#breathBtn').textContent = 'Start breathing';
 }
 $('#breathBtn').onclick = () => {
@@ -2592,6 +2773,13 @@ setInterval(() => {
   const el = $('#orbCount'); if (!el) return;
   const s = Math.floor((Date.now() - breathStart) / 1000);
   el.textContent = `${breathCycles} cycles · ${Math.floor(s / 60)}:${pad2(s % 60)}`;
+  if (breathPhaseDuration) {
+    const elapsed = Math.min(breathPhaseDuration, Date.now() - breathPhaseStarted);
+    const remaining = Math.max(0, Math.ceil((breathPhaseDuration - elapsed) / 1000));
+    if ($('#phaseCount')) $('#phaseCount').textContent = remaining;
+    const active = $('#breathTimeline .breath-step.active');
+    if (active) active.style.setProperty('--phase-progress', elapsed / breathPhaseDuration);
+  }
 }, 1000);
 $('#groundStart').onclick = () => {
   const steps = LIST('ground'); let i = 0;
@@ -4159,7 +4347,7 @@ const AB_FEATURES = [
   ['Week planner', 'M4 6h16v14H4zM4 10h16M9 3v4M15 3v4', 'Blocks scheduled into the hours you have historically focused well, two-way sync with Google Calendar, and .ics in and out.'],
   ['Stopwatch', 'M12 8v5l3 2M12 3a9 9 0 1 0 9 9', 'Click any task or calendar block to start timing it. Everything it records lands in the same history as the pomodoro sessions.'],
   ['Mood log', 'M3 15c3-5 5.5-5 8.5-1.5S17 17 21 9', 'Mood, energy and stress in five seconds, charted against the hours you actually worked — so the pattern is evidence rather than a feeling.'],
-  ['Sound and calm', 'M4 9v6M8 6v12M12 3v18M16 7v10M20 10v4', 'Synthesised focus sound with no streaming, a breathing pacer, and a 90-second grounding routine for the days it gets away from you.'],
+  ['Sound and calm', 'M4 9v6M8 6v12M12 3v18M16 7v10M20 10v4', 'Local public-domain nature recordings, generated focus noise, a visual breathing pacer, and a 90-second grounding routine for the days it gets away from you.'],
   ['Built for how you read', 'M3 12h18M12 3v18', 'Five comfort profiles, text to 175%, high contrast, muted colour, a built-in voice, and full screen-reader support — ADHD by default, adjustable for needs that conflict with it.'],
   ['Yours, wherever', 'M12 3v12M7 10l5 5 5-5M4 19h16', 'One file exports everything. Signed in it syncs across devices; signed out it stays in this browser and still works offline.']
 ];
@@ -4963,4 +5151,3 @@ export {
   forgotPasswordModal,
   enterApp
 };
-
