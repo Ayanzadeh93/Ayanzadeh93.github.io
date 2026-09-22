@@ -5,10 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'; frame-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <title>Projects | Aydin Ayanzadeh</title>
-  <meta name="description" content="Selected research and engineering projects by Aydin Ayanzadeh.">
+  <title>Research projects in vision and multimodal AI | Aydin Ayanzadeh</title>
+  <meta name="description" content="Project index for accessible indoor navigation, WildfireVLM, medical segmentation, knowledge distillation, and related systems.">
+  <link rel="canonical" href="https://www.ayanzadeh.com/projects/">
+  <meta name="robots" content="index, follow">
+  <meta property="og:title" content="Research projects | Aydin Ayanzadeh">
+  <meta property="og:url" content="https://www.ayanzadeh.com/projects/">
+  <meta property="og:image" content="https://www.ayanzadeh.com/images/profile-compressed.jpg">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:creator" content="@aydin_ayanzadeh">
   <link rel="icon" type="image/svg+xml" href="../favicon.svg">
   <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/refresh.css">
   <link rel="stylesheet" href="../css/projects-data.css">
 </head>
 <body>
@@ -20,30 +28,18 @@
       <a href="../index.html#contact">Contact</a>
     </nav>
   </header>
-
   <main class="data-shell">
     <section class="data-hero" aria-labelledby="projects-title">
       <p class="data-eyebrow">Research & engineering</p>
-      <h1 id="projects-title">Projects</h1>
+      <h1 id="projects-title">Research projects</h1>
       <p>A lightweight, data-driven index. Project metadata lives in one JSON file, so adding or updating a project does not require duplicating card markup.</p>
     </section>
-
     <section aria-label="Project filters" class="project-toolbar">
-      <label>
-        <span>Search projects</span>
-        <input id="project-search" type="search" autocomplete="off" placeholder="Search title, topic, or method">
-      </label>
-      <label>
-        <span>Category</span>
-        <select id="project-category">
-          <option value="">All categories</option>
-        </select>
-      </label>
+      <label><span>Search projects</span><input id="project-search" type="search" autocomplete="off" placeholder="Search title, topic, or method"></label>
+      <label><span>Category</span><select id="project-category"><option value="">All categories</option></select></label>
       <p id="project-status" role="status" aria-live="polite"></p>
     </section>
-
     <section id="project-grid" class="data-grid" aria-label="Project list"></section>
-
     <noscript>
       <section class="noscript-list">
         <h2>Selected projects</h2>
@@ -57,7 +53,6 @@
       </section>
     </noscript>
   </main>
-
   <script type="module" src="../js/projects-index.js"></script>
 </body>
 </html>

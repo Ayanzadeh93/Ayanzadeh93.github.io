@@ -1,0 +1,65 @@
+/* Accessibility-first academic refresh for ayanzadeh.com */
+:root {
+  --primary-color: #1c4f6b;
+  --primary-dark: #163e54;
+  --primary-light: #2b6f8f;
+  --accent-color: #b4532a;
+  --section-title-gradient: linear-gradient(135deg, #1c4f6b 0%, #b4532a 100%);
+  --focus-ring: #c46a3a;
+  --font-display: "Newsreader", "Source Serif 4", Georgia, serif;
+  --font-body: "Atkinson Hyperlegible", ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  font-family: var(--font-body);
+  letter-spacing: 0.01em;
+}
+
+.hero-title,
+.section-title,
+.brand-text,
+.publication-item h4,
+.project-card h3,
+.news-card h3,
+.featured-award h3,
+.data-hero h1,
+.pub-page h1 {
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+
+.hero-title {
+  font-optical-sizing: auto;
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+}
+
+.section-title::after {
+  width: 3.5rem;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--accent-color);
+}
+
+.hero {
+  background:
+    radial-gradient(circle at 82% 12%, rgba(180, 83, 42, 0.16), transparent 26rem),
+    radial-gradient(circle at 12% 88%, rgba(28, 79, 107, 0.35), transparent 28rem),
+    linear-gradient(148deg, #0a121c 0%, #132536 54%, #0c1824 100%);
+}
+
+.ai-text {
+  background: linear-gradient(120deg, #f7f1e8 8%, #e8c9b0 55%, #f4f7fb 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.btn-primary.ai-btn {
+  background: #b4532a;
+  box-shadow: 0 10px 28px rgba(180, 83, 42, 0.28);
+}
+
+:where(a, button, input, textarea, select):focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 3px;
+}

@@ -6,10 +6,10 @@ on:
       - 'data/**'
       - 'projects/**'
       - 'apps/claude-code-catalog.html'
+      - 'apps/claude-code-encyclopedia.html'
       - 'js/projects-index.js'
       - 'js/project-detail.js'
       - 'js/lib/project-data.js'
-      - 'js/claude-code-catalog.js'
       - 'css/projects-data.css'
       - 'tests/validate_content.py'
       - '.github/workflows/content-validation.yml'
@@ -19,6 +19,7 @@ on:
       - 'data/**'
       - 'projects/**'
       - 'apps/claude-code-catalog.html'
+      - 'apps/claude-code-encyclopedia.html'
       - 'js/**'
       - 'css/projects-data.css'
       - 'tests/validate_content.py'
@@ -34,5 +35,5 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Validate project and Claude data
+      - name: Validate project data
         run: python tests/validate_content.py

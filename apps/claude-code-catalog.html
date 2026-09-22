@@ -2,33 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta name="robots" content="noindex, follow">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'; frame-src 'none'">
-  <meta name="referrer" content="strict-origin-when-cross-origin">
-  <title>CLI Catalog</title>
-  <meta name="description" content="The Claude Code, Codex and GitHub CLI reference now lives in one encyclopedia.">
-  <link rel="canonical" href="https://www.ayanzadeh.com/apps/claude-code-encyclopedia.html">
+  <title>CLI Catalog — moved</title>
+  <meta name="description" content="This reference now lives in its own GitHub Pages app.">
+  <link rel="canonical" href="https://www.ayanzadeh.com/claude-code-encyclopedia/">
+  <meta http-equiv="refresh" content="0;url=https://www.ayanzadeh.com/claude-code-encyclopedia/">
   <link rel="icon" type="image/svg+xml" href="../favicon.svg">
-  <style>
-    body { font-family: ui-sans-serif, system-ui, sans-serif; margin: 0; padding: 48px 24px; line-height: 1.5; color: #101720; background: #f4f6f9; }
-    main { max-width: 42rem; margin: 0 auto; }
-    a { color: #0969da; }
-  </style>
 </head>
 <body>
   <main>
-    <h1>This catalog now lives in the encyclopedia</h1>
-    <p>
-      Claude Code, Codex CLI and GitHub CLI share one searchable page.
-      Filters in the address bar are kept when JavaScript is available.
-    </p>
-    <p>
-      <a id="encyclopedia-link" href="claude-code-encyclopedia.html">Open the encyclopedia</a>
-    </p>
+    <h1>Moved</h1>
+    <p>The encyclopedia now lives at <a href="https://www.ayanzadeh.com/claude-code-encyclopedia/">https://www.ayanzadeh.com/claude-code-encyclopedia/</a>.</p>
   </main>
-  <noscript>
-    <p><a href="claude-code-encyclopedia.html?family=github">GitHub CLI in the encyclopedia</a></p>
-  </noscript>
-  <script type="module" src="../js/claude-code-catalog.js"></script>
+  <script>location.replace('https://www.ayanzadeh.com/claude-code-encyclopedia/' + (location.search || '?family=github') + location.hash);</script>
 </body>
 </html>
