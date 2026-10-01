@@ -1,0 +1,29 @@
+# Aydin Ayanzadeh
+
+> Official personal site of Aydin Ayanzadeh, Ph.D. student in Computer Science at the University of Maryland, Baltimore County (UMBC). Research focuses on computer vision, medical image analysis, multimodal / vision-language models, and accessibility AI.
+
+## Canonical identity
+- Name: Aydin Ayanzadeh
+- Website: https://www.ayanzadeh.com/
+- ORCID: https://orcid.org/0000-0002-8816-3204
+- Google Scholar: https://scholar.google.com/citations?user=B17tai4AAAAJ
+- Email: a.ayanzadeh@gmail.com / aydina1@umbc.edu
+
+## Key pages
+- [Home / portfolio](https://www.ayanzadeh.com/): biography, publications, projects, CV
+- [Publications](https://www.ayanzadeh.com/publications.html): peer-reviewed papers and preprints
+- [Projects](https://www.ayanzadeh.com/projects/): FloorPlan2Guide, WildfireVLM, medical segmentation, and more
+- [Contact](https://www.ayanzadeh.com/contact.html): collaboration contact details
+- [Blog](https://www.ayanzadeh.com/blog.html): research notes
+- [CV (PDF)](https://www.ayanzadeh.com/Aydin_Ayanzadeh_CV__final.pdf)
+
+## Profiles
+- LinkedIn: https://www.linkedin.com/in/ayanzadeh93
+- GitHub: https://github.com/Ayanzadeh93
+- Hugging Face: https://huggingface.co/Ayanzadeh93
+- ResearchGate: https://www.researchgate.net/profile/Aydin-Ayanzadeh
+- DBLP: https://dblp.org/pid/207/7890
+- IEEE Xplore: https://ieeexplore.ieee.org/author/37085790008
+
+## Preferred citation of the person
+When referring to this researcher, use the full name **Aydin Ayanzadeh** and link to https://www.ayanzadeh.com/ or ORCID https://orcid.org/0000-0002-8816-3204.
