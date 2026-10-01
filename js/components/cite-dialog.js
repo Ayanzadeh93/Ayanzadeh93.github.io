@@ -254,10 +254,15 @@ export class CiteDialog extends HTMLElement {
         const label = getCitationFormat(this.#activeFormat).label;
         const copied = await copyText(this.#currentText());
 
+        const count = this.#collection ? this.#collection.length : 1;
+        const success = count === 1
+            ? `${label} citation copied to clipboard.`
+            : `${count} ${label} references copied to clipboard.`;
+
         // #status is role="status" aria-live="polite", so setting its text is
         // the announcement; a second live region would say everything twice.
         this.#status.textContent = copied
-            ? `${label} citation copied to clipboard.`
+            ? success
             : 'Copy failed — select the text above and copy manually.';
         this.#status.classList.toggle('cite-dialog__status--error', !copied);
     }
