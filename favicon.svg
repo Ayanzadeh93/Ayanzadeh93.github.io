@@ -1,1 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="#1a73e8"/><text x="50" y="60" font-family="Arial" font-size="40" fill="white" text-anchor="middle">A</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <circle cx="50" cy="50" r="46" fill="#0a121c"/>
+  <circle cx="50" cy="50" r="40" fill="#1c4f6b"/>
+  <circle cx="68" cy="32" r="10" fill="#b4532a" opacity="0.9"/>
+  <text x="50" y="62" font-family="Georgia, serif" font-size="42" font-weight="700" fill="#f7f1e8" text-anchor="middle">A</text>
+</svg>
