@@ -303,15 +303,19 @@ pub-explorer {
 
 /* ---------- match highlighting ---------- */
 
+/* A highlight exists to answer "why did this card match?", so it has to be
+   legible at a glance. The previous 12%-alpha tint under the bottom 42% of the
+   glyph was invisible against the muted author line it most often lands on. */
 .pub-explorer__mark {
-    padding: 0 2px;
-    color: inherit;
-    background: linear-gradient(180deg, transparent 58%, var(--accent-soft) 58%);
-    border-radius: 2px;
+    padding: 0 3px;
+    font-weight: 600;
+    color: var(--text-dark);
+    background: color-mix(in srgb, var(--primary-color) 22%, transparent);
+    border-radius: 3px;
 }
 
 [data-theme="dark"] .pub-explorer__mark {
-    background: linear-gradient(180deg, transparent 58%, rgba(96, 165, 250, 0.32) 58%);
+    background: color-mix(in srgb, #60a5fa 30%, transparent);
 }
 
 /* ---------- container queries: the toolbar responds to its own width,
