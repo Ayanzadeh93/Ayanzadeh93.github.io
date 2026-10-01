@@ -150,27 +150,44 @@ Field notes:
 | `data-doi` / `data-arxiv` | Used for the canonical link, in that order, then the first `.pub-link[href^="http"]`. |
 | `data-status` | Becomes a BibTeX `note` and an "(Accepted)" suffix in the prose styles. |
 
-Title and author names are parsed from the DOM, so `<h4>` must stay plain text —
-the search highlighter replaces its children with text nodes and `<mark>`.
+The title, author and venue lines are parsed from the DOM and are all
+highlighted during a search. Highlighting restores each line from a pristine
+clone and then walks its text nodes, so inline markup — the `<strong>` around
+the site owner's name — survives, and no HTML string is ever parsed.
 
 ## Component Map
 
 | Element | File | What it does |
 |---------|------|--------------|
-| `<pub-explorer>` | `js/components/pub-explorer.js` | Wraps `.publications-list`; adds ranked search, type facets, sort, and `/` focus shortcut. |
-| `<cite-dialog>` | `js/components/cite-dialog.js` | One per page; native `<dialog>` exporting BibTeX / APA 7 / MLA 9 / IEEE plus a `.bib` download. |
+| `<pub-explorer>` | `js/components/pub-explorer.js` | Wraps `.publications-list`; adds ranked search, type facets, a year filter, sort, URL state, reference-list export and the `/` focus shortcut. |
+| `<cite-dialog>` | `js/components/cite-dialog.js` | One per page; native `<dialog>` exporting BibTeX / RIS / APA 7 / MLA 9 / IEEE, for a single paper (`open`) or a whole list (`openCollection`), with copy and download in every format. |
 
 Supporting modules, all pure and side-effect free:
 
 | Module | Exports |
 |--------|---------|
 | `js/lib/dom.js` | `el`, `appendChildren`, `clear`, `escapeHtml`, `debounce`, `prefersReducedMotion`, `withViewTransition`, `copyText` |
-| `js/lib/citations.js` | `parseAuthors`, `splitName`, `bibKey`, `canonicalUrl`, `formatBibTeX/APA/MLA/IEEE`, `formatCitation`, `CITATION_FORMATS` |
+| `js/lib/citations.js` | `parseAuthors`, `splitName`, `bibKey`, `canonicalUrl`, `formatBibTeX/RIS/APA/MLA/IEEE`, `formatCitation`, `formatCollection`, `getCitationFormat`, `CITATION_FORMATS` |
 | `js/lib/search.js` | `normalize`, `tokenize`, `scoreRecord`, `filterRecords`, `matchRanges`, `buildHaystack` |
 
 Search semantics: tokens are AND-ed (every token must match somewhere), matching
 is diacritic-folded (`Toreyin` finds `Töreyin`), and field weights are
 title 10 / authors 6 / venue 4 / tags 3 / year 2.
+
+### Explorer URL state
+
+`<pub-explorer>` mirrors its filters into the query string with
+`history.replaceState` — `q`, `type`, `year`, `sort` — and restores them on
+load. Values that are not offered by this page are ignored, so a stale link
+falls back to the full list. Use `replaceState`, never `pushState`: a reader
+typing six characters should not have to press Back six times.
+
+### Adding a citation format
+
+Add the formatter to `js/lib/citations.js` and register it in
+`CITATION_FORMATS` with `id`, `label`, `mono`, `format`, `extension` and
+`mime`. The dialog builds its tabs, its download filename and its MIME type
+from that entry, so nothing in the component needs to change.
 
 ## Adding a Custom Element
 
