@@ -10,4 +10,9 @@ Disallow: /browserconfig.xml
 Disallow: /.git
 Disallow: /.cursor/
 
+# Identity / AI discovery files
+Allow: /humans.txt
+Allow: /llms.txt
+Allow: /sitemap.xml
+
 Sitemap: https://www.ayanzadeh.com/sitemap.xml
