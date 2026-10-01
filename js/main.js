@@ -378,11 +378,15 @@ function initIntersectionObserver() {
 
     setTimeout(() => {
         const revealTargets = Array.from(document.querySelectorAll(REVEAL_FALLBACK_SELECTOR));
-        const hasAnimated = revealTargets.some(element => element.classList.contains('animate-in'));
-
-        if (!hasAnimated) {
-            revealTargets.forEach(element => element.classList.add('animate-in'));
-        }
+        // Reveal anything the observer missed. The old "if none animated, reveal
+        // all" check skipped the rest of the page once the hero (or the first
+        // sliver of About) had already gotten `.animate-in`, leaving
+        // Publications and later sections blank.
+        revealTargets.forEach(element => {
+            if (!element.classList.contains('animate-in')) {
+                element.classList.add('animate-in');
+            }
+        });
     }, REVEAL_FALLBACK_DELAY);
 }
 
@@ -543,6 +547,70 @@ function initLazyLoading() {
 // Performance optimizations
 function initPerformanceOptimizations() {
     initHeroParallax();
+    initMetricCounters();
+}
+
+// Returns true when either the OS setting or the site's own Reduce Motion
+// toggle is asking us to hold still.
+function prefersLessMotion() {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        || document.body.classList.contains('reduce-motion');
+}
+
+// The "research at a glance" figures are recounted from the page's own markup
+// rather than hard-coded, so adding a publication updates the tile for free and
+// the number can never contradict the section it links to. The value written in
+// the HTML is the no-JS fallback and is only replaced once a count succeeds.
+function initMetricCounters() {
+    const counters = document.querySelectorAll('.metric__value[data-count-of]');
+    if (!counters.length) return;
+
+    const targets = new Map();
+
+    counters.forEach(el => {
+        const total = document.querySelectorAll(el.dataset.countOf).length;
+        // A selector that matches nothing means the section was renamed or
+        // removed — keep the authored fallback rather than showing a zero.
+        if (total > 0) targets.set(el, total);
+    });
+
+    const settle = (el) => {
+        el.textContent = String(targets.get(el));
+    };
+
+    const countUp = (el) => {
+        const total = targets.get(el);
+        const duration = 900;
+        const started = performance.now();
+
+        const step = (now) => {
+            const progress = Math.min((now - started) / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            el.textContent = String(Math.round(total * eased));
+            if (progress < 1) requestAnimationFrame(step);
+            else settle(el);
+        };
+
+        requestAnimationFrame(step);
+    };
+
+    if (!supportsIntersectionObserver || prefersLessMotion()) {
+        targets.forEach((_, el) => settle(el));
+        return;
+    }
+
+    // Start from zero only for counters we are about to animate, so a counter
+    // that never scrolls into view still shows its real figure.
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            observer.unobserve(entry.target);
+            if (prefersLessMotion()) settle(entry.target);
+            else countUp(entry.target);
+        });
+    }, { threshold: 0.4 });
+
+    targets.forEach((_, el) => observer.observe(el));
 }
 
 // Subtle parallax on the hero background only, driven by requestAnimationFrame

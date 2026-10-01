@@ -1317,7 +1317,6 @@ body.high-contrast .section-title {
     }
 }
 
-.js-enabled .section,
 .js-enabled .timeline-item,
 .js-enabled .experience-item,
 .js-enabled .publication-item,
@@ -1330,7 +1329,10 @@ body.high-contrast .section-title {
 .js-enabled .focus-item,
 .js-enabled .mentoring-list > li {
     /* Hidden until the IntersectionObserver adds .animate-in; the reveal itself
-       runs as a one-shot animation so hover transitions stay independent */
+       runs as a one-shot animation so hover transitions stay independent.
+       Whole `.section` wrappers stay visible — hiding them made About,
+       Publications, and everything below the hero a blank page on phones
+       until 15% of a tall section scrolled into view. */
     opacity: 0;
 }
 
@@ -1355,7 +1357,6 @@ body.high-contrast .section-title {
     animation-delay: 240ms;
 }
 
-html.js-enabled body.reduce-motion .section,
 html.js-enabled body.reduce-motion .timeline-item,
 html.js-enabled body.reduce-motion .experience-item,
 html.js-enabled body.reduce-motion .experience-card,
@@ -1386,7 +1387,6 @@ html.js-enabled body.reduce-motion .experience-timeline::before {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    html.js-enabled .section,
     html.js-enabled .timeline-item,
     html.js-enabled .experience-item,
     html.js-enabled .experience-card,
@@ -1414,6 +1414,77 @@ html.js-enabled body.reduce-motion .experience-timeline::before {
         transform: scaleY(1);
         animation: none;
         transition: none;
+    }
+}
+
+/* Research at a glance — publications and other counts under the hero. */
+.metrics-band {
+    background: var(--background-white);
+    border-bottom: 1px solid var(--border-color);
+    padding: 28px 0 32px;
+}
+
+.metrics-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.metric {
+    margin: 0;
+}
+
+.metric__link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 92px;
+    padding: 16px 10px;
+    text-align: center;
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--background-light);
+    transition: border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.metric__link:hover,
+.metric__link:focus-visible {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    box-shadow: var(--shadow-sm);
+}
+
+.metric__value {
+    font-size: 1.85rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+    color: var(--primary-color);
+}
+
+.metric__label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-light);
+}
+
+@media (max-width: 640px) {
+    .metrics-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .metric__value {
+        font-size: 1.55rem;
     }
 }
 
