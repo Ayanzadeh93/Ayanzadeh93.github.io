@@ -12,9 +12,12 @@
 
 /* ---------- shared primitives ---------- */
 
+/* Components that declare their own `display` would otherwise beat the user
+   agent's `[hidden] { display: none }` and leave inert controls on screen. */
 .publication-item[hidden],
 .pub-explorer__empty[hidden],
 .publications-list[hidden],
+.cite-dialog__action[hidden],
 [data-cite][hidden] {
     display: none !important;
 }
@@ -175,6 +178,7 @@ pub-explorer {
     display: flex;
     align-items: center;
     flex: 0 0 auto;
+    gap: 8px;
 }
 
 .pub-explorer__sort {
@@ -197,6 +201,55 @@ pub-explorer {
     outline: none;
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+/* ---------- export the current selection ---------- */
+
+/* The chips grow, the export button holds the end of the row. */
+.pub-explorer__row--secondary {
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.pub-explorer__row--secondary .pub-explorer__chips {
+    flex: 1 1 auto;
+}
+
+.pub-explorer__export {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    flex: 0 0 auto;
+    padding: 8px 16px;
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--primary-color);
+    background: var(--accent-soft);
+    border: 1px solid transparent;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.pub-explorer__export:hover {
+    color: #fff;
+    background: var(--primary-color);
+}
+
+.pub-explorer__export:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.pub-explorer__export[disabled] {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.pub-explorer__export[disabled]:hover {
+    color: var(--primary-color);
+    background: var(--accent-soft);
 }
 
 /* ---------- result count & empty state ---------- */
@@ -270,8 +323,36 @@ pub-explorer {
         align-items: stretch;
     }
 
+    /* flex-basis sizes the main axis. Once the row stacks, the `flex: 1 1
+       260px` that makes the search box grow sideways on desktop was asking
+       for a 260px-tall input instead. */
+    .pub-explorer__search {
+        flex: 0 0 auto;
+    }
+
     .pub-explorer__sort {
         width: 100%;
+    }
+
+    /* Both selects share the row rather than stacking into two full-width
+       controls, which reads as two unrelated questions. */
+    .pub-explorer__sort-field {
+        flex-direction: row;
+    }
+
+    /* The row is a column here, and wrap on a column flex container breaks
+       into extra *columns* — which pushed the export button off to the side
+       of the chips instead of under them. One stack, no wrapping. */
+    .pub-explorer__row--secondary {
+        flex-wrap: nowrap;
+    }
+
+    .pub-explorer__row--secondary .pub-explorer__chips {
+        min-width: 0;
+    }
+
+    .pub-explorer__export {
+        justify-content: center;
     }
 }
 
@@ -370,6 +451,16 @@ pub-explorer[data-query="active"] .publication-item:hover {
 .cite-dialog__close:focus-visible {
     outline: 2px solid var(--primary-color);
     outline-offset: 2px;
+}
+
+/* The dialog is a column flex container with a capped height. Everything
+   except the output must refuse to shrink, or a long export (a whole
+   reference list) squashes the tab row until its labels are clipped. */
+.cite-dialog__header,
+.cite-dialog__tabs,
+.cite-dialog__actions,
+.cite-dialog__status {
+    flex: 0 0 auto;
 }
 
 .cite-dialog__tabs {
