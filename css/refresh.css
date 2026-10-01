@@ -1,18 +1,41 @@
-/* Accessibility-first academic refresh for ayanzadeh.com */
+/* Accessibility-first academic refresh for ayanzadeh.com
+   Loaded after style.css so these tokens and accents win the cascade. */
+
 :root {
   --primary-color: #1c4f6b;
   --primary-dark: #163e54;
   --primary-light: #2b6f8f;
   --accent-color: #b4532a;
+  --hero-bg: #0a121c;
+  --hero-bg-mid: #132536;
+  --hero-bg-alt: #0c1824;
+  --hero-aurora: rgba(43, 111, 143, 0.42);
+  --hero-aurora-strong: rgba(180, 83, 42, 0.28);
   --section-title-gradient: linear-gradient(135deg, #1c4f6b 0%, #b4532a 100%);
+  --accent-soft: rgba(28, 79, 107, 0.12);
   --focus-ring: #c46a3a;
-  --font-display: "Newsreader", "Source Serif 4", Georgia, serif;
+  --font-display: "Newsreader", "Source Serif 4", Georgia, "Times New Roman", serif;
   --font-body: "Atkinson Hyperlegible", ui-sans-serif, system-ui, sans-serif;
+}
+
+:root[data-theme="dark"] {
+  --primary-color: #6eb4d4;
+  --primary-dark: #4a9fc4;
+  --primary-light: #8ecae6;
+  --accent-color: #e08a5c;
+  --accent-soft: rgba(110, 180, 212, 0.18);
+  --section-title-gradient: linear-gradient(135deg, #6eb4d4 0%, #e08a5c 100%);
+  --focus-ring: #e08a5c;
 }
 
 body {
   font-family: var(--font-body);
   letter-spacing: 0.01em;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--primary-color) 28%, transparent);
+  color: inherit;
 }
 
 .hero-title,
@@ -22,14 +45,23 @@ body {
 .project-card h3,
 .news-card h3,
 .featured-award h3,
+.experience-card h3,
+.timeline-content h3,
 .data-hero h1,
-.pub-page h1 {
+.pub-page h1,
+.blog-hero h1,
+.blog-post-title,
+.project-hero h1 {
   font-family: var(--font-display);
   font-weight: 600;
+  font-optical-sizing: auto;
+}
+
+.brand-text {
+  letter-spacing: -0.02em;
 }
 
 .hero-title {
-  font-optical-sizing: auto;
   letter-spacing: -0.03em;
   line-height: 0.95;
 }
@@ -46,20 +78,158 @@ body {
     radial-gradient(circle at 82% 12%, rgba(180, 83, 42, 0.16), transparent 26rem),
     radial-gradient(circle at 12% 88%, rgba(28, 79, 107, 0.35), transparent 28rem),
     linear-gradient(148deg, #0a121c 0%, #132536 54%, #0c1824 100%);
+  animation: none;
+}
+
+.hero::before {
+  background:
+    radial-gradient(circle at 20% 20%, var(--hero-aurora-strong), transparent 45%),
+    radial-gradient(circle at 80% 15%, var(--hero-aurora), transparent 50%),
+    radial-gradient(circle at 30% 80%, rgba(28, 79, 107, 0.35), transparent 55%);
 }
 
 .ai-text {
   background: linear-gradient(120deg, #f7f1e8 8%, #e8c9b0 55%, #f4f7fb 100%);
   -webkit-background-clip: text;
   background-clip: text;
+  filter: drop-shadow(0 0 14px rgba(180, 83, 42, 0.28));
+}
+
+.ai-frame {
+  border-color: color-mix(in srgb, var(--accent-color) 70%, #fff);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.12),
+    0 0 35px rgba(180, 83, 42, 0.35);
+}
+
+.ai-frame:hover {
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.18),
+    0 0 48px rgba(180, 83, 42, 0.5);
+}
+
+.expertise-tag {
+  background: rgba(180, 83, 42, 0.16);
+  color: #f0d2bf;
+  border-color: rgba(180, 83, 42, 0.35);
+}
+
+.expertise-tag:hover {
+  background: rgba(180, 83, 42, 0.28);
+  box-shadow: 0 5px 15px rgba(180, 83, 42, 0.22);
 }
 
 .btn-primary.ai-btn {
-  background: #b4532a;
+  background: var(--accent-color);
   box-shadow: 0 10px 28px rgba(180, 83, 42, 0.28);
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+
+.btn-secondary.ai-btn {
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+
+.btn-primary.ai-btn:hover {
+  background: #9a4522;
+  box-shadow: 0 12px 32px rgba(180, 83, 42, 0.38);
+}
+
+.section::before {
+  background:
+    radial-gradient(circle at 12% 18%, rgba(28, 79, 107, 0.09), transparent 45%),
+    radial-gradient(circle at 85% 12%, rgba(180, 83, 42, 0.06), transparent 50%);
+}
+
+.section-alt::before {
+  background:
+    radial-gradient(circle at 15% 20%, rgba(28, 79, 107, 0.1), transparent 45%),
+    radial-gradient(circle at 80% 30%, rgba(180, 83, 42, 0.07), transparent 55%);
+}
+
+.top-nav-link.active,
+.top-nav-link:hover,
+.top-nav-link:focus-visible {
+  color: var(--primary-color);
+}
+
+.metrics-band {
+  border-block: 1px solid color-mix(in srgb, var(--primary-color) 16%, var(--border-color));
+}
+
+.metric__value,
+.metrics-band .metric-number {
+  color: var(--primary-color);
+  font-family: var(--font-display);
+}
+
+.publication-item:hover,
+.project-card:hover,
+.news-card:hover,
+.experience-card:hover,
+.feature-card:hover {
+  border-color: color-mix(in srgb, var(--primary-color) 35%, var(--border-color));
+}
+
+.neuron,
+.particle {
+  background: var(--primary-light);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--primary-light) 55%, transparent);
 }
 
 :where(a, button, input, textarea, select):focus-visible {
   outline: 3px solid var(--focus-ring);
   outline-offset: 3px;
+}
+
+/* Secondary pages that share the refreshed system */
+.data-nav a,
+.pub-page a,
+.contact-page a {
+  color: var(--primary-color);
+}
+
+[data-theme="dark"] .btn-primary.ai-btn {
+  background: var(--accent-color);
+  color: #1a120e;
+  box-shadow: 0 10px 28px rgba(224, 138, 92, 0.28);
+}
+
+[data-theme="dark"] .btn-primary.ai-btn:hover {
+  background: #f0a57a;
+}
+
+[data-theme="dark"] .ai-text {
+  background: linear-gradient(120deg, #f7f1e8 8%, #e08a5c 55%, #cfe8f4 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.blog-hero {
+  background:
+    radial-gradient(circle at 85% 15%, rgba(180, 83, 42, 0.14), transparent 22rem),
+    radial-gradient(circle at 10% 90%, rgba(28, 79, 107, 0.28), transparent 24rem),
+    linear-gradient(148deg, #0a121c 0%, #132536 54%, #0c1824 100%);
+}
+
+.blog-card:hover,
+.featured-post:hover {
+  border-color: color-mix(in srgb, var(--primary-color) 35%, var(--border-color));
+}
+
+.project-hero {
+  background:
+    radial-gradient(circle at 80% 10%, rgba(180, 83, 42, 0.14), transparent 22rem),
+    linear-gradient(148deg, #0a121c 0%, #132536 60%, #0c1824 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero,
+  .hero::before,
+  .ai-frame,
+  .expertise-tag {
+    animation: none !important;
+    transition: none !important;
+  }
 }
