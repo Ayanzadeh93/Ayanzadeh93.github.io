@@ -73,18 +73,6 @@ def webapp(name: str, url: str, description: str) -> dict:
     }
 
 
-def crumb_html(items: list[tuple[str, str]]) -> str:
-    parts = ['    <nav class="schema-breadcrumbs" aria-label="Breadcrumb">', "        <ol>"]
-    last = len(items) - 1
-    for i, (name, url) in enumerate(items):
-        if i == last:
-            parts.append(f'            <li aria-current="page">{name}</li>')
-        else:
-            parts.append(f'            <li><a href="{url}">{name}</a></li>')
-    parts += ["        </ol>", "    </nav>"]
-    return "\n".join(parts) + "\n"
-
-
 def insert_before_head_end(html: str, block: str) -> str:
     # drop previous injected block
     html = re.sub(
@@ -99,23 +87,20 @@ def insert_before_head_end(html: str, block: str) -> str:
     return html + injection
 
 
-def insert_breadcrumb_nav(html: str, items: list[tuple[str, str]]) -> str:
-    html = re.sub(
-        r"\n?    <nav class=\"schema-breadcrumbs\"[\s\S]*?</nav>\n",
+def insert_breadcrumb_nav(html: str, items: list[tuple[str, str]] | None = None) -> str:
+    """Strip any visible breadcrumb ribbon. SEO uses JSON-LD BreadcrumbList only.
+
+    Older runs injected an unstyled ``schema-breadcrumbs`` nav that rendered as a
+    duplicate ribbon under the real top / project nav. Keep removing it so
+    re-running this script cannot bring it back.
+    """
+    del items  # callers may still pass crumb tuples; HTML nav is not re-injected
+    return re.sub(
+        r"\n?\s*<nav class=\"schema-breadcrumbs\"[\s\S]*?</nav>\s*",
         "\n",
         html,
         count=1,
     )
-    nav = crumb_html(items)
-    # after opening body or after project-nav if present
-    if "class=\"project-nav\"" in html:
-        return re.sub(
-            r"(</nav>\s*\n\s*<main )",
-            r"</nav>\n" + nav + "    <main ",
-            html,
-            count=1,
-        )
-    return re.sub(r"(<body[^>]*>)", r"\1\n" + nav, html, count=1)
 
 
 def patch_homepage(html: str) -> str:

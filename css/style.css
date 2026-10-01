@@ -4407,6 +4407,20 @@ body.enhanced-keyboard .top-nav-link:focus {
 
 /* Note: Navigation sidebar removed - using top navbar only */
 
+/* SEO breadcrumb navs must stay invisible if a page still ships one.
+   Structured data lives in JSON-LD BreadcrumbList, not a visible ribbon. */
+.schema-breadcrumbs {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
 /* Add fade-in animation */
 @keyframes fadeInUp {
     from {
