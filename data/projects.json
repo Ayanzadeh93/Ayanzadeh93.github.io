@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updated": "2026-09-18",
+  "updated": "2026-10-02",
   "projects": [
     {
       "id": "indoor-navigation",
@@ -10,34 +10,45 @@
       "status": "Research",
       "featured": true,
       "year": 2026,
-      "summary": "AI-powered indoor navigation using vision-language reasoning to support blind and low-vision users.",
+      "role": "Lead researcher",
+      "outcome": "Accepted at CVPR 2026 and IISWC 2026",
+      "icon": "route",
+      "summary": "AI-powered indoor navigation using vision-language reasoning, floor-plan parsing, and on-device multimodal workloads to support blind and low-vision users.",
       "highlights": [
-        "Combines scene understanding, floor-plan reasoning, and navigation guidance.",
-        "Designed around accessibility and practical indoor mobility workflows."
+        "LLM-guided floor-plan parsing for accessible indoor wayfinding (CVPR 2026).",
+        "On-device depth-aware multimodal workload characterization for assistive navigation (IISWC 2026).",
+        "Designed around accessibility workflows rather than sighted map metaphors."
       ],
       "methods": [
         "Vision-language models",
         "Computer vision",
-        "Graph reasoning",
+        "Floor-plan parsing",
         "Assistive AI"
       ],
       "tags": [
         "VLM",
         "Accessibility",
         "Indoor Navigation",
-        "Computer Vision"
+        "CVPR 2026",
+        "IISWC 2026"
       ],
       "legacyPage": "indoor-navigation.html",
       "links": [
         {
-          "label": "Existing project page",
+          "label": "Project writeup",
           "href": "indoor-navigation.html",
           "kind": "page"
+        },
+        {
+          "label": "View poster",
+          "href": "https://drive.google.com/file/d/10YMeVGifBEFt4FB8riwFU0akLkwUsQF-/view?usp=sharing",
+          "kind": "paper"
         }
       ],
       "related": [
-        "claude-code-encyclopedia",
-        "vision-language-medical"
+        "wildfire-vlm",
+        "vision-language-medical",
+        "adhd-study-pack"
       ]
     },
     {
@@ -48,10 +59,14 @@
       "status": "Published",
       "featured": true,
       "year": 2026,
-      "summary": "Vision-language system for early wildfire detection and risk assessment from satellite imagery; accepted at IGARSS 2026.",
+      "role": "Lead author",
+      "outcome": "Accepted at IGARSS 2026; modular next-day spread preprint on arXiv",
+      "icon": "fire",
+      "summary": "Vision-language system for early wildfire detection and risk assessment from satellite imagery, with follow-on work on auditable next-day spread prediction.",
       "highlights": [
-        "Connects visual wildfire evidence with language-based risk interpretation.",
-        "Targets remote-sensing and environmental decision-support settings."
+        "Pairs satellite visual evidence with language-based risk interpretation.",
+        "Accepted at IGARSS 2026 (arXiv:2602.13305).",
+        "Related modular next-day wildfire spread preprint under submission (arXiv:2609.17763)."
       ],
       "methods": [
         "Vision-language models",
@@ -68,9 +83,19 @@
       "legacyPage": "wildfire-vlm.html",
       "links": [
         {
-          "label": "Existing project page",
+          "label": "Project writeup",
           "href": "wildfire-vlm.html",
           "kind": "page"
+        },
+        {
+          "label": "IGARSS paper",
+          "href": "https://arxiv.org/abs/2602.13305",
+          "kind": "paper"
+        },
+        {
+          "label": "Spread preprint",
+          "href": "https://arxiv.org/abs/2609.17763",
+          "kind": "paper"
         }
       ],
       "related": [
@@ -86,13 +111,14 @@
       "status": "Live",
       "featured": true,
       "year": 2026,
-      "summary": "A searchable reference covering Claude Code, OpenAI Codex CLI and GitHub CLI in one encyclopedia UI: commands, flags, settings keys, hooks, gh workflows and configuration paths, with OS-aware examples. GitHub CLI entries are loaded from a structured JSON catalog so adding a command is a data edit.",
+      "role": "Sole builder",
+      "outcome": "Live standalone GitHub Pages app with structured JSON catalog",
+      "icon": "terminal",
+      "summary": "A searchable reference covering Claude Code, OpenAI Codex CLI and GitHub CLI in one encyclopedia UI: commands, flags, settings keys, hooks, gh workflows and configuration paths, with OS-aware examples.",
       "highlights": [
         "One encyclopedia UI for Claude Code, Codex CLI and GitHub CLI, with family filters and deep links.",
-        "Lives in its own repo (Ayanzadeh93/claude-code-encyclopedia) and GitHub Pages app, same pattern as the ADHD Study Pack.",
-        "504 embedded Claude and Codex entries, plus GitHub CLI records loaded from structured JSON.",
-        "OS-aware examples, version awareness, keyboard navigation, and local favorites.",
-        "Older catalog URLs redirect into the encyclopedia and keep family, search and hash."
+        "GitHub CLI records load from structured JSON so adding a command is a data edit.",
+        "OS-aware examples, version awareness, keyboard navigation, and local favorites."
       ],
       "methods": [
         "Vanilla JavaScript",
@@ -105,24 +131,18 @@
         "Claude Code",
         "Codex CLI",
         "GitHub CLI",
-        "Developer Tools",
-        "Offline"
+        "Developer Tools"
       ],
       "legacyPage": "claude-code-encyclopedia.html",
       "links": [
         {
-          "label": "Project page",
+          "label": "Project writeup",
           "href": "claude-code-encyclopedia.html",
           "kind": "page"
         },
         {
-          "label": "Launch encyclopedia",
+          "label": "Launch app",
           "href": "https://www.ayanzadeh.com/claude-code-encyclopedia/",
-          "kind": "app"
-        },
-        {
-          "label": "GitHub CLI",
-          "href": "https://www.ayanzadeh.com/claude-code-encyclopedia/?family=github",
           "kind": "app"
         },
         {
@@ -132,7 +152,7 @@
         }
       ],
       "related": [
-        "indoor-navigation",
+        "adhd-study-pack",
         "ml-data-pipeline"
       ]
     },
@@ -144,14 +164,14 @@
       "status": "Live",
       "featured": true,
       "year": 2026,
-      "summary": "A browser-based Pomodoro workspace built around how an ADHD study session actually falls apart: a focus dial with intervals you can shrink to a two-minute start, an Eisenhower matrix that separates loud from important, a week planner that auto-schedules study blocks into your free hours, one keystroke to park a distracting thought, and statistics that show when you actually focus well.",
+      "role": "Sole builder",
+      "outcome": "Live app with Google sync, comfort profiles, and planner tools",
+      "icon": "focus",
+      "summary": "A browser-based Pomodoro workspace built around how an ADHD study session actually falls apart: focus dial, Eisenhower triage, week planner, distraction parking, and comfort profiles.",
       "highlights": [
-        "Eisenhower priority matrix with drag-and-drop, one-at-a-time triage and a check on where focus time really went.",
-        "Week planner with courses, weekly targets and an auto-scheduler that favours your historically best hours; .ics import and export.",
-        "Focus dial with interval presets, activation rating, distraction tally, brain dump and a body-double mode.",
-        "Synthesised focus sounds, breathing and grounding tools, and Google sign-in that syncs the workspace across devices.",
-        "Comfort profiles for conflicting needs \u2014 ADHD by default, with Calm and predictable, Low vision, Easier reading and Screen reader as starting points, then every setting adjustable: WCAG 2.2 AA, NVDA, JAWS, Narrator, VoiceOver and TalkBack, and a built-in voice for reading aloud.",
-        "Mood, energy and stress logged in seconds and charted against the hours actually worked, on a journal database (IndexedDB locally, one Firestore document per record when signed in) that scales past the single-document ceiling."
+        "Eisenhower priority matrix with drag-and-drop triage and focus-time checks.",
+        "Week planner with auto-scheduling into free hours; .ics import and export.",
+        "Comfort profiles for ADHD, calm/predictable, low vision, easier reading, and screen readers."
       ],
       "methods": [
         "Vanilla JavaScript",
@@ -168,8 +188,16 @@
       ],
       "legacyPage": "adhd-study-pack.html",
       "links": [
-        {"label": "Project page", "href": "adhd-study-pack.html", "kind": "page"},
-        {"label": "Open the Study Pack", "href": "https://www.ayanzadeh.com/adhd-study-pack/", "kind": "app"}
+        {
+          "label": "Project writeup",
+          "href": "adhd-study-pack.html",
+          "kind": "page"
+        },
+        {
+          "label": "Open the Study Pack",
+          "href": "https://www.ayanzadeh.com/adhd-study-pack/",
+          "kind": "app"
+        }
       ],
       "related": [
         "indoor-navigation",
@@ -181,13 +209,17 @@
       "title": "Medical Image Segmentation",
       "subtitle": "Multi-task medical image analysis",
       "category": "Medical AI",
-      "status": "Project",
+      "status": "Published",
       "featured": false,
-      "year": null,
-      "summary": "Multi-task deep-learning platform for automated medical image analysis with explicit handling of imbalanced datasets.",
+      "year": 2021,
+      "role": "Lead author",
+      "outcome": "Peer-reviewed papers on label-free microscopy segmentation (2019–2021)",
+      "icon": "brain",
+      "summary": "Multi-task deep-learning platform for automated medical image analysis with explicit handling of imbalanced datasets and label-free optical microscopy.",
       "highlights": [
-        "Focuses on segmentation and classification workflows.",
-        "Designed for imbalanced medical-imaging datasets."
+        "Segmentation and classification workflows for phase-contrast microscopy.",
+        "Designed for imbalanced medical-imaging datasets.",
+        "Published results in Turkish Journal of Electrical Engineering and Computer Sciences and IEEE TIPTEKNO/SIU venues."
       ],
       "methods": [
         "Deep learning",
@@ -198,12 +230,13 @@
       "tags": [
         "Medical AI",
         "Segmentation",
-        "Deep Learning"
+        "Deep Learning",
+        "Microscopy"
       ],
       "legacyPage": "medical-segmentation.html",
       "links": [
         {
-          "label": "Existing project page",
+          "label": "Project writeup",
           "href": "medical-segmentation.html",
           "kind": "page"
         }
@@ -218,13 +251,17 @@
       "title": "Vision-Language Medical AI",
       "subtitle": "CLIP-based medical vision-language research",
       "category": "Medical AI",
-      "status": "Project",
+      "status": "Research",
       "featured": false,
-      "year": null,
+      "year": 2025,
+      "role": "Researcher",
+      "outcome": "Exploratory CLIP-style medical VLM for zero-shot classification and reporting",
+      "icon": "eye",
       "summary": "Custom CLIP-based architecture for medical imaging with zero-shot classification and report-generation capabilities.",
       "highlights": [
         "Explores zero-shot medical-image classification.",
-        "Connects medical visual features with language representations."
+        "Connects medical visual features with language representations.",
+        "Bridges medical imaging practice with modern multimodal models."
       ],
       "methods": [
         "CLIP",
@@ -241,14 +278,15 @@
       "legacyPage": "vision-language-medical.html",
       "links": [
         {
-          "label": "Existing project page",
+          "label": "Project writeup",
           "href": "vision-language-medical.html",
           "kind": "page"
         }
       ],
       "related": [
         "medical-segmentation",
-        "indoor-navigation"
+        "indoor-navigation",
+        "wildfire-vlm"
       ]
     },
     {
@@ -256,30 +294,41 @@
       "title": "Knowledge Distillation",
       "subtitle": "Hint-based model compression",
       "category": "Efficient AI",
-      "status": "Project",
+      "status": "Published",
       "featured": false,
-      "year": null,
-      "summary": "Hint-based knowledge-distillation framework reported on the existing project page as achieving 2.5\u00d7 model compression with minimal accuracy loss.",
+      "year": 2023,
+      "role": "Co-author",
+      "outcome": "Expert Systems with Applications, 2023 (PURSUhInT)",
+      "icon": "compress",
+      "summary": "Hint-based knowledge-distillation framework (PURSUhInT) for informative layer clustering, targeting efficient teacher-to-student transfer with strong compression.",
       "highlights": [
-        "Focuses on efficient transfer from larger teacher models to smaller students.",
+        "Finds informative hint points via layer clustering for distillation.",
+        "Published in Expert Systems with Applications, vol. 213, 119040, 2023.",
         "Targets reduced deployment cost while retaining predictive quality."
       ],
       "methods": [
         "Knowledge distillation",
         "Model compression",
+        "Layer clustering",
         "Deep learning"
       ],
       "tags": [
         "Efficient AI",
         "Distillation",
-        "Compression"
+        "Compression",
+        "ESWA 2023"
       ],
       "legacyPage": "knowledge-distillation.html",
       "links": [
         {
-          "label": "Existing project page",
+          "label": "Project writeup",
           "href": "knowledge-distillation.html",
           "kind": "page"
+        },
+        {
+          "label": "Journal article",
+          "href": "https://www.sciencedirect.com/science/article/abs/pii/S0957417422020589",
+          "kind": "paper"
         }
       ],
       "related": [
@@ -292,13 +341,17 @@
       "title": "Graph Autoencoder",
       "subtitle": "Residual GNN representation learning",
       "category": "Graph ML",
-      "status": "Project",
+      "status": "Published",
       "featured": false,
-      "year": null,
-      "summary": "Graph neural-network implementation using residual connections for representation learning on graph-structured data.",
+      "year": 2021,
+      "role": "Lead author",
+      "outcome": "arXiv preprint and IEEE SIU 2020 papers on residual graph autoencoders",
+      "icon": "graph",
+      "summary": "Graph neural-network work using residual connections for representation learning and link prediction on graph-structured data.",
       "highlights": [
-        "Uses graph autoencoding for representation learning.",
-        "Explores residual connections in graph neural networks."
+        "Residual variational graph autoencoders for link prediction.",
+        "Representation learning with residual graph autoencoders (arXiv:2105.00695).",
+        "IEEE SIU 2020 conference contributions."
       ],
       "methods": [
         "Graph neural networks",
@@ -309,14 +362,20 @@
       "tags": [
         "GNN",
         "Graph ML",
-        "Autoencoder"
+        "Autoencoder",
+        "Link Prediction"
       ],
       "legacyPage": "graph-autoencoder.html",
       "links": [
         {
-          "label": "Existing project page",
+          "label": "Project writeup",
           "href": "graph-autoencoder.html",
           "kind": "page"
+        },
+        {
+          "label": "arXiv preprint",
+          "href": "https://arxiv.org/abs/2105.00695",
+          "kind": "paper"
         }
       ],
       "related": [
@@ -331,11 +390,15 @@
       "category": "ML Systems",
       "status": "Project",
       "featured": false,
-      "year": null,
-      "summary": "Scalable data-processing pipeline described on the existing project page as handling 10 TB+ daily with automated preprocessing and feature engineering.",
+      "year": 2024,
+      "role": "Engineer",
+      "outcome": "Scalable preprocessing pipeline for high-volume ML workflows",
+      "icon": "pipeline",
+      "summary": "Scalable data-processing pipeline for automated preprocessing and feature engineering on high-volume machine-learning workloads.",
       "highlights": [
         "Automates preprocessing and feature-engineering stages.",
-        "Designed around high-volume machine-learning data workflows."
+        "Designed around high-volume machine-learning data workflows.",
+        "Emphasizes reliability and reproducible feature generation."
       ],
       "methods": [
         "Data engineering",
@@ -346,12 +409,13 @@
       "tags": [
         "ML Systems",
         "Data Pipeline",
-        "Automation"
+        "Automation",
+        "MLOps"
       ],
       "legacyPage": "ml-data-pipeline.html",
       "links": [
         {
-          "label": "Existing project page",
+          "label": "Project writeup",
           "href": "ml-data-pipeline.html",
           "kind": "page"
         }

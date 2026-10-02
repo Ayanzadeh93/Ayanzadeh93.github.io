@@ -66,7 +66,10 @@
 
 /* Project Hero */
 .project-hero {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    background:
+        radial-gradient(circle at 82% 12%, rgba(180, 83, 42, 0.16), transparent 26rem),
+        radial-gradient(circle at 12% 88%, rgba(28, 79, 107, 0.35), transparent 28rem),
+        linear-gradient(148deg, #0a121c 0%, #132536 54%, #0c1824 100%);
     color: white;
     padding: 80px 0;
 }
@@ -104,9 +107,11 @@
 }
 
 .project-hero h1 {
+    font-family: var(--font-display, Georgia, serif);
     font-size: 2.5rem;
     font-weight: 800;
     line-height: 1.2;
+    letter-spacing: -0.03em;
     margin-bottom: 16px;
 }
 
@@ -132,7 +137,38 @@
 }
 
 .meta-item i {
-    color: #60a5fa;
+    color: #e08a5c;
+}
+
+.schema-breadcrumbs {
+    padding: 12px 0 0;
+}
+
+.schema-breadcrumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    list-style: none;
+    margin: 0 auto;
+    padding: 0 24px;
+    max-width: var(--max-width, 1200px);
+    color: var(--text-light);
+    font-size: 0.85rem;
+}
+
+.schema-breadcrumbs li:not(:last-child)::after {
+    content: "/";
+    margin-left: 8px;
+    color: var(--text-light);
+}
+
+.schema-breadcrumbs a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.schema-breadcrumbs a:hover {
+    text-decoration: underline;
 }
 
 .project-actions {
