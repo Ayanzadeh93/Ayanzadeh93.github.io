@@ -26,26 +26,40 @@
 }
 
 .back-link {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
+    max-width: min(60vw, 280px);
     color: var(--text-dark);
     text-decoration: none;
     font-weight: 600;
-    transition: var(--transition);
+    line-height: 1.2;
+    white-space: nowrap;
+    transition: color 0.2s ease;
 }
 
-.back-link:hover {
+.back-link:hover,
+.back-link:focus-visible {
     color: var(--primary-color);
 }
 
-.back-link i {
-    font-size: 1rem;
+.back-link .back-link-arrow {
+    flex-shrink: 0;
+    font-size: 1.05rem;
+    line-height: 1;
+}
+
+.back-link > span:not(.back-link-arrow) {
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .nav-links {
     display: flex;
-    gap: 24px;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
 }
 
 .nav-links a {
@@ -61,7 +75,18 @@
 
 /* Project Main */
 .project-main {
-    padding-top: 70px;
+    padding-top: 0;
+}
+
+/* Breadcrumbs sit under the fixed project nav — give them clearance. */
+.schema-breadcrumbs {
+    margin-top: 70px;
+    padding: 14px 0 0;
+    background: var(--background-white);
+}
+
+[data-theme="dark"] .schema-breadcrumbs {
+    background: var(--background-white);
 }
 
 /* Project Hero */
@@ -138,10 +163,6 @@
 
 .meta-item i {
     color: #e08a5c;
-}
-
-.schema-breadcrumbs {
-    padding: 12px 0 0;
 }
 
 .schema-breadcrumbs ol {
