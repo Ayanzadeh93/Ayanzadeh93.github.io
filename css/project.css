@@ -26,26 +26,40 @@
 }
 
 .back-link {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
+    max-width: min(60vw, 280px);
     color: var(--text-dark);
     text-decoration: none;
     font-weight: 600;
-    transition: var(--transition);
+    line-height: 1.2;
+    white-space: nowrap;
+    transition: color 0.2s ease;
 }
 
-.back-link:hover {
+.back-link:hover,
+.back-link:focus-visible {
     color: var(--primary-color);
 }
 
-.back-link i {
-    font-size: 1rem;
+.back-link .back-link-arrow {
+    flex-shrink: 0;
+    font-size: 1.05rem;
+    line-height: 1;
+}
+
+.back-link > span:not(.back-link-arrow) {
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .nav-links {
     display: flex;
-    gap: 24px;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
 }
 
 .nav-links a {
@@ -61,12 +75,26 @@
 
 /* Project Main */
 .project-main {
-    padding-top: 70px;
+    padding-top: 0;
+}
+
+/* Breadcrumbs sit under the fixed project nav — give them clearance. */
+.schema-breadcrumbs {
+    margin-top: 70px;
+    padding: 14px 0 0;
+    background: var(--background-white);
+}
+
+[data-theme="dark"] .schema-breadcrumbs {
+    background: var(--background-white);
 }
 
 /* Project Hero */
 .project-hero {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    background:
+        radial-gradient(circle at 82% 12%, rgba(180, 83, 42, 0.16), transparent 26rem),
+        radial-gradient(circle at 12% 88%, rgba(28, 79, 107, 0.35), transparent 28rem),
+        linear-gradient(148deg, #0a121c 0%, #132536 54%, #0c1824 100%);
     color: white;
     padding: 80px 0;
 }
@@ -104,9 +132,11 @@
 }
 
 .project-hero h1 {
+    font-family: var(--font-display, Georgia, serif);
     font-size: 2.5rem;
     font-weight: 800;
     line-height: 1.2;
+    letter-spacing: -0.03em;
     margin-bottom: 16px;
 }
 
@@ -132,7 +162,34 @@
 }
 
 .meta-item i {
-    color: #60a5fa;
+    color: #e08a5c;
+}
+
+.schema-breadcrumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    list-style: none;
+    margin: 0 auto;
+    padding: 0 24px;
+    max-width: var(--max-width, 1200px);
+    color: var(--text-light);
+    font-size: 0.85rem;
+}
+
+.schema-breadcrumbs li:not(:last-child)::after {
+    content: "/";
+    margin-left: 8px;
+    color: var(--text-light);
+}
+
+.schema-breadcrumbs a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.schema-breadcrumbs a:hover {
+    text-decoration: underline;
 }
 
 .project-actions {

@@ -224,6 +224,16 @@ body {
     linear-gradient(148deg, #0a121c 0%, #132536 60%, #0c1824 100%);
 }
 
+.projects-hub-cta {
+  display: flex;
+  justify-content: center;
+  margin: -12px 0 28px;
+}
+
+.projects-hub-cta .btn-read-more {
+  font-weight: 700;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hero,
   .hero::before,

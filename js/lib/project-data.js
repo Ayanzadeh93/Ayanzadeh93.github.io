@@ -13,6 +13,36 @@ export function getProjectById(projects, id) {
   return projects.find(project => project.id === id) || null;
 }
 
-export function projectHref(id) {
-  return `project.html?id=${encodeURIComponent(id)}`;
+/** Prefer the static SEO writeup when present; fall back to the dynamic detail route. */
+export function projectHref(projectOrId) {
+  if (projectOrId && typeof projectOrId === 'object') {
+    if (projectOrId.legacyPage) return projectOrId.legacyPage;
+    return `project.html?id=${encodeURIComponent(projectOrId.id)}`;
+  }
+  return `project.html?id=${encodeURIComponent(projectOrId || '')}`;
+}
+
+export function sortProjects(projects) {
+  return [...projects].sort((a, b) => {
+    if (Boolean(a.featured) !== Boolean(b.featured)) return a.featured ? -1 : 1;
+    const yearA = a.year || 0;
+    const yearB = b.year || 0;
+    if (yearA !== yearB) return yearB - yearA;
+    return String(a.title).localeCompare(String(b.title));
+  });
+}
+
+export function iconGlyph(icon) {
+  const map = {
+    route: '↗',
+    fire: '◇',
+    terminal: '</>',
+    focus: '◎',
+    brain: '⊕',
+    eye: '◉',
+    compress: '⇔',
+    graph: '⬡',
+    pipeline: '⇉'
+  };
+  return map[icon] || '●';
 }

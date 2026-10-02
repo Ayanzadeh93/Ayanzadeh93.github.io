@@ -1,4 +1,9 @@
-import { getProjectById, loadProjects, projectHref } from './lib/project-data.js';
+import {
+  getProjectById,
+  iconGlyph,
+  loadProjects,
+  projectHref
+} from './lib/project-data.js';
 
 function element(tag, className, text) {
   const node = document.createElement(tag);
@@ -8,7 +13,8 @@ function element(tag, className, text) {
 }
 
 function addLink(container, link) {
-  const anchor = element('a', 'data-link detail-link', link.label);
+  const kind = link.kind || 'page';
+  const anchor = element('a', `data-link detail-link detail-link--${kind}`, link.label);
   anchor.href = link.href;
   if (/^https?:\/\//.test(link.href)) {
     anchor.target = '_blank';
@@ -28,6 +34,12 @@ async function init() {
     const project = getProjectById(projects, id);
     if (!project) throw new Error('Project not found');
 
+    // Static writeups are the canonical project pages; send readers there when present.
+    if (project.legacyPage && !params.has('preview')) {
+      window.location.replace(project.legacyPage);
+      return;
+    }
+
     document.title = `${project.title} | Aydin Ayanzadeh`;
     document.querySelector('meta[name="description"]').setAttribute('content', project.summary);
     document.querySelector('#project-title').textContent = project.title;
@@ -35,9 +47,21 @@ async function init() {
     document.querySelector('#project-summary').textContent = project.summary || '';
 
     const badges = document.querySelector('#project-badges');
+    const icon = element('span', `data-icon data-icon--${project.icon || 'default'}`, iconGlyph(project.icon));
+    icon.setAttribute('aria-hidden', 'true');
+    badges.append(icon);
     badges.append(element('span', 'data-pill', project.category));
     badges.append(element('span', 'data-status', project.status));
     if (project.year) badges.append(element('span', 'data-status', String(project.year)));
+
+    const meta = document.querySelector('#project-meta');
+    if (meta) {
+      const bits = [];
+      if (project.role) bits.push(project.role);
+      if (project.outcome) bits.push(project.outcome);
+      meta.textContent = bits.join(' · ');
+      meta.hidden = !bits.length;
+    }
 
     const links = document.querySelector('#project-links');
     (project.links || []).forEach(link => addLink(links, link));
@@ -54,11 +78,15 @@ async function init() {
       .filter(Boolean)
       .forEach(item => {
         const card = element('article', 'related-card');
-        card.append(element('p', 'data-eyebrow', item.category));
+        const eyebrow = element('div', 'data-card-top');
+        eyebrow.append(element('span', 'data-pill', item.category));
+        eyebrow.append(element('span', 'data-status', item.status));
+        card.append(eyebrow);
         card.append(element('h3', null, item.title));
+        if (item.outcome) card.append(element('p', 'data-card-meta', item.outcome));
         card.append(element('p', null, item.summary));
-        const link = element('a', 'data-link', 'View project');
-        link.href = projectHref(item.id);
+        const link = element('a', 'data-link', 'Open project');
+        link.href = projectHref(item);
         card.append(link);
         related.append(card);
       });
