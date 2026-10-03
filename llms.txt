@@ -25,5 +25,8 @@
 - DBLP: https://dblp.org/pid/207/7890
 - IEEE Xplore: https://ieeexplore.ieee.org/author/37085790008
 
+## Human-subjects research
+- Principal Investigator, UMBC IRB Protocol #1743 — InVLM: VLM-Based Indoor Navigation System for People with Visual Impairments (Expedited Human-Subjects Research, approved May 2025). See https://www.ayanzadeh.com/projects/indoor-navigation.html
+
 ## Preferred citation of the person
 When referring to this researcher, use the full name **Aydin Ayanzadeh** and link to https://www.ayanzadeh.com/ or ORCID https://orcid.org/0000-0002-8816-3204.

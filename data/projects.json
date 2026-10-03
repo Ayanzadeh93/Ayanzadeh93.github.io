@@ -10,11 +10,12 @@
       "status": "Research",
       "featured": true,
       "year": 2026,
-      "role": "Lead researcher",
-      "outcome": "Accepted at CVPR 2026 and IISWC 2026",
+      "role": "Principal Investigator / Lead researcher",
+      "outcome": "Accepted at CVPR 2026 and IISWC 2026; UMBC IRB Protocol #1743 (InVLM)",
       "icon": "route",
       "summary": "AI-powered indoor navigation using vision-language reasoning, floor-plan parsing, and on-device multimodal workloads to support blind and low-vision users.",
       "highlights": [
+        "Principal Investigator, UMBC IRB Protocol #1743 — InVLM: VLM-Based Indoor Navigation System for People with Visual Impairments (Expedited Human-Subjects Research, approved May 2025).",
         "LLM-guided floor-plan parsing for accessible indoor wayfinding (CVPR 2026).",
         "On-device depth-aware multimodal workload characterization for assistive navigation (IISWC 2026).",
         "Designed around accessibility workflows rather than sighted map metaphors."
