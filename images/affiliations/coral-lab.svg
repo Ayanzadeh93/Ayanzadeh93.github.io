@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 64" role="img" aria-label="CORAL Lab">
+  <rect width="240" height="64" rx="12" fill="#0f2740"/>
+  <circle cx="28" cy="32" r="12" fill="none" stroke="#6eb4d4" stroke-width="3"/>
+  <circle cx="28" cy="32" r="4" fill="#e08a5c"/>
+  <text x="52" y="28" fill="#f7f1e8" font-family="Georgia, serif" font-size="18" font-weight="700">CORAL Lab</text>
+  <text x="52" y="46" fill="#9fb8c9" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11">UMBC · Computer Science</text>
+</svg>

@@ -235,158 +235,136 @@ body {
 }
 
 /* ========================================
-   Spotlight chips — hero + focus callouts
+   Quiet affiliations — logos + lab marks
    ======================================== */
 
-.hero-spotlight {
+.hero-affiliation {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  list-style: none;
-  margin: 18px 0 0;
-  padding: 0;
-  max-width: 46rem;
-}
-
-.spotlight-chip {
-  display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 7px 12px;
-  border-radius: 999px;
-  border: 1px solid rgba(253, 230, 138, 0.28);
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.16), rgba(14, 116, 144, 0.18));
-  color: #fff7ed;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  line-height: 1.2;
+  margin: 14px 0 0;
+  color: rgba(226, 232, 240, 0.78);
+  font-size: 0.86rem;
+}
+
+.hero-affiliation-link {
+  display: inline-flex;
+  align-items: center;
   text-decoration: none;
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.04),
-    0 0 18px rgba(245, 158, 11, 0.18);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  padding: 3px 6px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  opacity: 0.92;
 }
 
-.spotlight-chip i {
-  font-size: 0.78rem;
-  opacity: 0.95;
+.hero-affiliation-logo {
+  display: block;
+  width: auto;
+  height: 20px;
 }
 
-.spotlight-chip:hover,
-.spotlight-chip:focus-visible {
-  transform: translateY(-1px);
-  border-color: rgba(253, 230, 138, 0.55);
-  box-shadow:
-    0 0 0 1px rgba(253, 230, 138, 0.18),
-    0 0 28px rgba(245, 158, 11, 0.32);
+.hero-affiliation-sep {
+  opacity: 0.45;
 }
 
-.spotlight-chip--venue {
-  animation: spotlightPulse 3.8s ease-in-out infinite;
+.hero-affiliation-lab {
+  color: rgba(232, 201, 176, 0.9);
+  font-weight: 500;
+  text-decoration: none;
 }
 
-.spotlight-chip--irb {
-  border-color: rgba(251, 191, 36, 0.45);
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.22), rgba(14, 165, 233, 0.16));
-  box-shadow:
-    0 0 0 1px rgba(253, 230, 138, 0.14),
-    0 0 22px rgba(245, 158, 11, 0.28);
-  animation: spotlightPulse 3.4s ease-in-out infinite;
+.hero-affiliation-lab:hover,
+.hero-affiliation-lab:focus-visible {
+  color: #f7f1e8;
+  text-decoration: underline;
 }
 
-.spotlight-chip--award {
-  border-color: rgba(224, 138, 92, 0.45);
-  background: linear-gradient(135deg, rgba(180, 83, 42, 0.28), rgba(28, 79, 107, 0.22));
-  animation: spotlightPulse 4.2s ease-in-out infinite;
+.affiliation-row {
+  margin: 0 0 12px;
 }
 
-.spotlight-chip--compact {
-  margin-top: 10px;
-  font-size: 0.72rem;
-  padding: 6px 10px;
+.affiliation-logo {
+  display: block;
+  width: auto;
+  max-width: min(100%, 168px);
+  height: auto;
+  object-fit: contain;
 }
 
-.focus-irb-note {
+.affiliation-logo--umbc {
+  max-width: 132px;
+  padding: 4px 0;
+}
+
+.affiliation-logo--lab {
+  max-width: 156px;
+}
+
+.affiliation-logo--contact {
+  max-width: 110px;
+  margin-bottom: 4px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  background: #fff;
+  border: 1px solid var(--border-color);
+}
+
+.affiliation-logo--project {
+  max-width: 118px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.94);
+}
+
+.experience-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+}
+
+.experience-heading h3 {
   margin: 0;
 }
 
-.publication-item.venue-glow {
-  border-color: color-mix(in srgb, var(--primary-color) 42%, var(--border-color));
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--primary-color) 12%, transparent),
-    0 0 28px color-mix(in srgb, var(--primary-color) 14%, transparent);
+.contact-affiliation {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
 }
 
-.publication-item.venue-glow--cvpr {
-  border-color: color-mix(in srgb, #f59e0b 45%, var(--border-color));
-  box-shadow:
-    0 0 0 1px rgba(245, 158, 11, 0.16),
-    0 0 32px rgba(245, 158, 11, 0.18);
+.project-irb-note {
+  margin: 0;
+  color: var(--text-medium);
+  font-size: 0.82rem;
+  line-height: 1.45;
 }
 
-.publication-badge.badge-glow {
-  background: linear-gradient(135deg, var(--primary-color), #0e7490);
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.12),
-    0 0 18px color-mix(in srgb, var(--primary-color) 45%, transparent);
+.meta-item--affiliations {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
 }
 
-.publication-badge.badge-glow--cvpr {
-  background: linear-gradient(135deg, #d97706, #b4532a);
-  box-shadow:
-    0 0 0 1px rgba(253, 230, 138, 0.28),
-    0 0 20px rgba(245, 158, 11, 0.42);
-}
-
-.award-item.award-glow,
-.featured-award.award-glow {
-  border-color: color-mix(in srgb, var(--accent-color) 55%, var(--primary-color));
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--accent-color) 18%, transparent),
-    0 0 34px color-mix(in srgb, var(--accent-color) 22%, transparent),
-    0 8px 30px rgba(26, 115, 232, 0.12);
-  animation: awardGlowPulse 4s ease-in-out infinite;
-}
-
-@keyframes spotlightPulse {
-  0%,
-  100% {
-    box-shadow:
-      0 0 0 1px rgba(255, 255, 255, 0.04),
-      0 0 14px rgba(245, 158, 11, 0.14);
-  }
-  50% {
-    box-shadow:
-      0 0 0 1px rgba(253, 230, 138, 0.2),
-      0 0 26px rgba(245, 158, 11, 0.32);
-  }
-}
-
-@keyframes awardGlowPulse {
-  0%,
-  100% {
-    box-shadow:
-      0 0 0 1px color-mix(in srgb, var(--accent-color) 14%, transparent),
-      0 0 22px color-mix(in srgb, var(--accent-color) 16%, transparent),
-      0 8px 30px rgba(26, 115, 232, 0.1);
-  }
-  50% {
-    box-shadow:
-      0 0 0 1px color-mix(in srgb, var(--accent-color) 28%, transparent),
-      0 0 36px color-mix(in srgb, var(--accent-color) 28%, transparent),
-      0 10px 34px rgba(26, 115, 232, 0.14);
-  }
+[data-theme="dark"] .affiliation-logo--umbc,
+[data-theme="dark"] .affiliation-logo--contact,
+[data-theme="dark"] .hero-affiliation-link {
+  background: #fff;
 }
 
 @media (max-width: 640px) {
-  .hero-spotlight {
+  .hero-affiliation {
     gap: 8px;
+    font-size: 0.84rem;
   }
 
-  .spotlight-chip {
-    font-size: 0.72rem;
-    padding: 6px 10px;
+  .hero-affiliation-logo {
+    height: 22px;
   }
 }
 
@@ -394,10 +372,7 @@ body {
   .hero,
   .hero::before,
   .ai-frame,
-  .expertise-tag,
-  .spotlight-chip,
-  .award-item.award-glow,
-  .featured-award.award-glow {
+  .expertise-tag {
     animation: none !important;
     transition: none !important;
   }
