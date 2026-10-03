@@ -6267,72 +6267,12 @@ html[data-view-transition="theme"]::view-transition-new(root) {
 #research-projects .project-details { gap: 10px; }
 #research-projects .project-collaborators, #research-projects .project-venue, #research-projects .project-outcome { font-size: .82rem; }
 
-/* IRB credit chip on the indoor-navigation research card */
-.project-irb.irb-glow-chip {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    margin-top: 2px;
-    padding: 10px 12px;
-    border-radius: 10px;
-    border: 1px solid rgba(217, 119, 6, 0.35);
-    background:
-        linear-gradient(135deg, rgba(251, 191, 36, 0.12), rgba(14, 116, 144, 0.08));
-    color: var(--text-dark);
+/* Quiet IRB note on the indoor-navigation research card */
+.project-irb-note {
+    margin: 0;
+    color: var(--text-medium);
     font-size: 0.82rem;
     line-height: 1.45;
-    box-shadow:
-        0 0 0 1px rgba(251, 191, 36, 0.08),
-        0 0 18px rgba(245, 158, 11, 0.16);
-    animation: irbChipGlow 3.6s ease-in-out infinite;
-}
-
-.project-irb.irb-glow-chip i {
-    margin-top: 2px;
-    color: #d97706;
-    flex-shrink: 0;
-}
-
-.project-irb.irb-glow-chip strong {
-    color: #92400e;
-}
-
-[data-theme="dark"] .project-irb.irb-glow-chip {
-    border-color: rgba(251, 191, 36, 0.4);
-    background:
-        linear-gradient(135deg, rgba(251, 191, 36, 0.16), rgba(14, 116, 144, 0.14));
-    color: #fef3c7;
-    box-shadow:
-        0 0 0 1px rgba(251, 191, 36, 0.12),
-        0 0 24px rgba(245, 158, 11, 0.22);
-}
-
-[data-theme="dark"] .project-irb.irb-glow-chip i {
-    color: #fbbf24;
-}
-
-[data-theme="dark"] .project-irb.irb-glow-chip strong {
-    color: #fde68a;
-}
-
-@keyframes irbChipGlow {
-    0%,
-    100% {
-        box-shadow:
-            0 0 0 1px rgba(251, 191, 36, 0.08),
-            0 0 14px rgba(245, 158, 11, 0.12);
-    }
-    50% {
-        box-shadow:
-            0 0 0 1px rgba(251, 191, 36, 0.22),
-            0 0 26px rgba(245, 158, 11, 0.28);
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .project-irb.irb-glow-chip {
-        animation: none;
-    }
 }
 
 #projects .section-description { margin-bottom: 30px; }

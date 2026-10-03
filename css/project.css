@@ -811,6 +811,33 @@
     animation: irbGlowPulse 3.6s ease-in-out infinite;
 }
 
+.irb-callout--quiet {
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(15, 23, 42, 0.42);
+    box-shadow: none;
+    animation: none;
+}
+
+.irb-callout--quiet .irb-callout__title {
+    color: #f8fafc;
+    font-size: 1.05rem;
+}
+
+.irb-callout--quiet .irb-callout__role,
+.irb-callout--quiet .irb-callout__study {
+    color: rgba(241, 245, 249, 0.9);
+}
+
+.irb-callout--quiet .irb-callout__meta {
+    color: rgba(226, 232, 240, 0.78);
+}
+
+.irb-callout--quiet .irb-protocol,
+.irb-callout--quiet .irb-study-name {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fde68a;
+}
+
 .irb-callout__badge {
     display: inline-flex;
     align-items: center;
