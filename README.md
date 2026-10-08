@@ -9,10 +9,12 @@ This is the personal website of Aydin Ayanzadeh, Ph.D. Student in Computer Scien
 - **Smooth Navigation**: Sticky navigation bar with smooth scrolling
 - **Interactive Elements**: Hover effects, animations on scroll, and mobile-friendly menu
 - **Publication Explorer**: Ranked search across titles, authors and venues, filter chips by
-  publication type, and re-sorting by year or relevance — with the full list still present in
-  the HTML for readers and crawlers without JavaScript
-- **Citation Export**: Every paper exports as BibTeX, APA 7, MLA 9 or IEEE, with a one-click
-  copy and a `.bib` download
+  publication type, a year filter, and re-sorting by year or relevance — with the full list
+  still present in the HTML for readers and crawlers without JavaScript. The active filters
+  are mirrored into the URL, so a filtered view can be bookmarked or shared
+- **Citation Export**: Every paper exports as BibTeX, RIS, APA 7, MLA 9 or IEEE, with
+  one-click copy and a download in each format. The whole filtered selection can be exported
+  as a single reference list for Zotero, Mendeley or EndNote
 - **Dark Mode**: Manual toggle that remembers the choice, following the system preference until
   one is made
 - **Comprehensive Sections**: 
@@ -55,7 +57,7 @@ they are committed. Modern platform APIs do the work a library would otherwise:
 │   ├── blog.js             # Blog-only features
 │   ├── lib/                # Pure helpers, no DOM side effects
 │   │   ├── dom.js          #   node builder, debounce, view transitions, clipboard
-│   │   ├── citations.js    #   BibTeX / APA / MLA / IEEE formatters
+│   │   ├── citations.js    #   BibTeX / RIS / APA / MLA / IEEE formatters
 │   │   └── search.js       #   ranked, diacritic-folded matching
 │   └── components/         # Custom elements
 │       ├── index.js        #   module entry, registers the elements
@@ -99,9 +101,23 @@ To customize the website:
 
 Copy an existing `.publication-item` inside `<pub-explorer>` and fill in its
 `data-*` attributes — type, year, venue, and any DOI or arXiv id. The explorer
-picks it up automatically: the facet counts, the search index and all four
-citation formats are derived from that markup. Verify a DOI at
+picks it up automatically: the facet counts, the year filter, the search index
+and all five citation formats are derived from that markup. Verify a DOI at
 `https://doi.org/<doi>` before adding it.
+
+### Sharing a filtered view
+
+The explorer keeps its state in the query string, so these are real links:
+
+| URL | Shows |
+|-----|-------|
+| `?type=article` | Journal articles only |
+| `?year=2026` | Everything from 2026 |
+| `?type=inproceedings&year=2026` | 2026 conference papers |
+| `?q=segmentation&sort=relevance` | Best matches for "segmentation" |
+
+Unrecognised values are ignored rather than applied, so a stale or hand-edited
+link degrades to the full list instead of an empty one.
 
 ## License
 

@@ -8,16 +8,22 @@
  *
  * Usage:
  *   document.querySelector('cite-dialog').open(record);
+ *   document.querySelector('cite-dialog').openCollection(records, 'Journal articles');
  */
 
 import { el, copyText } from '../lib/dom.js';
-import { CITATION_FORMATS, formatCitation, bibKey, canonicalUrl } from '../lib/citations.js';
+import {
+    CITATION_FORMATS, formatCitation, formatCollection, getCitationFormat, bibKey, canonicalUrl
+} from '../lib/citations.js';
 
 const STORAGE_KEY = 'cite-format';
 
 export class CiteDialog extends HTMLElement {
     #dialog = null;
     #record = null;
+    /** Non-null when the dialog is showing a whole reference list. */
+    #collection = null;
+    #collectionLabel = '';
     #activeFormat = CITATION_FORMATS[0].id;
     #output = null;
     #tabs = new Map();
@@ -25,6 +31,7 @@ export class CiteDialog extends HTMLElement {
     #titleEl = null;
     #copyButton = null;
     #downloadButton = null;
+    #downloadLabel = null;
     #sourceLink = null;
 
     connectedCallback() {
@@ -82,11 +89,12 @@ export class CiteDialog extends HTMLElement {
             onClick: () => this.#copy()
         }, el('i', { class: 'fas fa-copy', 'aria-hidden': 'true' }), ' Copy');
 
+        this.#downloadLabel = el('span', {}, ' Download .bib');
         this.#downloadButton = el('button', {
             type: 'button',
             class: 'cite-dialog__action',
-            onClick: () => this.#downloadBib()
-        }, el('i', { class: 'fas fa-download', 'aria-hidden': 'true' }), ' Download .bib');
+            onClick: () => this.#download()
+        }, el('i', { class: 'fas fa-download', 'aria-hidden': 'true' }), this.#downloadLabel);
 
         this.#sourceLink = el('a', {
             class: 'cite-dialog__action',
@@ -167,13 +175,20 @@ export class CiteDialog extends HTMLElement {
         } catch (error) { /* non-fatal */ }
     }
 
-    #render() {
-        if (!this.#record) return;
+    /** The text currently on show, for whichever mode the dialog is in. */
+    #currentText() {
+        if (this.#collection) return formatCollection(this.#collection, this.#activeFormat);
+        if (this.#record) return formatCitation(this.#record, this.#activeFormat);
+        return '';
+    }
 
-        const entry = CITATION_FORMATS.find((item) => item.id === this.#activeFormat);
-        this.#output.classList.toggle('cite-dialog__output--mono', Boolean(entry && entry.mono));
-        this.#output.textContent = formatCitation(this.#record, this.#activeFormat);
-        this.#downloadButton.hidden = this.#activeFormat !== 'bibtex';
+    #render() {
+        if (!this.#record && !this.#collection) return;
+
+        const entry = getCitationFormat(this.#activeFormat);
+        this.#output.classList.toggle('cite-dialog__output--mono', entry.mono);
+        this.#output.textContent = this.#currentText();
+        this.#downloadLabel.textContent = ` Download .${entry.extension}`;
     }
 
     /**
@@ -181,16 +196,41 @@ export class CiteDialog extends HTMLElement {
      * @param {Object} record see js/lib/citations.js for the shape
      */
     open(record) {
+        this.#collection = null;
+        this.#record = record;
+
+        this.#show(record.title || 'Cite this publication', canonicalUrl(record));
+    }
+
+    /**
+     * Open the dialog for a whole reference list — the current filter
+     * selection in <pub-explorer>, typically — so a reader can pull every
+     * matching paper into their reference manager in one go.
+     *
+     * @param {Object[]} records
+     * @param {string} [label] describes the selection, e.g. "Journal articles"
+     */
+    openCollection(records, label = '') {
+        if (!records || records.length === 0) return;
+
+        this.#record = null;
+        this.#collection = records;
+        this.#collectionLabel = label;
+
+        const count = `${records.length} reference${records.length === 1 ? '' : 's'}`;
+        this.#show(label ? `Export ${label} (${count})` : `Export ${count}`, '');
+    }
+
+    /** Shared open path for both modes. */
+    #show(title, sourceUrl) {
         if (!this.#dialog) this.#build();
 
-        this.#record = record;
-        this.#titleEl.textContent = record.title || 'Cite this publication';
-
-        const source = canonicalUrl(record);
-        this.#sourceLink.hidden = !source;
-        if (source) this.#sourceLink.href = source;
+        this.#titleEl.textContent = title;
+        this.#sourceLink.hidden = !sourceUrl;
+        if (sourceUrl) this.#sourceLink.href = sourceUrl;
 
         this.#status.textContent = '';
+        this.#status.classList.remove('cite-dialog__status--error');
         this.#render();
 
         if (typeof this.#dialog.showModal === 'function') {
@@ -211,36 +251,53 @@ export class CiteDialog extends HTMLElement {
     }
 
     async #copy() {
-        const text = this.#output.textContent;
-        const label = CITATION_FORMATS.find((entry) => entry.id === this.#activeFormat).label;
-        const copied = await copyText(text);
+        const label = getCitationFormat(this.#activeFormat).label;
+        const copied = await copyText(this.#currentText());
+
+        const count = this.#collection ? this.#collection.length : 1;
+        const success = count === 1
+            ? `${label} citation copied to clipboard.`
+            : `${count} ${label} references copied to clipboard.`;
 
         // #status is role="status" aria-live="polite", so setting its text is
         // the announcement; a second live region would say everything twice.
         this.#status.textContent = copied
-            ? `${label} citation copied to clipboard.`
+            ? success
             : 'Copy failed — select the text above and copy manually.';
         this.#status.classList.toggle('cite-dialog__status--error', !copied);
     }
 
     /**
-     * Offer the BibTeX entry as a .bib file. Object URLs are same-origin blobs,
+     * Save whatever is on screen as a file. Object URLs are same-origin blobs,
      * so this needs no CSP change and no network round trip.
      */
-    #downloadBib() {
-        const blob = new Blob([formatCitation(this.#record, 'bibtex')], {
-            type: 'application/x-bibtex;charset=utf-8'
-        });
+    #download() {
+        const entry = getCitationFormat(this.#activeFormat);
+        const filename = `${this.#downloadBasename()}.${entry.extension}`;
+
+        const blob = new Blob([this.#currentText()], { type: `${entry.mime};charset=utf-8` });
         const url = URL.createObjectURL(blob);
 
-        const link = el('a', { href: url, download: `${bibKey(this.#record)}.bib` });
+        const link = el('a', { href: url, download: filename });
         document.body.appendChild(link);
         link.click();
         link.remove();
 
         URL.revokeObjectURL(url);
-        this.#status.textContent = 'BibTeX file downloaded.';
+        this.#status.textContent = `${filename} downloaded.`;
         this.#status.classList.remove('cite-dialog__status--error');
+    }
+
+    /** A filename that says what is inside without needing to open it. */
+    #downloadBasename() {
+        if (this.#record) return bibKey(this.#record);
+
+        const slug = this.#collectionLabel
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-|-$/g, '');
+
+        return slug ? `ayanzadeh-${slug}` : 'ayanzadeh-publications';
     }
 }
 
