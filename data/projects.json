@@ -94,6 +94,11 @@
           "kind": "paper"
         },
         {
+          "label": "WildfireVLM website",
+          "href": "https://www.ayanzadeh.com/wildfirevlm-page/",
+          "kind": "website"
+        },
+        {
           "label": "Spread preprint",
           "href": "https://arxiv.org/abs/2609.17763",
           "kind": "paper"
