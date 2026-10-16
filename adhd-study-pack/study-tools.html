@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Progress & AI Plan — ADHD Study Pack</title>
+  <meta name="description" content="See how your study habits change week to week and turn any assignment into an ADHD-friendly plan you can print.">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Fraunces:opsz,wght@9..144,560;9..144,650&family=IBM+Plex+Mono:wght@400;600&display=swap">
+  <link rel="stylesheet" href="css/study-tools.css">
+</head>
+<body>
+  <header class="st-top no-print">
+    <a class="st-back" href="index.html">← Back to Focus Dial</a>
+    <nav class="st-tabs" role="tablist">
+      <button role="tab" data-tab="progress" aria-selected="true">Progress</button>
+      <button role="tab" data-tab="planner" aria-selected="false">AI plan</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="progress" class="st-panel">
+      <h1>Your study habits</h1>
+      <p class="muted" id="dataSource">Loading…</p>
+      <div class="st-cards" id="statCards"></div>
+
+      <div class="st-grid">
+        <article class="st-box">
+          <h2>Focus minutes · last 8 weeks</h2>
+          <div class="st-bars" id="weekBars"></div>
+        </article>
+        <article class="st-box">
+          <h2>This week, day by day</h2>
+          <div class="st-bars" id="dayBars"></div>
+        </article>
+      </div>
+
+      <div class="st-grid">
+        <article class="st-box">
+          <h2>Weekly goal</h2>
+          <label class="st-goal">Focus minutes per week
+            <input type="number" id="goalInput" min="15" step="15">
+          </label>
+          <div id="goalMeter"></div>
+          <h3>Course targets</h3>
+          <div id="courseGoals"></div>
+        </article>
+        <article class="st-box">
+          <h2>Tasks</h2>
+          <div id="taskStats"></div>
+          <h3>Recently finished sessions</h3>
+          <ul class="st-list" id="recentSessions"></ul>
+        </article>
+      </div>
+    </section>
+
+    <section id="planner" class="st-panel" hidden>
+      <div class="no-print">
+        <h1>Turn an assignment into a plan</h1>
+        <p class="muted">Describe it in your own words. The AI breaks it into small tasks and short focus sessions.</p>
+        <form id="planForm" class="st-box st-form">
+          <label>What's the assignment?
+            <textarea name="assignment" rows="4" required placeholder="e.g. 1500-word history essay on the causes of WWI, need 5 sources"></textarea>
+          </label>
+          <div class="st-row">
+            <label>Deadline
+              <input type="datetime-local" name="deadline" required>
+            </label>
+            <label>When can you study?
+              <input name="availability" required placeholder="e.g. weekdays 6–8pm, Saturday morning">
+            </label>
+          </div>
+          <div class="st-actions">
+            <button class="st-btn" type="submit" id="planBtn">Make my plan</button>
+            <span id="planStatus" class="muted" role="status"></span>
+          </div>
+        </form>
+      </div>
+      <div id="planOut"></div>
+    </section>
+  </main>
+
+  <script src="js/plan-api.js?v=1"></script>
+  <script type="module" src="js/study-tools.js"></script>
+</body>
+</html>

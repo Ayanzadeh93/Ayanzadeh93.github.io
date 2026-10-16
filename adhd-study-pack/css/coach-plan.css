@@ -1,0 +1,10 @@
+.coach-plan-card .cp-form{display:grid;gap:8px;margin-top:8px}
+.coach-plan-card label{display:grid;gap:4px;font-size:.82rem;color:var(--ink-2,inherit)}
+.coach-plan-card textarea,.coach-plan-card input{font:inherit;padding:8px 10px;border-radius:10px;border:1px solid var(--line,rgba(0,0,0,.15));background:var(--paper,transparent);color:inherit;resize:vertical}
+.coach-plan-card .cp-status{font-size:.8rem;margin:0;min-height:1em}
+.coach-plan-card .cp-status.err{color:var(--ember,#c2410c)}
+.coach-plan-card .cp-out h4{margin:14px 0 4px}
+.coach-plan-card .cp-tasks{padding-left:18px;display:grid;gap:6px;font-size:.88rem}
+.coach-plan-card .cp-pri{font-size:.66rem;text-transform:uppercase;letter-spacing:.06em;padding:1px 6px;border-radius:99px;border:1px solid currentColor;opacity:.8}
+.coach-plan-card .cp-pri.high{color:var(--ember,#c2410c)}
+.coach-plan-card .cp-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}

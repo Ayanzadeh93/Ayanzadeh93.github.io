@@ -1,0 +1,63 @@
+/* Mood is a check-in, not a scorecard. Plain values accompany every mark. */
+#view-mood>.mood-overview{margin:0 0 18px}
+.mood-coverage{display:grid;grid-template-columns:auto 1fr;align-items:baseline;column-gap:10px}
+.mood-coverage strong{font:650 calc(24px * var(--ts,1))/1.1 var(--font-display);font-variant-numeric:tabular-nums;color:var(--ink)}
+.mood-coverage strong span{font:500 calc(13px * var(--ts,1)) var(--font-ui);color:var(--muted)}
+.mood-coverage>span{font-size:calc(13px * var(--ts,1));color:var(--muted)}
+.mood-averages{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:0;margin:14px 0 0}
+.mood-averages>div{min-width:0;padding:11px 13px;border:1px solid var(--line);border-radius:var(--r-m);background:var(--bg)}
+.mood-averages dt{color:var(--muted);font-size:calc(12px * var(--ts,1))}
+.mood-averages dd{margin:5px 0 0;font:650 calc(19px * var(--ts,1))/1.2 var(--font-display);font-variant-numeric:tabular-nums}
+.mood-averages dd span{margin-left:4px;color:var(--muted);font:400 calc(11px * var(--ts,1)) var(--font-ui)}
+.mood-overview-note{margin:11px 0 0;color:var(--muted);font-size:calc(12px * var(--ts,1));line-height:1.55}
+.mood-chart-head{display:grid;gap:14px}
+.mood-axis-switch{display:flex;flex-wrap:wrap;gap:6px}
+.mood-axis{min-height:40px;padding:8px 16px;border:1px solid var(--line);border-radius:var(--r-s);background:var(--bg);color:var(--ink-2);font:600 calc(12px * var(--ts,1)) var(--font-ui);cursor:pointer}
+.mood-axis:hover{background:var(--surface-2)}
+.mood-axis.is-selected{border-color:var(--ink);background:var(--ink);color:var(--surface)}
+.mood-axis:focus-visible,.mood-day:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.mood-ribbon{display:block;width:100%;height:auto;min-height:140px;overflow:visible}
+.mood-ribbon text{fill:var(--muted);font:500 10px var(--font-ui)}
+.mood-ribbon .gl{stroke:var(--line);stroke-dasharray:3 4;stroke-width:1}
+.mood-chart-empty{font-size:13px!important}
+#view-mood .mood-grid-wrap{overflow-x:auto}
+.mood-calendar{table-layout:fixed;min-width:490px;width:100%;border-collapse:separate;border-spacing:4px 5px}
+.mood-calendar thead th{padding:2px;text-align:left;font-size:calc(10px * var(--ts,1));font-weight:500;color:var(--muted);white-space:nowrap}
+.mood-calendar thead td{width:28px}
+.mood-calendar tbody th{width:28px;text-align:center;color:var(--muted);font-size:calc(11px * var(--ts,1));font-weight:500}
+.mood-calendar td{padding:0}
+.mood-calendar .mood-calendar-padding{pointer-events:none}
+.mood-day{position:relative;display:grid;place-items:center;width:100%;min-width:32px;height:38px;overflow:hidden;padding:4px;border:1px solid transparent;border-radius:var(--r-s);background:color-mix(in srgb,var(--day-color,var(--surface-2)) 16%,var(--surface));color:var(--ink);font:500 calc(11px * var(--ts,1)) var(--font-ui);font-variant-numeric:tabular-nums;cursor:pointer}
+.mood-day:not(.is-missing){border-color:color-mix(in srgb,var(--day-color) 35%,var(--line))}
+.mood-day[aria-pressed="true"]{border:2px solid var(--ink);box-shadow:inset 0 0 0 1px var(--surface)}
+.mood-day.is-missing{background:var(--surface);border-color:var(--line);border-style:dashed;color:var(--muted)}
+.mood-day-focus{position:absolute;bottom:2px;left:0;height:3px;max-width:100%;border-radius:99px;background:var(--accent)}
+.mood-day-detail{min-height:140px}
+.mood-detail-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding-bottom:11px;border-bottom:1px solid var(--line)}
+.mood-detail-head h4{margin:0;font:650 calc(16px * var(--ts,1))/1.4 var(--font-display)}
+.mood-detail-head>span{color:var(--muted);font-size:calc(11px * var(--ts,1));text-align:right}
+.mood-day-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:12px 0}
+.mood-day-metrics>div{padding:8px;border-radius:var(--r-s);background:var(--bg)}
+.mood-day-metrics dt,.mood-day-entries p{color:var(--muted);font-size:calc(11px * var(--ts,1))}
+.mood-day-metrics dd{margin:4px 0 0;font-weight:600;font-variant-numeric:tabular-nums;font-size:calc(12px * var(--ts,1))}
+.mood-day-entries{display:grid;gap:9px;margin:13px 0 0;padding-left:19px}
+.mood-day-entries li{padding-left:2px}
+.mood-day-entries li>div{display:flex;gap:9px;align-items:baseline;font-size:calc(12px * var(--ts,1))}
+.mood-day-entries time,.mood-detail-tags{color:var(--muted);font-size:calc(11px * var(--ts,1))}
+.mood-day-entries strong{font-weight:600}
+.mood-day-entries p{margin:4px 0 0;line-height:1.5}
+.mood-day-entries .mood-detail-note{color:var(--ink-2);white-space:pre-wrap;overflow-wrap:anywhere}
+.mood-day-entries .mood-detail-tags{line-height:1.5}
+.mood-detail-empty{margin:13px 0 0;color:var(--muted);font-size:calc(12px * var(--ts,1));line-height:1.6}
+#view-mood .mood-list{max-height:380px;overflow:auto}
+#view-mood .mood-grid-card .chart-note,#view-mood .mood-chart-card .chart-note{line-height:1.65}
+[data-contrast="high"] .mood-day{border-color:var(--ink)}
+@media(max-width:760px){
+  .mood-averages{gap:7px}
+  .mood-averages>div{padding:10px 8px}
+  .mood-axis{flex:1;min-width:76px;padding:8px}
+  .mood-detail-head{align-items:flex-start;flex-direction:column;gap:3px}
+  .mood-day-metrics{gap:4px}
+  .mood-day-metrics>div{padding:7px 5px}
+}
+@media(max-width:390px){.mood-calendar{min-width:460px}.mood-averages dd{font-size:calc(16px * var(--ts,1))}}

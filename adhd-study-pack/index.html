@@ -3,84 +3,1359 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ADHD Study Pack — moved</title>
-  <meta name="description" content="The ADHD Study Pack has moved. It now lives at ayanzadeh93.github.io/adhd-study-pack/.">
-  <!-- The app used to be kept as a second copy in this repository, which drifted
-       from the real one: this domain was serving a build from months earlier.
-       There is now one copy, in the adhd-study-pack repository, and this page
-       points at it. GitHub Pages cannot issue a 301, so this is a canonical
-       link plus a refresh. -->
-  <link rel="canonical" href="https://ayanzadeh93.github.io/adhd-study-pack/">
-  <!-- No <meta refresh>: it would fire before the script below could offer to
-       rescue a workspace saved on this origin. The script redirects at once
-       when there is nothing to rescue; without scripting, the link does it. -->
-  <meta name="robots" content="noindex, follow">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <style>
-    :root { color-scheme: light dark; --ink:#141B19; --muted:#5B6865; --bg:#EDF0EE; --card:#F8FAF8; --line:#D4DCD8; --accent:#CC4520; }
-    @media (prefers-color-scheme: dark) {
-      :root { --ink:#E7EDEA; --muted:#8C9A96; --bg:#0D1114; --card:#141A1D; --line:#263034; --accent:#EE6033; }
-    }
-    body { margin:0; min-height:100vh; display:grid; place-items:center; padding:24px;
-           background:var(--bg); color:var(--ink);
-           font:16px/1.6 'Archivo', system-ui, -apple-system, sans-serif; }
-    .card { max-width:34rem; background:var(--card); border:1px solid var(--line);
-            border-radius:18px; padding:28px; }
-    h1 { font-size:1.35rem; margin:0 0 10px; }
-    p { margin:0 0 14px; color:var(--muted); }
-    a.go { display:inline-block; background:var(--accent); color:#fff; text-decoration:none;
-           padding:11px 18px; border-radius:10px; font-weight:600; }
-    button { font:inherit; font-weight:600; padding:10px 16px; border-radius:10px;
-             border:1px solid var(--line); background:transparent; color:var(--ink); cursor:pointer; }
-    #keep { display:none; margin-top:20px; padding-top:18px; border-top:1px solid var(--line); }
-    #keep.on { display:block; }
-  </style>
+  <!-- Firebase is only loaded once js/firebase-config.js holds a config:
+       script  www.gstatic.com = SDK, apis.google.com = Google sign-in helper
+       connect firestore / identitytoolkit / securetoken = data and auth APIs
+       frame   *.firebaseapp.com = the auth handler iframe on the authDomain
+       Google Calendar sync: accounts.google.com = Google Identity Services (the
+       consent popup, its script and styles); the Calendar API is www.googleapis.com.
+       Fonts come from Google Fonts; every sound is synthesised in the page. -->
+  <!-- WebLLM (the study coach) needs wasm plus its model host; the calm radio
+       streams Creative-Commons audio from Wikimedia Commons. The shell is no
+       longer fetched at runtime, so no githubusercontent origin is needed. -->
+  <!-- App Check (reCAPTCHA Enterprise), Remote Config and Performance
+       Monitoring are free Spark-plan extras, wired but not enforcing:
+       www.google.com = reCAPTCHA Enterprise's script and widget frame;
+       firebaseinstallations = the Installations API all three depend on;
+       content-firebaseappcheck / firebaseremoteconfig / firebaselogging-pa =
+       each SDK's own endpoint. See firebase/README.md. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' 'wasm-unsafe-eval' 'unsafe-eval' https://www.gstatic.com https://apis.google.com https://accounts.google.com https://cdn.jsdelivr.net https://esm.run https://www.google.com https://open.spotify.com https://embed-cdn.spotifycdn.com https://www.youtube.com https://www.youtube-nocookie.com https://s.ytimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; media-src 'self' blob: mediastream: https://upload.wikimedia.org https://commons.wikimedia.org; connect-src 'self' blob: http://127.0.0.1:3847 http://localhost:3847 https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://accounts.google.com https://cdn.jsdelivr.net https://data.jsdelivr.net https://esm.run https://huggingface.co https://*.huggingface.co https://*.hf.co https://cas-bridge.xethub.hf.co https://upload.wikimedia.org https://commons.wikimedia.org https://api.todoist.com https://api.anthropic.com https://api.openai.com https://openrouter.ai https://firebaseinstallations.googleapis.com https://content-firebaseappcheck.googleapis.com https://firebaseremoteconfig.googleapis.com https://firebaselogging-pa.googleapis.com https://www.google.com https://open.spotify.com https://api.spotify.com https://embed-cdn.spotifycdn.com https://www.youtube.com https://www.youtube-nocookie.com stun:stun.l.google.com:19302 stun:stun1.l.google.com:19302 stun:stun.cloudflare.com:3478; worker-src 'self' blob:; form-action 'self'; frame-src https://*.firebaseapp.com https://accounts.google.com https://www.google.com https://open.spotify.com https://www.youtube.com https://www.youtube-nocookie.com">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="color-scheme" content="light dark">
+  <title>ADHD Study Pack — a calm focus workspace for ADHD and autistic students</title>
+  <meta name="description" content="ADHD study workspace with a focus timer, a planner, and body-doubling tables. Sit with one partner or up to six, on camera or by voice.">
+  <link rel="canonical" href="https://www.ayanzadeh.com/adhd-study-pack/">
+  <meta name="keywords" content="ADHD study app, autism friendly study tool, pomodoro timer ADHD, focus timer, neurodivergent productivity, executive function tools, study planner ADHD, body doubling, study with me, virtual study room">
+  <meta name="author" content="Aydin Ayanzadeh">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta name="theme-color" content="#CC4520" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0D1114" media="(prefers-color-scheme: dark)">
+  <!-- Open Graph / Twitter: what a shared link looks like. -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="ADHD Study Pack">
+  <meta property="og:title" content="ADHD Study Pack — a calm focus workspace for ADHD and autistic students">
+  <meta property="og:description" content="A focus timer, a planner, and body-doubling tables for ADHD study. One partner or a table of six, on camera or by voice.">
+  <meta property="og:url" content="https://www.ayanzadeh.com/adhd-study-pack/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="ADHD Study Pack — a calm focus workspace">
+  <meta name="twitter:description" content="Focus timer, planner, and study-together tables with camera or voice. Built for ADHD and autistic attention.">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=4.45.0">
+  <link rel="manifest" href="manifest.webmanifest?v=4.45.0">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "ADHD Study Pack",
+    "url": "https://www.ayanzadeh.com/adhd-study-pack/",
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "Any browser",
+    "description": "A private, browser-based study workspace designed for ADHD and autistic attention systems: focus timer, priority matrix, week planner, calm sounds, and study-together tables with camera or voice.",
+    "featureList": [
+      "Focus timer",
+      "Week planner",
+      "Body doubling study tables with camera or voice",
+      "Calm sounds",
+      "Priority matrix",
+      "Public study card",
+      "Voice brain dump",
+      "Habit tracking"
+    ],
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "author": { "@type": "Person", "name": "Aydin Ayanzadeh" },
+    "accessibilityFeature": ["highContrastDisplay", "largePrint", "readingOrder", "structuralNavigation", "alternativeText", "audioDescription"],
+    "accessibilityHazard": ["noFlashingHazard", "noMotionSimulationHazard"]
+  }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:ital,wght@0,400;0,700;1,400;1,700&family=Archivo:wght@400;500;600;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Figtree:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,560;9..144,650&family=IBM+Plex+Mono:wght@400;500;600&family=Lexend:wght@400;500;600;700&family=Vazirmatn:wght@400;600;700&display=swap">
+  <!-- ?v= busts GitHub Pages' 10-minute cache when the app changes; bump it with VERSION in the script. -->
+  <link rel="stylesheet" href="css/adhd-study-pack.css?v=4.45.0">
+  <link rel="stylesheet" href="css/webllm-coach.css?v=4.45.0">
+  <link rel="stylesheet" href="css/guide-studio.css?v=4.45.0">
+  <link rel="stylesheet" href="css/wellbeing.css?v=4.45.0">
+  <link rel="stylesheet" href="css/mood-insights.css?v=4.45.0">
+  <link rel="stylesheet" href="css/wellbeing-music.css?v=4.45.0">
+  <link rel="stylesheet" href="css/room-tone-glass.css?v=4.45.3">
+  <link rel="stylesheet" href="css/coach-plan.css?v=1">
+  <link rel="stylesheet" href="css/glass-tabs.css?v=4.45.4">
+  <link rel="stylesheet" href="css/gate-modern.css?v=1">
+  <!-- Read by js/adhd-study-pack.js (never executed). The Firebase project
+       comes from js/firebase-config.js, so it is not repeated here. -->
+  <script type="application/json" id="focus-dial-config">
+  {
+    "appName":     "ADHD Study Pack",
+    "storageKey":  "adhd-study-pack.v1",
+    "homeUrl":     "https://www.ayanzadeh.com/",
+    "projectsUrl": "https://www.ayanzadeh.com/projects/index.html",
+    "projectUrl":  "https://www.ayanzadeh.com/projects/adhd-study-pack.html",
+    "startView":   "focus",
+    "migrateFrom": [],
+    "auth":        "auto",
+    "emailSignIn": true,
+    "seedAdmin":   false,
+    "demo":        true,
+    "embedDocs":   false,
+    "googleClientId": "17412743359-f5vndcgpgg295e9iughsprkgm94jv273.apps.googleusercontent.com"
+  }
+  </script>
 </head>
 <body>
-  <main class="card">
-    <h1>The Study Pack has moved</h1>
-    <p>It is now at <strong>ayanzadeh93.github.io/adhd-study-pack</strong>. You should arrive there in a moment.</p>
-    <p><a class="go" href="https://ayanzadeh93.github.io/adhd-study-pack/">Open the Study Pack</a></p>
+<a class="skip" href="#main">Skip to main content</a>
+<div class="app">
+  <!-- Seven destinations, not fifteen. Related screens (Tasks/Matrix under Plan,
+       the four wellbeing screens, Stats with Passport, and profile/About/Setup
+       under You) are tabs inside a destination rather than separate rail items:
+       the same screens, one level of hierarchy, far less to scan. Every screen
+       is still one keystroke away from the command palette. -->
+  <nav class="rail" aria-label="Sections">
+    <div class="brand" aria-hidden="true" title="ADHD Study Pack"><svg viewBox="0 0 40 40"><path d="M20 5.5a14.5 14.5 0 1 0 14.5 14.5"/><path d="M20 12v8l5.5 3"/><path d="M30.5 5v8M26.5 9h8"/></svg></div>
+    <button class="rail-btn" type="button" data-view="focus" aria-current="page"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg><span data-i18n="rail.focus">Focus</span></button>
+    <button class="rail-btn" type="button" data-view="plan" data-group="plan"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span data-i18n="rail.plan">Plan</span></button>
+    <button class="rail-btn" type="button" data-view="notes"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 4h14v11l-5 5H5z"/><path d="M19 15h-5v5"/></svg><span data-i18n="rail.notes">Notes</span></button>
+    <button class="rail-btn" type="button" data-view="calm" data-group="wellbeing"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8.5" stroke-dasharray="3 4"/></svg><span data-i18n="rail.wellbeing">Wellbeing</span></button>
+    <button class="rail-btn" type="button" data-view="coach"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 6h16v9H8l-4 3z"/><circle cx="9" cy="10.5" r="1"/><circle cx="12.5" cy="10.5" r="1"/><circle cx="16" cy="10.5" r="1"/></svg><span data-i18n="rail.coach">Coach</span></button>
+    <button class="rail-btn" type="button" data-view="together"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="8" cy="8" r="2.2"/><circle cx="16" cy="8" r="2.2"/><path d="M3.8 18.5c.7-2.6 2.6-4 4.4-4s3.6 1.3 4.3 3.6M12.2 18.5c.6-2.2 2.2-3.5 4-3.5 1.7 0 3.2 1.1 3.9 3"/></svg><span data-i18n="rail.together">Together</span></button>
+    <button class="rail-btn" type="button" data-view="passport" data-group="progress"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span data-i18n="rail.progress">Progress</span></button>
+    <div class="rail-sp"></div>
+    <button class="rail-btn" type="button" data-view="help"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4.5 5.5c3.1-.9 5.8-.3 7.5 1.3 1.7-1.6 4.4-2.2 7.5-1.3v13c-3.1-.9-5.8-.3-7.5 1.3-1.7-1.6-4.4-2.2-7.5-1.3z"/><path d="M12 7v12M8 10.2c1 .1 1.7.4 2.3.8M16 10.2c-1 .1-1.7.4-2.3.8"/><path d="m18.5 2 .6 1.5 1.5.6-1.5.6-.6 1.5-.6-1.5-1.5-.6 1.5-.6z"/></svg><span data-i18n="rail.help">Help</span></button>
+    <button class="rail-btn" type="button" data-view="profile" data-group="you"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c1.2-3.6 4-5.5 7-5.5s5.8 1.9 7 5.5"/></svg><span data-i18n="rail.you">You</span></button>
+    <button class="rail-btn" type="button" id="themeBtn" aria-describedby="themeLbl"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg><span id="themeLbl">Auto</span></button>
+  </nav>
 
-    <!-- A workspace saved without an account lives in this domain's storage and
-         cannot follow the person to another origin. If there is one here, offer
-         it as a file before sending them on; Import at the other end takes it
-         back. Signed-in accounts need none of this — their workspace is in the
-         account, not the browser. -->
-    <div id="keep">
-      <p><strong>One thing first.</strong> This browser has a Study Pack workspace saved on this address that will not follow you automatically. Save it, then use <em>Setup → Account and data → Import a backup</em> once you arrive.</p>
-      <button type="button" id="save">Save my workspace</button>
+  <div class="main">
+    <div class="banner" id="sampleBanner" role="region" aria-label="Demo workspace" hidden></div>
+    <header class="topbar">
+      <h1 class="sr-only">ADHD Study Pack</h1>
+      <div class="date" id="todayLbl">—</div>
+      <div class="sep"></div>
+      <div class="mini-timer" id="miniTimer" hidden>
+        <span class="dot" style="background:var(--phase)"></span>
+        <span class="num" id="miniTime">25:00</span>
+        <span style="font-size:calc(11.5px*var(--ts,1));color:var(--muted)" id="miniPhase">Focus</span>
+      </div>
+      <div class="chip track-chip" id="trackChip" hidden role="timer" aria-label="Stopwatch"></div>
+      <div class="chip" id="streakChip" title="Consecutive days with at least one finished focus session"><span class="dot" style="background:var(--alert)"></span><span><span id="streakVal">0</span>-day streak</span></div>
+      <div class="chip" id="todayChip"><span class="dot" style="background:var(--focus)"></span><span><span id="todayMin">0</span> min today</span></div>
+      <div class="chip" id="storeChip" hidden></div>
+      <button type="button" class="chip who" id="whoChip" hidden title="Open your passport"></button>
+      <div class="top-sp"></div>
+      <a class="btn sm" href="study-tools.html" title="Progress view and AI study plan">Progress &amp; AI plan</a>
+      <button class="btn sm" id="dumpBtn" title="Speak or type a list (B)"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3z"/><path d="M19 11a7 7 0 0 1-14 0M12 18v3"/></svg>Voice</button>
+      <button class="btn sm" id="soundBtn" title="Toggle the sound mix (M)"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M16 9a4 4 0 0 1 0 6"/></svg>Mix</button>
+      <button class="btn sm ghost" id="cmdBtn" title="Command palette (Ctrl or ⌘ + K)" aria-label="Command palette" aria-keyshortcuts="Control+K Meta+K">⌘K</button>
+      <nav class="topnav" id="siteNav"></nav>
+      <button class="btn sm ghost" id="signOutBtn" hidden title="Sign out">Sign out</button>
+    </header>
+
+    <!-- Second-level navigation for grouped destinations. Rendered by the
+         router: empty (and hidden) on screens that stand alone. -->
+    <nav class="group-tabs" id="groupTabs" aria-label="Section tabs" hidden></nav>
+
+    <main id="main" class="views" tabindex="-1">
+    <!-- ============ FOCUS ============ -->
+    <section class="view on" id="view-focus" aria-labelledby="focusTitle" data-arrange="off">
+      <h2 class="sr-only" id="focusTitle">Focus</h2>
+      <div class="focus-wrap" id="focusWrap">
+        <div class="side-stack dash-col" id="dashLeft" data-col="left">
+          <div class="dash-card" data-widget="quick" data-label="First run">
+            <div class="card pad" id="quickStart" hidden></div>
+          </div>
+          <div class="dash-card" data-widget="now" data-label="Now focusing on">
+            <div class="card pad">
+              <div class="panel-head"><h3>Now focusing on</h3><button class="btn sm ghost" id="pickTask">Change</button></div>
+              <div id="activeTaskBox"></div>
+            </div>
+          </div>
+          <div class="dash-card" data-widget="priority" data-label="Priority check">
+            <div class="card pad" id="focusMatrix"></div>
+          </div>
+          <div class="dash-card" data-widget="queue" data-label="Up next">
+            <div class="card pad fx-queue">
+              <div class="panel-head"><h3>Up next</h3><span class="eyebrow" id="queueCount"></span></div>
+              <div class="stack" id="focusQueue"></div>
+            </div>
+          </div>
+          <div class="dash-card" data-widget="intent" data-label="Session intent">
+            <div class="card pad">
+              <div class="panel-head"><h3>Session intent</h3></div>
+              <div class="field">
+                <label for="intentInput">One sentence — what does "done" look like?</label>
+                <textarea id="intentInput" rows="2" placeholder="Finish the derivation for Q3 and write it up neatly."></textarea>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+                <span class="eyebrow">Activation</span>
+                <div class="scale-row" style="flex:1" id="activationRow"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stage" id="stage">
+          <div class="stage-head">
+            <span class="phase-pill"><span class="dot"></span><span id="phaseName">Focus</span></span>
+            <span class="eyebrow" id="cycleLbl">Cycle 1 of 4</span>
+            <span class="top-sp"></span>
+            <button type="button" class="help-link btn sm ghost" data-help="focus" aria-label="Open Focus guide">Guide</button>
+            <div class="pips" id="pips"></div>
+          </div>
+          <div class="dash-arrange-row">
+            <button type="button" class="btn sm" id="dashArrange" aria-pressed="false" aria-label="Reorder Focus cards">Reorder</button>
+          </div>
+          <div class="dial" id="dial">
+            <canvas id="dialCanvas" class="dial-canvas" aria-hidden="true"></canvas>
+            <svg viewBox="0 0 320 320" id="dialSvg" aria-hidden="true">
+              <g id="ticks"></g>
+              <circle class="track" cx="160" cy="160" r="132" stroke-width="10"/>
+              <circle class="prog" id="prog" cx="160" cy="160" r="132" stroke-width="10"/>
+              <circle class="wake go" id="dialWake" cx="160" cy="160" r="132" stroke-width="10"/>
+            </svg>
+            <div class="dial-face">
+              <div class="clock" id="clock">25:00</div>
+              <div class="dial-end num" id="endsAt">ends 14:25</div>
+              <div class="dial-task" id="dialTask">No task selected</div>
+            </div>
+          </div>
+          <p class="session-now" id="sessionNow">Name the one thing, then start.</p>
+          <ol class="session-rail" id="sessionRail" data-step="start" aria-label="This block">
+            <li data-step="start" class="is-now" aria-current="step">Start</li>
+            <li data-step="stay">Stay</li>
+            <li data-step="close">Close</li>
+          </ol>
+          <div id="handoffCard" class="card pad handoff-card" hidden></div>
+          <div class="controls">
+            <button class="btn icon" id="resetBtn" type="button" title="Reset this interval" aria-label="Reset this interval"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></button>
+            <button class="btn-run" id="runBtn" type="button" aria-label="Start"><svg aria-hidden="true" viewBox="0 0 24 24" id="runIcon"><path d="M8 5v14l11-7z"/></svg></button>
+            <button class="btn icon" id="skipBtn" type="button" title="Skip to the next interval" aria-label="Skip to the next interval"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 5v14l9-7z"/><path d="M18 5v14"/></svg></button>
+          </div>
+          <div class="quick">
+            <button class="btn sm" id="tallyBtn" title="Log a distraction without stopping (D)"><svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01M10.3 3.9 2.5 17a2 2 0 0 0 1.7 3h15.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>Caught a distraction <span class="num" id="tallyCount">0</span></button>
+            <button class="btn sm" id="stuckBtn" type="button" data-i18n="focus.stuck">Can't start</button>
+            <button class="btn sm" id="bodyDoubleBtn">Body double</button>
+            <button class="btn sm" type="button" data-goto="together" data-i18n="focus.together">Study together</button>
+          </div>
+          <div class="cover-row" id="coverRow" role="group" aria-label="Timer cover"></div>
+        </div>
+
+        <div class="side-stack dash-col" id="dashRight" data-col="right">
+          <div class="dash-card" data-widget="today" data-label="Today's blocks">
+            <div class="card pad">
+              <div class="panel-head"><h3>Today's blocks</h3><button class="btn sm ghost" data-goto="plan">Open plan</button></div>
+              <div class="stack" id="todayBlocks"></div>
+            </div>
+          </div>
+          <div class="dash-card" data-widget="sound" data-label="Sound mix">
+            <div class="card pad fx-sound">
+              <div class="panel-head"><h3>Sound mix</h3><button class="btn sm ghost" data-goto="sound">All layers</button></div>
+              <div class="stack" id="miniMix"></div>
+              <div class="field" style="margin-top:10px">
+                <label for="masterVol">Master <span class="num" id="masterVal">60</span></label>
+                <input type="range" id="masterVol" min="0" max="100" value="60">
+              </div>
+            </div>
+          </div>
+          <div class="dash-card" data-widget="parked" data-label="Parked thoughts">
+            <div class="card pad">
+              <div class="panel-head"><h3>Parked thoughts</h3><span class="eyebrow" id="parkedCount"></span></div>
+              <div class="stack" id="parkedList"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="dash-add" id="dashAdd" hidden>
+        <p class="dash-add-lead">Add a card from the rest of the pack. Tap one and it lands on the quieter side. Arrange again any time to move or remove it.</p>
+        <div class="dash-add-row" id="dashAddList"></div>
+      </div>
+      <div id="dashShelf" hidden>
+        <div class="dash-card" data-widget="mood" data-label="Mood">
+          <div class="card pad">
+            <div class="panel-head"><h3>Mood</h3><button type="button" class="btn sm ghost" data-goto="mood">Open</button></div>
+            <div id="dashMood"></div>
+          </div>
+        </div>
+        <div class="dash-card" data-widget="habits" data-label="Habits today">
+          <div class="card pad">
+            <div class="panel-head"><h3>Habits today</h3><button type="button" class="btn sm ghost" data-goto="habits">Open</button></div>
+            <div id="dashHabits"></div>
+          </div>
+        </div>
+        <div class="dash-card" data-widget="streak" data-label="Today so far">
+          <div class="card pad">
+            <div class="panel-head"><h3>Today so far</h3><button type="button" class="btn sm ghost" data-goto="stats">Statistics</button></div>
+            <div id="dashStreak"></div>
+          </div>
+        </div>
+        <div class="dash-card" data-widget="load" data-label="Load check">
+          <div class="card pad">
+            <div class="panel-head"><h3>Load check</h3><button type="button" class="btn sm ghost" data-goto="tasks">Tasks</button></div>
+            <div id="dashLoad"></div>
+          </div>
+        </div>
+        <div class="dash-card" data-widget="week" data-label="Coming up">
+          <div class="card pad">
+            <div class="panel-head"><h3>Coming up</h3><button type="button" class="btn sm ghost" data-goto="plan">Open plan</button></div>
+            <div id="dashWeek"></div>
+          </div>
+        </div>
+        <div class="dash-card" data-widget="courses" data-label="Course load">
+          <div class="card pad">
+            <div class="panel-head"><h3>Course load</h3><button type="button" class="btn sm ghost" data-goto="plan">Open plan</button></div>
+            <p class="hint" style="margin:0 0 8px">Seven-day target.</p>
+            <div id="dashCourses"></div>
+          </div>
+        </div>
+        <div class="dash-card" data-widget="someday" data-label="Someday">
+          <div class="card pad">
+            <div class="panel-head"><h3>Someday</h3><button type="button" class="btn sm ghost" data-goto="tasks">Tasks</button></div>
+            <div id="dashSomeday"></div>
+          </div>
+        </div>
+        <div class="dash-card" data-widget="pinned" data-label="Pinned notes">
+          <div class="card pad">
+            <div class="panel-head"><h3>Pinned notes</h3><button type="button" class="btn sm ghost" data-goto="notes">Notes</button></div>
+            <div id="dashPinned"></div>
+          </div>
+        </div>
+        <div class="dash-card" data-widget="calm" data-label="Reset">
+          <div class="card pad">
+            <div class="panel-head"><h3>Reset</h3><button type="button" class="btn sm ghost" data-goto="calm">Open calm</button></div>
+            <p class="hint" id="dashCalm" style="margin:0 0 10px">If starting feels uphill, a short reset is faster than forcing the interval.</p>
+            <button type="button" class="btn sm" data-goto="calm">Start a breathing reset</button>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- ============ PLAN ============ -->
+    <section class="view" id="view-plan">
+      <div class="view-head">
+        <div class="view-title-row"><h2>Plan</h2><button type="button" class="help-link btn sm ghost" data-help="plan" aria-label="Open Plan guide">Guide</button></div>
+      </div>
+      <div class="plan-layout">
+        <aside class="plan-rail" id="planRail" aria-label="Today, upcoming, and inbox"></aside>
+        <div class="card plan-sheet" style="overflow:hidden">
+          <div class="plan-bar">
+            <div class="plan-head">
+              <button class="plan-arrow" id="weekPrev" type="button" aria-label="Previous">‹</button>
+              <strong id="weekLbl">—</strong>
+              <button class="plan-arrow" id="weekNext" type="button" aria-label="Next">›</button>
+              <button class="plan-text" id="weekToday" type="button">Today</button>
+              <span class="plan-head-sp"></span>
+              <button class="place-btn" id="placeBtn" type="button">Place</button>
+            </div>
+            <div class="plan-modes">
+              <div class="plan-mode" role="group" aria-label="Calendar layout">
+                <button type="button" data-plan="day" aria-pressed="false"><span class="plan-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 4v2.2M12 17.8V20M4 12h2.2M17.8 12H20M6.2 6.2l1.5 1.5M16.3 16.3l1.5 1.5M17.8 6.2l-1.5 1.5M7.7 16.3l-1.5 1.5"/></svg></span>Day</button>
+                <button type="button" data-plan="week" aria-pressed="false"><span class="plan-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M8 3.5v3M16 3.5v3"/></svg></span>Week</button>
+                <button type="button" data-plan="grid" aria-pressed="true"><span class="plan-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.3"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.3"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.3"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.3"/></svg></span>Grid</button>
+                <button type="button" data-plan="month" aria-pressed="false"><span class="plan-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M8 3.5v3M16 3.5v3M8 13h.01M12 13h.01M16 13h.01M8 16.5h.01M12 16.5h.01"/></svg></span>Month</button>
+              </div>
+              <button type="button" class="plan-text" id="courseworkBtn" aria-pressed="false" data-i18n="plan.coursework">Coursework</button>
+              <button type="button" class="plan-text" id="studyBtn" aria-pressed="false" data-i18n="plan.study">Study</button>
+              <button type="button" class="plan-text" id="bringBtn" aria-pressed="false" data-i18n="plan.bring">Bring in</button>
+              <button type="button" class="plan-text" id="bySubjectBtn" aria-pressed="false">By subject</button>
+              <button type="button" class="plan-done" id="showDoneBtn" aria-pressed="false">Show done</button>
+            </div>
+            <div class="plan-meter" id="planMeter" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Finished in this range"><span></span></div>
+          </div>
+          <div id="taskDock" class="task-dock" hidden></div>
+          <div id="calScroll" class="cal-scroll" tabindex="0" role="region" aria-label="Week calendar">
+            <div class="cal" id="calGrid"></div>
+          </div>
+          <div id="courseworkPanel" class="coursework" hidden aria-label="Coursework"></div>
+          <div id="studyDesk" class="coursework" hidden aria-label="Study"></div>
+          <div id="bringPanel" class="coursework" hidden aria-label="Bring in"></div>
+        </div>
+        <div class="side-stack">
+          <div class="card pad">
+            <div class="panel-head"><h3>Study plan</h3><button class="btn sm ghost" id="addSubject">+ Course</button></div>
+            <div class="stack" id="subjectList"></div>
+            <button class="btn primary" id="autoPlan" style="width:100%;justify-content:center;margin-top:12px">Auto-schedule this week</button>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="view" id="view-tasks">
+      <div class="view-head">
+        <div class="view-title-row"><h2>Tasks</h2><button type="button" class="help-link btn sm ghost" data-help="tasks" aria-label="Open Tasks guide">Guide</button></div>
+        <span class="top-sp"></span>
+        <button class="btn sm" id="pasteTasks">Paste a list</button>
+        <button class="btn sm" id="triageBtn">Sort unsorted</button>
+        <button class="btn sm" id="clearDone">Clear finished</button>
+      </div>
+      <div class="grid side">
+        <div class="card pad">
+          <form id="taskForm" style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px">
+            <p class="hint" id="taskHint" hidden></p>
+            <div id="taskViews" class="task-views" hidden></div>
+            <div class="field" style="flex:1;min-width:200px"><label for="taskTitle">New task</label><input type="text" id="taskTitle" placeholder="chapter 3 friday 2 pomos #stats" autocomplete="off"></div>
+            <button class="btn" type="button" id="taskMoreBtn">Details</button>
+            <button class="btn" type="button" id="taskVoice">Voice</button>
+            <button class="btn primary" type="submit">Add</button>
+            <div id="taskFields" hidden>
+            <div class="field" style="width:96px"><label for="taskEst">Pomos</label><input type="number" id="taskEst" min="1" max="16" value="2"></div>
+            <div class="field" style="width:130px"><label for="taskEnergy">Activation</label><select id="taskEnergy"><option value="low">Low — easy start</option><option value="med" selected>Medium</option><option value="high">High — dreaded</option></select></div>
+            <div class="field" style="width:150px"><label for="taskSubject">Course</label><select id="taskSubject"></select></div>
+            <div class="field" style="width:150px"><label for="taskQuad">Matrix</label><select id="taskQuad">
+              <option value="">Unsorted</option>
+              <option value="q1">Q1 — do first</option>
+              <option value="q2">Q2 — schedule</option>
+              <option value="q3">Q3 — trim</option>
+              <option value="q4">Q4 — drop</option></select></div>
+            </div>
+          </form>
+          <div class="stack" id="taskList"></div>
+        </div>
+        <div class="side-stack">
+          <div class="card pad" id="todoistCard"></div>
+          <div class="card pad">
+            <div class="panel-head"><h3>Start with the dread</h3><button type="button" class="help-link btn sm ghost" data-help="tasks" aria-label="Why dread tasks matter">Guide</button></div>
+            <div class="stack" id="dreadList"></div>
+          </div>
+          <div class="card pad">
+            <div class="panel-head"><h3>Load check</h3></div>
+            <div class="stack" id="loadCheck"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============ MATRIX ============ -->
+    <section class="view" id="view-matrix">
+      <div class="view-head">
+        <div class="view-title-row"><h2>Priority matrix</h2><button type="button" class="help-link btn sm ghost" data-help="matrix" aria-label="Open Priority matrix guide">Guide</button></div>
+        <span class="top-sp"></span>
+        <button class="btn sm primary" id="mxTriage">Sort the unsorted <span class="num" id="mxUnsortedN">0</span></button>
+      </div>
+      <p class="mx-lead">Two questions. Is it urgent? Does it matter? Then put the task in a box. Tap a task to move it.</p>
+      <div class="grid side">
+        <div class="card pad">
+          <div class="mx-frame">
+            <div class="mx-corner"></div>
+            <div class="mx-top">Urgent</div>
+            <div class="mx-top">Not urgent</div>
+            <div class="mx-side">Important</div>
+            <div class="mx-cell" data-quad="q1" data-drop="q1"></div>
+            <div class="mx-cell" data-quad="q2" data-drop="q2"></div>
+            <div class="mx-side">Not important</div>
+            <div class="mx-cell" data-quad="q3" data-drop="q3"></div>
+            <div class="mx-cell" data-quad="q4" data-drop="q4"></div>
+          </div>
+          <div class="mx-tray" id="mxTray" data-drop="none"></div>
+        </div>
+        <div class="side-stack">
+          <div class="card pad" id="mxBalance"></div>
+          <div class="card pad" id="mxGuide"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ NOTES ============ -->
+    <section class="view" id="view-notes">
+      <div class="view-head">
+        <div class="view-title-row"><h2>Notes</h2><button type="button" class="help-link btn sm ghost" data-help="notes" aria-label="Open Notes guide">Guide</button></div>
+        <span class="top-sp"></span>
+        <input type="text" id="noteSearch" placeholder="Search notes…" style="width:200px">
+        <button class="btn sm primary" id="addNote">+ Note</button>
+      </div>
+      <div class="board" id="board"></div>
+    </section>
+
+    <!-- ============ MUSIC ============ -->
+    <section class="view wb" id="view-sound" aria-labelledby="soundTitle">
+      <div class="view-head music-view-head">
+        <div class="music-heading"><h2 id="soundTitle">Music &amp; sound</h2><p>Settle in with a desk piece, your playlists, or a little room tone.</p></div>
+        <button class="btn sm" id="jumpPlaylists" type="button">Your playlists</button>
+      </div>
+      <div class="room" data-scene="rain">
+        <img id="soundScene" class="room-photo" alt="" width="960" height="540" src="img/scene-rain.jpg?v=4.45.0">
+        <div class="room-shade" aria-hidden="true"></div>
+        <div id="glassMount"></div>
+      </div>
+      <section class="music-library" aria-labelledby="playlistTitle">
+        <div class="music-library-head">
+          <div><h3 id="playlistTitle" tabindex="-1">Your playlists <span id="playlistCount" class="music-count">0</span></h3><p>Keep the sounds you come back to in one place.</p></div>
+          <button class="btn sm primary" id="addLink" type="button">Add a playlist</button>
+        </div>
+        <div class="music-library-grid" id="linkList"></div>
+        <p class="music-library-note">Spotify and YouTube can play here. Other links open in a new tab. Availability depends on the provider.</p>
+      </section>
+      <section class="room-tone" aria-label="Room tone">
+        <div class="room-tone-head">
+          <h3>Room tone</h3>
+          <div id="soundPresets"></div>
+          <span class="top-sp"></span>
+          <button class="btn sm" id="savePresetBtn" type="button">Save mix</button>
+          <button class="btn sm" id="soundStop" type="button">Silence</button>
+        </div>
+        <div class="mix" id="mixGrid"></div>
+        <p class="tone-credit">Real recordings, mastered as seamless loops. Via Wikimedia Commons — rain against the window (public domain), ocean waves on a tropical beach (CC0), campfire ambience (CC BY 3.0), morning birdsong by Matutinho (CC BY-SA 4.0), wind in a Swedish pine forest by W.carter (CC BY-SA 4.0), a close stream by jackthemurray (CC0), rain and thunder by David Öhlin (public domain), a crickets choir (CC BY-SA 4.0), a Dordogne pond by Glaneur de sons (CC BY 3.0), a dawn chorus by Robert EA Harvey (CC BY-SA 4.0), cicadas (CC0), a city street by Extemporalist (CC0), an espresso machine by hugh (public domain), Toronto subway by PascalHD (CC BY 4.0), typing by dustin-davis (CC0), the TU Delft library by el_mar (CC BY 3.0), Waterfall Gully (CC BY-SA 3.0), howling wind by Tvabutzku1234 (CC0), Treak Cliff Cavern drips by Andy Mabbett (CC BY-SA 3.0), a Chiang Mai night by Takeaway (CC BY-SA 3.0), a gentle meadow breeze by ezwa (public domain), a Christmas market by LG (CC BY 3.0), a purring cat by Lina Gebhardt & Anna Muck (CC BY-SA 4.0) and Koshi chimes (CC0). Full list: <a href="CREDITS.md" target="_blank" rel="noopener">CREDITS.md</a>.</p>
+        <div id="bilateralMount"></div>
+      </section>
+      <details class="sound-more">
+        <summary>Headphone tones</summary>
+          <div class="card pad music-headphone-panel">
+            <div class="panel-head"><h3>Binaural tone</h3><button class="btn sm" id="binauralToggle" type="button" aria-pressed="false">Start tone</button></div>
+            <p class="music-library-note">A separate tone in each ear. Use headphones and a comfortable volume; choose whatever helps you settle.</p>
+            <div class="music-tone-controls">
+              <div class="field"><label for="beatFreq">Beat <span class="num" id="beatVal">10</span> Hz — <span id="beatBand">alpha</span></label><input type="range" id="beatFreq" min="2" max="20" step="0.5" value="10"></div>
+              <div class="field"><label for="carrierFreq">Carrier <span class="num" id="carrierVal">180</span> Hz</label><input type="range" id="carrierFreq" min="80" max="400" step="10" value="180"></div>
+              <div class="field"><label for="binauralVolume">Tone volume <span class="num" id="binauralVal">30</span>%</label><input type="range" id="binauralVolume" min="0" max="100" value="30"></div>
+            </div>
+          </div>
+      </details>
+    </section>
+    <!-- ============ CALM ============ -->
+    <section class="view wb" id="view-calm" aria-labelledby="calmTitle">
+      <div id="glassDock" class="glass-dock" hidden></div>
+      <div class="view-head wellbeing-heading">
+        <div class="view-title-row"><h2 id="calmTitle">A little room to reset.</h2><button type="button" class="help-link btn sm ghost" data-help="calm" aria-label="Open Calm guide">Guide</button></div>
+        <p class="wb-lead">Breathe, check in, or find your feet. Choose what feels useful right now.</p>
+      </div>
+      <nav class="wb-shortcuts" aria-label="Explore wellbeing">
+        <button type="button" data-goto="sound"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 14v-3a8 8 0 0 1 16 0v3M4 12h3v8H4zM17 12h3v8h-3z"/></svg><span>Find your sound<small>Music and room tones</small></span></button>
+        <button type="button" data-goto="mood"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l5-6 5 3 8-10M3 21h18"/><circle cx="8" cy="11" r="1"/></svg><span>Notice how you feel<small>Mood, energy, and stress</small></span></button>
+        <button type="button" data-goto="habits"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l4 4 10-10M5 3h14v18H5z"/></svg><span>Keep a small promise<small>Your everyday habits</small></span></button>
+      </nav>
+      <section class="glass-mood" id="glassMood" aria-labelledby="gmTitle">
+        <div class="gm-head"><h3 id="gmTitle">How are you, right now?</h3><span class="gm-sub" id="gmLast">One tap. It stays on this device.</span></div>
+        <div class="gm-faces" id="gmFaces" role="group" aria-label="Pick your mood"></div>
+        <div class="gm-week" id="gmWeek" aria-label="Your last 7 days"></div>
+      </section>
+      <div class="grid side calm-split">
+        <div class="card pad breathing-card">
+          <div class="panel-head"><h3>Breathing pacer</h3><div class="scale-row" id="breathModes"></div></div>
+          <p class="wb-card-note">A visual rhythm to follow. You set the pace.</p>
+          <div class="breath-stage">
+            <div class="orb" id="orb">
+              <div class="ring"></div>
+              <div class="core"></div>
+              <div class="breath-reading"><div class="orb-txt" id="orbTxt" role="status" aria-live="polite" aria-atomic="true">Ready</div><span id="breathSeconds" aria-hidden="true">At your pace</span></div>
+            </div>
+            <div class="orb-count num" id="orbCount" style="margin:0">0 cycles · 0:00</div>
+            <div style="display:flex;gap:8px">
+              <button class="btn primary" id="breathBtn" type="button" aria-pressed="false">Start breathing</button>
+              <button class="btn" id="breathStop" type="button" disabled>Stop</button>
+            </div>
+            <p style="font-size:calc(12px*var(--ts,1));color:var(--muted);max-width:46ch;text-align:center;margin:0" id="breathHint"></p>
+          </div>
+        </div>
+        <div class="side-stack">
+          <div class="card pad checkin-card">
+            <div class="panel-head"><h3>Check in</h3><span class="eyebrow" id="lastCheckin"></span></div>
+            <p class="wb-card-note">No right answer. Just a snapshot of this moment.</p>
+            <div class="stack" style="gap:12px" id="checkinSliders"></div>
+            <div class="field" style="margin-top:10px"><label for="checkNote">Anything worth remembering?</label><input type="text" id="checkNote" placeholder="Slept 5h, coffee at 3pm, room too warm"></div>
+            <button class="btn primary" id="saveCheckin" style="width:100%;justify-content:center;margin-top:10px">Save check-in</button>
+          </div>
+          <div class="card pad grounding-card">
+            <div class="panel-head"><h3>90-second reset</h3></div>
+            <div class="stack" id="groundList"></div>
+            <button class="btn" id="groundStart" style="width:100%;justify-content:center;margin-top:10px">Run 5-4-3-2-1</button>
+          </div>
+          <div class="card pad">
+            <div class="panel-head"><h3>Movement snacks</h3><span class="eyebrow">for the break</span></div>
+            <div class="stack" id="moveList"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ COACH ============
+         Static markup. This used to be injected into the page by boot.js after
+         the shell was fetched; it is a normal section like every other view. -->
+    <section class="view" id="view-coach" aria-labelledby="coachTitle">
+      <div class="view-head compact">
+        <div class="view-title-row"><h2 id="coachTitle">Study coach</h2></div>
+        <!-- Rewritten by paintProviderUi(): the on-device claim is not true of
+             an online coach, and this is a privacy statement, so it has to
+             follow what is actually selected. -->
+        <p class="view-sub" data-coach-privacy>Runs on your own device. Nothing you type here leaves the browser.</p>
+      </div>
+      <div class="coach-full">
+        <div class="card coach-shell">
+          <div class="coach-head">
+            <div class="coach-id">
+              <div class="coach-avatar" aria-hidden="true">✦</div>
+              <div><h3>One clear next step</h3><p class="sub">A study partner for the work in front of you.</p></div>
+            </div>
+            <div class="coach-head-actions">
+              <button type="button" class="btn sm ghost" data-coach-clear>Clear thread</button>
+            </div>
+          </div>
+          <div class="coach-stage">
+            <div class="coach-model-picker"><label for="coachModel">Choose a coach</label>
+            <select id="coachModel" data-coach-model></select>
+            </div>
+            <button type="button" class="btn sm primary" data-coach-load hidden>Load on this device</button>
+            <button type="button" class="btn sm ghost" data-coach-stop hidden>Stop response</button>
+            <p class="coach-status" data-coach-status role="status" aria-live="polite">Ask to list, find, open, add, or start</p>
+            <div class="coach-progress" aria-hidden="true"><span data-coach-bar></span></div>
+          </div>
+          <!-- API key for the selected online coach. Hidden for the on-device one. -->
+          <div class="coach-connect" data-coach-connect hidden></div>
+          <!-- Voice is opt-in and per-reply: nothing is ever spoken automatically. -->
+          <div class="coach-voice" id="coachVoice" hidden>
+            <button type="button" class="btn sm ghost" id="coachSpeakToggle" aria-pressed="false">
+              <svg aria-hidden="true" viewBox="0 0 24 24" width="14" height="14"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M16 9a4 4 0 0 1 0 6"/></svg>
+              Read replies aloud
+            </button>
+            <button type="button" class="btn sm ghost" id="coachReplay" hidden>Replay</button>
+            <button type="button" class="btn sm ghost" id="coachStopVoice" hidden>Stop</button>
+            <span class="coach-voice-note" id="coachVoiceNote"></span>
+          </div>
+          <div class="coach-log" data-coach-log role="log" aria-live="polite" aria-relevant="additions text" aria-label="Conversation" tabindex="0">
+            <article class="coach-msg system coach-welcome"><div class="coach-welcome-mark" aria-hidden="true">✦</div><div class="coach-welcome-copy"><div class="who">Study coach</div><div class="bubble">One next step is enough. Tell me what feels stuck, or choose a prompt below.</div></div></article>
+          </div>
+          <div class="coach-chips" role="group" aria-label="Suggested prompts"></div>
+          <form class="coach-composer" data-coach-form>
+            <label class="sr-only" for="coachViewInput">Message the coach</label>
+            <textarea id="coachViewInput" data-coach-input rows="2" placeholder="What would help you get started?" aria-describedby="coachComposerHint"></textarea>
+            <div class="coach-compose-action"><span id="coachComposerHint">Enter to send · Shift + Enter for a new line</span><button class="btn primary" type="submit" data-coach-send>Send</button></div>
+          </form>
+        </div>
+        <aside class="coach-aside" aria-label="Coach ideas">
+          <section class="card coach-aside-card coach-plan-card" id="coachPlan"></section>
+          <section class="card coach-aside-card coach-guide-card">
+            <span class="coach-aside-mark" aria-hidden="true">↗</span>
+            <p class="coach-aside-label">Start smaller</p>
+            <h3>Make the next move feel possible.</h3>
+            <p>Say what feels hard. The coach can turn a big task into one clear two-minute beginning.</p>
+          </section>
+          <section class="card coach-aside-card">
+            <h3>Useful things to ask</h3>
+            <ul class="coach-capabilities">
+              <li>Find or organize an open task</li>
+              <li>Break study work into small steps</li>
+              <li>Start a focus block or open your plan</li>
+              <li>Park an idea before it slips away</li>
+            </ul>
+          </section>
+          <section class="card coach-aside-card coach-boundary-card">
+            <h3>Your choice, every time</h3>
+            <p>Simple workspace actions work without an AI model. Online coaches use your own provider key; the on-device model keeps prompts in this browser.</p>
+          </section>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============ STUDY TOGETHER ============
+         Match, then a video room. Picture and voice stay between the browsers. -->
+    <section class="view" id="view-together" aria-labelledby="togetherTitle">
+      <div id="tblLobby">
+        <div class="view-head compact">
+          <div class="view-title-row"><h2 id="togetherTitle">Study together</h2></div>
+          <p>Pick a session, then start. If someone else is waiting with the same choices, you sit with them. Otherwise the room stays open until they arrive.</p>
+        </div>
+        <div class="tbl-invite" id="tblInvite" hidden>
+          <p>A friend saved you a seat</p>
+          <p class="tbl-code" id="tblInviteCode"></p>
+          <p class="hint">Camera is selected so you can join in one tap. Switch to voice if you do not want a picture. Sign in with Google if this page asks.</p>
+        </div>
+        <fieldset class="tbl-set">
+          <legend>Session type</legend>
+          <label class="tbl-opt"><input type="radio" name="tbl-type" value="pair" checked><span><strong>1:1 study session</strong><small>You and one partner.</small></span></label>
+          <label class="tbl-opt"><input type="radio" name="tbl-type" value="group"><span><strong>Group study</strong><small>Up to six people.</small></span></label>
+        </fieldset>
+        <fieldset class="tbl-set">
+          <legend>Study mode</legend>
+          <label class="tbl-opt"><input type="radio" name="tbl-vibe" value="chill" checked><span><strong>Chill focus</strong><small>Quiet company. Mics start off.</small></span></label>
+          <label class="tbl-opt"><input type="radio" name="tbl-vibe" value="hard"><span><strong>Hard focus</strong><small>25 minutes, then 5. Mics start off.</small></span></label>
+          <label class="tbl-opt"><input type="radio" name="tbl-vibe" value="account"><span><strong>Accountability</strong><small>25 minute blocks, and a check every 15. Mics start off.</small></span></label>
+          <label class="tbl-opt"><input type="radio" name="tbl-vibe" value="talk"><span><strong>Talk it out</strong><small>25 minute blocks. Mics start on.</small></span></label>
+        </fieldset>
+        <fieldset class="tbl-set">
+          <legend>Camera</legend>
+          <label class="tbl-opt"><input type="radio" name="tbl-cam" value="video" checked><span><strong>Camera on</strong><small>They can see you.</small></span></label>
+          <label class="tbl-opt"><input type="radio" name="tbl-cam" value="audio"><span><strong>Voice only</strong><small>No picture. You can still hear each other.</small></span></label>
+        </fieldset>
+        <label class="tbl-list-opt" for="tblOpen"><input type="checkbox" id="tblOpen" checked> Match me with someone who is free. Uncheck this if the room is only for a person you send the link to.</label>
+        <label class="tbl-intent-edit" for="tblIntent">Shared intention <span>(optional)</span><input type="text" id="tblIntent" maxlength="160" placeholder="Read two pages, then compare notes"></label>
+        <button type="button" class="btn primary tbl-start" id="tblStart">Start studying</button>
+        <div class="tbl-join">
+          <label class="sr-only" for="tblCodeIn">Room code</label>
+          <input type="text" id="tblCodeIn" maxlength="32" placeholder="Room code, or paste an invite" autocomplete="off" spellcheck="false" autocapitalize="off">
+          <button type="button" class="btn" id="tblJoin">Sit down</button>
+        </div>
+        <button type="button" class="btn" id="tblSign">Continue with Google</button>
+        <h3 class="tbl-open-title">Open rooms</h3>
+        <div id="tblOpenList" class="tbl-open-list"><p class="hint">Sign in with Google to see open rooms.</p></div>
+      </div>
+
+      <div id="tblMatch" class="tbl-match" hidden>
+        <div class="tbl-match-bar">
+          <strong>Study together</strong>
+          <button type="button" class="btn sm" id="tblMatchBack">← Back</button>
+        </div>
+        <div class="tbl-match-hero">
+          <div class="tbl-ring" aria-hidden="true"></div>
+          <h2 id="tblMatchTitle">Looking for your study partner…</h2>
+          <p id="tblMatchSub">Finding someone ready to focus…</p>
+        </div>
+        <div class="tbl-facts">
+          <div><span>Session type</span><strong id="tblMatchType">1:1 study session</strong></div>
+          <div><span>Study mode</span><strong id="tblMatchVibe">Chill focus</strong></div>
+          <div><span>Camera</span><strong id="tblMatchCam">On</strong></div>
+          <div><span>Waiting time</span><strong id="tblMatchWait">0:00</strong></div>
+        </div>
+        <div class="tbl-found" id="tblMatchBanner" hidden>
+          <p class="tbl-found-title">Perfect match found</p>
+          <p>You're about to sit with another student. Picture and voice go straight between your browsers. This page does not record them.</p>
+        </div>
+        <button type="button" class="btn" id="tblMatchShare">Share this room instead</button>
+      </div>
+
+      <div id="tblRoom" class="tbl-room" hidden>
+        <div class="tbl-stage">
+          <div class="tbl-stage-top">
+            <div class="tbl-pill">
+              <span class="tbl-live" aria-hidden="true"></span>
+              <strong id="tblSessionLabel">1:1 study session active</strong>
+              <span id="tblCount">1 participant</span>
+              <span id="tblElapsed">0m</span>
+            </div>
+            <button type="button" class="tbl-share" id="tblShare"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v10M8 8l4-4 4 4"/><path d="M6 14v4a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-4"/></svg> Share room</button>
+          </div>
+          <p class="tbl-wait" id="tblWait">Waiting for someone to sit down. Share the room if you already know who.</p>
+          <p class="tbl-room-intent" id="tblRoomIntent" hidden></p>
+          <div id="tblSeats" class="tbl-seats"></div>
+          <aside class="tbl-focus" id="tblTimer">
+            <button type="button" class="tbl-x" id="tblTimerClose" aria-label="Close timer">×</button>
+            <div class="tbl-dial" id="tblDial"><span id="tblClock">25:00</span></div>
+            <p id="tblPhase">Focus time</p>
+            <div class="tbl-timer-actions">
+              <button type="button" id="tblTimerStart">Start</button>
+              <button type="button" id="tblTimerReset">Reset</button>
+            </div>
+          </aside>
+          <button type="button" class="tbl-timer-show" id="tblTimerShow" hidden>Focus</button>
+          <div class="tbl-dock">
+            <div class="tbl-tools">
+              <button type="button" id="tblCam" aria-label="Turn camera off"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8.5A2.5 2.5 0 0 1 5.5 6h7A2.5 2.5 0 0 1 15 8.5v7a2.5 2.5 0 0 1-2.5 2.5h-7A2.5 2.5 0 0 1 3 15.5z"/><path d="m15 11 5-3v8l-5-3z"/></svg></button>
+              <button type="button" id="tblMute" aria-label="Mute microphone"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4"/></svg></button>
+              <button type="button" id="tblScreen" aria-label="Share screen"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></button>
+            </div>
+            <button type="button" class="tbl-end" id="tblLeave"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a7 7 0 0 1 7 7c0 2.2-1 3.6-2 4.6V17a1 1 0 0 1-1 1h-8a1 1 0 0 1-1-1v-2.4C6 13.6 5 12.2 5 10a7 7 0 0 1 7-7z"/><path d="M9 21h6"/></svg> End</button>
+          </div>
+        </div>
+        <div class="tbl-check" id="tblCheck" hidden>
+          <p>Still with the room?</p>
+          <button type="button" class="btn sm primary" id="tblHere">I'm here</button>
+        </div>
+        <p class="tbl-code tbl-code-quiet" id="tblCodeShow"></p>
+        <button type="button" class="btn sm" id="tblCopy">Copy link</button>
+        <label class="sr-only" for="tblLink">Invite link</label>
+        <input id="tblLink" class="tbl-link" readonly value="" aria-label="Invite link">
+      </div>
+      <p class="hint" id="tblStatus" role="status">1:1, chill focus, and camera are selected. Start when you are ready.</p>
+    </section>
+
+    <!-- ============ PROFILE (You) ============
+         The identity card used to live inside Passport, which made that screen
+         half profile editor and half achievement wall. Passport is now purely
+         about progress; this is who you are. -->
+    <section class="view" id="view-profile" aria-labelledby="profileTitle">
+      <div class="view-head compact">
+        <div class="view-title-row"><h2 id="profileTitle">Your profile</h2></div>
+        <p>The card below is what another student sees. Your tasks, notes, and email stay private.</p>
+      </div>
+      <div class="profile-wrap">
+        <div class="stack" style="gap:16px">
+          <article class="pub-card" id="pubPreview" aria-live="polite"></article>
+          <div class="card pad passport-hero">
+            <div class="passport-photo-wrap">
+              <div class="passport-photo" id="passportPhotoBtn" role="img" aria-label="Your photo"></div>
+              <button type="button" class="btn sm" id="passportPhotoPick" aria-label="Change photo">Change photo</button>
+              <button type="button" class="btn sm ghost" id="passportPhotoClear" hidden>Remove photo</button>
+              <input type="file" id="passportPhoto" accept="image/*" hidden>
+            </div>
+            <div class="passport-id">
+              <p class="eyebrow" id="passportEmail">Not signed in</p>
+              <div class="field">
+                <label for="passportName">Display name</label>
+                <input type="text" id="passportName" maxlength="80" placeholder="What should we call you?" autocomplete="nickname">
+              </div>
+              <div class="field">
+                <label for="passportUser">Username</label>
+                <div class="handle-field">
+                  <span aria-hidden="true">@</span>
+                  <input type="text" id="passportUser" maxlength="24" placeholder="aydin" autocomplete="username" spellcheck="false" autocapitalize="off" autocorrect="off" inputmode="text">
+                </div>
+              </div>
+              <p class="hint" id="passportUserHint">Letters, numbers, and underscore. Shown as @username.</p>
+              <div class="field">
+                <label for="passportBio">A line about you</label>
+                <textarea id="passportBio" rows="3" maxlength="280" placeholder="How you study, what you are working on, anything you want on this card."></textarea>
+              </div>
+              <p class="hint" id="passportHint">The name, username, line, and photo are the only things that can go on the public card.</p>
+            </div>
+          </div>
+          <div class="card pad" id="profileLevelCard"></div>
+        </div>
+        <div class="side-stack">
+          <div class="card pad" id="pubPanel">
+            <div class="panel-head"><h3>Who can see this</h3></div>
+            <label class="pub-toggle" for="pubListed">
+              <input type="checkbox" id="pubListed">
+              <span><strong>Show my card</strong><small>A signed-in student can open it by your @username.</small></span>
+            </label>
+            <p class="pub-cap" id="pubStatus" role="status">Private. Only you can see this card.</p>
+            <div class="pub-find">
+              <label class="sr-only" for="pubFind">Find a student</label>
+              <input type="text" id="pubFind" maxlength="32" placeholder="@username" autocomplete="off" spellcheck="false" autocapitalize="off" autocorrect="off">
+              <button type="button" class="btn" id="pubFindGo">Open</button>
+            </div>
+            <div id="pubResult"></div>
+          </div>
+          <div class="card pad" id="profileCoachCard"></div>
+          <div class="card pad" id="profileAccountCard"></div>
+          <div class="card pad" id="expandYou"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ HELP ============ -->
+    <section class="view" id="view-help" aria-labelledby="helpTitle">
+      <div class="view-head compact">
+        <div class="view-title-row"><h2 id="helpTitle">Help</h2></div>
+      </div>
+      <div class="help">
+        <header class="help-hero" aria-labelledby="helpIntroTitle">
+          <div class="help-emblem" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="22"/><path d="M32 20v12l8 5"/><path d="M48 9v10M43 14h10"/><path d="M12 48l4 4"/></svg></div>
+          <div class="help-hero-copy">
+            <p class="help-kicker">ADHD STUDY PACK <span aria-hidden="true">·</span> FIELD GUIDE</p>
+            <h3 id="helpIntroTitle">Find your next clear step.</h3>
+            <p>Short, practical guides to the tools, study rhythms, and settings in your pack.</p>
+          </div>
+          <span class="help-guide-count" id="helpGuideCount" aria-label="Available guides"><strong>22</strong><span>guides</span></span>
+        </header>
+        <div class="help-toolbar">
+          <label class="sr-only" for="helpSearch">Search guides</label>
+          <div class="help-search-wrap">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></svg>
+            <input type="search" id="helpSearch" class="help-search" placeholder="Search tools, topics, or questions" autocomplete="off" enterkeyhint="search">
+            <kbd class="help-shortcut" title="Opens quick navigation">Ctrl / ⌘ K</kbd>
+          </div>
+          <div class="help-cats" id="helpCats" role="tablist" aria-label="Guide categories" aria-orientation="horizontal"></div>
+          <div class="help-results-meta"><p id="helpResultCount" role="status" aria-live="polite">All guides</p><button type="button" class="help-clear" id="helpClear" hidden>Clear filters</button></div>
+        </div>
+        <div class="help-grid" id="helpGrid" role="region" aria-label="Help guides"></div>
+        <div class="help-empty" id="helpEmpty" hidden><span class="help-empty-mark" aria-hidden="true">⌕</span><h3>No guides found</h3><p>Try a shorter search, choose a different topic, or clear your filters.</p></div>
+        <details class="help-coach-tour" id="helpCoachTour">
+          <summary><span class="help-tour-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 10h.01M12 10h.01M16 10h.01"/></svg></span><span><strong>Take a visual tour of the Study Coach</strong><small>Six short examples, at your own pace</small></span><span class="help-tour-chevron" aria-hidden="true">⌄</span></summary>
+          <div id="guideStudio" class="help-tour-content"></div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ============ ABOUT ============
+         Every animation here is decorative and additive: the section is
+         complete and readable with all of it switched off, which is what
+         happens under reduced motion or Setup → Motion. -->
+    <section class="view" id="view-about">
+      <h2 class="sr-only">About the ADHD Study Pack</h2>
+      <div class="card pad" id="discoverCard"></div>
+      <div class="about">
+        <header class="ab-hero reveal" id="abHero">
+          <div class="ab-aurora" aria-hidden="true"><span></span><span></span><span></span></div>
+          <div class="ab-hero-grid">
+            <div class="ab-hero-txt">
+              <p class="ab-eyebrow">Built around the attention you actually have</p>
+              <h3 class="ab-title">The <span class="ab-shine">Study&nbsp;Pack</span></h3>
+              <p class="ab-lead">A workspace for the two moments that decide a study session: the one where starting feels impossible, and the one where you surface an hour later with no idea where it went.</p>
+              <div class="ab-cta">
+                <button class="btn primary" type="button" data-goto="focus">Start a 25-minute block</button>
+                <button class="btn" type="button" data-goto="mood">Log how you feel</button>
+              </div>
+            </div>
+            <div class="ab-mark" aria-hidden="true">
+              <svg viewBox="0 0 220 220" class="ab-dial">
+                <defs>
+                  <linearGradient id="abG" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="var(--focus)"/><stop offset="55%" stop-color="var(--accent)"/><stop offset="100%" stop-color="var(--rest)"/>
+                  </linearGradient>
+                </defs>
+                <circle class="ab-track" cx="110" cy="110" r="86"/>
+                <circle class="ab-prog" cx="110" cy="110" r="86"/>
+                <circle class="ab-spark" cx="110" cy="24" r="5"/>
+                <g class="ab-ticks">
+                  <path d="M110 8v12M110 200v12M8 110h12M200 110h12"/>
+                </g>
+              </svg>
+              <div class="ab-mark-clock num">25:00</div>
+            </div>
+          </div>
+        </header>
+
+        <div class="ab-stats reveal" id="abStats"></div>
+
+        <section class="ab-places reveal" id="abPlaces" aria-labelledby="abPlacesTitle">
+          <div class="ab-places-head">
+            <div><h3 id="abPlacesTitle">Pick a place to begin.</h3><p>Choose the kind of support that fits today.</p></div>
+            <span class="ab-places-note">Three ways into the same workspace</span>
+          </div>
+          <div class="ab-places-grid">
+            <button class="ab-place" type="button" data-goto="focus">
+              <span class="ab-place-art" aria-hidden="true">
+                <svg class="ab-place-fallback" viewBox="0 0 48 48"><circle cx="24" cy="26" r="15"/><path d="M24 17v9l6 4M19 4h10M24 4v6"/></svg>
+                <img data-about-image src="img/assistant-desk.jpg?v=4.45.0" alt="" width="960" height="540" loading="lazy" decoding="async">
+              </span>
+              <span class="ab-place-copy"><span class="ab-place-topic">Focus</span><strong>Make one small start</strong><span>Two minutes counts.</span><span class="ab-place-open">Open Focus <svg viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></svg></span></span>
+            </button>
+            <button class="ab-place" type="button" data-goto="mood">
+              <span class="ab-place-art" aria-hidden="true">
+                <svg class="ab-place-fallback" viewBox="0 0 48 48"><path d="M8 36V13M8 36h33M13 29l8-8 7 4 10-12"/><circle cx="21" cy="21" r="2"/><circle cx="28" cy="25" r="2"/></svg>
+                <img data-about-image src="img/scene-forest.jpg?v=4.45.0" alt="" width="960" height="540" loading="lazy" decoding="async">
+              </span>
+              <span class="ab-place-copy"><span class="ab-place-topic">Mood</span><strong>Notice your rhythm</strong><span>Mood and energy beside focus time.</span><span class="ab-place-open">Open Mood <svg viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></svg></span></span>
+            </button>
+            <button class="ab-place" type="button" data-goto="sound">
+              <span class="ab-place-art" aria-hidden="true">
+                <svg class="ab-place-fallback" viewBox="0 0 48 48"><path d="M7 25h4M15 17v16M22 11v28M29 18v14M36 7v36M42 22v7"/></svg>
+                <img data-about-image src="img/scene-ocean.jpg?v=4.45.0" alt="" width="960" height="540" loading="lazy" decoding="async">
+              </span>
+              <span class="ab-place-copy"><span class="ab-place-topic">Music</span><strong>Settle into a sound</strong><span>Pick a playlist, then ease back in.</span><span class="ab-place-open">Open Music <svg viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></svg></span></span>
+            </button>
+          </div>
+        </section>
+
+        <h3 class="ab-h reveal">What is in it</h3>
+        <div class="ab-grid" id="abGrid"></div>
+
+        <h3 class="ab-h reveal">How one block goes</h3>
+        <ol class="ab-flow" id="abFlow"></ol>
+
+        <div class="ab-notes reveal" id="abNotes"></div>
+      </div>
+    </section>
+
+    <!-- ============ MOOD ============ -->
+    <section class="view wb" id="view-mood" aria-labelledby="moodTitle">
+      <div class="view-head wellbeing-heading">
+        <div class="view-title-row"><h2 id="moodTitle">A clearer picture of your week.</h2><button type="button" class="help-link btn sm ghost" data-help="mood" aria-label="Open Mood guide">Guide</button></div>
+        <p class="wb-lead">Mood, energy, and stress can move differently. A quick check-in helps you notice what is changing.</p>
+        <div class="view-tools">
+          <div class="seg" role="radiogroup" aria-label="Time range" id="moodRange"></div>
+        </div>
+      </div>
+      <div class="card pad mood-overview" id="moodOverview" aria-live="polite"></div>
+      <div class="grid side">
+        <div class="stack" style="gap:16px">
+          <!-- composer -->
+          <div class="card pad mood-composer">
+            <div class="panel-head"><h3 id="moodNowTitle">Now</h3><span class="eyebrow" id="moodLast"></span></div>
+            <div class="mood-form">
+              <!-- The pad is the pretty way in; the sliders beside it are the real
+                   control and stay visible, so keyboard and screen-reader users get
+                   the same thing rather than a lesser one. -->
+              <div class="pad-wrap">
+                <div class="mpad" id="moodPad" aria-hidden="true">
+                  <div class="pad-glow" id="padGlow"></div>
+                  <span class="pad-ax pad-ax-y">Good</span>
+                  <span class="pad-ax pad-ax-y low">Low</span>
+                  <span class="pad-ax pad-ax-x">Wired</span>
+                  <span class="pad-ax pad-ax-x low">Flat</span>
+                  <span class="pad-q pad-q-tl">calm · low</span>
+                  <span class="pad-q pad-q-tr">bright</span>
+                  <span class="pad-q pad-q-bl">flat</span>
+                  <span class="pad-q pad-q-br">wired · rough</span>
+                  <div class="pad-dot" id="padDot"></div>
+                </div>
+                <p class="pad-read" id="padRead" title="Steady. Even energy. Noticeable stress.">Steady</p>
+              </div>
+              <div class="mood-fields" id="moodFields"></div>
+            </div>
+            <div class="field" style="margin-top:2px">
+              <span class="set-label" id="moodTagsLbl">Tags</span>
+              <div class="tagline" id="moodTags" role="group" aria-labelledby="moodTagsLbl"></div>
+            </div>
+            <div class="field"><label for="moodNote">Note</label><input type="text" id="moodNote" placeholder="Optional"></div>
+            <button class="btn primary" id="moodSave" style="width:100%;justify-content:center;margin-top:4px">Log</button>
+          </div>
+
+          <!-- the ribbon -->
+          <div class="card pad mood-chart-card">
+            <div class="mood-chart-head">
+              <div class="panel-head"><h3>The shape of it</h3><span class="eyebrow" id="moodRibbonNote"></span></div>
+              <div class="mood-axis-switch" id="moodMetric" role="group" aria-label="Show a different part of your check-ins">
+                <button type="button" class="mood-axis is-selected" data-mood-axis="mood" aria-pressed="true">Mood</button>
+                <button type="button" class="mood-axis" data-mood-axis="energy" aria-pressed="false">Energy</button>
+                <button type="button" class="mood-axis" data-mood-axis="stress" aria-pressed="false">Stress</button>
+              </div>
+            </div>
+            <div class="chart-wrap" id="moodRibbon"></div>
+            <p class="chart-note" id="moodRibbonSum" aria-live="polite"></p>
+          </div>
+
+          <!-- the grid -->
+          <div class="card pad">
+            <div class="panel-head"><h3>Day by day</h3><span class="eyebrow">mood, and the hours behind it</span></div>
+            <div class="mood-grid-wrap" id="moodGrid" tabindex="0" role="region" aria-label="Mood by day, scrollable"></div>
+            <p class="chart-note" id="moodGridSum"></p>
+          </div>
+        </div>
+
+        <div class="side-stack">
+          <div class="card pad mood-now" id="moodNowCard"></div>
+          <div class="card pad mood-day-detail" id="moodDayDetail" aria-live="polite"><p class="empty">Choose a day to see its check-ins.</p></div>
+          <div class="card pad">
+            <div class="panel-head"><h3>Patterns to notice</h3></div>
+            <div class="stack" id="moodPatterns"></div>
+          </div>
+          <div class="card pad">
+            <div class="panel-head"><h3>Recent entries</h3><span class="eyebrow" id="moodCount"></span></div>
+            <div class="stack scroll-y" id="moodList" style="max-height:320px" tabindex="0" role="region" aria-label="Recent mood entries, scrollable"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ HABITS ============ -->
+    <section class="view wb" id="view-habits" aria-labelledby="habitsTitle">
+      <div class="view-head compact">
+        <div class="view-title-row"><h2 id="habitsTitle">Habits</h2><button type="button" class="help-link btn sm ghost" data-help="habits" aria-label="Open Habits guide">Guide</button></div>
+        <span class="top-sp"></span>
+        <button class="btn sm" type="button" id="habitTemplatesBtn" aria-label="Add from template">Templates</button>
+        <button class="btn sm primary" type="button" id="habitAddBtn">+ Habit</button>
+      </div>
+      <p class="wb-lead">Small steps count. Build a routine that fits the day you are having.</p>
+      <div class="habits-wrap">
+        <div class="habits-main">
+          <div class="card pad habit-today-card">
+            <div class="panel-head"><h3>Today</h3><span class="eyebrow" id="habitTodayLbl">—</span></div>
+            <div class="habit-today" id="habitToday" role="list"></div>
+          </div>
+          <div class="habit-sections" id="habitSections"></div>
+        </div>
+        <div class="side-stack">
+          <div class="card pad" id="habitImpulseCard"></div>
+          <div class="card pad" id="habitWeekCard"></div>
+          <div class="card pad" id="habitSnoozedCard"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ STATS ============ -->
+    <section class="view" id="view-stats">
+      <div class="view-head">
+        <div class="view-title-row"><h2>Statistics</h2><button type="button" class="help-link btn sm ghost" data-help="stats" aria-label="Open Statistics guide">Guide</button></div>
+        <span class="top-sp"></span>
+        <div class="scale-row" style="width:230px" id="rangeBtns"></div>
+      </div>
+      <div class="stack" style="gap:16px">
+        <div class="card pad" id="learnCard"></div>
+        <div class="kpis" id="kpis"></div>
+        <div class="grid" style="grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)">
+          <div class="card chart-card">
+            <h3>Focus minutes per day</h3>
+            <svg class="chart" id="chDaily" viewBox="0 0 760 220" role="img" aria-label="Focus minutes per day"></svg>
+          </div>
+          <div class="card chart-card">
+            <h3>When you focus best</h3>
+            <svg class="chart" id="chHours" viewBox="0 0 480 220" role="img" aria-label="Focus minutes by hour of day"></svg>
+          </div>
+        </div>
+        <div class="grid" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr)">
+          <div class="card chart-card">
+            <h3>Consistency</h3>
+            <svg class="chart" id="chHeat" viewBox="0 0 480 150" role="img" aria-label="Daily focus heatmap"></svg>
+          </div>
+          <div class="card chart-card">
+            <h3>What pulls you away</h3>
+            <svg class="chart" id="chDistract" viewBox="0 0 480 190" role="img" aria-label="Distraction causes"></svg>
+          </div>
+        </div>
+        <div class="grid" style="grid-template-columns:repeat(3,minmax(0,1fr))" id="sparkRow"></div>
+        <div class="grid" style="grid-template-columns:minmax(0,1.2fr) minmax(0,1fr)">
+          <div class="card">
+            <div class="pad" style="border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px">
+              <h3 style="font-size:calc(13.5px*var(--ts,1));font-weight:700">Session log</h3><span class="top-sp"></span>
+              <button class="btn sm ghost" id="exportCsv">Export CSV</button>
+            </div>
+            <div style="max-height:320px;overflow:auto" tabindex="0" role="region" aria-label="Session log"><table class="tbl" id="logTbl"><caption class="sr-only">Focus sessions, newest first</caption></table></div>
+          </div>
+          <div class="card chart-card">
+            <h3>Time by course</h3>
+            <svg class="chart" id="chSubjects" viewBox="0 0 480 220" role="img" aria-label="Focus minutes by course"></svg>
+          </div>
+        </div>
+        <div class="card pad" id="insightCard"></div>
+      </div>
+    </section>
+
+
+    <!-- ============ PASSPORT ============ -->
+    <section class="view" id="view-passport" aria-labelledby="passportTitle">
+      <div class="view-head compact">
+        <div class="view-title-row passport-title-row">
+          <div><h2 id="passportTitle">Passport</h2><p class="view-sub">A record of the focus you have made, one session at a time.</p></div>
+          <button type="button" class="help-link btn sm ghost" data-help="passport" aria-label="Open Passport guide">Guide</button>
+        </div>
+      </div>
+      <div class="passport-wrap">
+        <div class="stack" style="gap:16px">
+          <div class="card pad" id="scoreControls"></div>
+          <div class="card pad xp-card" id="xpCard"></div>
+          <div class="card pad passport-momentum-card" id="passportMomentum"></div>
+          <div class="card pad passport-milestones">
+            <div class="panel-head passport-section-head">
+              <div><h3>Milestones</h3><p class="hint">Every badge marks something you have practiced.</p></div>
+              <span class="eyebrow" id="passportBadgeCount"></span>
+            </div>
+            <div class="passport-filters" id="passportFilters" role="group" aria-label="Filter milestones"></div>
+            <p class="sr-only" id="passportFilterStatus" aria-live="polite"></p>
+            <p class="passport-filter-empty" id="passportFilterEmpty" hidden></p>
+            <div class="passport-badges" id="passportBadges"></div>
+          </div>
+        </div>
+        <div class="side-stack">
+          <div class="card pad" id="passportStatsCard"></div>
+          <div class="card pad">
+            <div class="panel-head"><h3>Next up</h3></div>
+            <div id="passportNext"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SETTINGS ============ -->
+    <section class="view" id="view-settings">
+      <div class="view-head compact">
+        <div class="view-title-row"><h2>Setup</h2><button type="button" class="help-link btn sm ghost" data-help="setup" aria-label="Open Setup guide">Guide</button></div>
+        <p class="view-sub">Make this study space work for you. Change anything whenever you like.</p>
+      </div>
+      <div class="set-welcome" aria-labelledby="setupWelcomeTitle">
+        <div class="set-welcome-mark" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><path d="M9 14h30M9 24h30M9 34h30"/><circle cx="18" cy="14" r="4"/><circle cx="31" cy="24" r="4"/><circle cx="20" cy="34" r="4"/></svg>
+        </div>
+        <div class="set-welcome-copy">
+          <h3 id="setupWelcomeTitle">Build a setup that feels right</h3>
+          <p>Start with a comfort profile, then adjust one small thing at a time. There is no perfect setup — just what helps today.</p>
+        </div>
+        <div class="set-welcome-note">
+          <svg aria-hidden="true" viewBox="0 0 20 20"><path d="m4 10 4 4 8-8"/></svg>
+          <span><strong>Changes take effect right away</strong><small>Come back and adjust them any time.</small></span>
+        </div>
+      </div>
+      <div class="set-find">
+        <label class="sr-only" for="setFind">Find a setting</label>
+        <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg>
+        <input type="search" id="setFind" placeholder="Try “text size”, “reminders”, or “timer”" autocomplete="off" enterkeyhint="search" spellcheck="false">
+        <button type="button" class="btn sm ghost" id="setFindClear" hidden>Clear</button>
+      </div>
+      <p class="set-find-empty" id="setFindEmpty" hidden>Nothing matches that. Try a shorter word, like font, timer, or tasks.</p>
+      <div class="set-shell">
+        <nav class="set-nav" id="setNav" aria-label="Setup sections">
+          <p class="set-nav-label">A good starting point</p>
+          <div class="set-tabs" role="tablist" aria-label="A good starting point" aria-orientation="vertical">
+            <button type="button" class="set-tab" role="tab" id="tab-profile" aria-controls="set-profile" aria-selected="true" tabindex="0" data-sec="profile"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c1.2-3.6 4-5.5 7-5.5s5.8 1.9 7 5.5"/></svg><span class="set-tab-copy"><span>Comfort</span><small>Choose a starting point</small></span></button>
+          </div>
+          <p class="set-nav-label">How things feel</p>
+          <div class="set-tabs" role="tablist" aria-label="How things feel" aria-orientation="vertical">
+            <button type="button" class="set-tab" role="tab" id="tab-seeing" aria-controls="set-seeing" aria-selected="false" tabindex="-1" data-sec="seeing"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><span class="set-tab-copy"><span>Seeing</span><small>Text, colour &amp; contrast</small></span></button>
+            <button type="button" class="set-tab" role="tab" id="tab-motion" aria-controls="set-motion" aria-selected="false" tabindex="-1" data-sec="motion"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 12h2l2-6 4 12 4-9 2 3h4"/></svg><span class="set-tab-copy"><span>Motion</span><small>Animation &amp; sound</small></span></button>
+            <button type="button" class="set-tab" role="tab" id="tab-focus" aria-controls="set-focus" aria-selected="false" tabindex="-1" data-sec="focus"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><span class="set-tab-copy"><span>Focus</span><small>Nudges &amp; interruptions</small></span></button>
+            <button type="button" class="set-tab" role="tab" id="tab-speech" aria-controls="set-speech" aria-selected="false" tabindex="-1" data-sec="speech"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg><span class="set-tab-copy"><span>Voice</span><small>Read things aloud</small></span></button>
+          </div>
+          <p class="set-nav-label">Study tools</p>
+          <div class="set-tabs" role="tablist" aria-label="Study tools" aria-orientation="vertical">
+            <button type="button" class="set-tab" role="tab" id="tab-tasks" aria-controls="set-tasks" aria-selected="false" tabindex="-1" data-sec="tasks"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M8 6h12M8 12h12M8 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01"/></svg><span class="set-tab-copy"><span>Tasks</span><small>Lists &amp; capture</small></span></button>
+            <button type="button" class="set-tab" role="tab" id="tab-timer" aria-controls="set-timer" aria-selected="false" tabindex="-1" data-sec="timer"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg><span class="set-tab-copy"><span>Timer</span><small>Focus &amp; breaks</small></span></button>
+            <button type="button" class="set-tab" role="tab" id="tab-calendar" aria-controls="set-calendar" aria-selected="false" tabindex="-1" data-sec="calendar"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span class="set-tab-copy"><span>Calendar</span><small>Schedule &amp; sync</small></span></button>
+            <button type="button" class="set-tab" role="tab" id="tab-keys" aria-controls="set-keys" aria-selected="false" tabindex="-1" data-sec="keys"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg><span class="set-tab-copy"><span>Keyboard</span><small>Shortcuts</small></span></button>
+            <button type="button" class="set-tab" role="tab" id="tab-prompts" aria-controls="set-prompts" aria-selected="false" tabindex="-1" data-sec="prompts"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg><span class="set-tab-copy"><span>Lists</span><small>Task prompts</small></span></button>
+          </div>
+          <p class="set-nav-label">Connected apps &amp; data</p>
+          <div class="set-tabs" role="tablist" aria-label="Connected apps and data" aria-orientation="vertical">
+            <button type="button" class="set-tab" role="tab" id="tab-assistant" aria-controls="set-assistant" aria-selected="false" tabindex="-1" data-sec="assistant"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="7" cy="12" r="3"/><circle cx="17" cy="7" r="3"/><circle cx="17" cy="17" r="3"/><path d="M9.8 12h4.4M14.6 9.1 9.2 11.2M14.6 14.9 9.2 12.8"/></svg><span class="set-tab-copy"><span>Assistant</span><small>Connect tools</small></span></button>
+            <button type="button" class="set-tab" role="tab" id="tab-data" aria-controls="set-data" aria-selected="false" tabindex="-1" data-sec="data"><svg aria-hidden="true" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg><span class="set-tab-copy"><span>Data</span><small>Account &amp; storage</small></span></button>
+          </div>
+        </nav>
+        <div class="set-body">
+          <section class="set-panel" id="set-profile" role="tabpanel" aria-labelledby="tab-profile" tabindex="-1"></section>
+          <section class="set-panel" id="set-seeing" role="tabpanel" aria-labelledby="tab-seeing" tabindex="-1" hidden></section>
+          <section class="set-panel" id="set-motion" role="tabpanel" aria-labelledby="tab-motion" tabindex="-1" hidden></section>
+          <section class="set-panel" id="set-focus" role="tabpanel" aria-labelledby="tab-focus" tabindex="-1" hidden></section>
+          <section class="set-panel" id="set-tasks" role="tabpanel" aria-labelledby="tab-tasks" tabindex="-1" hidden></section>
+          <section class="set-panel" id="set-speech" role="tabpanel" aria-labelledby="tab-speech" tabindex="-1" hidden></section>
+          <section class="set-panel" id="set-keys" role="tabpanel" aria-labelledby="tab-keys" tabindex="-1" hidden></section>
+          <section class="set-panel" id="set-timer" role="tabpanel" aria-labelledby="tab-timer" tabindex="-1" hidden>
+            <div class="set-panel-head"><h3>Timer</h3>
+            <p class="set-lead">Set the intervals to the attention you actually have.</p></div>
+            <div class="set-group"><div class="set-group-head"><h4>Intervals</h4><button type="button" class="btn sm" id="presetsBtn">Presets</button></div>
+              <div class="set-fields" id="durFields"></div></div>
+            <div id="timerRows"></div>
+          </section>
+          <section class="set-panel" id="set-calendar" role="tabpanel" aria-labelledby="tab-calendar" tabindex="-1" hidden>
+            <div class="set-panel-head"><h3>Calendar</h3></div>
+            <div class="set-cards">
+              <div class="card pad" id="gcalCard"></div>
+              <div class="card pad" id="connectCard"></div>
+              <div class="card pad">
+                <div class="panel-head"><h3>Files</h3></div>
+                <div class="stack" style="gap:8px">
+                  <button class="btn" id="gcalPushBtn" type="button" style="justify-content:center">Push a block to Google</button>
+                  <button class="btn" id="icsImportBtn" type="button" style="justify-content:center">Import an .ics file</button>
+                  <button class="btn" id="icsExportBtn" type="button" style="justify-content:center">Export these days as .ics</button>
+                </div>
+              </div>
+              <div class="card pad">
+                <div class="panel-head"><h3>Day window</h3></div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap">
+                  <div class="field"><label for="dayStart">Earliest</label><input type="time" id="dayStart" value="08:00"></div>
+                  <div class="field"><label for="dayEnd">Latest</label><input type="time" id="dayEnd" value="21:00"></div>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section class="set-panel" id="set-prompts" role="tabpanel" aria-labelledby="tab-prompts" tabindex="-1" hidden>
+            <div class="set-panel-head"><h3>Lists</h3>
+            <p class="set-lead">Short lists the workspace can draw from. One job each.</p></div>
+            <div id="listsCard"></div>
+          </section>
+          <section class="set-panel" id="set-assistant" role="tabpanel" aria-labelledby="tab-assistant" tabindex="-1" hidden>
+            <div class="set-panel-head"><h3>Assistant</h3></div>
+            <div class="card pad" id="assistantCard"></div>
+          </section>
+          <section class="set-panel" id="set-data" role="tabpanel" aria-labelledby="tab-data" tabindex="-1" hidden>
+            <div class="set-panel-head"><h3>Account and data</h3>
+            <p class="set-lead">Who is signed in, where this workspace lives, and your backup.</p></div>
+            <div class="set-cards">
+              <div class="card pad" id="accountCard"></div>
+              <div class="card pad" id="storageCard"></div>
+              <div class="card pad">
+                <div class="panel-head"><h3>Your data</h3></div>
+                <p class="set-hint" style="margin:0 0 12px">Export is the workspace as plain JSON. Tokens and coach keys are not in the file. The three endings below are different, and a refusal is said as a refusal.</p>
+                <div class="stack" style="gap:8px">
+                  <button type="button" class="btn" id="exportBtn" style="justify-content:center">Export everything</button>
+                  <button type="button" class="btn" id="importBtn" style="justify-content:center">Import a backup</button>
+                  <button type="button" class="btn" id="clearDeviceBtn" style="justify-content:center">Clear this browser</button>
+                  <button type="button" class="btn" id="resetBtn2" style="justify-content:center">Delete this workspace</button>
+                  <button type="button" class="btn" id="deleteAccountBtn" style="justify-content:center;color:var(--crit)">Delete this account</button>
+                </div>
+                <p class="set-hint" style="margin:12px 0 0" id="storageInfo"></p>
+                <div id="dataExtra"></div>
+              </div>
+              <div class="card pad" id="embedCard" hidden></div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+    </main>
+  </div>
+</div>
+
+<div class="gate" id="gate" role="region" aria-labelledby="gateTitle">
+  <div class="gate-orbs" aria-hidden="true"><i></i><i></i><i></i></div>
+  <aside class="gate-hero" aria-hidden="true">
+    <div class="gh-dial"><svg viewBox="0 0 200 200"><circle class="gh-track" cx="100" cy="100" r="84"/><circle class="gh-arc" cx="100" cy="100" r="84"/></svg><div class="gh-time"><b>25:00</b><small>one small step</small></div></div>
+    <h2 class="gh-title">Study with your brain,<br><em>not against it.</em></h2>
+    <ul class="gh-list">
+      <li><span>◷</span>Short focus sessions with gentle breaks</li>
+      <li><span>✦</span>An AI coach that turns big tasks into tiny first steps</li>
+      <li><span>♪</span>24 room tones and calming sound mixes</li>
+      <li><span>☁</span>Your plan, mood and progress — synced or on-device</li>
+    </ul>
+  </aside>
+  <div class="gate-card">
+  <div class="gate-brand"><div class="brand" id="gateLogo" aria-hidden="true" title="ADHD Study Pack"><svg viewBox="0 0 40 40"><path d="M20 5.5a14.5 14.5 0 1 0 14.5 14.5"/><path d="M20 12v8l5.5 3"/><path d="M30.5 5v8M26.5 9h8"/></svg></div><h1 id="gateTitle">Focus Dial</h1></div>
+    <p class="gate-sub" id="gateSub">Sign in to load your workspace.</p>
+    <div id="gateMsg"></div>
+    <form id="gateForm" autocomplete="on">
+      <div class="field"><label for="gateUser">Email or username</label>
+        <input type="text" id="gateUser" autocomplete="username" spellcheck="false" placeholder="you@school.edu"></div>
+      <div class="field"><label for="gatePass">Password</label>
+        <input type="password" id="gatePass" autocomplete="current-password" placeholder="••••••••"></div>
+      <fieldset class="gate-device">
+        <legend>This computer</legend>
+        <label><input type="radio" name="gateDevice" data-device value="personal"> Just me</label>
+        <label><input type="radio" name="gateDevice" data-device value="shared"> Shared</label>
+        <p id="gateDeviceNote"></p>
+      </fieldset>
+      <div class="row">
+        <label><input type="checkbox" id="gateRemember" checked> Stay signed in on this device</label>
+        <button type="button" class="btn sm ghost" id="gateForgot">Forgot password?</button>
+        <button type="button" class="btn sm ghost" id="gateSignup">Create account</button>
+      </div>
+      <button class="btn primary" type="submit" id="gateGo" style="justify-content:center;padding:10px">Sign in</button>
+    </form>
+    <div id="gateCloud" hidden>
+      <div class="gate-or"><span>or</span></div>
+      <button class="btn" id="googleBtn" style="width:100%;justify-content:center;padding:10px">Continue with Google</button>
+      <button class="btn" type="button" id="gateLinkSend" data-i18n="gate.link" style="width:100%;justify-content:center;padding:10px;margin-top:8px">Email me a sign-in link</button>
+      <p class="gate-note" data-i18n="gate.passkey">Passkeys are not offered. A lost device signs in again with this email or with Google.</p>
     </div>
-  </main>
-
-  <script>
-    (function () {
-      var DEST = 'https://ayanzadeh93.github.io/adhd-study-pack/';
-      var raw = null;
-      try { raw = localStorage.getItem('adhd-study-pack.v1'); } catch (e) {}
-
-      // Nothing stored here, or nothing worth keeping: just go.
-      if (!raw || raw.length < 40) { location.replace(DEST); return; }
-
-      document.getElementById('keep').className = 'on';
-      document.getElementById('save').addEventListener('click', function () {
-        try {
-          var blob = new Blob([raw], { type: 'application/json' });
-          var a = document.createElement('a');
-          a.href = URL.createObjectURL(blob);
-          a.download = 'adhd-study-pack-workspace.json';
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-          setTimeout(function () { location.href = DEST; }, 1200);
-        } catch (e) {
-          location.href = DEST;
-        }
-      });
-    })();
-  </script>
-  <noscript>
-    <p style="text-align:center"><a href="https://ayanzadeh93.github.io/adhd-study-pack/">Continue to the Study Pack</a></p>
-  </noscript>
+    <div id="gateLink" hidden>
+      <p class="gate-note">This is an email sign-in link. Type the same email. Passkeys are not offered.</p>
+      <div class="field"><label for="gateLinkEmail">Email</label>
+        <input type="email" id="gateLinkEmail" autocomplete="email" spellcheck="false"></div>
+      <button class="btn primary" type="button" id="gateLinkGo" style="width:100%;justify-content:center;padding:10px">Finish sign-in</button>
+    </div>
+    <div class="gate-foot">
+      <button class="btn primary" type="button" id="gateGuest" style="width:100%;justify-content:center;margin-bottom:8px">Start without an account</button>
+      <button class="btn sm ghost" id="gateLocal">Use a local profile instead</button>
+      <button class="btn sm ghost" id="gateTheme">Theme</button>
+    </div>
+    <p class="gate-note" id="gateNote"></p>
+    <p class="gate-legal"><a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></p>
+  </div>
+</div>
+<div class="scrim" id="scrim"><div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-head"><h2 id="modalTitle">Title</h2><button type="button" class="btn icon ghost" id="modalX" aria-label="Close dialog">✕</button></div><div class="body" id="modalBody"></div><footer id="modalFoot"></footer></div></div>
+<div class="scrim" id="cmdScrim"><div class="cmdk" role="dialog" aria-modal="true" aria-label="Command palette"><input type="text" id="cmdInput" placeholder="Go somewhere, or /ask the coach…" autocomplete="off" role="combobox" aria-expanded="true" aria-controls="cmdList" aria-autocomplete="list" aria-label="Search commands and sections"><div class="cmd-list" id="cmdList" role="listbox" aria-label="Commands" tabindex="0"></div></div></div>
+<div class="scrim unlock-scrim" id="unlockScrim" hidden>
+  <div class="unlock-card" role="dialog" aria-modal="true" aria-labelledby="unlockTitle">
+    <div class="unlock-sparks" aria-hidden="true"></div>
+    <p class="unlock-kicker">Unlocked</p>
+    <div class="unlock-halo" aria-hidden="true"><span class="unlock-icon" id="unlockIcon"></span></div>
+    <h2 id="unlockTitle">First Spark</h2>
+    <p id="unlockDesc"></p>
+    <button class="btn primary" type="button" id="unlockNext">Keep going</button>
+  </div>
+</div>
+<div class="reading-guide" id="readingGuide" aria-hidden="true"></div>
+<div class="toasts" id="toasts" aria-hidden="true"></div>
+<div class="tip" id="tip" aria-hidden="true"></div>
+<!-- Screen readers read these; the toasts above are the visual copy. -->
+<div id="srPolite" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+<div id="srAlert" class="sr-only" role="alert" aria-atomic="true"></div>
+<input type="file" id="filePick" accept=".ics,.json,text/calendar,application/json" hidden>
+<noscript>
+  <p style="max-width:40rem;margin:4rem auto;padding:0 1rem;font:16px/1.6 system-ui,sans-serif">
+    The ADHD Study Pack runs entirely in your browser, so it needs JavaScript.
+    Nothing is sent anywhere unless you choose to sign in with Google.
+  </p>
+</noscript>
+<div id="voiceSheet" class="voice-sheet" hidden>
+  <div class="voice-card" role="dialog" aria-modal="true" aria-labelledby="voiceTitle">
+    <div class="voice-head">
+      <h2 id="voiceTitle">Say it, or type it</h2>
+      <button type="button" class="btn sm ghost" id="voiceClose">Close</button>
+    </div>
+    <p class="voice-lead">Speak the list. Each pause becomes a task. Say “start focus”, “go to plan”, or “park …” for a command. The browser hears the words. This page does not.</p>
+    <button type="button" class="voice-mic" id="voiceMic" aria-pressed="false">Speak</button>
+    <p id="voiceLive" class="voice-live" aria-live="polite"></p>
+    <label class="sr-only" for="voiceWrite">Or write the list</label>
+    <textarea id="voiceWrite" rows="3" placeholder="Or type: email the lab. read chapter 3 for 40 minutes."></textarea>
+    <button type="button" class="btn" id="voiceUse">Use this text</button>
+    <div class="voice-meter" id="voiceMeter">
+      <p><strong id="voiceOpen">0m</strong> open today</p>
+      <p><strong id="voicePick">0m</strong> selected</p>
+      <div class="voice-bar" aria-hidden="true"><span id="voiceBar"></span></div>
+    </div>
+    <ul id="voiceList" class="voice-list"></ul>
+    <div class="voice-actions">
+      <button type="button" class="btn" id="voiceAdd">Add to inbox</button>
+      <button type="button" class="btn primary" id="voicePlace">Place on today</button>
+    </div>
+    <p id="voiceStatus" class="voice-status" role="status"></p>
+  </div>
+</div>
+<script type="module" src="js/boot.js?v=4.45.0"></script>
+<script defer src="js/mood-glass.js?v=1"></script>
+<script type="module" src="js/bilateral.js?v=1"></script>
+<script defer src="js/plan-api.js?v=1"></script>
+<script defer src="js/coach-plan.js?v=1"></script>
 </body>
 </html>

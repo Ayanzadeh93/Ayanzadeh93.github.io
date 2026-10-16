@@ -1,0 +1,57 @@
+/* Modern sign-in: animated showcase + frosted glass card. Reuses paper/ink/ember variables. */
+.gate.on{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,440px);gap:clamp(24px,5vw,72px);align-items:center;justify-content:center;padding:clamp(18px,4vw,56px)}
+.gate{isolation:isolate;background:radial-gradient(70% 60% at 15% 10%,color-mix(in srgb,var(--accent) 16%,transparent),transparent 70%),radial-gradient(60% 60% at 90% 90%,color-mix(in srgb,var(--accent) 10%,transparent),transparent 70%),var(--bg)}
+.gate-orbs{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+.gate-orbs i{position:absolute;border-radius:50%;filter:blur(60px);opacity:.45;background:var(--accent);animation:gOrb 18s ease-in-out infinite alternate}
+.gate-orbs i:nth-child(1){width:340px;height:340px;top:-80px;left:-60px}
+.gate-orbs i:nth-child(2){width:260px;height:260px;bottom:-60px;right:8%;opacity:.25;animation-duration:22s}
+.gate-orbs i:nth-child(3){width:180px;height:180px;top:40%;left:42%;opacity:.18;animation-duration:26s}
+@keyframes gOrb{to{transform:translate(60px,40px) scale(1.15)}}
+
+.gate-hero{max-width:520px;justify-self:end;display:flex;flex-direction:column;gap:22px;animation:gIn .7s cubic-bezier(.32,.72,0,1) both}
+.gh-dial{position:relative;width:170px;height:170px}
+.gh-dial svg{width:100%;height:100%;transform:rotate(-90deg)}
+.gh-dial circle{fill:none;stroke-width:10}
+.gh-track{stroke:color-mix(in srgb,var(--line) 85%,transparent)}
+.gh-arc{stroke:var(--accent);stroke-linecap:round;stroke-dasharray:528;stroke-dashoffset:528;animation:gArc 4s cubic-bezier(.6,0,.2,1) .3s infinite alternate;filter:drop-shadow(0 0 10px color-mix(in srgb,var(--accent) 60%,transparent))}
+@keyframes gArc{to{stroke-dashoffset:132}}
+.gh-time{position:absolute;inset:0;display:grid;place-content:center;text-align:center;line-height:1.1}
+.gh-time b{font-family:var(--font-display);font-size:34px;letter-spacing:-.02em}
+.gh-time small{font-size:12px;color:var(--muted)}
+.gh-title{margin:0;font-family:var(--font-display);font-size:clamp(30px,4.2vw,50px);line-height:1.05;letter-spacing:-.03em;color:var(--ink)}
+.gh-title em{font-style:normal;color:var(--accent)}
+.gh-list{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.gh-list li{display:flex;align-items:center;gap:12px;font-size:15px;color:var(--ink-2,var(--ink))}
+.gh-list span{flex:none;width:32px;height:32px;display:grid;place-content:center;border-radius:10px;color:var(--accent);background:color-mix(in srgb,var(--accent) 13%,var(--surface));border:1px solid color-mix(in srgb,var(--accent) 25%,var(--line))}
+
+.gate .gate-card{width:100%;max-width:440px;justify-self:start;border-radius:28px;padding:30px 28px 22px;
+  background:linear-gradient(160deg,color-mix(in srgb,var(--surface) 78%,transparent),color-mix(in srgb,var(--surface-2) 60%,transparent));
+  backdrop-filter:blur(24px) saturate(1.5);-webkit-backdrop-filter:blur(24px) saturate(1.5);
+  border:1px solid color-mix(in srgb,white 45%,var(--line));
+  box-shadow:0 30px 80px -30px color-mix(in srgb,var(--ink) 45%,transparent),inset 0 1px 0 color-mix(in srgb,white 60%,transparent);
+  animation:gIn .7s cubic-bezier(.32,.72,0,1) .08s both}
+@keyframes gIn{from{opacity:0;transform:translateY(14px);filter:blur(6px)}to{opacity:1;transform:none;filter:none}}
+.gate .gate-brand h1{font-size:24px}
+.gate .gate-brand .brand{width:46px;height:46px;border-radius:14px;box-shadow:0 8px 22px -8px color-mix(in srgb,var(--accent) 70%,transparent)}
+.gate .gate-sub{font-size:14px;margin:10px 0 18px}
+.gate .field input{border-radius:12px;padding:11px 13px;transition:border-color .2s,box-shadow .2s}
+.gate .field input:focus-visible{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 20%,transparent)}
+.gate .btn{border-radius:12px;min-height:44px}
+.gate .btn.sm{min-height:32px}
+.gate .btn.primary{box-shadow:0 10px 26px -10px color-mix(in srgb,var(--accent) 75%,transparent);transition:transform .15s,box-shadow .2s}
+.gate .btn.primary:hover{transform:translateY(-1px);box-shadow:0 14px 30px -10px color-mix(in srgb,var(--accent) 85%,transparent)}
+.gate .row{justify-content:flex-start;gap:6px 10px}
+.gate .row label{flex-basis:100%}
+.gate-device{border-radius:14px}
+.gate .gate-foot{flex-wrap:wrap;justify-content:center}
+.gate .gate-legal{text-align:center}
+
+@media (max-width:900px){
+  .gate.on{grid-template-columns:1fr;align-content:start}
+  .gate-hero{justify-self:center;align-items:center;text-align:center;gap:14px}
+  .gh-dial{width:110px;height:110px}.gh-time b{font-size:22px}
+  .gh-list{display:none}
+  .gate .gate-card{justify-self:center}
+}
+html[data-motion="reduce"] .gate *,html[data-motion="reduce"] .gate-orbs i{animation:none!important}
+@media (prefers-reduced-motion:reduce){html:not([data-motion="full"]) .gate *{animation:none!important}}

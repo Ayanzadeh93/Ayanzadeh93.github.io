@@ -1,0 +1,38 @@
+{
+  "id": "./",
+  "name": "ADHD Study Pack",
+  "short_name": "Study Pack",
+  "description": "A calm, adaptable study workspace for focus, planning, wellbeing, and study together.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "background_color": "#F3F5F2",
+  "theme_color": "#CC4520",
+  "icons": [
+    {
+      "src": "img/pwa-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "img/pwa-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "img/pwa-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "favicon.svg?v=4.45.0",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

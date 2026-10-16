@@ -1,0 +1,70 @@
+/* Wellbeing: quiet surfaces, readable controls, and one clear next action. */
+.view.wb{background:var(--bg)}
+.view.wb .card{
+  background:var(--surface); border-color:var(--line);
+  backdrop-filter:none; -webkit-backdrop-filter:none; box-shadow:none;
+}
+.view.wb .view-head{gap:12px; flex-wrap:wrap}
+.view.wb .view-head h2{font-family:var(--font-display); letter-spacing:-.035em; font-size:calc(30px * var(--ts,1))}
+.view.wb .wb-lead{flex-basis:100%; max-width:65ch; margin:0 0 6px; color:var(--ink-2); line-height:1.65; font-size:calc(14px * var(--ts,1))}
+.view.wb .view-head .wb-lead{margin-top:-3px}
+.view.wb > .wb-lead{margin:-5px 0 22px}
+.view.wb .panel-head h3{font-size:calc(17px * var(--ts,1)); letter-spacing:-.02em}
+.view.wb .wb-card-note{margin:-2px 0 18px; color:var(--muted); font-size:calc(12.5px * var(--ts,1)); line-height:1.6; max-width:54ch}
+.wb-shortcuts{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin:0 0 24px}
+.wb-shortcuts button{
+  display:flex; gap:13px; align-items:center; min-width:0; min-height:90px; padding:16px;
+  border:1px solid var(--line); border-radius:var(--r-m); background:var(--surface);
+  color:var(--ink); font:inherit; text-align:left; cursor:pointer;
+}
+.wb-shortcuts button:hover{background:var(--surface-2); border-color:var(--line-2)}
+.wb-shortcuts svg{width:25px; height:25px; flex:none; fill:none; stroke:var(--rest); stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round}
+.wb-shortcuts span{font-size:calc(13.5px * var(--ts,1)); font-weight:600; line-height:1.45}
+.wb-shortcuts small{display:block; margin-top:3px; color:var(--muted); font-size:calc(11.5px * var(--ts,1)); font-weight:400}
+#view-calm .calm-split{--side:340px; gap:20px}
+#view-calm .breathing-card{padding:24px; min-width:0}
+#view-calm .breath-stage{gap:20px; padding:22px 0; min-height:420px}
+#view-calm .orb{
+  width:min(280px,65vw); height:min(280px,65vw); border:1px solid var(--line);
+  background:var(--surface-2); box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none;
+}
+#view-calm .orb .ring{inset:12%; border-color:var(--rest); opacity:.22}
+#view-calm .orb .core{background:var(--rest); opacity:.14; box-shadow:none; width:120px; height:120px}
+#view-calm .breath-reading{position:absolute; inset:0; z-index:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; pointer-events:none}
+#view-calm .breath-reading .orb-txt{position:static; display:block; font-size:calc(20px * var(--ts,1)); color:var(--ink)}
+#breathSeconds{font-family:var(--font-display); font-size:calc(42px * var(--ts,1)); font-variant-numeric:tabular-nums; line-height:1.1; color:var(--ink)}
+.breathing-card:has(#breathBtn[aria-pressed="false"]) #breathSeconds{font-family:var(--font-ui); font-size:calc(12px * var(--ts,1)); color:var(--muted)}
+#view-calm #orbCount{font-family:var(--font-ui); font-size:calc(12px * var(--ts,1))}
+#view-calm #breathHint{line-height:1.65}
+#view-calm .checkin-card{padding:20px}
+#view-calm .checkin-card label{display:flex; justify-content:space-between; gap:10px}
+#view-calm .checkin-card output{font-family:var(--font-ui); color:var(--ink-2); font-size:calc(12px * var(--ts,1))}
+#view-calm #checkinSliders{gap:18px!important}
+#view-calm #checkinSliders input{accent-color:var(--rest); min-height:28px}
+#view-calm .grounding-card{border-left:3px solid var(--rest)}
+.view.wb :is(button,a,input,summary):focus-visible{outline:2px solid var(--accent); outline-offset:4px}
+body:has(.view.wb.on) .group-tab{min-height:44px; padding:10px 18px; box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none}
+body:has(.view.wb.on) .group-tab.on{background:var(--ink); border-color:var(--ink); color:var(--surface)}
+[data-motion="reduce"] #view-calm .orb .core{transition:none!important}
+@media (prefers-reduced-motion:reduce){#view-calm .orb .core{transition:none!important}}
+[data-contrast="high"] .wb-shortcuts button{border-color:var(--ink)}
+[data-contrast="high"] #view-calm .orb .ring{opacity:1}
+@media(max-width:1100px){
+  .wb-shortcuts{gap:8px}
+  .wb-shortcuts button{padding:13px; gap:10px}
+  #view-calm .calm-split{--side:300px}
+}
+@media(max-width:760px){
+  .wb-shortcuts{grid-template-columns:minmax(0,1fr); gap:8px; margin-bottom:18px}
+  .wb-shortcuts button{min-height:72px; padding:12px 16px}
+  .view.wb .view-head h2{font-size:calc(26px * var(--ts,1))}
+  #view-calm .breathing-card{padding:18px}
+  #view-calm .breath-stage{min-height:380px; padding:16px 0}
+  body:has(.view.wb.on) .group-tabs{gap:6px; padding-left:12px; padding-right:12px}
+  body:has(.view.wb.on) .group-tab{padding:10px 14px}
+}
+@media(max-width:450px){
+  #view-calm .orb{width:220px; height:220px}
+  #view-calm .orb .core{width:100px; height:100px}
+  #view-calm .breath-stage{min-height:350px}
+}

@@ -1,0 +1,32 @@
+/* Glass look for Focus (study desk), Plan/Tasks/Matrix and Coach — matches Wellbeing. */
+:is(#view-focus,#view-plan,#view-tasks,#view-matrix,#view-coach) :is(.card,.dash-card,.stage,.coach-stage,.coach-log,.task-dock,.session-rail,.plan-rail){
+  background:linear-gradient(160deg, color-mix(in srgb, var(--surface) 72%, transparent), color-mix(in srgb, var(--surface-2) 55%, transparent));
+  backdrop-filter:blur(20px) saturate(1.4); -webkit-backdrop-filter:blur(20px) saturate(1.4);
+  border:1px solid color-mix(in srgb, white 40%, var(--line));
+  box-shadow:0 18px 50px -26px color-mix(in srgb, var(--ink) 40%, transparent), inset 0 1px 0 color-mix(in srgb, white 60%, transparent);
+  transition:transform .25s ease, box-shadow .3s ease, border-color .3s ease;
+}
+:is(#view-focus,#view-plan,#view-tasks,#view-matrix,#view-coach) :is(.card,.dash-card):hover{
+  border-color:color-mix(in srgb, var(--accent) 45%, white);
+  box-shadow:0 0 0 1px color-mix(in srgb, var(--accent) 25%, transparent), 0 20px 44px -22px color-mix(in srgb, var(--accent) 45%, transparent), inset 0 1px 0 color-mix(in srgb, white 60%, transparent);
+}
+:is(#view-focus,#view-plan,#view-tasks,#view-matrix,#view-coach) .btn.primary{
+  box-shadow:0 8px 24px -10px color-mix(in srgb, var(--accent) 70%, transparent);
+  transition:box-shadow .3s ease, transform .2s ease;
+}
+:is(#view-focus,#view-plan,#view-tasks,#view-matrix,#view-coach) .btn.primary:hover{
+  box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent), 0 12px 30px -10px color-mix(in srgb, var(--accent) 80%, transparent);
+}
+:is(#view-focus,#view-plan,#view-tasks,#view-matrix,#view-coach) :is(input,textarea,select):focus-visible{
+  box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+/* Smooth staggered fade-in when a tab opens */
+:is(#view-focus,#view-plan,#view-tasks,#view-matrix,#view-coach).on :is(.card,.dash-card,.stage,.coach-stage,.task-dock){
+  animation:glassTabIn .5s cubic-bezier(.32,.72,0,1) both;
+}
+:is(#view-focus,#view-plan,#view-tasks,#view-matrix,#view-coach).on :is(.card,.dash-card):nth-child(2){animation-delay:.05s}
+:is(#view-focus,#view-plan,#view-tasks,#view-matrix,#view-coach).on :is(.card,.dash-card):nth-child(3){animation-delay:.1s}
+:is(#view-focus,#view-plan,#view-tasks,#view-matrix,#view-coach).on :is(.card,.dash-card):nth-child(n+4){animation-delay:.15s}
+@keyframes glassTabIn{from{opacity:0; transform:translateY(8px); filter:blur(4px)} to{opacity:1; transform:none; filter:none}}
+html[data-motion="reduce"] :is(#view-focus,#view-plan,#view-tasks,#view-matrix,#view-coach) *{animation:none!important}
+@media (prefers-reduced-motion:reduce){html:not([data-motion="full"]) :is(#view-focus,#view-plan,#view-tasks,#view-matrix,#view-coach) *{animation:none!important}}
