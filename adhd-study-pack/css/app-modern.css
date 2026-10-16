@@ -1,0 +1,65 @@
+/* Shared modern look for the React app (/app). Reuses the paper/ink/ember variables. */
+.home{max-width:1120px;margin:0 auto;padding:clamp(14px,3vw,28px)}
+.m-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+.m-head h2{margin:2px 0 4px;font-size:clamp(26px,4vw,38px)}
+.m-kicker{margin:0;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3,var(--ink));opacity:.7}
+.m-cta{padding:12px 22px;font-size:15px}
+.m-grid{display:grid;gap:16px;grid-template-columns:repeat(6,1fr)}
+.m-today{grid-column:span 3}.m-next{grid-column:span 3}
+.m-mood{grid-column:span 2}.m-mix{grid-column:span 2}.m-notes{grid-column:span 2}
+@media (max-width:860px){.m-grid{grid-template-columns:1fr}.m-grid>*{grid-column:auto!important}}
+.m-card{border-radius:22px;padding:18px 20px;display:flex;flex-direction:column;gap:12px;
+  background:linear-gradient(160deg,color-mix(in srgb,var(--surface) 72%,transparent),color-mix(in srgb,var(--surface-2) 55%,transparent));
+  backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);
+  border:1px solid color-mix(in srgb,white 40%,var(--line));
+  box-shadow:0 18px 50px -26px color-mix(in srgb,var(--ink) 40%,transparent),inset 0 1px 0 color-mix(in srgb,white 60%,transparent);
+  transition:border-color .3s,box-shadow .3s;animation:mIn .5s cubic-bezier(.32,.72,0,1) both}
+.m-card:nth-child(2){animation-delay:.05s}.m-card:nth-child(3){animation-delay:.1s}.m-card:nth-child(n+4){animation-delay:.15s}
+.m-card:hover{border-color:color-mix(in srgb,var(--accent) 45%,white);box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 25%,transparent),0 20px 44px -22px color-mix(in srgb,var(--accent) 45%,transparent)}
+.m-card h3{margin:0;font-size:16px}
+@keyframes mIn{from{opacity:0;transform:translateY(8px);filter:blur(4px)}to{opacity:1;transform:none;filter:none}}
+html[data-motion="reduce"] .m-card{animation:none}
+@media (prefers-reduced-motion:reduce){html:not([data-motion="full"]) .m-card{animation:none}}
+.m-today{flex-direction:row;align-items:center;flex-wrap:wrap;gap:20px}
+.m-ring{position:relative;width:110px;height:110px;flex:none}
+.m-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.m-ring circle{fill:none;stroke-width:8}
+.m-ring-bg{stroke:color-mix(in srgb,var(--line) 80%,transparent)}
+.m-ring-fg{stroke:var(--accent);stroke-linecap:round;transition:stroke-dashoffset .8s ease;filter:drop-shadow(0 0 6px color-mix(in srgb,var(--accent) 50%,transparent))}
+.m-ring span{position:absolute;inset:0;display:grid;place-content:center;text-align:center;line-height:1.1}
+.m-ring b{font-size:22px}.m-ring small{font-size:11px;opacity:.7}
+.m-stats{display:flex;gap:22px;margin:0;flex:1}
+.m-stats dt{font-size:12px;opacity:.7}.m-stats dd{white-space:nowrap;margin:2px 0 0;font-size:20px;font-weight:600}
+.m-link{font-size:13px;color:var(--accent);width:100%}
+.m-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.m-list li{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:color-mix(in srgb,var(--surface) 60%,transparent);border:1px solid var(--line)}
+.m-title{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.m-list small{opacity:.7}
+.m-event{margin:0;font-size:13px;display:flex;align-items:center;gap:8px}
+.m-event .dot{width:8px;height:8px;border-radius:50%}
+.m-empty{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px;border-radius:14px;border:1px dashed var(--line)}
+.m-empty p{margin:0;opacity:.75}
+.m-moods{display:flex;justify-content:space-between;gap:4px}
+.m-moods button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0;border-radius:12px;border:1px solid transparent;background:none;cursor:pointer;color:inherit;font:inherit}
+.m-moods button span{font-size:24px}.m-moods button small{font-size:11px;opacity:.75}
+.m-moods button[aria-pressed="true"]{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent)}
+.m-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.m-notes-row{display:flex;flex-direction:column;gap:8px}
+.m-note{padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--accent) 10%,var(--surface));color:inherit;text-decoration:none;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* Consistent headers/spacing across rebuilt tabs */
+.app .views .view-title-row{margin-bottom:16px}
+@media (max-width:600px){.app .views{padding-bottom:84px}}
+/* Tabs: same glass cards + ember accent as Home */
+.app .views :is(.card,.panel,.help-card,.cw-card,.plan-sheet,.st-card,.pp-card,.habit-card,.mood-card,.coach-aside-card){border-radius:22px;
+  background:linear-gradient(160deg,color-mix(in srgb,var(--surface) 72%,transparent),color-mix(in srgb,var(--surface-2) 55%,transparent));
+  backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);
+  border:1px solid color-mix(in srgb,white 40%,var(--line));
+  box-shadow:0 18px 50px -26px color-mix(in srgb,var(--ink) 40%,transparent),inset 0 1px 0 color-mix(in srgb,white 60%,transparent);
+  transition:border-color .3s,box-shadow .3s;animation:mIn .5s cubic-bezier(.32,.72,0,1) both}
+.app .views :is(.card,.panel,.help-card,.cw-card,.st-card,.coach-aside-card):hover{border-color:color-mix(in srgb,var(--accent) 45%,white);box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 25%,transparent),0 20px 44px -22px color-mix(in srgb,var(--accent) 45%,transparent)}
+.app .views .view-head h2,.app .views .view-title-row h2{font-size:clamp(26px,4vw,38px)}
+.app .views .btn.primary{box-shadow:0 8px 24px -10px color-mix(in srgb,var(--accent) 70%,transparent)}
+.app .views :is(input,textarea,select):focus-visible{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+.app .group-tabs .group-tab.on{box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 35%,transparent),0 6px 18px -8px color-mix(in srgb,var(--accent) 60%,transparent)}
+html[data-motion="reduce"] .app .views *{animation:none!important}
+@media (prefers-reduced-motion:reduce){html:not([data-motion="full"]) .app .views *{animation:none!important}}

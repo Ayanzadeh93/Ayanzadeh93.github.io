@@ -30,7 +30,7 @@
     <header>
       <p class="meta">ADHD Study Pack</p>
       <h1>Privacy</h1>
-      <p class="lede">What is stored, who can read it, and what Google is asked for. Last updated 20 September 2026.</p>
+      <p class="lede">What is stored, who can read it, and what Google is asked for. Last updated 14 October 2026.</p>
     </header>
 
     <h2>In one sentence</h2>
@@ -40,7 +40,7 @@
     <p>Aydin Ayanzadeh. Contact: <a href="mailto:a.ayanzadeh@gmail.com">a.ayanzadeh@gmail.com</a>. The working app is at <a href="https://www.ayanzadeh.com/adhd-study-pack/">ayanzadeh.com/adhd-study-pack</a>.</p>
 
     <h2>If you do not sign in</h2>
-    <p>Tasks, the timer, notes, habits, mood, and history stay in this browser (localStorage and IndexedDB). Nothing is sent to a server. Clearing site data deletes it.</p>
+    <p>Tasks, the timer, notes, habits, mood, and history stay in this browser (localStorage and IndexedDB). Nothing is sent to a server. You can start without an account; that guest workspace is a separate copy on this device and is not merged into an account unless you export it and import it yourself. Clearing site data deletes it.</p>
 
     <h2>If you sign in with Google</h2>
     <p>Continue with Google uses Firebase Authentication. It requests only:</p>
@@ -51,8 +51,8 @@
     <p>Google then gives the pack an account id, display name, email, and (if you have one) a profile photo. The pack does not receive a calendar token from this step.</p>
 
     <h2>Where a signed-in workspace lives</h2>
-    <p>Cloud Firestore, project <code>adhdrelief-bdbea</code>, under <code>users/{your id}/</code>. Security rules allow only that signed-in user to read or write those documents. Other users cannot list or open them. There is no analytics product, no advertising, and nothing is sold or shared with third parties for their own use.</p>
-    <p>Firebase (Google) processes this as the host of Authentication and Firestore. The pack’s operator does not get a copy of your password; Google verifies it.</p>
+    <p>Cloud Firestore, project <code>adhdrelief-bdbea</code>, under <code>users/{your id}/</code>. Security rules allow only that signed-in user to read or write those documents. Other users cannot list or open them. Nothing is sold. There is no advertising and no marketing analytics script.</p>
+    <p>Firebase (Google) processes this as the host of Authentication and Firestore. The pack’s operator does not get a copy of your password; Google verifies it. If Performance Monitoring loads, Google receives page-load timing, not your tasks, notes, or mood. App Check, when it is on, sends a reCAPTCHA Enterprise token so the request is from this app. Remote Config may fetch a feature flag. None of those three carry the workspace.</p>
 
     <h2>Google Calendar (optional)</h2>
     <p>Calendar is a separate button on Plan: <strong>Connect Google Calendar</strong>. That first press asks Google only to <strong>view</strong>:</p>
@@ -64,8 +64,15 @@
     <p>You can use the whole pack without ever pressing Connect. If you do connect, the access token stays in this tab (memory and sessionStorage) for about an hour. It is not written to Firestore. Disconnect revokes it. Events the pack already created in Google stay in Google until you remove them from the same card.</p>
     <p>Because those calendar permissions are classed as sensitive by Google, the Calendar popup may still say the app is unverified until Google finishes a review. That warning is about calendar, not about signing in.</p>
 
-    <h2>Google API Limited Use Disclosure</h2>
-    <p>ADHD Study Pack's use and transfer to any other app of information received from Google APIs will adhere to the <a href="https://developers.google.com/terms/api-services-user-data-policy#additional_requirements_for_specific_api_scopes" target="_blank" rel="noopener noreferrer">Google API Services User Data Policy</a>, including the Limited Use requirements. Your Google Calendar data is never sold, transferred to third parties, or used for advertising or artificial intelligence models.</p>
+    <h2>Todoist (optional)</h2>
+    <p>Connecting Todoist stores the API token in this browser, under this account only. It is not written into an export and it is not sent to Firestore. Sync sends task titles, dates, and done state to Todoist. Disconnect deletes the token from this browser.</p>
+
+    <h2>Coach (optional)</h2>
+    <p>The on-device coach runs in the browser. What you type does not leave the machine, apart from the model file downloaded the first time you choose that size.</p>
+    <p>An online coach (OpenAI, Anthropic, or OpenRouter) is off until you paste your own API key. The key stays in this browser under this account. It is not in an export and it is not in the workspace. When you send a message, that provider receives the message, the key as the login, and a short summary: up to twelve open task titles, counts of notes, habits, and sessions, and the current intention. It does not receive mood text, note bodies, or the key inside the summary. The provider’s own policy covers what they keep.</p>
+
+    <h2>Music (optional)</h2>
+    <p>Desk sounds are generated on this page. Spotify and YouTube Music load only after you choose them. Those companies then see the usual player request from your browser. The pack does not send tasks, notes, or mood to them. A YouTube access token, if you connect one, stays in this tab under this account.</p>
 
     <h2>What is not collected</h2>
     <ul>
@@ -76,13 +83,26 @@
     </ul>
 
     <h2>How long it is kept</h2>
-    <p>Local data lasts until you clear it or export and wipe from Setup. A signed-in workspace lasts until you delete it or ask for deletion. Calendar tokens expire in about an hour. To delete a cloud workspace, sign in and use Setup to wipe, then sign out; or email the address above from the same Google account and the operator will delete <code>users/{your id}</code>.</p>
+    <p>Local data lasts until you clear this browser, or you delete the workspace, from Setup. Those are different buttons. Delete this account removes the sign-in as well, and only after the server accepts it. A failed deletion is not described as done. Calendar tokens expire in about an hour. You can also email the address above from the same Google account and the operator will delete <code>users/{your id}</code>.</p>
 
     <h2>Email and password</h2>
     <p>If email sign-in is enabled, Firebase stores the hashed password. The pack never sees the raw password. Local profiles (not Google) exist only in this browser; that password is a courtesy lock, not cloud security.</p>
 
     <h2>Children</h2>
     <p>The pack is not directed at children under 13. Do not create an account for a child that age.</p>
+
+    <h2>Public study card</h2>
+    <p>Your profile stays private until you turn on Show my card. Then a signed-in student who knows your @username can see your display name, username, the line you wrote, your photo if it is small enough, and three totals: level, focused minutes, and streak. They cannot see your email, tasks, notes, mood, or coach key. Turning the card off deletes that public copy.</p>
+
+    <h2>Voice</h2>
+    <p>Speaking a list is optional. The microphone is used only while Speak is on, and only after you tap it. This page does not record or upload the audio. Recognition is done by the browser, which may send the audio to its own speech service (Google in Chrome, Apple in Safari). The words that come back stay in this page until you add them as tasks or a note.</p>
+
+    <h2>Study together</h2>
+    <p>Study together is optional. If you start or join a room, the browser asks for your camera and microphone. The picture and voice go directly from your browser to the other people in that room. This site does not upload, record, or store them. A public STUN service (Google or Cloudflare) is asked only for a network path so two phones on different networks can find each other. It does not receive the picture or the voice.</p>
+    <p>A short connection note, enough for the browsers to find each other, is written to Firestore under <code>rooms/{code}</code>, with your display name, whether the camera is on, and whether you are muted. Anyone signed in who has the code can read that note. If you list the table, other signed-in students can see it and sit down. Leave the table to turn the camera off. The note is removed when the table ends.</p>
+
+    <h2>Chrome extension</h2>
+    <p>The optional Chrome extension stores two settings in Chrome sync (the Study Pack URL and an optional reminder interval) and keeps a toolbar focus timer on this device only (time left and today’s focus minutes). It does not read other websites, does not show notifications, does not run analytics, and does not sell data. Full extension policy: <a href="./chrome-extension/privacy.html">Chrome extension privacy</a>.</p>
 
     <h2>Changes</h2>
     <p>Material changes to this page will bump the date at the top. The live pack is the source of truth. Related: <a href="terms.html">Terms of use</a>.</p>

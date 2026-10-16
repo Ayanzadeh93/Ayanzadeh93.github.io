@@ -1,0 +1,161 @@
+/* Passport-only visual polish. Scoped so every other workspace screen stays unchanged. */
+#view-passport{--passport-ease:cubic-bezier(.22,1,.36,1)}
+#view-passport.on .xp-card,#view-passport.on .passport-wrap>.stack>.card,#view-passport.on .side-stack>.card{animation:passport-rise .62s var(--passport-ease) both}
+#view-passport.on .passport-wrap>.stack>.card:nth-child(2){animation-delay:.08s}
+#view-passport.on .side-stack>.card:first-child{animation-delay:.13s}
+#view-passport.on .side-stack>.card:nth-child(2){animation-delay:.18s}
+#view-passport .xp-card{position:relative;isolation:isolate;overflow:hidden;border-color:color-mix(in srgb,var(--accent) 28%,var(--line));background:linear-gradient(145deg,color-mix(in srgb,var(--accent) 10%,var(--surface)),var(--surface) 62%);box-shadow:var(--shadow-2);transition:transform .35s var(--passport-ease),box-shadow .35s,border-color .35s}
+#view-passport .xp-card::before{content:"";position:absolute;inset:-80% -35%;z-index:-1;background:conic-gradient(from 120deg,transparent 0 34%,color-mix(in srgb,var(--accent) 16%,transparent) 42%,transparent 50% 100%);animation:passport-aurora 11s linear infinite;pointer-events:none}
+#view-passport .xp-card:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--accent) 52%,var(--line));box-shadow:var(--shadow-3)}
+#view-passport .xp-card .xp-bar{height:12px;padding:2px;border:1px solid color-mix(in srgb,var(--accent) 22%,var(--line));background:color-mix(in srgb,var(--surface-3) 88%,transparent)}
+#view-passport .xp-card .xp-bar>span{position:relative;overflow:hidden;transition:width 1.35s var(--passport-ease)}
+#view-passport .xp-card .xp-bar>span::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 20%,color-mix(in srgb,var(--accent-ink) 48%,transparent) 48%,transparent 76%);transform:translateX(-110%);animation:passport-sheen 2.8s ease-in-out 1s infinite}
+#view-passport .p-badge{position:relative;isolation:isolate;overflow:hidden;transform:translateZ(0);transition:transform .32s var(--passport-ease),border-color .32s,box-shadow .32s,background .32s;animation:passport-badge-in .52s var(--passport-ease) both}
+#view-passport .p-badge:nth-child(2n){--badge-tilt:.45deg}
+#view-passport .p-badge:nth-child(2n+1){--badge-tilt:-.45deg}
+#view-passport .p-badge::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,color-mix(in srgb,var(--accent) 13%,transparent) 47%,transparent 64%);transform:translateX(-120%);transition:transform .7s var(--passport-ease);pointer-events:none}
+#view-passport .p-badge:hover{transform:translateY(-5px) rotate(var(--badge-tilt));border-color:color-mix(in srgb,var(--accent) 45%,var(--line));box-shadow:var(--shadow-2)}
+#view-passport .p-badge:hover::after{transform:translateX(120%)}
+#view-passport .p-badge.on{background:linear-gradient(150deg,color-mix(in srgb,var(--accent) 15%,var(--surface)),var(--surface) 75%);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 10%,transparent)}
+#view-passport .p-badge .p-ico{width:40px;height:40px;display:grid;place-items:center;border-radius:50%;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow-1);filter:grayscale(.8);opacity:.62;transition:transform .4s var(--passport-ease),filter .3s,opacity .3s,box-shadow .3s}
+#view-passport .p-badge.on .p-ico{filter:none;opacity:1;border-color:color-mix(in srgb,var(--accent) 48%,var(--line));box-shadow:0 0 0 5px color-mix(in srgb,var(--accent) 9%,transparent)}
+#view-passport .p-badge:hover .p-ico{transform:rotate(-7deg) scale(1.1)}
+#view-passport .p-bar>span{transform-origin:left;animation:passport-progress 1.1s var(--passport-ease) both}
+#view-passport .passport-next-list li{padding:10px;border-radius:var(--r-m);transition:background .25s,transform .25s var(--passport-ease)}
+#view-passport .passport-next-list li:hover{background:var(--surface-2);transform:translateX(4px)}
+.unlock-card{position:relative;overflow:hidden;animation:passport-unlock-card .55s var(--passport-ease,cubic-bezier(.22,1,.36,1)) both}
+.unlock-card::before,.unlock-card::after{content:"✦  ◆  ✧  ●  ✦";position:absolute;left:50%;top:46%;width:150%;color:var(--accent);font-size:18px;word-spacing:28px;opacity:0;pointer-events:none;animation:passport-confetti 1s cubic-bezier(.22,1,.36,1) .12s both}
+.unlock-card::after{transform:rotate(38deg);animation-delay:.2s}
+.unlock-icon{box-shadow:0 0 0 10px color-mix(in srgb,var(--accent) 10%,transparent),0 16px 45px color-mix(in srgb,var(--accent) 32%,transparent)}
+@keyframes passport-rise{from{opacity:0;transform:translateY(18px) scale(.985);filter:blur(4px)}to{opacity:1;transform:none;filter:none}}
+@keyframes passport-badge-in{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes passport-progress{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes passport-sheen{0%,38%{transform:translateX(-110%)}72%,100%{transform:translateX(110%)}}
+@keyframes passport-aurora{to{transform:rotate(1turn)}}
+@keyframes passport-unlock-card{from{opacity:0;transform:translateY(22px) scale(.9)}to{opacity:1;transform:none}}
+@keyframes passport-confetti{0%{opacity:0;transform:translate(-50%,0) scale(.5)}30%{opacity:1}100%{opacity:0;transform:translate(-50%,-150px) scale(1.15)}}
+@media (prefers-reduced-motion:reduce){html:not([data-motion="full"]) #view-passport :is(.xp-card,.card,.p-badge,.p-bar>span,.xp-bar>span::after),html:not([data-motion="full"]) .unlock-card,html:not([data-motion="full"]) .unlock-card::before,html:not([data-motion="full"]) .unlock-card::after{animation:none!important;transition:none!important;filter:none!important}}
+html[data-motion="reduce"] #view-passport :is(.xp-card,.card,.p-badge,.p-bar>span,.xp-bar>span::after),html[data-motion="reduce"] :is(.unlock-card,.unlock-card::before,.unlock-card::after){animation:none!important;transition:none!important;filter:none!important}
+
+/* ---- Profile (You) — same FocusQuest motion language as the Passport ---- */
+#view-profile{--passport-ease:cubic-bezier(.22,1,.36,1)}
+#view-profile.on .profile-wrap>.stack>.card,#view-profile.on .side-stack>.card{animation:passport-rise .62s var(--passport-ease) both}
+#view-profile.on .profile-wrap>.stack>.card:nth-child(2){animation-delay:.09s}
+#view-profile.on .side-stack>.card:first-child{animation-delay:.15s}
+#view-profile .passport-hero{position:relative;isolation:isolate;overflow:hidden;border-color:color-mix(in srgb,var(--accent) 28%,var(--line));background:linear-gradient(145deg,color-mix(in srgb,var(--accent) 10%,var(--surface)),var(--surface) 62%);box-shadow:var(--shadow-2);transition:transform .35s var(--passport-ease),box-shadow .35s,border-color .35s}
+#view-profile .passport-hero::before{content:"";position:absolute;inset:-80% -35%;z-index:-1;background:conic-gradient(from 200deg,transparent 0 34%,color-mix(in srgb,var(--accent) 16%,transparent) 42%,transparent 50% 100%);animation:passport-aurora 13s linear infinite;pointer-events:none}
+#view-profile .passport-hero:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--accent) 50%,var(--line));box-shadow:var(--shadow-3)}
+#view-profile .passport-photo{position:relative;transition:transform .4s var(--passport-ease),box-shadow .4s;box-shadow:0 0 0 5px color-mix(in srgb,var(--accent) 12%,transparent),var(--shadow-2)}
+#view-profile .passport-photo:hover{transform:scale(1.05) rotate(-2deg);box-shadow:0 0 0 8px color-mix(in srgb,var(--accent) 18%,transparent),var(--shadow-3)}
+#view-profile .field input,#view-profile .field textarea{transition:transform .25s var(--passport-ease),border-color .25s,box-shadow .25s}
+#view-profile .field input:focus,#view-profile .field textarea:focus{transform:translateY(-2px);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 14%,transparent)}
+#view-profile #profileLevelCard{position:relative;overflow:hidden}
+#view-profile #profileLevelCard .xp-bar>span,#view-profile .p-bar>span{transform-origin:left;animation:passport-progress 1.1s var(--passport-ease) both}
+#view-profile .btn{transition:transform .2s var(--passport-ease),box-shadow .2s}
+#view-profile .btn:hover{transform:translateY(-2px)}
+#view-profile .btn:active{transform:translateY(0) scale(.97)}
+
+/* ---- Passport: a calm progress dashboard with an earned, game-like rhythm ---- */
+#view-passport{--passport-ease:cubic-bezier(.22,1,.36,1)}
+#view-passport .passport-wrap{grid-template-columns:minmax(0,1fr) 300px;gap:18px}
+#view-passport .passport-wrap>.stack{min-width:0;gap:18px!important}
+#view-passport .xp-card{padding:clamp(18px,3vw,30px);border-radius:var(--r-l);}
+#view-passport .passport-journey{display:grid;grid-template-columns:148px minmax(0,1fr);align-items:center;gap:clamp(18px,3vw,34px)}
+#view-passport .passport-medal-column{display:grid;justify-items:center;gap:10px}
+#view-passport .passport-medal{--pct:0;width:128px;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;padding:8px;background:conic-gradient(var(--accent) calc(var(--pct)*1%),color-mix(in srgb,var(--surface-3) 85%,transparent) 0);box-shadow:0 12px 30px color-mix(in srgb,var(--accent) 16%,transparent);transition:background 1s var(--passport-ease),transform .5s var(--passport-ease)}
+#view-passport .xp-card:hover .passport-medal{transform:rotate(-5deg) scale(1.025)}
+#view-passport .passport-medal-face{position:relative;width:100%;height:100%;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(155deg,var(--surface),var(--surface-2));border:1px solid color-mix(in srgb,var(--accent) 22%,var(--line));box-shadow:inset 0 1px 0 color-mix(in srgb,#fff 60%,transparent)}
+#view-passport .passport-medal-face>span:first-child{font-size:calc(11px*var(--ts,1));text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:700}
+#view-passport .passport-medal-face strong{font:700 48px/.95 var(--font-display);color:var(--ink);font-variant-numeric:tabular-nums}
+#view-passport .passport-medal-star{position:absolute;right:23px;top:22px;color:var(--accent);font-size:14px}
+#view-passport .passport-rank-title{max-width:150px;text-align:center;font-size:calc(12px*var(--ts,1));font-weight:700;color:var(--accent)}
+#view-passport .passport-journey-detail{min-width:0}
+#view-passport .passport-journey-topline{display:flex;align-items:center;justify-content:space-between;gap:12px}
+#view-passport .passport-kicker{display:block;color:var(--accent);font-size:calc(11px*var(--ts,1));font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+#view-passport .passport-xp-total{white-space:nowrap;color:var(--muted);font-size:calc(12px*var(--ts,1))}
+#view-passport .passport-xp-total strong{color:var(--ink);font:700 calc(20px*var(--ts,1))/1 var(--font-display);font-variant-numeric:tabular-nums}
+#view-passport .passport-journey-detail h3{margin:10px 0 4px;font:700 clamp(21px,2.5vw,30px)/1.12 var(--font-display);letter-spacing:-.035em}
+#view-passport .passport-journey-copy{max-width:48ch;margin:0;color:var(--ink-2);font-size:calc(13px*var(--ts,1));line-height:1.55}
+#view-passport .passport-level-track{height:12px;margin:18px 0 8px;padding:2px;border:1px solid color-mix(in srgb,var(--accent) 22%,var(--line));border-radius:99px;background:var(--surface-3);overflow:hidden}
+#view-passport .passport-level-track>span{display:block;width:0;height:100%;border-radius:inherit;background:var(--accent-fill,var(--accent));box-shadow:0 1px 7px color-mix(in srgb,var(--accent) 38%,transparent);transition:width 1.2s var(--passport-ease)}
+#view-passport .passport-level-caption{display:flex;align-items:baseline;justify-content:space-between;gap:10px;color:var(--muted);font-size:calc(11px*var(--ts,1))}
+#view-passport .passport-level-caption>span:last-child{color:var(--ink-2);font-weight:600;text-align:right}
+#view-passport .passport-stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-top:22px;padding-top:16px;border-top:1px solid var(--line)}
+#view-passport .passport-stat{display:flex;flex-direction:column;gap:4px;min-width:0;padding:11px 12px;border:1px solid var(--line);border-radius:var(--r-m);background:color-mix(in srgb,var(--surface) 72%,var(--surface-2));transition:transform .25s var(--passport-ease),border-color .25s}
+#view-passport .passport-stat:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--accent) 35%,var(--line))}
+#view-passport .passport-stat-label{color:var(--muted);font-size:calc(10px*var(--ts,1));font-weight:700;letter-spacing:.07em;text-transform:uppercase}
+#view-passport .passport-stat strong{font:700 clamp(19px,2vw,25px)/1.1 var(--font-display);font-variant-numeric:tabular-nums}
+#view-passport .passport-stat strong small{font:600 calc(11px*var(--ts,1))/1 var(--font-ui);color:var(--muted)}
+#view-passport .passport-stat-note{color:var(--muted);font-size:calc(10px*var(--ts,1));line-height:1.3}
+#view-passport .passport-momentum-card{overflow:hidden;position:relative}
+#view-passport .passport-momentum-head{display:flex;justify-content:space-between;align-items:flex-start;gap:18px}
+#view-passport .passport-momentum-head h3{margin:3px 0;font:700 22px/1.15 var(--font-display)}
+#view-passport .passport-momentum-head .hint{margin:0;max-width:52ch}
+#view-passport .passport-week-total{display:flex;flex-direction:column;align-items:flex-end;white-space:nowrap}
+#view-passport .passport-week-total strong{font:700 28px/1 var(--font-display);font-variant-numeric:tabular-nums}
+#view-passport .passport-week-total span{margin-top:4px;color:var(--muted);font-size:calc(11px*var(--ts,1))}
+#view-passport .passport-week-chart{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:clamp(8px,2vw,18px);align-items:end;height:110px;margin:20px 4px 4px;padding:0 8px}
+#view-passport .passport-day{display:grid;grid-template-rows:1fr auto;justify-items:center;align-items:end;gap:7px;height:100%;min-width:0}
+#view-passport .passport-day-track{width:min(100%,34px);height:78px;display:flex;align-items:flex-end;overflow:hidden;border-radius:99px;background:var(--surface-2)}
+#view-passport .passport-day-track span{display:block;width:100%;height:var(--bar-height);min-height:3px;border-radius:99px;background:color-mix(in srgb,var(--accent) 34%,var(--surface-3));transform-origin:bottom;animation:passport-bar-rise .85s var(--passport-ease) both;transition:height .5s var(--passport-ease),background .25s}
+#view-passport .passport-day.has-focus .passport-day-track span{background:var(--accent-fill,var(--accent))}
+#view-passport .passport-day.is-today .passport-day-track{outline:2px solid color-mix(in srgb,var(--accent) 28%,transparent);outline-offset:3px}
+#view-passport .passport-day-label{color:var(--muted);font-size:calc(10px*var(--ts,1));font-weight:600}
+#view-passport .passport-day.is-today .passport-day-label{color:var(--accent)}
+#view-passport .passport-week-foot{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding-top:10px;color:var(--muted);font-size:calc(11px*var(--ts,1))}
+#view-passport .passport-week-foot>span:first-child{display:flex;align-items:center;gap:7px}
+#view-passport .passport-week-foot i{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+#view-passport .passport-milestones{min-width:0}
+#view-passport .passport-section-head{align-items:flex-start}
+#view-passport .passport-section-head h3{margin:0;font:700 22px/1.15 var(--font-display)}
+#view-passport .passport-section-head .hint{margin:4px 0 0;max-width:50ch}
+#view-passport #passportBadgeCount{white-space:nowrap;border:1px solid var(--line);border-radius:99px;padding:5px 9px;background:var(--surface-2)}
+#view-passport .passport-filters{display:flex;gap:7px;overflow-x:auto;padding:3px 1px 9px;margin-top:14px;scrollbar-width:thin}
+#view-passport .passport-filter{display:inline-flex;align-items:center;gap:7px;flex:0 0 auto;min-height:36px;padding:0 11px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--ink-2);font:600 calc(11px*var(--ts,1))/1 var(--font-ui);cursor:pointer;transition:color .2s,border-color .2s,background .2s,transform .2s var(--passport-ease)}
+#view-passport .passport-filter span{color:var(--muted);font:600 calc(10px*var(--ts,1))/1 var(--font-ui)}
+#view-passport .passport-filter:hover{transform:translateY(-1px);border-color:color-mix(in srgb,var(--accent) 42%,var(--line))}
+#view-passport .passport-filter.is-active{border-color:transparent;background:var(--accent);color:var(--accent-ink);box-shadow:0 3px 10px color-mix(in srgb,var(--accent) 20%,transparent)}
+#view-passport .passport-filter.is-active span{color:inherit;opacity:.8}
+#view-passport .passport-filter:focus-visible{outline:3px solid color-mix(in srgb,var(--accent) 45%,transparent);outline-offset:2px}
+#view-passport .passport-badges{grid-template-columns:repeat(auto-fill,minmax(min(100%,190px),1fr));gap:10px;margin-top:0}
+#view-passport .p-badge{display:grid;grid-template-columns:40px minmax(0,1fr);grid-template-rows:auto auto auto;column-gap:10px;align-content:start;min-height:150px;padding:14px;border-radius:14px}
+#view-passport .p-badge .p-ico{grid-row:1 / 3;width:38px;height:38px;font-size:19px}
+#view-passport .p-badge-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:6px;min-width:0}
+#view-passport .p-badge h4{font-size:calc(13px*var(--ts,1));line-height:1.25}
+#view-passport .p-badge-state{display:inline-flex;flex:0 0 auto;align-items:center;border-radius:99px;padding:3px 6px;background:var(--surface-2);color:var(--muted);font-size:calc(9px*var(--ts,1));font-weight:700;line-height:1;white-space:nowrap}
+#view-passport .p-badge.on .p-badge-state{background:var(--rest-wash);color:var(--good)}
+#view-passport .p-badge p{grid-column:1 / -1;display:block;min-height:34px;margin:10px 0 8px;overflow:visible;font-size:calc(11px*var(--ts,1));line-height:1.45}
+#view-passport .p-badge .p-bar{grid-column:1 / -1;height:7px}
+#view-passport .p-badge .p-bar>span{background:var(--accent-fill,var(--accent));transition:width .85s var(--passport-ease)}
+#view-passport .p-badge.on .p-bar>span{background:var(--good)}
+#view-passport .p-badge-progress{grid-column:1 / -1;margin-top:5px;color:var(--muted);font-size:calc(10px*var(--ts,1));font-weight:600;font-variant-numeric:tabular-nums}
+#view-passport .p-badge.on .p-badge-progress{color:var(--good)}
+#view-passport .passport-next-list{gap:6px}
+#view-passport .passport-next-list li{display:grid;grid-template-columns:34px minmax(0,1fr);gap:9px;padding:10px 7px;border-bottom:1px solid var(--line)}
+#view-passport .passport-next-list li:last-child{border-bottom:0}
+#view-passport .passport-next-list li>div{min-width:0}
+#view-passport .passport-next-list li .p-ico{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--surface-2);font-size:16px}
+#view-passport .passport-next-list strong{font-size:calc(12px*var(--ts,1))}
+#view-passport .passport-next-list span{font-size:calc(10.5px*var(--ts,1));margin:2px 0 7px}
+#view-passport .passport-next-list .p-bar{height:5px}
+#view-passport .passport-next-list .p-bar>span{background:var(--accent-fill,var(--accent))}
+#view-passport #passportStatsCard .panel-head{align-items:baseline}
+#view-passport #passportStatsCard .kv .p-bar{width:100%}
+@keyframes passport-bar-rise{from{transform:scaleY(.12);opacity:.4}to{transform:scaleY(1);opacity:1}}
+@media(max-width:1020px){#view-passport .passport-wrap{grid-template-columns:minmax(0,1fr) 250px}}
+@media(max-width:860px){#view-passport .passport-wrap{grid-template-columns:minmax(0,1fr)}#view-passport .passport-journey{grid-template-columns:120px minmax(0,1fr)}#view-passport .passport-medal{width:108px}}
+@media(max-width:600px){#view-passport .passport-journey{grid-template-columns:1fr;justify-items:center;text-align:center;gap:16px}#view-passport .passport-journey-topline{justify-content:center;flex-wrap:wrap}#view-passport .passport-journey-copy{margin-inline:auto}#view-passport .passport-level-caption{align-items:flex-start;text-align:left}#view-passport .passport-level-caption>span:last-child{max-width:50%;text-align:right}#view-passport .passport-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#view-passport .passport-momentum-head{gap:10px}#view-passport .passport-week-total strong{font-size:22px}#view-passport .passport-week-total span{text-align:right;white-space:normal}#view-passport .passport-week-chart{gap:6px;margin-inline:0;padding-inline:2px}#view-passport .passport-badges{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}#view-passport .p-badge{padding:10px;min-height:145px;column-gap:7px}#view-passport .p-badge .p-ico{width:32px;height:32px;font-size:16px}#view-passport .p-badge h4{font-size:calc(11px*var(--ts,1))}#view-passport .p-badge-state{font-size:calc(8px*var(--ts,1));padding:3px 4px}}
+@media(max-width:360px){#view-passport .passport-badges{grid-template-columns:1fr}#view-passport .p-badge{min-height:0}}
+@media(prefers-reduced-motion:reduce){#view-passport .passport-day-track span{animation:none}}
+html[data-motion="reduce"] #view-passport .passport-day-track span{animation:none}
+
+/* ---- Ranks card living inside the Progress screen ---- */
+.lb-inline{position:relative;isolation:isolate;overflow:hidden;animation:passport-rise .62s cubic-bezier(.22,1,.36,1) .22s both}
+.lb-inline .lb-inline-head{display:flex;align-items:baseline;justify-content:space-between;gap:.6rem;margin-bottom:.6rem}
+.lb-inline .lb-inline-head h3{margin:0}
+.lb-inline .lb-list{max-height:360px;padding:0;gap:.4rem}
+.lb-inline .lb-row{background:var(--surface-2,rgba(255,255,255,.035));border-color:var(--line)}
+.lb-stat-dock{display:flex;gap:.4rem;align-items:center;pointer-events:auto}
+.lb-stat-dock span{display:inline-flex;align-items:center;gap:.3rem;padding:.34rem .6rem;border-radius:999px;font:700 12px/1 system-ui,sans-serif;color:#0b1020;background:linear-gradient(135deg,#fde68a,#fbbf24);box-shadow:0 4px 14px rgba(251,191,36,.3)}
+.lb-stat-dock span.lb-stat-streak{background:linear-gradient(135deg,#a78bfa,#22d3ee)}
+@media (prefers-reduced-motion:reduce){.lb-inline{animation:none!important}}
