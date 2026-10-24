@@ -558,7 +558,7 @@ export const LOCALES = [
 const STR = {
   en: {
     'rail.focus': 'Focus', 'rail.plan': 'Plan', 'rail.notes': 'Notes', 'rail.wellbeing': 'Wellbeing',
-    'rail.coach': 'Coach', 'rail.together': 'Together', 'rail.progress': 'Progress', 'rail.help': 'Help', 'rail.you': 'You',
+    'rail.coach': 'Coach', 'rail.together': 'Together', 'rail.progress': 'Progress', 'rail.help': 'Help', 'rail.about': 'About', 'rail.you': 'You',
     'plan.coursework': 'Coursework', 'plan.study': 'Study', 'plan.bring': 'Bring in',
     'focus.stuck': "Can't start", 'focus.together': 'Study together',
     'gate.link': 'Email me a sign-in link',
@@ -580,7 +580,7 @@ const STR = {
   },
   fa: {
     'rail.focus': 'تمرکز', 'rail.plan': 'برنامه', 'rail.notes': 'یادداشت', 'rail.wellbeing': 'حال',
-    'rail.coach': 'راهنما', 'rail.together': 'با هم', 'rail.progress': 'پیشرفت', 'rail.help': 'کمک', 'rail.you': 'شما',
+    'rail.coach': 'راهنما', 'rail.together': 'با هم', 'rail.progress': 'پیشرفت', 'rail.help': 'کمک', 'rail.about': 'درباره', 'rail.you': 'شما',
     'plan.coursework': 'درس', 'plan.study': 'مطالعه', 'plan.bring': 'وارد کردن',
     'focus.stuck': 'نمی‌توانم شروع کنم', 'focus.together': 'مطالعه با هم',
     'gate.link': 'پیوند ورود را ایمیل کن',
@@ -602,7 +602,7 @@ const STR = {
   },
   es: {
     'rail.focus': 'Enfoque', 'rail.plan': 'Plan', 'rail.notes': 'Notas', 'rail.wellbeing': 'Bienestar',
-    'rail.coach': 'Guía', 'rail.together': 'Juntos', 'rail.progress': 'Progreso', 'rail.help': 'Ayuda', 'rail.you': 'Tú',
+    'rail.coach': 'Guía', 'rail.together': 'Juntos', 'rail.progress': 'Progreso', 'rail.help': 'Ayuda', 'rail.about': 'Acerca', 'rail.you': 'Tú',
     'plan.coursework': 'Curso', 'plan.study': 'Estudio', 'plan.bring': 'Traer',
     'focus.stuck': 'No puedo empezar', 'focus.together': 'Estudiar juntos',
     'gate.link': 'Enviarme un enlace',

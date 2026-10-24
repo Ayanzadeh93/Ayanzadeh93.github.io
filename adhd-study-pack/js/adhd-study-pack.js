@@ -1114,7 +1114,7 @@ const GROUPS = {
   plan:      { label:'Plan',      views:[['plan','Week'], ['tasks','Tasks'], ['matrix','Priorities']] },
   wellbeing: { label:'Wellbeing', views:[['calm','Calm'], ['sound','Music'], ['mood','Mood'], ['habits','Habits']] },
   progress:  { label:'Progress',  views:[['passport','Passport'], ['stats','Statistics']] },
-  you:       { label:'You',       views:[['profile','Profile'], ['about','About'], ['settings','Setup']] }
+  you:       { label:'You',       views:[['profile','Profile'], ['settings','Setup']] }
 };
 /** The group a view belongs to, or null when it stands alone. */
 function groupOf(v) {
