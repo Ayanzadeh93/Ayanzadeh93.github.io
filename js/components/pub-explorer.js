@@ -191,6 +191,7 @@ export class PubExplorer extends HTMLElement {
             type: 'search',
             id: searchId,
             class: 'pub-explorer__input',
+            value: this.#state.query,
             placeholder: 'Search by title, author, venue or year…',
             autocomplete: 'off',
             'aria-describedby': 'pub-explorer-count',
