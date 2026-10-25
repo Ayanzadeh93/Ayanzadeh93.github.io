@@ -365,7 +365,7 @@ footer a{color:var(--text-2)}
   </div>
   <div class="searchwrap">
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
-    <input id="q" type="search" autocomplete="off" spellcheck="false"
+    <input id="q" type="search" autocomplete="off" spellcheck="false" maxlength="160"
       placeholder="Search commands, flags, paths, gh, settings, hooks&hellip;"
       aria-label="Search the encyclopedia">
     <span class="kbdhint"><kbd>/</kbd><kbd>&#8984;K</kbd></span>
@@ -1279,6 +1279,8 @@ const LS = {
 const FAM_FROM_QS = {github:"gh", gh:"gh", claude:"cc", cc:"cc", "claude-code":"cc", codex:"cx", cx:"cx"};
 const FAM_TO_QS = {cc:"claude", cx:"codex", gh:"github"};
 const FAM_LABEL = {cc:"Claude Code", cx:"Codex", gh:"GitHub CLI"};
+const MAX_QUERY_LENGTH = 160;
+const MAX_QUERY_TERMS = 12;
 let githubReady = false;
 let githubFailed = false;
 
@@ -1297,9 +1299,14 @@ const st = {
 
 function readUrl(){
   const p = new URLSearchParams(location.search);
-  st.q = p.get("q") || "";
+  st.q = limitQuery(p.get("q") || "");
   st.fam = FAM_FROM_QS[(p.get("family")||"").toLowerCase()] || null;
   st.sec = p.get("section") || null;
+}
+function limitQuery(value){
+  const query = String(value || "").slice(0, MAX_QUERY_LENGTH);
+  const terms = query.trim().split(/\s+/).filter(Boolean);
+  return terms.length > MAX_QUERY_TERMS ? terms.slice(0, MAX_QUERY_TERMS).join(" ") : query;
 }
 function syncUrl(){
   const p = new URLSearchParams();
@@ -1470,7 +1477,7 @@ function score(e, terms){
 }
 
 function render(){
-  const terms = st.q.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const terms = st.q.trim().toLowerCase().split(/\s+/).filter(Boolean).slice(0, MAX_QUERY_TERMS);
   const out = [];
   let shown = 0;
   const counts = {};
@@ -1631,7 +1638,11 @@ function setOS(os){
 }
 
 /* ================= events ================= */
-$("#q").addEventListener("input", e => { st.q = e.target.value; render(); });
+$("#q").addEventListener("input", e => {
+  st.q = limitQuery(e.target.value);
+  if(e.target.value !== st.q) e.target.value = st.q;
+  render();
+});
 $$(".seg button[data-os]").forEach(b => b.addEventListener("click", () => setOS(b.dataset.os)));
 $$(".famseg button[data-fam]").forEach(b => b.addEventListener("click", () => {
   const next = b.dataset.fam || null;

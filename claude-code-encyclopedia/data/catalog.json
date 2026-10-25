@@ -1860,7 +1860,7 @@
           "label": "shell"
         },
         {
-          "command": "git clone https://x-access-token:$(gh auth token)@github.com/owner/repo.git",
+          "command": "gh repo clone owner/repo",
           "label": "shell"
         }
       ],
@@ -1870,7 +1870,7 @@
         "token",
         "scripting"
       ],
-      "note": "Never echo this into a log or a committed file; treat the output the same as a password."
+      "note": "The output is a credential; never place it in a URL, command-line arguments, logs or committed files. For Git operations, use `gh repo clone owner/repo`, or run `gh auth setup-git` before a plain `git clone`."
     },
     {
       "id": "ghauth-gh-auth-refresh",
