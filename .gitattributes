@@ -1,2 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Keep PDF assets out of line-oriented diffs and whitespace checks.
+*.pdf binary
