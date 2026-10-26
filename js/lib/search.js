@@ -95,17 +95,23 @@ export function scoreRecord(record, tokens, weights = DEFAULT_WEIGHTS) {
  * @param {Object} criteria
  * @param {string} [criteria.query]
  * @param {string} [criteria.type]  record type, or 'all'
+ * @param {string} [criteria.year]  publication year, or 'all'
  * @param {string} [criteria.sort]  'relevance' | 'newest' | 'oldest'
  * @param {Object<string, number>} [criteria.weights] override the field weights
  * @returns {Object[]} matching records, ordered
  */
 export function filterRecords(records, criteria = {}) {
-    const { query = '', type = 'all', sort = 'newest', weights = DEFAULT_WEIGHTS } = criteria;
+    const {
+        query = '', type = 'all', year = 'all', sort = 'newest', weights = DEFAULT_WEIGHTS
+    } = criteria;
     const tokens = tokenize(query);
 
     const matches = [];
     for (const record of records) {
         if (type !== 'all' && record.type !== type) continue;
+        // Years come off data attributes as strings; compare as strings so a
+        // missing year never coerces to 0 and matches.
+        if (year !== 'all' && String(record.year) !== String(year)) continue;
 
         const score = scoreRecord(record, tokens, weights);
         if (score === 0) continue;

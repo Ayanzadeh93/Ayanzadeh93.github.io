@@ -95,6 +95,16 @@ Root pages use relative paths (`css/style.css`). Subpages under `projects/` use 
 - Use existing utility classes (`.container`, `.section`, `.badge`, card patterns) before writing new ones.
 - `style.css` has a universal reset that zeroes every margin. It also hits UA defaults you may be relying on — a modal `<dialog>` needs `margin: auto` restored explicitly, or it pins to the top-left.
 
+Three flex/`hidden` traps have each already shipped a visible bug here — check
+for them whenever you touch component CSS:
+
+- **`[hidden]` loses to any `display` rule.** `.my-thing { display: flex }` beats the UA's `[hidden] { display: none }`, so JS that sets `hidden` appears to do nothing. Add the selector to the shared `[hidden]` block at the top of `components.css`.
+- **`flex-basis` sizes the main axis.** `flex: 1 1 260px` means 260px *tall* once a container query flips the row to `flex-direction: column`. Reset to `flex: 0 0 auto` inside the narrow query.
+- **`flex-wrap: wrap` on a column wraps into extra columns,** not extra rows, which pushes content out sideways. Use `nowrap` once a row becomes a column.
+
+A capped-height flex column also needs `flex: 0 0 auto` on everything except
+the one scrollable region, or long content squashes the fixed chrome.
+
 ### JavaScript
 
 - Init pattern: `document.addEventListener('DOMContentLoaded', …)` calling `init*` functions.
@@ -164,6 +174,7 @@ Copy checklists from [reference.md](reference.md) when executing these tasks.
 2. Give it the structured `data-*` attributes — see the checklist in [reference.md](reference.md). `<pub-explorer>` reads them; nothing is duplicated into JavaScript.
 3. Ship the Cite control as `<button type="button" class="pub-link" data-cite hidden>`. The component unhides it, so no-JS readers never see a dead button.
 4. Verify DOIs before adding them (`https://doi.org/<doi>` or the Crossref API). A wrong identifier in a citation is worse than a missing one.
+5. Do not hand-write a citation string anywhere. All five styles are generated from the `data-*` attributes; check the result in the Cite dialog instead.
 
 ### Add a CLI catalog entry
 

@@ -1,6 +1,7 @@
 /**
  * citations.js — turn a structured publication record into the citation
- * formats an academic reader actually asks for: BibTeX, APA 7, MLA 9 and IEEE.
+ * formats an academic reader actually asks for: BibTeX, RIS, APA 7, MLA 9 and
+ * IEEE.
  *
  * Pure functions only. Records come from the DOM (see pub-explorer.js), so the
  * page markup stays the single source of truth for every publication.
@@ -189,6 +190,72 @@ export function formatBibTeX(record) {
     return `@${entryType}{${bibKey(record)},\n${body}\n}`;
 }
 
+/** RIS reference type per record type. */
+const RIS_TYPE = {
+    article: 'JOUR',
+    inproceedings: 'CPAPER',
+    incollection: 'CHAP',
+    preprint: 'GEN',
+    misc: 'GEN'
+};
+
+/**
+ * RIS — the tagged format Zotero, Mendeley and EndNote import directly.
+ *
+ * Unlike the prose styles this is consumed by software, so fields stay
+ * separate: the page range is split into SP/EP and the container goes in JO
+ * for journals and T2 for anything that is part of a larger work.
+ */
+export function formatRIS(record) {
+    const lines = [['TY', RIS_TYPE[record.type] || 'GEN']];
+
+    for (const name of record.authors) {
+        const { given, family } = splitName(name);
+        lines.push(['AU', given.length ? `${family}, ${given.join(' ')}` : family]);
+    }
+
+    lines.push(['TI', record.title]);
+
+    if (record.venue) {
+        lines.push([record.type === 'article' ? 'JO' : 'T2', record.venue]);
+    }
+
+    if (record.pages) {
+        const [start, end] = String(record.pages).split(/\s*[-\u2013]+\s*/);
+        if (isPageRange(record.pages)) {
+            lines.push(['SP', start], ['EP', end]);
+        } else {
+            // An article number is not a start page; C7 is the RIS slot for it.
+            lines.push(['C7', start]);
+        }
+    }
+
+    // RIS has no "and others" marker, and the obvious candidates (an extra AU,
+    // or A2) would import as a real person called "et al.". A note keeps the
+    // truncation visible without inventing an author.
+    const notes = [record.status, record.etAl && 'Author list abbreviated in source']
+        .filter(Boolean)
+        .join('. ');
+
+    const optional = [
+        ['PY', record.year],
+        ['VL', record.volume],
+        ['IS', record.number],
+        ['PB', record.publisher],
+        ['DO', record.doi],
+        ['UR', canonicalUrl(record)],
+        ['N1', notes]
+    ];
+
+    for (const [tag, value] of optional) {
+        if (value) lines.push([tag, value]);
+    }
+
+    lines.push(['ER', '']);
+
+    return lines.map(([tag, value]) => `${tag}  - ${value}`).join('\n');
+}
+
 /** APA 7th edition. */
 export function formatAPA(record) {
     const names = record.authors.map(familyThenInitials);
@@ -295,16 +362,36 @@ export function formatIEEE(record) {
     return `${authorPart}${titlePart}${sourcePart}${yearPart}${statusPart}${link}`.trim();
 }
 
-/** Every supported style, keyed by the id the citation dialog uses for tabs. */
+/**
+ * Every supported style, keyed by the id the citation dialog uses for tabs.
+ * `extension` and `mime` let the dialog offer a download for any style, not
+ * only the two machine-readable ones.
+ */
 export const CITATION_FORMATS = [
-    { id: 'bibtex', label: 'BibTeX', mono: true, format: formatBibTeX },
-    { id: 'apa', label: 'APA 7', mono: false, format: formatAPA },
-    { id: 'mla', label: 'MLA 9', mono: false, format: formatMLA },
-    { id: 'ieee', label: 'IEEE', mono: false, format: formatIEEE }
+    { id: 'bibtex', label: 'BibTeX', mono: true, format: formatBibTeX, extension: 'bib', mime: 'application/x-bibtex' },
+    { id: 'ris', label: 'RIS', mono: true, format: formatRIS, extension: 'ris', mime: 'application/x-research-info-systems' },
+    { id: 'apa', label: 'APA 7', mono: false, format: formatAPA, extension: 'txt', mime: 'text/plain' },
+    { id: 'mla', label: 'MLA 9', mono: false, format: formatMLA, extension: 'txt', mime: 'text/plain' },
+    { id: 'ieee', label: 'IEEE', mono: false, format: formatIEEE, extension: 'txt', mime: 'text/plain' }
 ];
+
+/** Look up a style by id, falling back to BibTeX. */
+export function getCitationFormat(styleId) {
+    return CITATION_FORMATS.find((entry) => entry.id === styleId) || CITATION_FORMATS[0];
+}
 
 /** Render a record in one named style, falling back to BibTeX. */
 export function formatCitation(record, styleId) {
-    const style = CITATION_FORMATS.find((entry) => entry.id === styleId) || CITATION_FORMATS[0];
-    return style.format(record);
+    return getCitationFormat(styleId).format(record);
+}
+
+/**
+ * Render a whole reference list in one style.
+ *
+ * Prose styles are listed newest-first the way a CV reads; BibTeX and RIS keep
+ * whatever order the caller passed, since reference managers re-sort on import
+ * anyway.
+ */
+export function formatCollection(records, styleId) {
+    return records.map((record) => formatCitation(record, styleId)).join('\n\n');
 }
