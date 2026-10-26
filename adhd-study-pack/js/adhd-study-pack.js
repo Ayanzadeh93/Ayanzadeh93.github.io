@@ -71,7 +71,7 @@ const DOW = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
    defaults, then a <script type="application/json" id="focus-dial-config">
    block, then window.FOCUS_DIAL_CONFIG.
    ===================================================================== */
-const VERSION = '4.45.4';
+const VERSION = '4.46.3';
 const DEFAULT_CONFIG = {
   storageKey: 'focusdial.v3',
   storage:    'local',            // 'local' | 'session' | 'memory' | 'rest'
@@ -4075,12 +4075,13 @@ function renderPlanRail() {
   for (let i = 0; i < 42; i++) {
     const d = new Date(+start + i * DAY);
     const k = dayKey(d);
+    const bits = cellBits(k);
     const on = k === todayK;
-    cells += `<button type="button" class="rail-day${d.getMonth() !== mo ? ' out' : ''}${on ? ' today' : ''}" data-day="${k}"${on ? ' aria-current="date"' : ''}>${d.getDate()}</button>`;
+    const marks = bits.slice(0, 4).map(b => `<span class="plan-mark" style="background:${b.color}"></span>`).join('');
+    cells += `<button type="button" class="rail-day${d.getMonth() !== mo ? ' out' : ''}${on ? ' today' : ''}" data-day="${k}"${on ? ' aria-current="date"' : ''}>${d.getDate()}${marks ? `<span class="rail-marks">${marks}</span>` : ''}</button>`;
   }
   const monthLabel = planMonth.toLocaleDateString(undefined, { month: 'short', year: 'numeric' });
   const todayEvents = dayEvents(todayK).filter(e => !e.allDay);
-  const mins = Math.round(todayEvents.reduce((sum, e) => sum + Math.max(0, (new Date(e.end) - new Date(e.start)) / 60000), 0));
   const courses = [];
   todayEvents.forEach(e => {
     const sub = e.subjectId ? S.subjects.find(s => s.id === e.subjectId) : null;
@@ -4115,7 +4116,6 @@ function renderPlanRail() {
     </div>
     <div class="rail-foot">
       <div class="rail-kicker">Today</div>
-      <p class="rail-timed">${railTimed(mins)}</p>
       ${courseBody}
       ${extraBody}
     </div>`;
@@ -4228,12 +4228,10 @@ function renderPlanBoard(days, mode) {
     const cells = days.map(d => {
       const k = dayKey(d);
       const bits = cellBits(k);
-      const shown = bits.slice(0, 3);
-      const more = bits.length - shown.length;
+      const marks = bits.slice(0, 4).map(b => `<span class="plan-mark" style="background:${b.color}"></span>`).join('');
       return `<button type="button" class="plan-cell${d.getMonth() !== mo ? ' out' : ''}${k === todayK ? ' today' : ''}" data-openday="${k}">
         <span class="n">${d.getDate()}</span>
-        ${shown.map(b => `<span class="plan-mini${b.done ? ' done' : ''}">${esc(b.name)}</span>`).join('')}
-        ${more > 0 ? `<span class="plan-mini more">+${more}</span>` : ''}
+        ${marks ? `<span class="plan-marks">${marks}</span>` : ''}
       </button>`;
     }).join('');
     grid.innerHTML = `<div class="plan-dow">${dow}</div><div class="plan-month-grid">${cells}</div>`;
@@ -4287,17 +4285,11 @@ function renderCalendar() {
   const H = Math.round(48 * Math.min(CF().textSize / 100, 1.5));
   const todayK = dayKey(new Date());
   let html = '<div class="cal-h" aria-hidden="true"></div>';
-  days.forEach((d, i) => {
+  days.forEach(d => {
     const k = dayKey(d);
-    const all = dayEvents(k);
-    const timed = all.filter(e => !e.allDay);
-    const planned = Math.round(timed.reduce((sum, e) => sum + Math.max(0, (new Date(e.end) - new Date(e.start)) / 60000), 0));
-    const packed = planned > 240;
     const wknd = d.getDay() === 0 || d.getDay() === 6;
-    const overlap = dayOverlaps(all);
-    const load = (planned ? minsToHM(planned) : 'Open') + (overlap ? ' · overlap' : '');
     const dow = DOW[(d.getDay() + 6) % 7];
-    html += `<div class="cal-h ${k === todayK ? 'today' : ''} ${wknd ? 'weekend' : ''} ${packed ? 'packed' : ''}" aria-hidden="true"><div class="d">${dow}</div><div class="n">${d.getDate()}</div><div class="load"${packed ? ' title="Over four hours. Leave a gap."' : ''}>${load}</div></div>`;
+    html += `<div class="cal-h ${k === todayK ? 'today' : ''} ${wknd ? 'weekend' : ''}" aria-hidden="true"><div class="d">${dow}</div><div class="n">${d.getDate()}</div></div>`;
   });
   html += '<div class="cal-hours" aria-hidden="true">' + Array.from({ length:n }, (_, i) => `<div class="hour-lbl">${pad2(a + i)}:00</div>`).join('') + '</div>';
   days.forEach(d => {
