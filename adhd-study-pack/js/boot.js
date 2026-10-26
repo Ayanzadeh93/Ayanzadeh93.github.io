@@ -11,7 +11,7 @@
  * ?v= query strings in step with VERSION in adhd-study-pack.js: GitHub Pages
  * caches for ten minutes and these are what bust it.
  */
-const V = '4.45.4';
+const V = '4.46.3';
 
 function fail(err) {
   const el = document.getElementById('bootNote') || document.body.appendChild(document.createElement('p'));
