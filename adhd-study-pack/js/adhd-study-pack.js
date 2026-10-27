@@ -41,8 +41,8 @@ import { searchWorkspace } from './lib/workspace-search.js?v=4.45.0';
 import { primaryResource } from './lib/coursework.js?v=4.45.0';
 import { mountCoursework } from './coursework-page.js?v=4.45.0';
 import { mountStudyDesk } from './study-desk-page.js?v=4.45.0';
-import { mountExpand } from './expand-page.js?v=4.45.0';
-import { resolveHandoff, stampSession } from './lib/expand.js?v=4.45.0';
+import { mountExpand } from './expand-page.js?v=4.46.4';
+import { resolveHandoff, stampSession } from './lib/expand.js?v=4.46.4';
 import { sessionCue, mountDialCanvas } from './lib/dial-canvas.js?v=4.45.0';
 import { safePlaylistUrl, playlistLinkInfo } from './music-link.js?v=4.45.0';
 import { moodTimestamp, moodScore, moodRowsInRange, moodDaySeries, moodSegments,
@@ -71,7 +71,7 @@ const DOW = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
    defaults, then a <script type="application/json" id="focus-dial-config">
    block, then window.FOCUS_DIAL_CONFIG.
    ===================================================================== */
-const VERSION = '4.46.3';
+const VERSION = '4.46.4';
 const DEFAULT_CONFIG = {
   storageKey: 'focusdial.v3',
   storage:    'local',            // 'local' | 'session' | 'memory' | 'rest'

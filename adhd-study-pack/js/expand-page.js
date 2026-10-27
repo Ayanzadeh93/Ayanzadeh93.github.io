@@ -5,9 +5,9 @@ import {
   parseMicrosoftIcs, mergeMicrosoft, CONNECTOR_BOUNDARIES,
   takeover, handoffView, sharedPayload, revokeMember,
   trustPreview, trustReadable, suggestFrom, decideSuggestion, undoSuggestion,
-  resetSuggestion, trialOutcome, translate, coverage, localeOf, domainNote,
+  resetSuggestion, trialOutcome, translate, coverage, localeOf, LOCALES, FA_FONTS, domainNote,
   recoveryCopy, PASSKEYS_OFFERED
-} from './lib/expand.js?v=4.45.0';
+} from './lib/expand.js?v=4.46.4';
 
 export function mountExpand(api) {
   let bring = false;
@@ -54,6 +54,12 @@ export function mountExpand(api) {
     const loc = localeOf(lang());
     document.documentElement.lang = loc.id;
     document.documentElement.dir = loc.dir;
+    if (loc.id === 'fa') {
+      const chosen = (S().settings && S().settings.faFont) || 'vazirmatn';
+      document.documentElement.dataset.faFont = FA_FONTS.some(item => item.id === chosen) ? chosen : 'vazirmatn';
+    } else {
+      delete document.documentElement.dataset.faFont;
+    }
     document.querySelectorAll('[data-i18n]').forEach(el => {
       el.textContent = translate(lang(), el.getAttribute('data-i18n')).text;
     });
@@ -215,15 +221,17 @@ export function mountExpand(api) {
     }, Date.now());
     const outcome = trialOutcome(state.sessions || [], state.trial, Date.now());
     const note = coverage(lang()).note;
-    const options = ['en', 'fa', 'es'].map(id => {
-      const loc = localeOf(id);
-      return `<option value="${id}" ${lang() === id ? 'selected' : ''}>${esc(loc.label)}</option>`;
-    }).join('');
+    const options = LOCALES.map(loc => `<option value="${loc.id}" ${lang() === loc.id ? 'selected' : ''}>${esc(loc.label)}</option>`).join('');
+    const fontId = state.settings.faFont || 'vazirmatn';
+    const fonts = lang() === 'fa'
+      ? `<p class="cw-note">${esc(tr('you.font'))}</p><div class="fa-fonts" role="radiogroup" aria-label="${esc(tr('you.font'))}">${FA_FONTS.map(font => `<button type="button" data-fa-font="${font.id}" aria-pressed="${font.id === fontId}" style="font-family:${font.family}, Vazirmatn, sans-serif">${esc(font.label)}</button>`).join('')}</div>`
+      : '';
     const reason = idea.ok
       ? idea.timer.reason + (idea.review ? ' ' + idea.review.reason : '') + ' ' + idea.cards.reason
       : idea.reason;
     card.innerHTML = `<h3>${esc(tr('you.lang'))}</h3>
       <label class="field"><span class="sr-only">${esc(tr('you.lang'))}</span><select id="langPick">${options}</select></label>
+      ${fonts}
       ${note ? `<p class="cw-note">${esc(note)}</p>` : ''}
       <h3>A suggestion from your own sessions</h3>
       <p class="cw-note">${esc(reason)}</p>
@@ -254,6 +262,13 @@ export function mountExpand(api) {
       api.save();
       render(true);
     };
+    card.querySelectorAll('[data-fa-font]').forEach(button => {
+      button.onclick = () => {
+        ensure().settings.faFont = button.getAttribute('data-fa-font');
+        api.save();
+        render(true);
+      };
+    });
     api.$('#tryAccept').onclick = () => {
       if (!idea.ok) return;
       const next = decideSuggestion(state.settings, idea, 'accept');

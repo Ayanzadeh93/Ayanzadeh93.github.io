@@ -3017,5 +3017,11 @@ html[data-scores="off"] #streakChip{display:none !important}
 #bringPanel .stack,#expandYou .stack{display:flex; flex-direction:column; gap:8px}
 #handoffCard{margin:12px auto 0; max-width:28rem}
 html[dir="rtl"]{--font-ui:"Vazirmatn","Archivo","Helvetica Neue",Arial,sans-serif; --font-display:"Vazirmatn","Bricolage Grotesque",sans-serif}
+html[dir="rtl"][data-fa-font="estedad"]{--font-ui:"Estedad","Vazirmatn",sans-serif; --font-display:"Estedad","Vazirmatn",sans-serif}
+html[dir="rtl"][data-fa-font="sahel"]{--font-ui:"Sahel","Vazirmatn",sans-serif; --font-display:"Sahel","Vazirmatn",sans-serif}
+html[dir="rtl"][data-fa-font="shabnam"]{--font-ui:"Shabnam","Vazirmatn",sans-serif; --font-display:"Shabnam","Vazirmatn",sans-serif}
+.fa-fonts{display:flex; flex-wrap:wrap; gap:8px; margin:8px 0 4px}
+.fa-fonts button{min-height:44px; padding:0 14px; border-radius:999px; border:1px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer}
+.fa-fonts button[aria-pressed="true"]{background:var(--ink); color:var(--bg)}
 html[dir="rtl"] .cal,html[dir="rtl"] .cal-scroll,html[dir="rtl"] .plan-head,html[dir="rtl"] .plan-modes{direction:ltr}
 #bringPanel [dir="auto"],#connectCard [dir="auto"],#expandYou [dir="auto"]{unicode-bidi:plaintext}
