@@ -1,5 +1,5 @@
 const CACHE_PREFIX = 'adhd-study-pack-shell-';
-const CACHE_NAME = CACHE_PREFIX + '4.46.3';
+const CACHE_NAME = CACHE_PREFIX + '4.46.4';
 const SCOPE_URL = new URL(self.registration.scope);
 
 function sameApp(url) {

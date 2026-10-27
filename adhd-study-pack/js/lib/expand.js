@@ -552,7 +552,15 @@ export function trialOutcome(sessions, trial, now) {
 export const LOCALES = [
   { id: 'en', label: 'English', dir: 'ltr' },
   { id: 'fa', label: 'فارسی', dir: 'rtl' },
+  { id: 'tr', label: 'Türkçe', dir: 'ltr' },
   { id: 'es', label: 'Español', dir: 'ltr' }
+];
+
+export const FA_FONTS = [
+  { id: 'vazirmatn', label: 'وزیرمتن', family: 'Vazirmatn' },
+  { id: 'estedad', label: 'استعداد', family: 'Estedad' },
+  { id: 'sahel', label: 'ساحل', family: 'Sahel' },
+  { id: 'shabnam', label: 'شبنم', family: 'Shabnam' }
 ];
 
 const STR = {
@@ -571,6 +579,7 @@ const STR = {
     'desk.private': 'Only the assignments and notes you tick are copied. Mood, email, and your account are not.',
     'handoff.take': 'Take over this session',
     'you.lang': 'Language',
+    'you.font': 'Persian type',
     'you.fallback': 'Some lines are still in English. Dates and the page direction follow this language. Text you imported stays as it was written.',
     'you.accept': 'Use this',
     'you.decline': 'Not now',
@@ -579,11 +588,11 @@ const STR = {
     'domain.access': 'The timer, planner, and these forms work from the keyboard. Motion can be reduced. Targets stay large. This is a study tool, not medical advice.'
   },
   fa: {
-    'rail.focus': 'تمرکز', 'rail.plan': 'برنامه', 'rail.notes': 'یادداشت', 'rail.wellbeing': 'حال',
-    'rail.coach': 'راهنما', 'rail.together': 'با هم', 'rail.progress': 'پیشرفت', 'rail.help': 'کمک', 'rail.about': 'درباره', 'rail.you': 'شما',
-    'plan.coursework': 'درس', 'plan.study': 'مطالعه', 'plan.bring': 'وارد کردن',
-    'focus.stuck': 'نمی‌توانم شروع کنم', 'focus.together': 'مطالعه با هم',
-    'gate.link': 'پیوند ورود را ایمیل کن',
+    'rail.focus': 'تمرکز', 'rail.plan': 'برنامه', 'rail.notes': 'یادداشت‌ها', 'rail.wellbeing': 'آرامش',
+    'rail.coach': 'راهنما', 'rail.together': 'با هم', 'rail.progress': 'پیشرفت', 'rail.help': 'کمک', 'rail.about': 'درباره', 'rail.you': 'من',
+    'plan.coursework': 'تکلیف‌ها', 'plan.study': 'مطالعه', 'plan.bring': 'آوردن',
+    'focus.stuck': 'نمی‌توانم شروع کنم', 'focus.together': 'با هم درس بخوانیم',
+    'gate.link': 'پیوند ورود را برایم بفرست',
     'gate.passkey': 'کلید عبور ارائه نمی‌شود. دستگاه گم‌شده با همین ایمیل یا با گوگل دوباره وارد می‌شود.',
     'bring.lead': 'برنامه درسی یا فایل تکلیف فقط پس از تأیید هر خط وارد می‌شود. اینجا دستیار را روشن نمی‌کند.',
     'syl.tz': 'منطقه زمانی این تاریخ‌ها',
@@ -593,8 +602,9 @@ const STR = {
     'desk.private': 'فقط تکلیف و یادداشتی که تیک می‌زنی کپی می‌شود. حال، ایمیل، و حساب تو نه.',
     'handoff.take': 'این نشست را همین‌جا ادامه بده',
     'you.lang': 'زبان',
-    'you.fallback': 'بعضی خط‌ها هنوز انگلیسی‌اند. تاریخ و جهت صفحه از این زبان پیروی می‌کنند. متنی که وارد کردی همان‌طور می‌ماند که نوشته شده.',
-    'you.accept': 'همین را بگذار',
+    'you.font': 'قلم',
+    'you.fallback': 'بعضی خط‌ها هنوز انگلیسی‌اند. تاریخ و جهت صفحه از این زبان پیروی می‌کنند. متنی که نوشته‌ای همان می‌ماند.',
+    'you.accept': 'بپذیر',
     'you.decline': 'حالا نه',
     'you.undo': 'برگردان',
     'trust.lead': 'فیلدهایی را انتخاب کن که یک نفر مورد اعتماد ببیند. ایمیل، یادداشت، حال، و ورود هرگز نمی‌آیند.',
@@ -624,6 +634,30 @@ const STR = {
   }
 };
 
+STR.tr = {
+  'rail.focus': 'Odak', 'rail.plan': 'Plan', 'rail.notes': 'Notlar', 'rail.wellbeing': 'Sakinlik',
+  'rail.coach': 'Rehber', 'rail.together': 'Birlikte', 'rail.progress': 'İlerleme', 'rail.help': 'Yardım', 'rail.about': 'Hakkında', 'rail.you': 'Ben',
+  'plan.coursework': 'Ödevler', 'plan.study': 'Çalışma', 'plan.bring': 'Getir',
+  'focus.stuck': 'Başlayamıyorum', 'focus.together': 'Birlikte çalışalım',
+  'gate.link': 'Giriş bağlantısını gönder',
+  'gate.passkey': 'Geçiş anahtarı yok. Kayıp bir cihaz bu e-posta veya Google ile yeniden girer.',
+  'bring.lead': 'Bir ders planı veya ödev, ancak her satırı onayladıktan sonra girer. Bu, yardımcıya haber vermez.',
+  'syl.tz': 'Bu tarihlerin saat dilimi',
+  'syl.empty': 'Tarih veya zorunluluk bulunamadı.',
+  'syl.import': 'İşaretli satırları al',
+  'lms.lead': 'Bir Canvas veya Moodle dışa aktarımını yapıştır. Salt okunur. Canlı bağlantı yok ve bir web adresi kaydedilmez.',
+  'desk.private': 'Yalnızca işaretlediğin ödev ve not kopyalanır. Ruh hali, e-posta ve hesap değil.',
+  'handoff.take': 'Bu oturumu burada sürdür',
+  'you.lang': 'Dil',
+  'you.font': 'Yazı',
+  'you.fallback': 'Bazı satırlar hâlâ İngilizce. Tarihler ve sayfa yönü bu dili izler. Kendi yazdığın metin olduğu gibi kalır.',
+  'you.accept': 'Bunu kullan',
+  'you.decline': 'Şimdi değil',
+  'you.undo': 'Geri al',
+  'trust.lead': 'Güvendiğin birinin görebileceği alanları seç. E-posta, notlar, ruh hali ve giriş asla dahil edilmez.',
+  'domain.access': 'Zamanlayıcı, plan ve bu formlar klavyeyle çalışır. Hareket azaltılabilir. Hedefler büyük kalır. Bu bir çalışma aracıdır, tıbbi tavsiye değildir.'
+};
+
 export function localeOf(lang) {
   return LOCALES.find(item => item.id === lang) || LOCALES[0];
 }
@@ -641,7 +675,7 @@ export function coverage(lang) {
 }
 
 export function formatWhen(date, lang, timeZone) {
-  const locale = lang === 'fa' ? 'fa-IR' : (lang || 'en');
+  const locale = lang === 'fa' ? 'fa-IR' : lang === 'tr' ? 'tr-TR' : lang === 'es' ? 'es' : 'en';
   const options = { weekday: 'short', month: 'short', day: 'numeric' };
   if (timeZone) options.timeZone = timeZone;
   try { return new Intl.DateTimeFormat(locale, options).format(date); }
