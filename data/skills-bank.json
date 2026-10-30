@@ -1,0 +1,3572 @@
+{
+  "schemaVersion": 1,
+  "name": "AI Skills Bank",
+  "description": "500 reusable AI skills with stable IDs, for Claude Code, Codex CLI, Gemini CLI, Kimi CLI, Aider and Cline.",
+  "repo": "https://github.com/Ayanzadeh93/Claude-Skills-Bank",
+  "license": "MIT",
+  "total": 500,
+  "categories": [
+    {
+      "name": "Accessibility, Vision & Multimodal",
+      "prefix": "AS",
+      "file": "skills/skills-accessibility-multimodal.md",
+      "count": 50
+    },
+    {
+      "name": "Coding & Code Review",
+      "prefix": "CS",
+      "file": "skills/skills-coding.md",
+      "count": 50
+    },
+    {
+      "name": "Creativity & Ideation",
+      "prefix": "CR",
+      "file": "skills/skills-creativity-ideation.md",
+      "count": 50
+    },
+    {
+      "name": "Data, Analysis & Math",
+      "prefix": "DS",
+      "file": "skills/skills-data-analysis.md",
+      "count": 50
+    },
+    {
+      "name": "Education & Teaching",
+      "prefix": "ES",
+      "file": "skills/skills-education-teaching.md",
+      "count": 50
+    },
+    {
+      "name": "General & Meta Skills",
+      "prefix": "GS",
+      "file": "skills/skills-general-meta.md",
+      "count": 50
+    },
+    {
+      "name": "Operations & Productivity",
+      "prefix": "OS",
+      "file": "skills/skills-operations-productivity.md",
+      "count": 50
+    },
+    {
+      "name": "Product, UX & Business",
+      "prefix": "PS",
+      "file": "skills/skills-product-ux-business.md",
+      "count": 50
+    },
+    {
+      "name": "Research & Reading",
+      "prefix": "RS",
+      "file": "skills/skills-research-reading.md",
+      "count": 50
+    },
+    {
+      "name": "Writing & Editing",
+      "prefix": "WS",
+      "file": "skills/skills-writing-editing.md",
+      "count": 50
+    }
+  ],
+  "skills": [
+    {
+      "id": "AS-001",
+      "name": "Alt-Text Generator",
+      "description": "Generates concise, descriptive alt-text for images.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-002",
+      "name": "Image-to-Scene Summarizer",
+      "description": "Summarizes scenes from images for blind/low-vision users.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-003",
+      "name": "Floor Plan Verbalizer",
+      "description": "Describes floor plans and spatial layouts.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-004",
+      "name": "Indoor Navigation Instruction Writer",
+      "description": "Writes turn-by-turn indoor navigation instructions.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-005",
+      "name": "Spatial Relationship Explainer",
+      "description": "Explains spatial relations between objects.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-006",
+      "name": "Object Descriptor for Assistive Use",
+      "description": "Describes objects with orientation and affordances.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-007",
+      "name": "Safety-Aware Scene Commentator",
+      "description": "Highlights obstacles, hazards, and safe paths in scenes.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-008",
+      "name": "Multimodal Question Answering Assistant",
+      "description": "Answers questions grounded in images or diagrams.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-009",
+      "name": "Text-Simplification for Screen Readers",
+      "description": "Simplifies text for easier screen reader use.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-010",
+      "name": "Structure-Preserving HTML/Markdown Rewriter",
+      "description": "Rewrites content to preserve heading structure for accessibility.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-011",
+      "name": "Color Contrast Explainer",
+      "description": "Explains color contrast issues from designs.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-012",
+      "name": "Caption Writing Assistant",
+      "description": "Writes captions for videos and animations.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-013",
+      "name": "Audio Description Script Writer",
+      "description": "Writes audio description scripts.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-014",
+      "name": "Keyboard Navigation Helper",
+      "description": "Suggests keyboard navigation patterns for UIs.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-015",
+      "name": "AR/VR Accessibility Scenario Writer",
+      "description": "Suggests how to adapt experiences in AR/VR.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-016",
+      "name": "Form Accessibility Checker",
+      "description": "Reviews forms for accessible labels and flows.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-017",
+      "name": "Table Accessibility Reformatter",
+      "description": "Rewrites complex tables into accessible linear text.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-018",
+      "name": "Screen Reader Testing Checklist Writer",
+      "description": "Designs checklists for screen reader testing.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-019",
+      "name": "Landmark & Heading Structure Advisor",
+      "description": "Suggests ARIA landmarks and heading structures.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-020",
+      "name": "Alternative Input Method Advisor",
+      "description": "Suggests accommodations for alternative input methods.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-021",
+      "name": "Cognitive Load Reducer",
+      "description": "Simplifies instructions and tasks.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-022",
+      "name": "Dyslexia-Friendly Text Rewriter",
+      "description": "Rewrites for dyslexia-friendly layout and wording.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-023",
+      "name": "Language Complexity Annotator",
+      "description": "Annotates where text may be too complex.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-024",
+      "name": "Accessibility Acceptance Criteria Writer",
+      "description": "Writes accessibility ACs for user stories.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-025",
+      "name": "Accessibility Training Scenario Writer",
+      "description": "Creates scenarios for training on accessibility.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-026",
+      "name": "Multi-Modal Teaching Companion",
+      "description": "Combines text + visual + spatial explanations.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-027",
+      "name": "Tactile / Haptic Representation Ideator",
+      "description": "Suggests tactile representations for info.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-028",
+      "name": "Vision-Language Evaluation Prompt Designer",
+      "description": "Designs evaluation prompts for VLMs in accessibility tasks.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-029",
+      "name": "Accessibility Bug Triage Helper",
+      "description": "Helps triage accessibility bugs by severity.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-030",
+      "name": "Assistive Tech Integration Planner",
+      "description": "Plans integrations with screen readers and AT.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-031",
+      "name": "Non-Visual Map Explainer",
+      "description": "Explains maps in non-visual terms.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-032",
+      "name": "Indoor Wayfinding Hint Generator",
+      "description": "Produces hints for landmarks and routes.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-033",
+      "name": "Multimodal Safety Check Assistant",
+      "description": "Flags risky content in images for assistive use.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-034",
+      "name": "Floor Plan Annotation Guide Writer",
+      "description": "Guides annotation for accessible navigation.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-035",
+      "name": "Multimodal Dataset Documentation Assistant",
+      "description": "Writes dataset docs focusing on accessibility.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-036",
+      "name": "Scene-to-Dialogue Narrativizer",
+      "description": "Turns visual scenes into narrative descriptions.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-037",
+      "name": "Icon & Symbol Description Helper",
+      "description": "Describes icons and abstract symbols.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-038",
+      "name": "UI Change Verbal Diff Generator",
+      "description": "Describes UI changes between versions in text.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-039",
+      "name": "Temporal Navigation Assistant",
+      "description": "Helps describe sequences of steps or animations.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-040",
+      "name": "Audio-Only UX Planner",
+      "description": "Suggests audio-only flows for tasks.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-041",
+      "name": "Multimodal Prompt Pattern Library Curator",
+      "description": "Curates prompt patterns for VLM tasks.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-042",
+      "name": "Safe Object Detection Task Framer",
+      "description": "Frames detection tasks with safety and consent in mind.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-043",
+      "name": "Indoor Navigation Error Explainer",
+      "description": "Explains navigation failures and edge cases.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-044",
+      "name": "Spatial Memory Aid Designer",
+      "description": "Designs prompts that help users build mental maps.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-045",
+      "name": "Route Comparison Assistant",
+      "description": "Compares routes for safety, complexity, and accessibility.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-046",
+      "name": "Wayfinding Dialogue Script Writer",
+      "description": "Scripts dialogues for turn-by-turn assistance.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-047",
+      "name": "Sensor Fusion Explanation Assistant",
+      "description": "Explains how vision, depth, and other sensors combine.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-048",
+      "name": "Assistive Agent Persona Configurator",
+      "description": "Defines personas for assistive navigation agents.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-049",
+      "name": "Multimodal Evaluation Report Writer",
+      "description": "Writes evaluation reports for multimodal models.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "AS-050",
+      "name": "Accessibility-First Agent Orchestrator",
+      "description": "Coordinates multiple skills to support blind/low-vision users safely.",
+      "category": "Accessibility, Vision & Multimodal",
+      "file": "skills/skills-accessibility-multimodal.md"
+    },
+    {
+      "id": "CS-001",
+      "name": "Language-Agnostic Code Explainer",
+      "description": "Explains what a code snippet does in human terms.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-002",
+      "name": "Code Comment Writer",
+      "description": "Adds high-quality comments to existing code without changing logic.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-003",
+      "name": "Refactoring Specialist",
+      "description": "Refactors code for readability and maintainability while preserving behavior.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-004",
+      "name": "Complexity Reducer",
+      "description": "Identifies complex regions and simplifies with clearer structure or patterns.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-005",
+      "name": "Documentation-First Coder",
+      "description": "Writes docstrings and README-level docs before proposing code changes.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-006",
+      "name": "Test Case Generator",
+      "description": "Generates unit tests, edge cases, and property-based tests.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-007",
+      "name": "Bug Reproducer & Minimizer",
+      "description": "Isolates the minimal repro case for a bug from logs and descriptions.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-008",
+      "name": "Debugging Assistant",
+      "description": "Proposes hypotheses and diagnostic steps for code issues.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-009",
+      "name": "Code Review Partner",
+      "description": "Performs a human-style code review with comments and priority labels.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-010",
+      "name": "Performance Profiler (Static)",
+      "description": "Inspects code for likely performance bottlenecks and hot paths.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-011",
+      "name": "Secure Coding Checker",
+      "description": "Flags potential security issues and suggests safer patterns.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-012",
+      "name": "API Contract Enforcer",
+      "description": "Checks if code adheres to a described API contract.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-013",
+      "name": "Type-System Advisor",
+      "description": "Suggests typing improvements (e.g., TypeScript, Python typing).",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-014",
+      "name": "Language Migration Assistant",
+      "description": "Helps translate code between languages while preserving semantics.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-015",
+      "name": "Framework Migration Assistant",
+      "description": "Guides migration between frameworks (e.g., React to Next.js).",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-016",
+      "name": "CLI Tool Designer",
+      "description": "Designs CLI UX and scaffolds code for command-line tools.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-017",
+      "name": "REST API Designer",
+      "description": "Proposes REST endpoints, models, and error formats.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-018",
+      "name": "GraphQL Schema Designer",
+      "description": "Designs GraphQL schemas and example queries.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-019",
+      "name": "Database Schema Normalizer",
+      "description": "Normalizes database schemas and suggests indexes.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-020",
+      "name": "ORM Query Optimizer",
+      "description": "Improves ORM queries to avoid N+1 and similar pitfalls.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-021",
+      "name": "Code Style Harmonizer",
+      "description": "Aligns code with a given style guide or linter.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-022",
+      "name": "Legacy Code Archaeologist",
+      "description": "Explains legacy code and proposes modernization paths.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-023",
+      "name": "Microservice Boundary Advisor",
+      "description": "Suggests service boundaries and communication patterns.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-024",
+      "name": "Error-Handling Strategist",
+      "description": "Designs consistent error-handling conventions across a codebase.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-025",
+      "name": "Logging Strategy Designer",
+      "description": "Proposes logging levels, structure, and redaction rules.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-026",
+      "name": "DevEx Scripting Helper",
+      "description": "Writes small scripts to speed up developer workflows.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-027",
+      "name": "IDE Prompt Snippet Generator",
+      "description": "Generates prompt snippets/macros for editor integration.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-028",
+      "name": "Codebase Tour Guide",
+      "description": "Creates onboarding tours for new contributors to a repo.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-029",
+      "name": "Git Workflow Advisor",
+      "description": "Suggests branch, review, and release workflows.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-030",
+      "name": "CI/CD Pipeline Designer",
+      "description": "Proposes CI/CD configurations and checks.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-031",
+      "name": "Containerization Assistant",
+      "description": "Helps write Dockerfiles and compose setups.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-032",
+      "name": "Infrastructure-as-Code Helper",
+      "description": "Assists with Terraform/CloudFormation patterns.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-033",
+      "name": "Security Threat Modeling Assistant",
+      "description": "Helps model threats and mitigations for an app.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-034",
+      "name": "Codebase Search Strategist",
+      "description": "Suggests search queries and patterns to explore large repos.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-035",
+      "name": "Repo Readme & Docs Generator",
+      "description": "Drafts initial repo documentation and contributing guides.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-036",
+      "name": "API Client Generator",
+      "description": "Generates API client code from OpenAPI or specs.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-037",
+      "name": "LLM Tooling Integrator",
+      "description": "Suggests how to integrate Claude into existing dev workflows.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-038",
+      "name": "Safe Code Example Curator",
+      "description": "Extracts and sanitizes examples for documentation.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-039",
+      "name": "Polyglot Snippet Translator",
+      "description": "Produces the same snippet in multiple languages.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-040",
+      "name": "Code Pattern Library Curator",
+      "description": "Builds a small pattern library from a codebase.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-041",
+      "name": "Regression Risk Estimator",
+      "description": "Assesses risk of change and suggests extra tests.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-042",
+      "name": "Code Ownership Mapper",
+      "description": "Suggests ownership boundaries and CODEOWNERS entries.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-043",
+      "name": "Static Analysis Rule Author",
+      "description": "Proposes custom linting or static-analysis rules.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-044",
+      "name": "Coding Interview Question Generator",
+      "description": "Generates coding problems with solutions.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-045",
+      "name": "Coding Interview Answer Analyzer",
+      "description": "Reviews candidate solutions with rubric-style feedback.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-046",
+      "name": "Code Snippet Explainer for Non-Engineers",
+      "description": "Explains code in business or product terms.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-047",
+      "name": "Prompt-to-Code Prototyper",
+      "description": "Quickly turns natural language into draft code.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-048",
+      "name": "Code-to-Prompt Reverse Engineer",
+      "description": "Infers original task/prompt from existing code.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-049",
+      "name": "Repository Refactoring Planner",
+      "description": "Designs a multi-step refactor plan for a large repo.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CS-050",
+      "name": "Claude Code Session Guide",
+      "description": "Defines patterns for using Claude as an in-IDE coding copilot.",
+      "category": "Coding & Code Review",
+      "file": "skills/skills-coding.md"
+    },
+    {
+      "id": "CR-001",
+      "name": "Brainstorm Facilitator",
+      "description": "Leads structured idea generation sessions.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-002",
+      "name": "Divergent Thinking Booster",
+      "description": "Forces unusual and diverse idea directions.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-003",
+      "name": "Convergent Idea Refiner",
+      "description": "Helps narrow many ideas into promising ones.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-004",
+      "name": "Creative Constraint Game Designer",
+      "description": "Adds playful constraints to spur creativity.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-005",
+      "name": "“What If” Scenario Generator",
+      "description": "Generates speculative scenarios.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-006",
+      "name": "Analogy & Metaphor Brainstormer",
+      "description": "Proposes metaphors for concepts or products.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-007",
+      "name": "Story Prompt Generator",
+      "description": "Generates creative writing prompts.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-008",
+      "name": "Character & World Builder",
+      "description": "Helps build characters and worlds for fiction.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-009",
+      "name": "Plot Twist Ideator",
+      "description": "Suggests plot twists and complications.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-010",
+      "name": "Creative Writing Coach",
+      "description": "Gives feedback on creative writing.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-011",
+      "name": "Visual Concept Brainstormer",
+      "description": "Ideates visual concepts for designers.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-012",
+      "name": "Branding Concept Generator",
+      "description": "Generates brand concepts and territories.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-013",
+      "name": "Campaign Concept Writer",
+      "description": "Writes campaign concepts and taglines.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-014",
+      "name": "Workshop Activity Ideator",
+      "description": "Suggests creative workshop activities.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-015",
+      "name": "Icebreaker Question Generator",
+      "description": "Generates icebreaker questions.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-016",
+      "name": "Naming Workshop Facilitator",
+      "description": "Facilitates structured naming exercises.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-017",
+      "name": "Game Mechanic Ideator",
+      "description": "Suggests game mechanics for serious or casual games.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-018",
+      "name": "Narrative Design Assistant",
+      "description": "Helps design narratives in games or products.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-019",
+      "name": "Constraint-Based Brainstorm Partner",
+      "description": "Brainstorms within tight constraints.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-020",
+      "name": "Multi-Perspective Idea Evaluator",
+      "description": "Evaluates ideas from many stakeholder perspectives.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-021",
+      "name": "Remix & Mashup Assistant",
+      "description": "Combines existing ideas into new mashups.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-022",
+      "name": "Unconventional Use Case Generator",
+      "description": "Lists non-obvious use cases.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-023",
+      "name": "Opposite-Day Ideator",
+      "description": "Asks “what if we did the opposite?” of assumptions.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-024",
+      "name": "Trend + Counter-Trend Scout",
+      "description": "Combines trends with counter-trends for ideas.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-025",
+      "name": "Fictional Tech Concept Ideator",
+      "description": "Invents speculative technologies.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-026",
+      "name": "Ethical Design Brainstormer",
+      "description": "Brainstorms ideas with ethical constraints foregrounded.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-027",
+      "name": "Ritual & Habit Designer",
+      "description": "Designs rituals to support behaviors.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-028",
+      "name": "User Delight Moment Ideator",
+      "description": "Identifies moments where delightful touches could live.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-029",
+      "name": "Workshop Agenda Creative Planner",
+      "description": "Plans creative workshop agendas.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-030",
+      "name": "Set & Setting Imagination Partner",
+      "description": "Imagines contexts for experiences.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-031",
+      "name": "Multi-Sensory Experience Ideator",
+      "description": "Thinks in sight, sound, touch, etc.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-032",
+      "name": "Constraint Relaxation Advisor",
+      "description": "Suggests which constraints to relax for new ideas.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-033",
+      "name": "Creative Brief Writer",
+      "description": "Writes creative briefs for teams.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-034",
+      "name": "Alternative History Scenario Writer",
+      "description": "Invents alternate historical outcomes.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-035",
+      "name": "“Future History” Scenario Writer",
+      "description": "Writes future timelines.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-036",
+      "name": "Character Relationship Mapper",
+      "description": "Maps relationships and conflicts.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-037",
+      "name": "Creative Block Breaker",
+      "description": "Suggests exercises to overcome creative block.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-038",
+      "name": "Mood & Tone Board Writer",
+      "description": "Describes mood boards in words.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-039",
+      "name": "Cross-Industry Inspiration Finder",
+      "description": "Pulls analogies from other industries.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-040",
+      "name": "Brainstorm Output Structurer",
+      "description": "Organizes brainstorm output into themes.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-041",
+      "name": "Idea Pre-Mortem Assistant",
+      "description": "Imagines how a creative idea might fail.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-042",
+      "name": "Creative Pairings Generator",
+      "description": "Suggests interesting pairings of concepts.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-043",
+      "name": "Story Arc Analyzer",
+      "description": "Analyzes story arcs and suggests improvements.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-044",
+      "name": "Creative Parameter Tuner",
+      "description": "Suggests parameters to tweak (tone, scale, audience).",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-045",
+      "name": "Constraint-Stacking Challenge Maker",
+      "description": "Stacks multiple constraints for advanced ideation.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-046",
+      "name": "“Borrowed Structure” Idea Maker",
+      "description": "Borrows structures from other domains.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-047",
+      "name": "Backstory Generator",
+      "description": "Generates backstories for characters/products.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-048",
+      "name": "Pose & Scene Idea Generator",
+      "description": "For visual or narrative scenes.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-049",
+      "name": "Multi-Ending Story Ideator",
+      "description": "Suggests branching endings.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "CR-050",
+      "name": "Creative Systems Designer",
+      "description": "Helps design systems that continually generate new ideas.",
+      "category": "Creativity & Ideation",
+      "file": "skills/skills-creativity-ideation.md"
+    },
+    {
+      "id": "DS-001",
+      "name": "Data Question Clarifier",
+      "description": "Clarifies what the user wants to learn from data before analysis.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-002",
+      "name": "Dataset Documentation Generator",
+      "description": "Writes dataset cards and documentation.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-003",
+      "name": "Column Dictionary Builder",
+      "description": "Infers meanings of columns and units from context.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-004",
+      "name": "EDA Strategist",
+      "description": "Designs an exploratory data analysis plan.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-005",
+      "name": "Chart Type Recommender",
+      "description": "Suggests chart types suitable for different relationships.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-006",
+      "name": "Hypothesis Framer",
+      "description": "Helps frame testable hypotheses from vague questions.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-007",
+      "name": "Metric Definition Assistant",
+      "description": "Defines metrics precisely, including numerator, denominator, and window.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-008",
+      "name": "A/B Test Planner",
+      "description": "Designs A/B tests with metrics and guardrails.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-009",
+      "name": "A/B Test Result Interpreter",
+      "description": "Interprets test output and caveats in business terms.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-010",
+      "name": "Experiment Log Summarizer",
+      "description": "Summarizes multiple experiments into a single narrative.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-011",
+      "name": "SQL Query Explainer",
+      "description": "Explains what a SQL query does and its pitfalls.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-012",
+      "name": "SQL Query Refiner",
+      "description": "Optimizes SQL for clarity and performance.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-013",
+      "name": "Time-Series Analysis Assistant",
+      "description": "Helps with trends, seasonality, and anomalies.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-014",
+      "name": "Forecasting Plan Designer",
+      "description": "Suggests forecasting approaches and validation strategies.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-015",
+      "name": "KPI Tree Builder",
+      "description": "Builds metric trees showing how KPIs break down into drivers.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-016",
+      "name": "Dashboard Spec Writer",
+      "description": "Writes specs for BI dashboards.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-017",
+      "name": "Causal Inference Advisor",
+      "description": "Flags where causal claims are unwarranted.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-018",
+      "name": "Sampling & Survey Design Helper",
+      "description": "Advises on survey/sampling designs and biases.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-019",
+      "name": "Statistical Test Selector",
+      "description": "Suggests appropriate statistical tests for a situation.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-020",
+      "name": "Result Communication Coach",
+      "description": "Helps write clear analytical memos for non-technical readers.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-021",
+      "name": "Query-to-Question Mapper",
+      "description": "Checks that your queries really answer your business question.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-022",
+      "name": "Data Quality Checklist Generator",
+      "description": "Lists checks for missingness, duplicates, corruption.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-023",
+      "name": "Unit Consistency Checker",
+      "description": "Finds potential unit mismatches and conversion issues.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-024",
+      "name": "Outlier Handling Strategist",
+      "description": "Suggests ways to treat or explain outliers.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-025",
+      "name": "Feature Ideation Assistant",
+      "description": "Brainstorms features for ML problems.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-026",
+      "name": "Feature Importance Explainer",
+      "description": "Explains feature importance results in plain language.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-027",
+      "name": "Model Evaluation Explainer",
+      "description": "Interprets metrics like AUC, F1, calibration.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-028",
+      "name": "Error Analysis Designer",
+      "description": "Suggests slices and drill-downs to understand model errors.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-029",
+      "name": "Bias & Fairness Auditor",
+      "description": "Helps reason about fairness metrics and bias checks.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-030",
+      "name": "ML Experiment Journal Writer",
+      "description": "Structures experiment logs and notes.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-031",
+      "name": "Probability & Bayes Coach",
+      "description": "Explains probability problems and Bayesian ideas.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-032",
+      "name": "Optimization Problem Framer",
+      "description": "Turns informal goals into optimization formulations.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-033",
+      "name": "Constraint Programming Sketcher",
+      "description": "Sketches constraints for scheduling and allocation problems.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-034",
+      "name": "Numerical Stability Advisor",
+      "description": "Flags numerically fragile approaches.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-035",
+      "name": "Approximation & Heuristic Designer",
+      "description": "Suggests heuristics when exact solutions are infeasible.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-036",
+      "name": "Math Proof Outliner",
+      "description": "Outlines proof strategies without fully solving olympiad-style tasks.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-037",
+      "name": "Formula Explainer",
+      "description": "Breaks down a complex formula into intuitive components.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-038",
+      "name": "LaTeX Equation Formatter",
+      "description": "Outputs math cleanly in LaTeX inline or display format.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-039",
+      "name": "Dimension & Unit Checker",
+      "description": "Checks dimensional consistency in physics/math problems.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-040",
+      "name": "Back-of-the-Envelope Estimator",
+      "description": "Performs quick Fermi-style estimates.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-041",
+      "name": "Uncertainty Explainer",
+      "description": "Explains confidence intervals, credible intervals, and uncertainty.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-042",
+      "name": "Metric Drift Watcher",
+      "description": "Designs simple procedures to monitor metric drift.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-043",
+      "name": "Data Access Risk Assessor",
+      "description": "Flags privacy and security risks in data usage.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-044",
+      "name": "Synthetic Dataset Generator (Safe)",
+      "description": "Creates synthetic examples for demos (no real user data).",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-045",
+      "name": "Data Storyboard Writer",
+      "description": "Turns findings into a narrative with “setup-conflict-resolution” structure.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-046",
+      "name": "Visual Annotation Assistant",
+      "description": "Suggests annotations and callouts for charts.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-047",
+      "name": "Notebook Structure Coach",
+      "description": "Proposes structure for analytic notebooks (intro, setup, EDA, results).",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-048",
+      "name": "Data Contract Drafting Assistant",
+      "description": "Helps define data contracts between services/teams.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-049",
+      "name": "Metric Library Curator",
+      "description": "Organizes a shared library of metric definitions.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "DS-050",
+      "name": "Analytics Request Triage Bot",
+      "description": "Categorizes incoming analytics requests and suggests next steps.",
+      "category": "Data, Analysis & Math",
+      "file": "skills/skills-data-analysis.md"
+    },
+    {
+      "id": "ES-001",
+      "name": "Adaptive Tutor",
+      "description": "Adjusts explanations based on learner’s responses.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-002",
+      "name": "Learning Objectives Writer",
+      "description": "Crafts clear learning objectives.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-003",
+      "name": "Lesson Plan Designer",
+      "description": "Designs lesson plans for specific topics.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-004",
+      "name": "Curriculum Outliner",
+      "description": "Outlines multi-week curricula.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-005",
+      "name": "Concept Explanation Levels",
+      "description": "Explains at multiple levels (novice, intermediate, advanced).",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-006",
+      "name": "Homework Problem Generator",
+      "description": "Creates practice problems with solutions.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-007",
+      "name": "Quiz & Test Writer",
+      "description": "Writes quizzes with answer keys.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-008",
+      "name": "Rubric Designer",
+      "description": "Designs grading rubrics.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-009",
+      "name": "Feedback Comment Bank Generator",
+      "description": "Generates reusable feedback comments.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-010",
+      "name": "Study Plan Designer",
+      "description": "Designs study plans for a goal or exam.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-011",
+      "name": "Misconception Detector",
+      "description": "Detects and corrects common misconceptions.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-012",
+      "name": "Peer Instruction Question Writer",
+      "description": "Writes conceptual clicker-style questions.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-013",
+      "name": "Flipped Classroom Content Helper",
+      "description": "Helps design pre-class materials.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-014",
+      "name": "Active Learning Activity Designer",
+      "description": "Suggests interactive classroom activities.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-015",
+      "name": "Educational Analogy Maker",
+      "description": "Creates analogies tailored to learner background.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-016",
+      "name": "Learner Progress Summarizer",
+      "description": "Summarizes progress over time.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-017",
+      "name": "Exam Review Session Planner",
+      "description": "Plans a structured review session.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-018",
+      "name": "Bloom’s Taxonomy Question Generator",
+      "description": "Generates questions at different cognitive levels.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-019",
+      "name": "Socratic Dialogue Script Writer",
+      "description": "Scripts Socratic dialogues on a topic.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-020",
+      "name": "Concept Prerequisite Mapper",
+      "description": "Maps prerequisite relationships among concepts.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-021",
+      "name": "Multimodal Teaching Strategy Designer",
+      "description": "Suggests text, visual, and interactive teaching methods.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-022",
+      "name": "Classroom Scenario Simulator",
+      "description": "Simulates classroom dynamics for planning.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-023",
+      "name": "Accessibility-Aware Instructor Assistant",
+      "description": "Suggests accommodations and accessible materials.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-024",
+      "name": "Educational Game Mechanic Ideator",
+      "description": "Invents simple game mechanics for learning.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-025",
+      "name": "Course Syllabus Writer",
+      "description": "Writes syllabi including policies and schedules.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-026",
+      "name": "Feedback-to-Action Translator",
+      "description": "Helps teachers turn feedback into course changes.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-027",
+      "name": "Learning Reflection Prompt Writer",
+      "description": "Creates prompts for learner reflection.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-028",
+      "name": "Concept Check Quiz Creator",
+      "description": "Generates quick checks to verify understanding.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-029",
+      "name": "Remediation Plan Designer",
+      "description": "Designs remediation plans for struggling learners.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-030",
+      "name": "Peer Review Activity Designer",
+      "description": "Designs peer review activities.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-031",
+      "name": "Study Guide Generator",
+      "description": "Generates study guides from course material.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-032",
+      "name": "Interactive Notebook Helper",
+      "description": "Suggests interactive notebook activities.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-033",
+      "name": "Office Hours Companion",
+      "description": "Suggests how to structure office hours time.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-034",
+      "name": "Grade Explanation Writer",
+      "description": "Helps explain grades transparently.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-035",
+      "name": "Academic Integrity Scenario Writer",
+      "description": "Creates scenarios to discuss integrity.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-036",
+      "name": "Cross-Disciplinary Link Finder",
+      "description": "Finds connections between subjects.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-037",
+      "name": "Language Tutor for Technical Topics",
+      "description": "Tutors language learning via technical content.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-038",
+      "name": "Study Technique Coach",
+      "description": "Suggests effective study techniques.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-039",
+      "name": "Learning Disability-Aware Assistant",
+      "description": "Suggests accommodations strategies.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-040",
+      "name": "Parent/Guardian Communication Writer",
+      "description": "Drafts communications about learner progress.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-041",
+      "name": "Lab Manual Assistant",
+      "description": "Helps write or clarify lab manuals.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-042",
+      "name": "Group Project Structure Designer",
+      "description": "Designs group project structures and roles.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-043",
+      "name": "Discussion Question Writer",
+      "description": "Writes questions for in-class discussion.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-044",
+      "name": "MOOC Content Planner",
+      "description": "Helps plan online course content.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-045",
+      "name": "Knowledge Check Bot",
+      "description": "Conducts quick checks in chat form.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-046",
+      "name": "Certification Exam Blueprint Helper",
+      "description": "Assists in designing exam blueprints.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-047",
+      "name": "Learning Analytics Question Crafter",
+      "description": "Crafts questions to ask of learning analytics.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-048",
+      "name": "Study Habit Tracker Prompt Designer",
+      "description": "Designs prompts for habit tracking.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-049",
+      "name": "Research Skill Trainer",
+      "description": "Teaches basic research skills and information literacy.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "ES-050",
+      "name": "Tutor Persona Configurator",
+      "description": "Helps define custom tutor personas for specific domains.",
+      "category": "Education & Teaching",
+      "file": "skills/skills-education-teaching.md"
+    },
+    {
+      "id": "GS-001",
+      "name": "Structured General Assistant",
+      "description": "Default Claude assistant that responds clearly, step-by-step, and asks for clarification when needed.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-002",
+      "name": "Socratic Questioner",
+      "description": "Guides the user by asking probing questions instead of giving direct answers immediately.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-003",
+      "name": "Clarifying Requirements Bot",
+      "description": "Specializes in rewriting vague tasks into precise, testable requirements.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-004",
+      "name": "Task Decomposer",
+      "description": "Breaks complex goals into ordered subtasks with dependencies and milestones.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-005",
+      "name": "Planning & Execution Orchestrator",
+      "description": "Creates a multi-phase plan, then executes one phase at a time with checkpoints.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-006",
+      "name": "Constraint Enforcer",
+      "description": "Ensures all outputs obey explicit constraints like word limits, formats, or style rules.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-007",
+      "name": "Safety & Red-Team Checker",
+      "description": "Reviews ideas and prompts for safety, privacy, and policy concerns before execution.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-008",
+      "name": "Persona Switchboard",
+      "description": "Suggests and manages different personas (teacher, critic, coach) for a given task.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-009",
+      "name": "Prompt Optimizer",
+      "description": "Takes a rough prompt and rewrites it into a clearer, more structured version.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-010",
+      "name": "Output Evaluator",
+      "description": "Scores and critiques Claude’s own answer quality against explicit criteria.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-011",
+      "name": "XML-Tag Response Formatter",
+      "description": "Wraps responses in custom XML tags for easy downstream parsing.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-012",
+      "name": "JSON Schema Filler",
+      "description": "Fills a given JSON schema strictly, refusing to add extra fields.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-013",
+      "name": "Markdown Formatter",
+      "description": "Ensures all responses are clean, well-structured Markdown (headings, lists, tables).",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-014",
+      "name": "Role-Play Controller",
+      "description": "Maintains a role-play persona while still complying with system constraints.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-015",
+      "name": "Thought-Trace Summarizer",
+      "description": "Produces a concise summary of internal reasoning without exposing raw chain-of-thought.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-016",
+      "name": "“Think Step by Step” Enforcer",
+      "description": "Always structures solutions as numbered reasoning steps.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-017",
+      "name": "Multi-Option Generator",
+      "description": "Always proposes 3–5 distinct options with pros and cons.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-018",
+      "name": "Decision Helper",
+      "description": "Helps pick between options using explicit decision criteria and scoring.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-019",
+      "name": "Assumption Highlighter",
+      "description": "Flags hidden assumptions in user questions and proposed solutions.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-020",
+      "name": "Risk & Edge-Case Spotter",
+      "description": "Lists failure modes, edge cases, and ways to mitigate them.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-021",
+      "name": "Meta-Critic",
+      "description": "Critiques its own previous answer and proposes a better version.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-022",
+      "name": "Explain-Like-I’m-Five Translator",
+      "description": "Turns complex explanations into very simple, intuitive language.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-023",
+      "name": "Jargon Buster",
+      "description": "Rewrites an explanation with minimal jargon, defining all technical terms.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-024",
+      "name": "Style Mimic",
+      "description": "Imitates a given writing or reasoning style from examples provided by the user.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-025",
+      "name": "Cross-Cultural Sensitivity Checker",
+      "description": "Reviews content for cultural assumptions and potential offense.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-026",
+      "name": "Error Message Interpreter",
+      "description": "Explains confusing AI or system error messages in plain language.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-027",
+      "name": "Session Memory Summarizer",
+      "description": "Summarizes a long conversation into a reusable brief for future sessions.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-028",
+      "name": "Goal Alignment Checker",
+      "description": "Checks if a proposed plan truly targets the stated user goal.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-029",
+      "name": "Time-Boxed Planner",
+      "description": "Designs a plan that fits within strict time limits (e.g., 30 minutes).",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-030",
+      "name": "Resource-Aware Planner",
+      "description": "Plans tasks given constraints like skills, tools, and budget.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-031",
+      "name": "Cross-Model Prompt Portability Advisor",
+      "description": "Suggests how to adapt a prompt for different LLM providers.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-032",
+      "name": "Localization Advisor",
+      "description": "Points out what needs changing to adapt content for another locale or language.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-033",
+      "name": "Content Policy Sanity Checker",
+      "description": "Simulates a content-policy review of a draft.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-034",
+      "name": "Multi-Persona Debate Moderator",
+      "description": "Orchestrates a debate among multiple named Claude personas.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-035",
+      "name": "Priority Negotiator",
+      "description": "Helps users trade off priorities like cost, speed, and quality.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-036",
+      "name": "Iterative Refinement Partner",
+      "description": "Always proposes an improved next iteration, then asks for feedback.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-037",
+      "name": "“Rubber Duck” Listener",
+      "description": "Lets user talk through a problem and mirrors it back without prematurely solving.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-038",
+      "name": "Constraints-First Designer",
+      "description": "Starts by listing constraints, then designs within them.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-039",
+      "name": "Analogy Maker",
+      "description": "Explains a concept with multiple analogies tailored to user background.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-040",
+      "name": "Output Length Controller",
+      "description": "Keeps responses within a target token/word range.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-041",
+      "name": "Format-Aware Router",
+      "description": "Chooses between list, table, narrative, or diagram depending on task.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-042",
+      "name": "Multi-Language Switcher",
+      "description": "Can switch languages mid-conversation while preserving technical accuracy.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-043",
+      "name": "Critique-Then-Create Pattern",
+      "description": "First critiques existing work, then uses critique to create a better version.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-044",
+      "name": "Traceability Enforcer",
+      "description": "Ensures every recommendation points back to explicit evidence or assumptions.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-045",
+      "name": "Checklist Generator",
+      "description": "Converts complex procedures into actionable checklists.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-046",
+      "name": "API Output Post-Processor",
+      "description": "Cleans and structures raw tool/API output for human consumption.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-047",
+      "name": "Conversation Boundary Setter",
+      "description": "Clarifies what will and won’t be covered in a session.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-048",
+      "name": "Feedback Summarizer",
+      "description": "Aggregates multiple pieces of feedback into themes and action items.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-049",
+      "name": "Logging & Note-Taking Assistant",
+      "description": "Turns a live discussion into structured notes or minutes.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "GS-050",
+      "name": "Meta-Prompt Designer",
+      "description": "Helps design custom prompts and skill definitions for this very skills bank.",
+      "category": "General & Meta Skills",
+      "file": "skills/skills-general-meta.md"
+    },
+    {
+      "id": "OS-001",
+      "name": "Daily Planning Assistant",
+      "description": "Helps plan daily tasks with priorities.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-002",
+      "name": "Weekly Review Guide",
+      "description": "Guides a weekly review ritual.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-003",
+      "name": "Project Plan Drafting Assistant",
+      "description": "Drafts project plans with milestones.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-004",
+      "name": "Risk Register Draft Helper",
+      "description": "Builds risk registers for projects.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-005",
+      "name": "Task Prioritization Helper",
+      "description": "Applies prioritization frameworks to to-do lists.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-006",
+      "name": "Meeting Agenda & Prep Assistant",
+      "description": "Prepares agenda and pre-reads.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-007",
+      "name": "Action Item Tracker",
+      "description": "Extracts action items from notes or transcripts.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-008",
+      "name": "SOP Writer",
+      "description": "Writes standard operating procedures.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-009",
+      "name": "Checklist Library Builder",
+      "description": "Builds checklist libraries for recurring tasks.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-010",
+      "name": "Process Improvement Brainstormer",
+      "description": "Brainstorms process improvement ideas.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-011",
+      "name": "Time-Boxed Sprint Planner",
+      "description": "Plans sprints with capacities and goals.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-012",
+      "name": "Retrospective Facilitator Script",
+      "description": "Scripts retro questions and flow.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-013",
+      "name": "Dependency Mapper",
+      "description": "Maps dependencies across tasks.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-014",
+      "name": "Work-In-Progress Limit Advisor",
+      "description": "Suggests WIP limits and policies.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-015",
+      "name": "Documentation Gap Finder",
+      "description": "Identifies missing documentation areas.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-016",
+      "name": "Handoff Plan Writer",
+      "description": "Writes handoff plans when shifting ownership.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-017",
+      "name": "Vendor Evaluation Checklist Writer",
+      "description": "Drafts vendor evaluation criteria.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-018",
+      "name": "Runbook Author",
+      "description": "Writes incident runbooks.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-019",
+      "name": "Incident Postmortem Writer",
+      "description": "Helps write postmortems with action items.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-020",
+      "name": "Communication Cadence Planner",
+      "description": "Plans cadence for status updates.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-021",
+      "name": "Template Library Curator",
+      "description": "Suggests a library of internal templates.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-022",
+      "name": "Budget Narrative Writer",
+      "description": "Explains budgets and cost allocations.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-023",
+      "name": "Ops Risk Scenario Planner",
+      "description": "Envisions risk scenarios and mitigations.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-024",
+      "name": "Meeting Load Optimizer",
+      "description": "Suggests meeting reductions and async options.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-025",
+      "name": "Workflow Automation Ideator",
+      "description": "Identifies candidates for automation.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-026",
+      "name": "Integration Spec Writer",
+      "description": "Writes integration specs between systems.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-027",
+      "name": "SLA / SLO Draft Writer",
+      "description": "Drafts service level agreements/objectives.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-028",
+      "name": "Capacity Planning Helper",
+      "description": "Assists with rough capacity planning.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-029",
+      "name": "Knowledge Base Article Writer",
+      "description": "Writes internal KB entries.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-030",
+      "name": "Policy & Procedure Harmonizer",
+      "description": "Harmonizes overlapping policies.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-031",
+      "name": "Delegation Planner",
+      "description": "Helps plan what to delegate and to whom.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-032",
+      "name": "Role & Responsibility Clarifier",
+      "description": "Clarifies RACI or role definitions.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-033",
+      "name": "Onboarding Plan Writer",
+      "description": "Designs onboarding plans for roles.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-034",
+      "name": "Offboarding Checklist Writer",
+      "description": "Creates offboarding checklists.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-035",
+      "name": "Compliance Document Draft Helper",
+      "description": "Assists with compliance docs.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-036",
+      "name": "Audit Prep Organizer",
+      "description": "Organizes info for audits.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-037",
+      "name": "Multi-Team Coordination Planner",
+      "description": "Plans cross-team coordination.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-038",
+      "name": "SLA Breach Communication Helper",
+      "description": "Drafts customer comms for SLA breaches.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-039",
+      "name": "Process KPI Selector",
+      "description": "Suggests KPIs for operational processes.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-040",
+      "name": "Workload Balancing Advisor",
+      "description": "Suggests ways to balance team workload.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-041",
+      "name": "Async Collaboration Playbook Writer",
+      "description": "Writes a playbook for async work.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-042",
+      "name": "Documentation Template Designer",
+      "description": "Designs templates for docs.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-043",
+      "name": "Time Audit Companion",
+      "description": "Helps conduct personal or team time audits.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-044",
+      "name": "Meeting Notes Formatter",
+      "description": "Formats raw notes into clean summaries.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-045",
+      "name": "Recurring Rituals Planner",
+      "description": "Designs recurring planning/review rituals.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-046",
+      "name": "Vendor Risk Assessment Helper",
+      "description": "Helps assess vendor risk.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-047",
+      "name": "Internal FAQ & Wiki Organizer",
+      "description": "Structures internal wikis.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-048",
+      "name": "Operational Run Simulation Designer",
+      "description": "Designs tabletop exercises and drills.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-049",
+      "name": "Burnout Risk Spotter",
+      "description": "Flags burnout risks in schedules/plans.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "OS-050",
+      "name": "Personal Productivity Coach",
+      "description": "Coaches users on productivity habits.",
+      "category": "Operations & Productivity",
+      "file": "skills/skills-operations-productivity.md"
+    },
+    {
+      "id": "PS-001",
+      "name": "Product Requirements Writer",
+      "description": "Drafts clear PRDs from feature ideas.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-002",
+      "name": "User Story Generator",
+      "description": "Writes user stories with acceptance criteria.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-003",
+      "name": "Jobs-To-Be-Done Mapper",
+      "description": "Maps features to jobs-to-be-done.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-004",
+      "name": "Opportunity Solution Tree Helper",
+      "description": "Helps build opportunity solution trees.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-005",
+      "name": "Product Vision Articulator",
+      "description": "Writes concise product visions and narratives.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-006",
+      "name": "Roadmap Drafting Assistant",
+      "description": "Drafts roadmap options with tradeoffs.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-007",
+      "name": "Feature Prioritization Helper",
+      "description": "Guides prioritization using frameworks (RICE, MoSCoW).",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-008",
+      "name": "Experiment Idea Generator",
+      "description": "Suggests experiments for validating product ideas.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-009",
+      "name": "Onboarding Flow Designer",
+      "description": "Proposes onboarding flows for new users.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-010",
+      "name": "UX Writing Assistant",
+      "description": "Writes UI copy, tooltips, and microcopy.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-011",
+      "name": "User Journey Mapper",
+      "description": "Maps journeys from awareness to retention.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-012",
+      "name": "Persona Builder",
+      "description": "Helps construct realistic user personas.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-013",
+      "name": "Support Macro Writer",
+      "description": "Writes customer support macros.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-014",
+      "name": "Incident Communication Writer",
+      "description": "Drafts incident/status updates for users.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-015",
+      "name": "Churn Risk Hypothesis Generator",
+      "description": "Suggests reasons for churn and tests.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-016",
+      "name": "Pricing Experiment Planner",
+      "description": "Suggests pricing tests and metrics.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-017",
+      "name": "Competitive Landscape Summarizer",
+      "description": "Summarizes competitors and differentiators.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-018",
+      "name": "SWOT & Strategy Assistant",
+      "description": "Builds SWOT analyses.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-019",
+      "name": "OKR Drafting Assistant",
+      "description": "Helps define OKRs and key results.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-020",
+      "name": "Meeting Facilitation Script Writer",
+      "description": "Drafts facilitation scripts for product meetings.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-021",
+      "name": "Customer Interview Guide Writer",
+      "description": "Designs interview guides and question sets.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-022",
+      "name": "Voice of Customer Synthesizer",
+      "description": "Synthesizes feedback into themes.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-023",
+      "name": "Product Risk Register Helper",
+      "description": "Lists product risks and mitigations.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-024",
+      "name": "UX Research Plan Writer",
+      "description": "Drafts research plans and methods.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-025",
+      "name": "Usability Test Script Writer",
+      "description": "Writes tasks and prompts for usability tests.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-026",
+      "name": "Beta Program Planner",
+      "description": "Designs beta/early-access program structure.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-027",
+      "name": "Launch Checklist Generator",
+      "description": "Generates launch checklists.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-028",
+      "name": "Release Notes Writer",
+      "description": "Drafts user-friendly release notes.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-029",
+      "name": "Customer Journey Email Writer",
+      "description": "Writes lifecycle email sequences.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-030",
+      "name": "Sales Enablement Content Helper",
+      "description": "Drafts one-pagers and battlecards.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-031",
+      "name": "Partner Pitch Deck Narrative",
+      "description": "Helps shape the narrative for pitch decks.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-032",
+      "name": "Market Sizing Estimator",
+      "description": "Guides top-down and bottom-up sizing.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-033",
+      "name": "Business Model Canvas Assistant",
+      "description": "Fills in BMC blocks with user input.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-034",
+      "name": "KPI Definition & Alignment Helper",
+      "description": "Aligns KPIs with business goals.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-035",
+      "name": "Product Strategy Narrative Writer",
+      "description": "Craft strategy memos.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-036",
+      "name": "Experiment Result Memo Writer",
+      "description": "Summarizes experimental findings for stakeholders.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-037",
+      "name": "Product-Tech Bridge Explainer",
+      "description": "Translates technical constraints for product folks.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-038",
+      "name": "Product Accessibility Advocate",
+      "description": "Highlights accessibility implications in designs.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-039",
+      "name": "Roadmap Communication Coach",
+      "description": "Helps communicate roadmaps empathetically.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-040",
+      "name": "Customer-Centric Requirement Reframer",
+      "description": "Rewrites requirements from the user’s viewpoint.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-041",
+      "name": "Beta Feedback Analyzer",
+      "description": "Synthesizes feedback from beta users.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-042",
+      "name": "Sunsetting Communication Planner",
+      "description": "Plans communication for feature deprecations.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-043",
+      "name": "Feature Naming Assistant",
+      "description": "Helps name features clearly and memorably.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-044",
+      "name": "UX Anti-Pattern Spotter",
+      "description": "Flags potential UX anti-patterns.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-045",
+      "name": "Value Proposition Refiner",
+      "description": "Improves value propositions for clarity and resonance.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-046",
+      "name": "Customer Objection Handler",
+      "description": "Suggests responses to common objections.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-047",
+      "name": "Internal Alignment Memo Writer",
+      "description": "Writes alignment memos for cross-functional teams.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-048",
+      "name": "Product-Analytics Bridge",
+      "description": "Connects product questions to analytics tasks.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-049",
+      "name": "UX Metrics & NPS Interpreter",
+      "description": "Interprets UX metrics and survey data.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "PS-050",
+      "name": "Strategy Review Companion",
+      "description": "Guides regular review of strategy and roadmap.",
+      "category": "Product, UX & Business",
+      "file": "skills/skills-product-ux-business.md"
+    },
+    {
+      "id": "RS-001",
+      "name": "Literature Search Planner",
+      "description": "Designs a search strategy across engines and databases.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-002",
+      "name": "Query Refiner for Search",
+      "description": "Refines keyword queries for better search results.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-003",
+      "name": "Paper Abstract Explainer",
+      "description": "Explains an abstract in accessible language.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-004",
+      "name": "Full-Paper Summarizer",
+      "description": "Summarizes long papers into structured briefs (context, method, results).",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-005",
+      "name": "Related Work Mapper",
+      "description": "Maps how papers relate (citations, families, competing methods).",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-006",
+      "name": "Terminology Glossary Builder",
+      "description": "Extracts and defines key terms from a paper.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-007",
+      "name": "Method Comparison Assistant",
+      "description": "Compares methods across multiple papers.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-008",
+      "name": "Result Sanity Checker",
+      "description": "Spots surprising or suspicious results needing further scrutiny.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-009",
+      "name": "Literature Gap Identifier",
+      "description": "Suggests potential unexplored gaps or extensions.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-010",
+      "name": "Research Question Refiner",
+      "description": "Converts broad ideas into sharp research questions.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-011",
+      "name": "Hypothesis Cataloguer",
+      "description": "Lists candidate hypotheses and their testability.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-012",
+      "name": "Experimental Design Critic",
+      "description": "Reviews experimental design and suggests improvements.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-013",
+      "name": "Reproducibility Checklist Builder",
+      "description": "Creates a checklist for reproducing a paper.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-014",
+      "name": "Citation Recommendation Assistant",
+      "description": "Suggests citations to support a claim.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-015",
+      "name": "Reference Manager Formatter",
+      "description": "Formats references for various styles.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-016",
+      "name": "Review Response Draft Helper",
+      "description": "Helps draft responses to reviewer comments.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-017",
+      "name": "Literature Review Outliner",
+      "description": "Outlines sections for a literature review.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-018",
+      "name": "Trend Summarizer",
+      "description": "Summarizes trends across a body of work in a field.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-019",
+      "name": "Paper Reading Coach",
+      "description": "Guides how to read a specific paper efficiently.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-020",
+      "name": "Note-Taking Template Designer",
+      "description": "Designs note templates for reading.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-021",
+      "name": "Multi-Paper Matrix Builder",
+      "description": "Suggests comparison matrices across multiple works.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-022",
+      "name": "Controversy Mapper",
+      "description": "Identifies areas of disagreement in a literature.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-023",
+      "name": "Method Selection Advisor",
+      "description": "Helps choose methods aligning with constraints and data.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-024",
+      "name": "Bibliography Gap Checker",
+      "description": "Flags obvious missing citations in a draft.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-025",
+      "name": "Conference Fit Advisor",
+      "description": "Suggests which venues fit a given project.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-026",
+      "name": "Research Roadmap Planner",
+      "description": "Outlines a multi-stage research roadmap.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-027",
+      "name": "Dataset & Benchmark Hunter",
+      "description": "Suggests relevant datasets and benchmarks.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-028",
+      "name": "Evaluation Metric Advisor",
+      "description": "Suggests evaluation metrics aligned to task goals.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-029",
+      "name": "Replication Study Planner",
+      "description": "Designs a replication study.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-030",
+      "name": "Threats to Validity Analyzer",
+      "description": "Lists internal, external, and construct validity threats.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-031",
+      "name": "Open Problems Cataloguer",
+      "description": "Helps catalog open questions in a domain.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-032",
+      "name": "Survey Instrument Designer",
+      "description": "Assists in designing questionnaires and interview guides.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-033",
+      "name": "IRB / Ethics Draft Helper",
+      "description": "Helps draft ethical considerations sections.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-034",
+      "name": "Prior-Art Search for Patents",
+      "description": "Structures patent-style prior art searches.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-035",
+      "name": "Patent Claim Structurer",
+      "description": "Helps sketch structured claims for an invention.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-036",
+      "name": "Grant Proposal Outliner",
+      "description": "Outlines proposals with aims, novelty, and impact.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-037",
+      "name": "Impact Statement Writer",
+      "description": "Helps write impact statements for research.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-038",
+      "name": "Negative Result Narrativizer",
+      "description": "Helps write up negative or null findings constructively.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-039",
+      "name": "Workshop & Special Session Ideator",
+      "description": "Suggests workshop themes around a line of work.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-040",
+      "name": "Cross-Domain Transfer Scout",
+      "description": "Spots how ideas transfer between domains.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-041",
+      "name": "Reading Group Facilitator",
+      "description": "Prepares reading group questions and structure.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-042",
+      "name": "Research Log Companion",
+      "description": "Helps maintain a daily or weekly research log.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-043",
+      "name": "Concept Map Builder",
+      "description": "Builds concept maps linking ideas in a subfield.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-044",
+      "name": "Claims-Evidence Mapper",
+      "description": "Maps claims to supporting evidence and gaps.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-045",
+      "name": "Position Paper Coach",
+      "description": "Helps structure arguments for a position paper.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-046",
+      "name": "Survey / Tutorial Writer Assistant",
+      "description": "Assists in designing survey/tutorial-style papers.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-047",
+      "name": "Meta-Analysis Outliner",
+      "description": "Outlines a meta-analysis plan for a question.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-048",
+      "name": "Dataset Limitations Explainer",
+      "description": "Helps articulate dataset biases and limitations.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-049",
+      "name": "Relevance Filter for Sources",
+      "description": "Ranks sources by relevance to a specific question.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "RS-050",
+      "name": "Research-to-Product Bridge",
+      "description": "Helps translate research results into product ideas.",
+      "category": "Research & Reading",
+      "file": "skills/skills-research-reading.md"
+    },
+    {
+      "id": "WS-001",
+      "name": "Structure-First Essay Planner",
+      "description": "Plans essays with clear sections before drafting.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-002",
+      "name": "Thesis Statement Crafter",
+      "description": "Crafts strong thesis statements.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-003",
+      "name": "Argument Strengthener",
+      "description": "Identifies weak arguments and suggests support.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-004",
+      "name": "Coherence & Flow Editor",
+      "description": "Improves paragraph transitions and flow.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-005",
+      "name": "Clarity & Brevity Editor",
+      "description": "Makes writing more concise without dropping key content.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-006",
+      "name": "Tone Shifter",
+      "description": "Adjusts writing tone (formal, friendly, neutral, assertive).",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-007",
+      "name": "Grammar & Style Checker",
+      "description": "Corrects grammar, punctuation, and style.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-008",
+      "name": "Executive Summary Writer",
+      "description": "Produces tight executive summaries.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-009",
+      "name": "Outline-to-Draft Expander",
+      "description": "Expands outlines into full drafts.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-010",
+      "name": "Draft-to-Outline Distiller",
+      "description": "Distills a long draft back into an outline.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-011",
+      "name": "Email Polisher",
+      "description": "Polishes emails for clarity and tone.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-012",
+      "name": "Cold Outreach Email Writer",
+      "description": "Drafts outreach emails with customized hooks.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-013",
+      "name": "Meeting Agenda Writer",
+      "description": "Writes clear agendas and desired outcomes.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-014",
+      "name": "Meeting Minutes Writer",
+      "description": "Converts raw notes into structured minutes.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-015",
+      "name": "Blog Post Planner",
+      "description": "Helps plan a blog post structure and angle.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-016",
+      "name": "Blog Post SEO Assistant",
+      "description": "Suggests headings and keywords.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-017",
+      "name": "Social Post Generator",
+      "description": "Produces short posts for multiple platforms.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-018",
+      "name": "Headline / Title Generator",
+      "description": "Suggests multiple headline options.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-019",
+      "name": "Tagline & Slogan Generator",
+      "description": "Generates concise taglines.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-020",
+      "name": "Style Guide Enforcer",
+      "description": "Edits text according to a custom style guide.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-021",
+      "name": "Accessibility-First Writer",
+      "description": "Writes content for broad accessibility (plain language).",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-022",
+      "name": "Legalese Simplifier",
+      "description": "Makes legal text more understandable.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-023",
+      "name": "Policy Document Drafter",
+      "description": "Drafts internal policies in clear language.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-024",
+      "name": "FAQ Generator",
+      "description": "Generates FAQs from a body of content.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-025",
+      "name": "Q&A Pair Generator",
+      "description": "Extracts key questions and answers.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-026",
+      "name": "Translator + Context Keeper",
+      "description": "Translates while preserving technical nuance.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-027",
+      "name": "Consistency Checker",
+      "description": "Checks for inconsistencies in terminology and claims.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-028",
+      "name": "Style Mimic Writer",
+      "description": "Mimics a writing style given examples.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-029",
+      "name": "Long-Form Report Writer",
+      "description": "Generates structured reports from notes and data.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-030",
+      "name": "White Paper Assistant",
+      "description": "Helps with white paper structure and tone.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-031",
+      "name": "Proposal Writer",
+      "description": "Assists in writing business or project proposals.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-032",
+      "name": "Slide Narrative Writer",
+      "description": "Writes the narrative to accompany slides.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-033",
+      "name": "Script Writer (Talk/Video)",
+      "description": "Drafts scripts for talks or videos.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-034",
+      "name": "Resume & CV Editor",
+      "description": "Improves resumes for clarity and impact.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-035",
+      "name": "Cover Letter Writer",
+      "description": "Writes tailored cover letters.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-036",
+      "name": "Peer Review Comment Generator",
+      "description": "Helps reviewers phrase constructive feedback.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-037",
+      "name": "Sensitivity Reader Assistant",
+      "description": "Checks content for inclusive language.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-038",
+      "name": "Multilingual Copy Harmonizer",
+      "description": "Keeps messaging consistent across languages.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-039",
+      "name": "Reference & Citation Inserter",
+      "description": "Suggests where to reference sources in text.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-040",
+      "name": "Reading Level Adjuster",
+      "description": "Adjusts text to a target reading level.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-041",
+      "name": "Dialogue Writer",
+      "description": "Crafts natural dialogue for stories.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-042",
+      "name": "Narrative Point-of-View Shifter",
+      "description": "Changes POV (first, third, omniscient).",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-043",
+      "name": "Story Beat Outliner",
+      "description": "Outlines story beats for fiction or case studies.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-044",
+      "name": "Editing Checklist Companion",
+      "description": "Provides a checklist for reviewing drafts.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-045",
+      "name": "Plagiarism-Aware Rewriter",
+      "description": "Rewrites while avoiding copying phrasing.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-046",
+      "name": "Abstract & Summary Harmonizer",
+      "description": "Aligns abstract/summary with full text.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-047",
+      "name": "Localization Copy Adapter",
+      "description": "Adapts copy to cultural context.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-048",
+      "name": "Call-to-Action Optimizer",
+      "description": "Improves calls-to-action in text.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-049",
+      "name": "Multi-Audience Versioning Helper",
+      "description": "Creates versions of content for different audiences.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    },
+    {
+      "id": "WS-050",
+      "name": "Prompted Writing Tutor",
+      "description": "Uses prompts to coach the user’s own writing practice.",
+      "category": "Writing & Editing",
+      "file": "skills/skills-writing-editing.md"
+    }
+  ]
+}

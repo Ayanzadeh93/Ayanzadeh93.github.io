@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://formspree.io; form-action 'self' https://formspree.io; frame-src 'none'; manifest-src 'self'">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>AI Skills Bank | 500 reusable AI skills for coding agents | Aydin Ayanzadeh</title>
+    <meta name="description" content="An MIT-licensed library of 500 reusable AI skills with stable IDs, a machine-readable JSON index and platform packs for Claude Code, Codex CLI, Gemini CLI, Kimi CLI, Aider and Cline.">
+    <link rel="canonical" href="https://www.ayanzadeh.com/projects/ai-skills-bank.html">
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://www.ayanzadeh.com/projects/ai-skills-bank.html">
+    <meta property="og:title" content="AI Skills Bank — 500 reusable AI skills">
+    <meta property="og:description" content="Stable skill IDs, copy-ready prompts, six CLI platform packs and a JSON index. MIT licensed and self-hosted.">
+    <meta property="og:image" content="https://www.ayanzadeh.com/images/profile-compressed.jpg">
+    <meta property="og:site_name" content="Aydin Ayanzadeh - Research Portfolio">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://www.ayanzadeh.com/projects/ai-skills-bank.html">
+    <meta name="twitter:title" content="AI Skills Bank — 500 reusable AI skills">
+    <meta name="twitter:description" content="Stable skill IDs, copy-ready prompts, six CLI platform packs and a JSON index. MIT licensed and self-hosted.">
+    <meta name="twitter:image" content="https://www.ayanzadeh.com/images/profile-compressed.jpg">
+    <meta name="twitter:creator" content="@ayanzadeh93">
+    <meta name="twitter:site" content="@ayanzadeh93">
+
+    <!-- Apply the saved (or system) theme before first paint to avoid a light-mode flash -->
+    <script>
+        (function () {
+            var saved = null;
+            try { saved = localStorage.getItem('theme'); } catch (e) { /* storage unavailable */ }
+            var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            var dark = saved === 'dark' || (!saved && prefersDark);
+            document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+        })();
+    </script>
+
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/project.css">
+    <link rel="stylesheet" href="../css/refresh.css">
+    <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=Newsreader:opsz,wght@6..72,400;6..72,600;6..72,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer"></noscript>
+
+    <style>
+        .project-page .table-wrap { overflow-x: auto; margin-top: 16px; }
+        .project-page .cat-table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+        .project-page .cat-table th,
+        .project-page .cat-table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border-color); vertical-align: top; }
+        .project-page .cat-table th { color: var(--text-dark); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
+        .project-page .cat-table td { color: var(--text-medium); }
+        .project-page .cat-table code { font-size: 12.5px; font-weight: 700; color: var(--primary-color); }
+        .project-page .cat-table tr:last-child td { border-bottom: 0; }
+        .project-page .code-sample {
+            margin: 14px 0 0; padding: 16px 18px; overflow-x: auto;
+            background: #0f172a; color: #e2e8f0; border: 1px solid rgba(148, 163, 184, .22); border-radius: 12px;
+            font-family: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
+            font-size: 13.5px; line-height: 1.65; white-space: pre;
+        }
+        .project-page .code-sample code { background: none; color: inherit; padding: 0; font-size: inherit; }
+        .project-page .code-label { margin: 18px 0 0; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--text-light); font-weight: 700; }
+        .project-page .note-box {
+            margin-top: 18px; padding: 16px 18px; border-left: 3px solid var(--primary-color);
+            background: var(--background-alt); border-radius: 0 10px 10px 0;
+        }
+        .project-page .note-box p { margin: 0; }
+    </style>
+
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "SoftwareSourceCode",
+    "name": "AI Skills Bank",
+    "url": "https://www.ayanzadeh.com/projects/ai-skills-bank.html",
+    "codeRepository": "https://github.com/Ayanzadeh93/Claude-Skills-Bank",
+    "description": "An MIT-licensed library of 500 reusable AI skills with stable IDs, a machine-readable JSON index and platform packs for six AI coding CLIs.",
+    "author": {
+        "@id": "https://www.ayanzadeh.com/#person"
+    },
+    "programmingLanguage": "Markdown",
+    "license": "https://opensource.org/licenses/MIT",
+    "isAccessibleForFree": true
+}
+    </script>
+
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.ayanzadeh.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Projects", "item": "https://www.ayanzadeh.com/projects/" },
+        { "@type": "ListItem", "position": 3, "name": "AI Skills Bank", "item": "https://www.ayanzadeh.com/projects/ai-skills-bank.html" }
+    ]
+}
+    </script>
+</head>
+<body class="project-page">
+    <nav class="project-nav" aria-label="Project page">
+        <div class="container">
+            <a href="index.html" class="back-link">
+                <span class="back-link-arrow" aria-hidden="true">&larr;</span>
+                <span>All projects</span>
+            </a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="../skills/">Skills catalog</a>
+                <a href="../index.html#contact">Contact</a>
+                <button type="button" id="theme-toggle" class="theme-toggle-btn" aria-label="Switch to dark theme">
+                    <i class="fas fa-moon" aria-hidden="true"></i> <span>Theme</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <nav class="schema-breadcrumbs" aria-label="Breadcrumb">
+        <ol>
+            <li><a href="https://www.ayanzadeh.com/">Home</a></li>
+            <li><a href="https://www.ayanzadeh.com/projects/">Projects</a></li>
+            <li aria-current="page">AI Skills Bank</li>
+        </ol>
+    </nav>
+
+    <main class="project-main">
+        <section class="project-hero">
+            <div class="container">
+                <div class="project-hero-content">
+                    <div class="project-badges">
+                        <span class="badge featured">Developer Tools</span>
+                        <span class="badge status">Live</span>
+                    </div>
+                    <h1>AI Skills Bank</h1>
+                    <p class="project-tagline">500 reusable AI skills with stable IDs, for six coding agents</p>
+                    <div class="project-meta-info">
+                        <div class="meta-item">
+                            <i class="fas fa-user"></i>
+                            <span><strong>Aydin Ayanzadeh</strong></span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-layer-group"></i>
+                            <span>500 skills &middot; 10 categories</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-calendar"></i>
+                            <span>2026</span>
+                        </div>
+                    </div>
+                    <div class="project-actions">
+                        <a href="https://www.ayanzadeh.com/skills/" class="btn btn-primary">
+                            <i class="fas fa-magnifying-glass"></i> Browse the Catalog
+                        </a>
+                        <a href="https://github.com/Ayanzadeh93/Claude-Skills-Bank" class="btn btn-secondary" target="_blank" rel="noopener">
+                            <i class="fab fa-github"></i> GitHub Repository
+                        </a>
+                        <a href="index.html" class="btn btn-secondary">
+                            <i class="fas fa-th"></i> All Projects
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="project-section">
+            <div class="container">
+                <h2><i class="fas fa-eye"></i> Overview</h2>
+                <div class="overview-content">
+                    <p class="lead">
+                        Most prompt libraries are a pile of paragraphs. They are useful once, then the wording drifts, the file gets renamed and nobody can tell which behavior a teammate meant. The AI Skills Bank gives every reusable behavior a short, stable identity: <code>CS-009</code> is always Code Review Partner, and <code>GS-016</code> is always the step-by-step enforcer.
+                    </p>
+                    <p>
+                        The library ships 500 skills, 50 in each of ten categories, as plain Markdown. Every skill is one ID, one name and one actionable line. Copy the line into <code>CLAUDE.md</code>, <code>AGENTS.md</code>, <code>GEMINI.md</code> or any agent instruction field, or reference the ID in a spec, a review or a routing rule.
+                    </p>
+                    <p>
+                        The same data powers a searchable public catalog at <a href="https://www.ayanzadeh.com/skills/">ayanzadeh.com/skills</a>, a machine-readable <code>skills.json</code> index, and configuration packs for Claude Code, Codex CLI, Gemini CLI, Kimi CLI, Aider and Cline. MIT licensed, self-hosted, no account.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="project-section alt-bg">
+            <div class="container">
+                <h2><i class="fas fa-layer-group"></i> What Is Inside</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-list-check"></i></div>
+                        <h3>500 Skills</h3>
+                        <p>Fifty skills in each category, written as one-line roles and behaviors rather than essays. Every one has a stable ID in the form <code>CS-009</code>.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-shapes"></i></div>
+                        <h3>10 Categories</h3>
+                        <p>Accessibility and multimodal work, coding, creativity, data, education, general reasoning, operations, product, research and writing.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-plug"></i></div>
+                        <h3>6 Platform Packs</h3>
+                        <p>Ready-made configuration for Claude Code, Codex CLI, Gemini CLI, Kimi CLI, Aider and Cline, each pointing at the same skill IDs.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-database"></i></div>
+                        <h3>1 JSON Index</h3>
+                        <p><code>skills.json</code> carries every ID, name, description, category and source file, so tools can route skills without parsing Markdown.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-shield-halved"></i></div>
+                        <h3>CI-Validated</h3>
+                        <p>A GitHub Actions check fails the build on duplicate IDs, malformed IDs, unknown categories or count drift between the docs and the index.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-copy"></i></div>
+                        <h3>Copy-Ready Catalog</h3>
+                        <p>The public catalog is static HTML: every skill is indexable and linkable, and one button copies the exact prompt line to the clipboard.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="project-section">
+            <div class="container">
+                <h2><i class="fas fa-table-list"></i> The Ten Categories</h2>
+                <div class="overview-content">
+                    <p>Each category lives in its own Markdown file and keeps a fixed prefix, so an ID tells you where a skill lives before you open anything.</p>
+                    <div class="table-wrap">
+                        <table class="cat-table">
+                            <thead>
+                                <tr><th scope="col">Prefix</th><th scope="col">Category</th><th scope="col">Skills</th><th scope="col">Source</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><code>AS</code></td><td><a href="https://www.ayanzadeh.com/skills/#category-accessibility">Accessibility, Vision &amp; Multimodal</a></td><td>50</td><td><a href="https://github.com/Ayanzadeh93/Claude-Skills-Bank/blob/main/skills/skills-accessibility-multimodal.md">Markdown</a></td></tr>
+                                <tr><td><code>CS</code></td><td><a href="https://www.ayanzadeh.com/skills/#category-coding">Coding &amp; Code Review</a></td><td>50</td><td><a href="https://github.com/Ayanzadeh93/Claude-Skills-Bank/blob/main/skills/skills-coding.md">Markdown</a></td></tr>
+                                <tr><td><code>CR</code></td><td><a href="https://www.ayanzadeh.com/skills/#category-creativity">Creativity &amp; Ideation</a></td><td>50</td><td><a href="https://github.com/Ayanzadeh93/Claude-Skills-Bank/blob/main/skills/skills-creativity-ideation.md">Markdown</a></td></tr>
+                                <tr><td><code>DS</code></td><td><a href="https://www.ayanzadeh.com/skills/#category-data">Data, Analysis &amp; Math</a></td><td>50</td><td><a href="https://github.com/Ayanzadeh93/Claude-Skills-Bank/blob/main/skills/skills-data-analysis.md">Markdown</a></td></tr>
+                                <tr><td><code>ES</code></td><td><a href="https://www.ayanzadeh.com/skills/#category-education">Education &amp; Teaching</a></td><td>50</td><td><a href="https://github.com/Ayanzadeh93/Claude-Skills-Bank/blob/main/skills/skills-education-teaching.md">Markdown</a></td></tr>
+                                <tr><td><code>GS</code></td><td><a href="https://www.ayanzadeh.com/skills/#category-general">General &amp; Meta Skills</a></td><td>50</td><td><a href="https://github.com/Ayanzadeh93/Claude-Skills-Bank/blob/main/skills/skills-general-meta.md">Markdown</a></td></tr>
+                                <tr><td><code>OS</code></td><td><a href="https://www.ayanzadeh.com/skills/#category-operations">Operations &amp; Productivity</a></td><td>50</td><td><a href="https://github.com/Ayanzadeh93/Claude-Skills-Bank/blob/main/skills/skills-operations-productivity.md">Markdown</a></td></tr>
+                                <tr><td><code>PS</code></td><td><a href="https://www.ayanzadeh.com/skills/#category-product">Product, UX &amp; Business</a></td><td>50</td><td><a href="https://github.com/Ayanzadeh93/Claude-Skills-Bank/blob/main/skills/skills-product-ux-business.md">Markdown</a></td></tr>
+                                <tr><td><code>RS</code></td><td><a href="https://www.ayanzadeh.com/skills/#category-research">Research &amp; Reading</a></td><td>50</td><td><a href="https://github.com/Ayanzadeh93/Claude-Skills-Bank/blob/main/skills/skills-research-reading.md">Markdown</a></td></tr>
+                                <tr><td><code>WS</code></td><td><a href="https://www.ayanzadeh.com/skills/#category-writing">Writing &amp; Editing</a></td><td>50</td><td><a href="https://github.com/Ayanzadeh93/Claude-Skills-Bank/blob/main/skills/skills-writing-editing.md">Markdown</a></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="project-section alt-bg">
+            <div class="container">
+                <h2><i class="fas fa-terminal"></i> Using a Skill</h2>
+                <div class="approach-content">
+                    <div class="approach-item">
+                        <h3>1. Paste the one-line prompt</h3>
+                        <p>A skill is deliberately short enough to sit in a system prompt or a context file without swallowing the task.</p>
+                        <p class="code-label">Example</p>
+                        <pre class="code-sample"><code>You are CS-009 — Code Review Partner. Performs a human-style code review with comments and priority labels.</code></pre>
+                    </div>
+                    <div class="approach-item">
+                        <h3>2. Or list IDs in your project instructions</h3>
+                        <p>IDs are easier to route, diff and review than repeated prose. Keep the active set small and explicit.</p>
+                        <p class="code-label">CLAUDE.md / AGENTS.md</p>
+                        <pre class="code-sample"><code>## Active skills
+- GS-016 — "Think Step by Step" Enforcer
+- CS-009 — Code Review Partner
+- GS-020 — Risk &amp; Edge-Case Spotter</code></pre>
+                    </div>
+                    <div class="approach-item">
+                        <h3>3. Or query the JSON index</h3>
+                        <p>The public index keeps the catalog and any downstream tool in sync with the Markdown source.</p>
+                        <p class="code-label">skills.json</p>
+                        <pre class="code-sample"><code>{
+  "id": "RS-004",
+  "name": "Full-Paper Summarizer",
+  "description": "Summarizes long papers into structured briefs (context, method, results).",
+  "category": "Research &amp; Reading",
+  "file": "skills/skills-research-reading.md"
+}</code></pre>
+                    </div>
+                </div>
+                <div class="note-box">
+                    <p><strong>Why IDs matter:</strong> a renamed prompt is a new behavior to everyone downstream. A stable ID keeps reviews, routing rules, eval cases and documentation pointing at the same skill even when the wording is improved.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="project-section">
+            <div class="container">
+                <h2><i class="fas fa-cogs"></i> How It Is Built</h2>
+                <div class="approach-content">
+                    <div class="approach-item">
+                        <h3>1. Markdown Is the Source of Truth</h3>
+                        <p>Ten files, one per category, hold the 500 skills. Adding a skill is a one-line edit in the file that owns its prefix; nothing else needs to be rewritten by hand.</p>
+                    </div>
+                    <div class="approach-item">
+                        <h3>2. A Build Script Derives the Index</h3>
+                        <p>A dependency-free Node script parses the Markdown and emits <code>skills.json</code> with a schema version, category metadata, counts and every skill record. The catalog on this site is generated from the same JSON, so the page and the API cannot disagree silently.</p>
+                    </div>
+                    <div class="approach-item">
+                        <h3>3. CI Checks the Invariants</h3>
+                        <p>The validation workflow checks ID format, uniqueness, category membership, the 50-per-category count and the generated index. It caught a real bug: 1,028 IDs had been written with a non-breaking hyphen that looked identical to a normal one but broke copy, search and grep. Every ID is ASCII now, and the check keeps it that way.</p>
+                    </div>
+                    <div class="approach-item">
+                        <h3>4. The Catalog Is Static</h3>
+                        <p>The public catalog is pre-rendered HTML with client-side search and copy buttons. There is no framework, no API call and no build step at request time; GitHub Pages serves the whole thing.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="project-section">
+            <div class="container">
+                <h2><i class="fas fa-code"></i> Technologies Used</h2>
+                <div class="tech-stack">
+                    <span class="tech-item">Markdown</span>
+                    <span class="tech-item">Node.js</span>
+                    <span class="tech-item">JSON</span>
+                    <span class="tech-item">GitHub Actions</span>
+                    <span class="tech-item">Static HTML</span>
+                    <span class="tech-item">Vanilla JavaScript</span>
+                    <span class="tech-item">CSS Custom Properties</span>
+                    <span class="tech-item">GitHub Pages</span>
+                    <span class="tech-item">MIT License</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="project-section alt-bg">
+            <div class="container">
+                <h2><i class="fas fa-link"></i> Related</h2>
+                <div class="overview-content">
+                    <p>
+                        The <a href="claude-code-encyclopedia.html">Claude Code Encyclopedia</a> covers the commands, flags, settings and config paths for Claude Code, Codex CLI and GitHub CLI. The Skills Bank covers what to tell those agents once they are running.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="project-cta">
+            <div class="container">
+                <h2>Browse all 500 skills</h2>
+                <p>Search by task or ID, copy a prompt, and keep the ID. No signup, no install, MIT licensed.</p>
+                <a href="https://www.ayanzadeh.com/skills/" class="btn btn-primary btn-lg">
+                    <i class="fas fa-magnifying-glass"></i> Open the Skills Catalog
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="project-footer">
+        <div class="container">
+            <p>&copy; 2026 Aydin Ayanzadeh. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="../index.html">Home</a>
+                <a href="index.html">Projects</a>
+                <a href="../skills/">Skills</a>
+                <a href="../index.html#publications">Publications</a>
+            </div>
+        </div>
+    </footer>
+
+    <button type="button" id="backToTop" class="back-to-top" aria-label="Back to top" hidden>
+        <i class="fas fa-arrow-up" aria-hidden="true"></i>
+    </button>
+
+    <script src="../js/main.js"></script>
+</body>
+</html>

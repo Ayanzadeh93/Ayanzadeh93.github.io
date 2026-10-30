@@ -85,6 +85,18 @@
         <priority>0.6</priority>
     </url>
     <url>
+        <loc>https://www.ayanzadeh.com/projects/ai-skills-bank.html</loc>
+        <lastmod>2026-10-30</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://www.ayanzadeh.com/skills/</loc>
+        <lastmod>2026-10-30</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
         <loc>https://www.ayanzadeh.com/claude-code-encyclopedia/</loc>
         <lastmod>2026-10-01</lastmod>
         <changefreq>weekly</changefreq>
