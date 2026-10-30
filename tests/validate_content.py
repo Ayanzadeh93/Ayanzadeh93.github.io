@@ -94,9 +94,83 @@ def validate_routes_and_size_budgets():
         assert_true(size <= limit, f"{relative} exceeds lightweight size budget: {size} > {limit}")
 
 
+def validate_skills_bank():
+    payload = read_json("data/skills-bank.json")
+    assert_true(payload.get("schemaVersion") == 1, "skills-bank.json schemaVersion must be 1")
+
+    skills = payload.get("skills")
+    categories = payload.get("categories")
+    assert_true(isinstance(skills, list) and skills, "skills-bank.json must contain skills")
+    assert_true(isinstance(categories, list) and categories, "skills-bank.json must contain categories")
+    assert_true(payload.get("total") == len(skills) == 500, "skills-bank.json must describe 500 skills")
+    assert_true(len(categories) == 10, "skills-bank.json must describe 10 categories")
+
+    ids = [skill.get("id") for skill in skills]
+    assert_true(all(ids), "every skill needs a non-empty id")
+    assert_true(len(ids) == len(set(ids)), "skill ids must be unique")
+    assert_true(all(len(skill_id) == 6 for skill_id in ids), "skill ids must be six characters")
+    assert_true(
+        all(skill_id[2] == "-" and skill_id[3:].isdigit() for skill_id in ids),
+        "skill ids must look like CS-009",
+    )
+    assert_true(
+        all(skill_id.isascii() for skill_id in ids),
+        "skill ids must be ASCII (a non-breaking hyphen once broke 1,028 ids)",
+    )
+
+    category_names = {category.get("name") for category in categories}
+    prefixes = {category.get("prefix") for category in categories}
+    assert_true(len(category_names) == 10, "category names must be unique")
+    assert_true(len(prefixes) == 10, "category prefixes must be unique")
+
+    for category in categories:
+        assert_true(category.get("file", "").startswith("skills/"), f"{category.get('prefix')} needs a source file")
+        count = sum(1 for skill in skills if skill.get("category") == category.get("name"))
+        assert_true(count == category.get("count") == 50, f"{category.get('name')} must contain 50 skills")
+
+    for skill in skills:
+        assert_true(skill.get("category") in category_names, f"{skill['id']} has an unknown category")
+        assert_true(skill["id"].startswith(
+            next(category["prefix"] for category in categories if category["name"] == skill["category"])
+        ), f"{skill['id']} does not match its category prefix")
+        for field in ("name", "description", "file"):
+            assert_true(str(skill.get(field, "")).strip(), f"{skill['id']} is missing {field}")
+
+    catalog = (ROOT / "skills" / "index.html").read_text(encoding="utf-8")
+    assert_true(catalog.count('<article class="skill"') == 500, "skills catalog must render 500 skill cards")
+    assert_true("https://www.ayanzadeh.com/skills/" in catalog, "skills catalog needs its canonical URL")
+    assert_true('"numberOfItems":500' in catalog, "skills catalog JSON-LD must list all 500 skills")
+    for skill_id in ids:
+        assert_true(f'id="{skill_id}"' in catalog, f"skills catalog is missing {skill_id}")
+    for category in categories:
+        slug = {
+            "AS": "accessibility", "CS": "coding", "CR": "creativity", "DS": "data", "ES": "education",
+            "GS": "general", "OS": "operations", "PS": "product", "RS": "research", "WS": "writing",
+        }[category["prefix"]]
+        assert_true(f'id="category-{slug}"' in catalog, f"skills catalog is missing the {category['name']} section")
+
+    # The public JSON must be the same document as the vendored source.
+    public_json = read_json("skills/skills.json")
+    assert_true(public_json == payload, "skills/skills.json must match data/skills-bank.json")
+
+    page = (ROOT / "projects" / "ai-skills-bank.html").read_text(encoding="utf-8")
+    assert_true("https://github.com/Ayanzadeh93/Claude-Skills-Bank" in page, "project page must link the repository")
+    assert_true("https://www.ayanzadeh.com/skills/" in page, "project page must link the catalog")
+    assert_true("MIT" in page, "project page must state the license")
+
+    sitemap = (ROOT / "sitemap.xml").read_text(encoding="utf-8")
+    for url in ("https://www.ayanzadeh.com/skills/", "https://www.ayanzadeh.com/projects/ai-skills-bank.html"):
+        assert_true(url in sitemap, f"sitemap is missing {url}")
+
+    llms = (ROOT / "llms.txt").read_text(encoding="utf-8")
+    assert_true("https://www.ayanzadeh.com/skills/" in llms, "llms.txt must mention the skills catalog")
+    assert_true("skills.json" in llms, "llms.txt must mention the JSON index")
+
+
 def main():
     validate_projects()
     validate_routes_and_size_budgets()
+    validate_skills_bank()
     print("content validation: PASS")
 
 

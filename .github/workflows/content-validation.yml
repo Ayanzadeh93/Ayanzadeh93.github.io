@@ -5,6 +5,8 @@ on:
     paths:
       - 'data/**'
       - 'projects/**'
+      - 'skills/**'
+      - 'scripts/build_skills_catalog.py'
       - 'apps/claude-code-catalog.html'
       - 'apps/claude-code-encyclopedia.html'
       - 'js/projects-index.js'
@@ -12,17 +14,23 @@ on:
       - 'js/lib/project-data.js'
       - 'css/projects-data.css'
       - 'tests/validate_content.py'
+      - 'sitemap.xml'
+      - 'llms.txt'
       - '.github/workflows/content-validation.yml'
   push:
     branches: [main]
     paths:
       - 'data/**'
       - 'projects/**'
+      - 'skills/**'
+      - 'scripts/build_skills_catalog.py'
       - 'apps/claude-code-catalog.html'
       - 'apps/claude-code-encyclopedia.html'
       - 'js/**'
       - 'css/projects-data.css'
       - 'tests/validate_content.py'
+      - 'sitemap.xml'
+      - 'llms.txt'
 
 permissions:
   contents: read
@@ -35,5 +43,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Validate project data
+      - name: Validate project and skills data
         run: python tests/validate_content.py
+      - name: Check skills catalog is current
+        run: python scripts/build_skills_catalog.py --check

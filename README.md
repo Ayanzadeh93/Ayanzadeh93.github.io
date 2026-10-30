@@ -23,6 +23,10 @@ This is the personal website of Aydin Ayanzadeh, Ph.D. Student in Computer Scien
   - Technical Skills
   - Awards & Honors
   - Contact Information
+- **AI Skills Catalog**: `/skills/` lists all 500 skills from
+  [Claude-Skills-Bank](https://github.com/Ayanzadeh93/Claude-Skills-Bank) as static HTML,
+  so every skill is indexable and linkable, with client-side search, category filters
+  and copy-ready prompts. The page is generated from `data/skills-bank.json`.
 
 ## Technologies Used
 
@@ -62,6 +66,10 @@ they are committed. Modern platform APIs do the work a library would otherwise:
 │       ├── pub-explorer.js #   <pub-explorer>
 │       └── cite-dialog.js  #   <cite-dialog>
 ├── projects/               # One page per project
+├── skills/                 # Generated 500-skill catalog + public skills.json
+├── data/                   # projects.json + vendored skills-bank.json
+├── scripts/                # build_skills_catalog.py (stdlib only)
+├── tests/                  # validate_content.py
 ├── images/                 # Image assets
 ├── sitemap.xml / robots.txt
 └── manifest.json           # PWA manifest
@@ -102,6 +110,21 @@ Copy an existing `.publication-item` inside `<pub-explorer>` and fill in its
 picks it up automatically: the facet counts, the search index and all four
 citation formats are derived from that markup. Verify a DOI at
 `https://doi.org/<doi>` before adding it.
+
+### Updating the skills catalog
+
+`data/skills-bank.json` is a vendored copy of
+`skills.json` from `Ayanzadeh93/Claude-Skills-Bank`. After it changes:
+
+```bash
+python scripts/build_skills_catalog.py           # rewrite skills/index.html + skills/skills.json
+python scripts/build_skills_catalog.py --check   # verify the committed catalog is current
+python tests/validate_content.py                 # data, route and catalog checks
+```
+
+The generator refuses anything that is not 500 skills in 10 categories of 50, and it
+rejects malformed or duplicate IDs. CI runs both the validator and `--check`, so a
+stale or hand-edited catalog fails the pull request.
 
 ## License
 
