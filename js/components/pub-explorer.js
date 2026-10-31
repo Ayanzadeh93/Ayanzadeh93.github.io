@@ -59,6 +59,10 @@ export class PubExplorer extends HTMLElement {
         this.#bindCiteButtons();
         this.#bindShortcut();
         this.#apply({ animate: false });
+        // Cards start at opacity:0 under .js-enabled until main.js adds
+        // .animate-in per card; a tall list leaves most papers invisible
+        // until the global fallback. Reveal the full list once enhanced.
+        this.#records.forEach((record) => record.card.classList.add('animate-in'));
     }
 
     /** Read every card in the light DOM into a searchable, citable record. */
