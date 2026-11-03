@@ -18,7 +18,7 @@ app moved on. One copy, one deployment, no drift.
 
 ## Private source
 
-The application repository may be **private** (GitHub Pro / Student Developer
+The application repository is **private** (GitHub Pro / Student Developer
 Pack). With Pro, Pages still publishes the live site: visitors can use the app;
 they cannot browse or clone the source. Do not put a full copy of the app back
 into this public portfolio.
