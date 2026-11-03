@@ -151,12 +151,13 @@
 }
 
 /* ---------- Metric band: elevated cards, gradient numbers ---------- */
-.metric {
+.metric__link {
   transition: transform var(--transition-fast), box-shadow var(--transition-fast),
     border-color var(--transition-fast);
 }
 
-.metric:hover {
+.metric__link:hover,
+.metric__link:focus-visible {
   transform: translateY(-4px);
   box-shadow: var(--shadow-md);
   border-color: var(--primary-light);

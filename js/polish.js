@@ -44,8 +44,12 @@
   onScroll();
 
   /* ---------- Reveal on scroll ---------- */
+  /* Whole `.section` wrappers are intentionally excluded: main.js already
+     drives card-level `.animate-in`, and hiding an entire section made
+     Publications (and the metrics band beneath a full-viewport hero) stay
+     at opacity:0 until a second observer fired. */
   var revealTargets = document.querySelectorAll(
-    ".section, .metrics-grid .metric, .project-card, .news-card, .focus-card"
+    ".metrics-grid .metric, .project-card, .news-card, .focus-card"
   );
   if (!reduceMotion && "IntersectionObserver" in window) {
     revealTargets.forEach(function (el, i) {
@@ -62,11 +66,18 @@
           }
         });
       },
-      { rootMargin: "0px 0px -8% 0px", threshold: 0.08 }
+      /* Catch tiles sitting flush with the viewport bottom (metrics band). */
+      { rootMargin: "80px 0px 80px 0px", threshold: 0.01 }
     );
     revealTargets.forEach(function (el) {
       observer.observe(el);
     });
+
+    window.setTimeout(function () {
+      document.querySelectorAll(".reveal:not(.reveal-visible)").forEach(function (el) {
+        el.classList.add("reveal-visible");
+      });
+    }, 2000);
   }
 
   /* ---------- Copy email chip next to the Email button ---------- */
