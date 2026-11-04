@@ -22,9 +22,14 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "data" / "skills-bank.json"
+COMMUNITY_DIR = ROOT / "data" / "community-skills"
 CATALOG_DIR = ROOT / "skills"
 CATALOG_HTML = CATALOG_DIR / "index.html"
 CATALOG_JSON = CATALOG_DIR / "skills.json"
+
+FIRST_PARTY_TOTAL = 500
+COMMUNITY_TOTAL = 4500
+CATALOG_TOTAL = FIRST_PARTY_TOTAL + COMMUNITY_TOTAL
 
 SITE = "https://www.ayanzadeh.com"
 PAGE_URL = f"{SITE}/skills/"
@@ -55,6 +60,7 @@ CATEGORY_BLURBS = {
     "PS": "Product specs, user stories, UX review, positioning and business analysis.",
     "RS": "Literature search, paper reading, synthesis, evidence mapping and research planning.",
     "WS": "Drafting, structure, editing, tone, argumentation and publication-ready prose.",
+    "EX": "Source-linked community skills. Every entry links to its original file and shows the available license information.",
 }
 
 ICON_SEARCH = (
@@ -129,7 +135,7 @@ def validate(payload: dict) -> None:
 def build_chips(categories: list[dict], total: int) -> str:
     parts = [
         f'<button type="button" class="chip" data-cat="all" aria-pressed="true">'
-        f'<span>All</span><b>{total}</b></button>'
+        f'<span>All</span><b>{total:,}</b></button>'
     ]
     for category in categories:
         prefix = category["prefix"]
@@ -145,20 +151,53 @@ def build_sections(categories: list[dict], skills: list[dict]) -> str:
     for index, category in enumerate(categories, start=1):
         prefix = category["prefix"]
         slug = normalize_category(prefix)
-        category_skills = [skill for skill in skills if skill["category"] == category["name"]]
+        category_skills = [] if prefix == "EX" else [skill for skill in skills if skill["category"] == category["name"]]
         cards: list[str] = []
         for skill in category_skills:
             sid = html.escape(skill["id"], quote=True)
             name = html.escape(skill["name"])
             description = html.escape(skill["description"])
-            cards.append(
-                f'''<article class="skill" id="{sid}">
+            if prefix == "EX":
+                topic = html.escape(skill.get("topic", "Community"))
+                source_url = html.escape(skill["sourceUrl"], quote=True)
+                source_repo = html.escape(skill["sourceRepo"])
+                license_name = html.escape(skill["license"])
+                license_url = html.escape(skill["licenseUrl"], quote=True)
+                attribution_url = skill.get("attributionUrl")
+                attribution_link = (
+                    f' <a href="{html.escape(attribution_url, quote=True)}" target="_blank" rel="noopener">Attribution notes</a>'
+                    if attribution_url else ""
+                )
+                cards.append(
+                    f'''<article class="skill skill-external" id="{sid}">
+<div class="skill-top"><a class="skill-id" href="#{sid}">{sid}</a><span class="skill-badge">External · not reviewed</span></div>
+<h3>{name}</h3>
+<p>{description}</p>
+<p class="skill-topic">Topic: {topic}</p>
+<div class="skill-links"><a href="{source_url}" target="_blank" rel="noopener">{source_repo} · open SKILL.md {ICON_ARROW}</a><a href="{license_url}" target="_blank" rel="noopener">License: {license_name}</a>{attribution_link}</div>
+</article>'''
+                )
+            else:
+                cards.append(
+                    f'''<article class="skill" id="{sid}">
 <div class="skill-top"><a class="skill-id" href="#{sid}">{sid}</a><button type="button" class="copy" data-id="{sid}" aria-label="Copy {sid}"><span>Copy</span></button></div>
 <h3>{name}</h3>
 <p>{description}</p>
 </article>'''
-            )
-        file_url = f"{REPO}/blob/main/{category['file']}"
+                )
+        if prefix == "EX":
+            cards.extend([
+                '<div class="community-results" id="community-grid" aria-live="polite"><p class="community-loading" id="community-loading">Loading 4,500 community skill references…</p></div>',
+                '<nav class="community-pagination" id="community-pagination" aria-label="Community skill pages" hidden>'
+                '<button type="button" class="btn btn-ghost" id="community-prev">Previous</button>'
+                '<span id="community-page-status" role="status" aria-live="polite"></span>'
+                '<button type="button" class="btn btn-ghost" id="community-next">Next</button></nav>',
+                '<noscript><p class="community-loading">Enable JavaScript to browse the 4,500 source-linked community records, or download the complete JSON index.</p></noscript>',
+            ])
+            category_link = '<span class="cat-link">Source and license shown per entry</span>'
+        else:
+            file_url = f"{REPO}/blob/main/{category['file']}"
+            category_link = f'<a class="cat-link" href="{file_url}" target="_blank" rel="noopener">Markdown {ICON_ARROW}</a>'
         sections.append(
             f'''<section class="cat" id="category-{slug}" data-cat="{slug}" aria-labelledby="cat-{slug}-title">
         <div class="cat-head">
@@ -166,7 +205,7 @@ def build_sections(categories: list[dict], skills: list[dict]) -> str:
           <span class="cat-prefix" aria-hidden="true">{prefix}</span>
           <h2 id="cat-{slug}-title">{html.escape(category["name"])}</h2>
           <span class="cat-count">{category["count"]} skills</span>
-          <a class="cat-link" href="{file_url}" target="_blank" rel="noopener">Markdown {ICON_ARROW}</a>
+          {category_link}
         </div>
         <p class="cat-desc">{html.escape(CATEGORY_BLURBS.get(prefix, ""))}</p>
         <div class="grid">
@@ -178,20 +217,20 @@ def build_sections(categories: list[dict], skills: list[dict]) -> str:
 
 
 def build_structured_data(payload: dict) -> tuple[str, str, str]:
-    skills = sorted(payload["skills"], key=lambda skill: skill["id"])
+    skills = sorted((skill for skill in payload["skills"] if not skill.get("sourceUrl")), key=lambda skill: skill["id"])
     item_list = {
         "@context": "https://schema.org",
         "@type": "ItemList",
-        "name": "AI Skills Bank",
+        "name": "AI Skills Catalog",
         "description": payload["description"],
-        "numberOfItems": len(skills),
+        "numberOfItems": payload["total"],
         "itemListOrder": "https://schema.org/ItemListOrderAscending",
         "itemListElement": [
             {
                 "@type": "ListItem",
                 "position": position,
                 "name": f"{skill['id']} \u2014 {skill['name']}",
-                "url": f"{PAGE_URL}#{skill['id']}",
+                "url": skill.get("sourceUrl", f"{PAGE_URL}#{skill['id']}"),
             }
             for position, skill in enumerate(skills, start=1)
         ],
@@ -199,13 +238,13 @@ def build_structured_data(payload: dict) -> tuple[str, str, str]:
     collection = {
         "@context": "https://schema.org",
         "@type": "CollectionPage",
-        "name": "AI Skills Bank \u2014 500 reusable AI skills",
+        "name": f"AI Skills Catalog \u2014 {payload['total']:,} skill references",
         "url": PAGE_URL,
         "description": payload["description"],
         "isPartOf": {"@type": "WebSite", "name": "Aydin Ayanzadeh", "url": f"{SITE}/"},
         "about": {
             "@type": "SoftwareSourceCode",
-            "name": "AI Skills Bank",
+            "name": "Original AI Skills Bank (500 first-party prompts)",
             "codeRepository": REPO,
             "license": LICENSE_URL,
             "programmingLanguage": "Markdown",
@@ -227,11 +266,15 @@ def build_structured_data(payload: dict) -> tuple[str, str, str]:
         ],
     }
     item_list["@id"] = f"{PAGE_URL}#skill-list"
-    return (
-        json.dumps(item_list, ensure_ascii=False, separators=(",", ":")),
-        json.dumps(collection, ensure_ascii=False, separators=(",", ":")),
-        json.dumps(breadcrumb, ensure_ascii=False, separators=(",", ":")),
-    )
+    def json_script(value: dict) -> str:
+        return (
+            json.dumps(value, ensure_ascii=False, separators=(",", ":"))
+            .replace("<", "\\u003c")
+            .replace(">", "\\u003e")
+            .replace("&", "\\u0026")
+        )
+
+    return (json_script(item_list), json_script(collection), json_script(breadcrumb))
 
 
 PAGE = r'''<!doctype html>
@@ -561,6 +604,17 @@ h1 .accent { color: var(--accent); font-style: italic; }
 }
 .copy:hover { border-color: var(--accent-line); color: var(--accent); }
 .copy.done { background: var(--ok-bg); border-color: var(--ok-line); color: var(--ok); }
+.skill-badge { margin-left: auto; color: var(--muted); font-size: 10.5px; font-weight: 700; letter-spacing: .02em; }
+.skill-topic { color: var(--muted) !important; font-size: 12px !important; }
+.skill-links { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin-top: auto; padding-top: 5px; font-size: 11.5px; }
+.skill-links a { font-weight: 700; text-decoration: none; }
+.skill-links a:hover { text-decoration: underline; }
+.community-results { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fill, minmax(292px, 1fr)); gap: 11px; }
+.community-loading { grid-column: 1 / -1; color: var(--muted); }
+.community-pagination { grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 8px; }
+.community-pagination[hidden] { display: none; }
+.community-pagination span { color: var(--muted); font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.community-pagination button:disabled { opacity: .45; cursor: not-allowed; }
 .skill h3 { margin: 0; font-size: 15.5px; line-height: 1.32; letter-spacing: -.01em; }
 .skill p { margin: 0; font-size: 13.5px; line-height: 1.5; color: var(--body); }
 .cat[hidden], .skill[hidden] { display: none; }
@@ -665,27 +719,27 @@ h1 .accent { color: var(--accent); font-style: italic; }
 <main id="main">
   <section class="hero" aria-labelledby="page-title">
     <div class="hero-in">
-      <p class="eyebrow"><span class="dot" aria-hidden="true"></span>Open source &middot; MIT &middot; No signup</p>
-      <h1 id="page-title">500 AI skills, <span class="accent">ready to paste.</span></h1>
-      <p class="lead">A curated bank of reusable roles and behaviors with <strong>stable IDs</strong>, built for Claude Code, Codex CLI, Gemini CLI, Kimi CLI, Aider and Cline. Find a skill by task or ID, copy one line, and keep the ID in your notes so the behavior stays reproducible.</p>
+      <p class="eyebrow"><span class="dot" aria-hidden="true"></span>Source-linked catalog &middot; per-skill licenses &middot; no signup</p>
+      <h1 id="page-title">__TOTAL__ AI skills, <span class="accent">ready to explore.</span></h1>
+      <p class="lead">Search 500 original MIT prompts and 4,500 community skill references. Every community entry links to its original file and shows the license information available for that source. Review upstream instructions before use.</p>
       <div class="actions">
         <a class="btn btn-primary" href="__REPO__" target="_blank" rel="noopener">__ICON_STAR__ Star on GitHub</a>
         <a class="btn btn-ghost" href="#how">How it works</a>
         <a class="link-plain" href="../projects/ai-skills-bank.html">Read the project writeup &rarr;</a>
       </div>
       <div class="stats" role="list" aria-label="Bank at a glance">
-        <div class="stat" role="listitem"><b>500</b><span>Skills</span></div>
-        <div class="stat" role="listitem"><b>10</b><span>Categories</span></div>
-        <div class="stat" role="listitem"><b>6</b><span>CLI platforms</span></div>
-        <div class="stat" role="listitem"><b>MIT</b><span>Self-hosted</span></div>
+        <div class="stat" role="listitem"><b>__TOTAL__</b><span>Skills</span></div>
+        <div class="stat" role="listitem"><b>__CATEGORY_COUNT__</b><span>Filters</span></div>
+        <div class="stat" role="listitem"><b>6</b><span>Original CLI packs</span></div>
+        <div class="stat" role="listitem"><b>Per skill</b><span>License shown</span></div>
       </div>
     </div>
   </section>
 
   <section class="how" id="how" aria-label="How to use a skill">
-    <div class="step"><span class="step-num" aria-hidden="true">1</span><div><b>Find the skill</b><p>Search by task, name or ID. Every card links to its own anchor, so <code>#CS-009</code> is shareable.</p></div></div>
-    <div class="step"><span class="step-num" aria-hidden="true">2</span><div><b>Copy the line</b><p>Paste it into <code>CLAUDE.md</code>, <code>AGENTS.md</code>, <code>GEMINI.md</code> or any agent instruction field.</p></div></div>
-    <div class="step"><span class="step-num" aria-hidden="true">3</span><div><b>Keep the ID</b><p>Reference <code>CS-009</code> in a spec, review or commit so people and agents route to the same behavior.</p></div></div>
+    <div class="step"><span class="step-num" aria-hidden="true">1</span><div><b>Find the skill</b><p>Search all 5,000 entries by name, task, topic, ID or source repository.</p></div></div>
+    <div class="step"><span class="step-num" aria-hidden="true">2</span><div><b>Copy or open</b><p>Copy an original prompt, or follow the source link to read a community skill.</p></div></div>
+    <div class="step"><span class="step-num" aria-hidden="true">3</span><div><b>Check its terms</b><p>Community skills are external and not reviewed here. Each card links to its source and license information.</p></div></div>
   </section>
 
   <div class="toolbar">
@@ -693,7 +747,7 @@ h1 .accent { color: var(--accent); font-style: italic; }
       <div class="search">
         __ICON_SEARCH__
         <input id="q" type="search" autocomplete="off" spellcheck="false" maxlength="120"
-          placeholder="Search 500 skills by task, name or ID&hellip;" aria-label="Search skills">
+          placeholder="Search __TOTAL__ skills by name, task, topic or source&hellip;" aria-label="Search skills">
         <kbd aria-hidden="true">/</kbd>
       </div>
       <p class="result-count" id="result-count" role="status" aria-live="polite">__TOTAL__ skills</p>
@@ -703,7 +757,7 @@ h1 .accent { color: var(--accent); font-style: italic; }
     </div>
   </div>
 
-  <div class="catalog" id="catalog">
+  <div class="catalog" id="catalog" data-total="__TOTAL_COUNT__" data-community-total="__COMMUNITY_TOTAL_COUNT__">
     __SECTIONS__
 
     <div class="empty" id="empty" hidden>
@@ -716,9 +770,9 @@ h1 .accent { color: var(--accent); font-style: italic; }
   <section class="about" aria-labelledby="about-title">
     <div class="about-in">
       <div>
-        <h2 id="about-title">One bank, every agent.</h2>
-        <p>The bank groups 50 skills into each of ten categories: accessibility and multimodal work, coding and review, creativity, data and math, education, general reasoning, operations, product and UX, research and reading, and writing.</p>
-        <p>Every entry has a stable ID, a human-readable name and a one-line description. The repository ships the same 500 skills as Markdown, plus configuration packs for six AI coding CLIs. MIT licensed, no account and no hosted service.</p>
+        <h2 id="about-title">A searchable catalog, with sources.</h2>
+        <p>The original 500 MIT prompts stay grouped in their ten categories. Another 4,500 entries link to community-maintained skill files across development, research, design, business and other topics.</p>
+        <p>Community records show their source repository and available license details. Full community instructions remain at the upstream source; this catalog does not execute skill files. The original bank remains available as a separate MIT-licensed source.</p>
       </div>
       <div class="about-actions">
         <a class="btn btn-primary" href="__REPO__" target="_blank" rel="noopener">__ICON_GITHUB__ View the repository</a>
@@ -732,7 +786,7 @@ h1 .accent { color: var(--accent); font-style: italic; }
 
 <footer class="site-foot">
   <div class="foot-in">
-    <span>&copy; 2026 Aydin Ayanzadeh &middot; MIT-licensed skills</span>
+    <span>&copy; 2026 Aydin Ayanzadeh &middot; Original prompts MIT licensed &middot; external terms vary by entry</span>
     <nav aria-label="Footer">
       <a href="__SITE__/">Home</a>
       <a href="../projects/">Projects</a>
@@ -757,11 +811,23 @@ h1 .accent { color: var(--accent); font-style: italic; }
   var chips = Array.prototype.slice.call(document.querySelectorAll('.chip'));
   var sections = Array.prototype.slice.call(document.querySelectorAll('.cat'));
   var cards = Array.prototype.slice.call(document.querySelectorAll('.skill'));
+  var communitySection = document.getElementById('category-ex');
+  var communityGrid = document.getElementById('community-grid');
+  var communityLoading = document.getElementById('community-loading');
+  var communityPagination = document.getElementById('community-pagination');
+  var communityPageStatus = document.getElementById('community-page-status');
+  var communityPrev = document.getElementById('community-prev');
+  var communityNext = document.getElementById('community-next');
   var items = cards.map(function (card) {
     return { el: card, cat: card.closest('.cat').getAttribute('data-cat'), text: normalize(card.textContent) };
   });
-  var total = cards.length;
-  var state = { q: '', cat: 'all' };
+  var total = parseInt(catalog.getAttribute('data-total'), 10) || cards.length;
+  var communityTotal = parseInt(catalog.getAttribute('data-community-total'), 10) || 0;
+  var pageSize = 100;
+  var communitySkills = [];
+  var communityItems = [];
+  var communityReady = false;
+  var state = { q: '', cat: 'all', communityPage: 1 };
 
   function normalize(value) {
     return String(value || '').toLowerCase().normalize('NFKD')
@@ -774,24 +840,105 @@ h1 .accent { color: var(--accent); font-style: italic; }
     var url = new URL(window.location.href);
     if (state.q.trim()) { url.searchParams.set('q', state.q.trim()); } else { url.searchParams.delete('q'); }
     if (state.cat !== 'all') { url.searchParams.set('category', state.cat); } else { url.searchParams.delete('category'); }
+    if (state.communityPage > 1) { url.searchParams.set('page', String(state.communityPage)); } else { url.searchParams.delete('page'); }
     return url.pathname + url.search + url.hash;
+  }
+
+  function safeSourceUrl(value) {
+    try {
+      var url = new URL(value, window.location.href);
+      if (url.protocol !== 'https:' || url.hostname !== 'github.com') { return ''; }
+      return url.href;
+    } catch (error) { return ''; }
+  }
+
+  function appendText(parent, tag, className, value) {
+    var node = document.createElement(tag);
+    if (className) { node.className = className; }
+    node.textContent = String(value || '');
+    parent.appendChild(node);
+    return node;
+  }
+
+  function appendSourceLink(parent, href, label) {
+    var safeHref = safeSourceUrl(href);
+    if (!safeHref) { return; }
+    var link = document.createElement('a');
+    link.href = safeHref;
+    link.target = '_blank';
+    link.rel = 'noopener';
+    link.textContent = label;
+    parent.appendChild(link);
+  }
+
+  function renderCommunity(matches) {
+    if (!communityReady) { return; }
+    if (communityLoading) { communityLoading.hidden = true; }
+    communityGrid.textContent = '';
+    var pageCount = Math.max(1, Math.ceil(matches.length / pageSize));
+    state.communityPage = Math.min(Math.max(1, state.communityPage), pageCount);
+    var start = (state.communityPage - 1) * pageSize;
+    matches.slice(start, start + pageSize).forEach(function (item) {
+      var skill = item.skill;
+      var card = document.createElement('article');
+      card.className = 'skill skill-external';
+      card.id = skill.id;
+      var top = document.createElement('div');
+      top.className = 'skill-top';
+      var idLink = document.createElement('a');
+      idLink.className = 'skill-id';
+      idLink.href = '#' + skill.id;
+      idLink.textContent = skill.id;
+      top.appendChild(idLink);
+      appendText(top, 'span', 'skill-badge', 'External · not reviewed');
+      card.appendChild(top);
+      appendText(card, 'h3', '', skill.name);
+      appendText(card, 'p', '', skill.description);
+      appendText(card, 'p', 'skill-topic', 'Topic: ' + (skill.topic || 'Community'));
+      var links = document.createElement('div');
+      links.className = 'skill-links';
+      appendSourceLink(links, skill.sourceUrl, (skill.sourceRepo || 'Source') + ' · open SKILL.md');
+      appendSourceLink(links, skill.licenseUrl, 'License: ' + (skill.license || 'See source'));
+      if (skill.attributionUrl) { appendSourceLink(links, skill.attributionUrl, 'Attribution notes'); }
+      card.appendChild(links);
+      communityGrid.appendChild(card);
+    });
+    communityPagination.hidden = matches.length <= pageSize;
+    communityPageStatus.textContent = 'Page ' + state.communityPage + ' of ' + pageCount + ' · ' + matches.length.toLocaleString('en-US') + ' community results';
+    communityPrev.disabled = state.communityPage <= 1;
+    communityNext.disabled = state.communityPage >= pageCount;
   }
 
   function apply(updateUrl) {
     var terms = normalize(state.q.trim()).split(/\s+/).filter(Boolean);
-    var shown = 0;
+    var originalShown = 0;
     items.forEach(function (item) {
       var catOk = state.cat === 'all' || item.cat === state.cat;
       var queryOk = !terms.length || terms.every(function (term) { return item.text.indexOf(term) !== -1; });
       var visible = catOk && queryOk;
       item.el.hidden = !visible;
-      if (visible) { shown += 1; }
+      if (visible) { originalShown += 1; }
     });
+    var matchingCommunity = communityReady && (state.cat === 'all' || state.cat === 'ex')
+      ? communityItems.filter(function (item) {
+          return !terms.length || terms.every(function (term) { return item.text.indexOf(term) !== -1; });
+        })
+      : [];
+    renderCommunity(matchingCommunity);
+    var shown = originalShown + matchingCommunity.length;
     sections.forEach(function (section) {
-      section.hidden = !section.querySelector('.skill:not([hidden])');
+      if (section === communitySection) {
+        section.hidden = communityReady ? matchingCommunity.length === 0 : !(state.cat === 'all' || state.cat === 'ex');
+      } else {
+        section.hidden = !section.querySelector('.skill:not([hidden])');
+      }
     });
-    count.textContent = shown === total ? total + ' skills' : shown + ' of ' + total + ' skills';
-    empty.hidden = shown !== 0;
+    if (communityReady) {
+      count.textContent = shown === total ? total.toLocaleString('en-US') + ' skills' : shown.toLocaleString('en-US') + ' of ' + total.toLocaleString('en-US') + ' skills';
+    } else {
+      count.textContent = 'Loading community index · ' + originalShown.toLocaleString('en-US') + ' original results';
+    }
+    empty.hidden = shown !== 0 || !communityReady;
     chips.forEach(function (chip) {
       chip.setAttribute('aria-pressed', chip.getAttribute('data-cat') === state.cat ? 'true' : 'false');
     });
@@ -800,6 +947,7 @@ h1 .accent { color: var(--accent); font-style: italic; }
 
   function setCategory(value) {
     state.cat = value || 'all';
+    state.communityPage = 1;
     apply(true);
     var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var top = catalog.getBoundingClientRect().top + window.pageYOffset - 128;
@@ -812,12 +960,23 @@ h1 .accent { color: var(--accent); font-style: italic; }
 
   search.addEventListener('input', function () {
     state.q = search.value;
+    state.communityPage = 1;
+    apply(true);
+  });
+
+  communityPrev.addEventListener('click', function () {
+    state.communityPage = Math.max(1, state.communityPage - 1);
+    apply(true);
+  });
+  communityNext.addEventListener('click', function () {
+    state.communityPage += 1;
     apply(true);
   });
 
   document.getElementById('clear-filters').addEventListener('click', function () {
     state.q = '';
     state.cat = 'all';
+    state.communityPage = 1;
     search.value = '';
     apply(true);
     search.focus();
@@ -833,6 +992,7 @@ h1 .accent { color: var(--accent); font-style: italic; }
     if (event.key === 'Escape' && document.activeElement === search) {
       search.value = '';
       state.q = '';
+      state.communityPage = 1;
       apply(true);
       search.blur();
     }
@@ -922,11 +1082,50 @@ h1 .accent { color: var(--accent); font-style: italic; }
   var params = new URLSearchParams(window.location.search);
   state.q = params.get('q') || '';
   state.cat = params.get('category') || 'all';
+  state.communityPage = Math.max(1, parseInt(params.get('page') || '1', 10) || 1);
   var known = chips.some(function (chip) { return chip.getAttribute('data-cat') === state.cat; });
   if (!known) { state.cat = 'all'; }
   search.value = state.q;
   apply(false);
   focusHash();
+
+  fetch('skills.json', { credentials: 'same-origin' })
+    .then(function (response) {
+      if (!response.ok) { throw new Error('Could not load the skills index'); }
+      return response.json();
+    })
+    .then(function (payload) {
+      if (!payload || !Array.isArray(payload.communitySkills) || payload.communitySkills.length !== communityTotal) {
+        throw new Error('The community skills index has an unexpected shape');
+      }
+      communitySkills = payload.communitySkills;
+      communityItems = communitySkills.map(function (skill) {
+        return { skill: skill, text: normalize([skill.id, skill.name, skill.description, skill.topic, skill.sourceRepo, skill.license].join(' ')) };
+      });
+      communityReady = true;
+      var hashId = '';
+      try { hashId = decodeURIComponent(window.location.hash.replace('#', '')); } catch (error) { hashId = ''; }
+      var hashIndex = communitySkills.findIndex(function (skill) { return skill.id === hashId; });
+      if (hashIndex >= 0) {
+        state.cat = 'ex';
+        state.q = '';
+        search.value = '';
+        state.communityPage = Math.floor(hashIndex / pageSize) + 1;
+      }
+      apply(false);
+      focusHash();
+    })
+    .catch(function () {
+      communityReady = true;
+      communityGrid.textContent = '';
+      var message = document.createElement('p');
+      message.className = 'community-loading';
+      message.textContent = 'The community index could not be loaded. Download the JSON index to browse all records.';
+      communityGrid.appendChild(message);
+      communitySection.hidden = false;
+      count.textContent = '500 original skills · community index unavailable';
+      empty.hidden = true;
+    });
 })();
 </script>
 </body>
@@ -936,20 +1135,22 @@ h1 .accent { color: var(--accent); font-style: italic; }
 
 def render(payload: dict) -> str:
     description = (
-        "Browse 500 reusable AI skills for Claude Code, Codex CLI, Gemini CLI, Kimi CLI, "
-        "Aider and Cline. Stable IDs, one-line descriptions and copy-ready prompts. "
-        "MIT licensed, self-hosted, no signup."
+        "Browse 5,000 AI skill entries: 500 original MIT prompts and 4,500 source-linked "
+        "community references. Each community entry links to its source and shows available license details."
     )
     item_list, collection, breadcrumb = build_structured_data(payload)
     page = PAGE
     replacements = {
-        "__TITLE__": "AI Skills Bank \u2014 500 reusable AI skills | Aydin Ayanzadeh",
-        "__OG_TITLE__": "AI Skills Bank \u2014 500 reusable AI skills",
+        "__TITLE__": "AI Skills Catalog \u2014 5,000 searchable entries | Aydin Ayanzadeh",
+        "__OG_TITLE__": "AI Skills Catalog \u2014 5,000 searchable entries",
         "__DESCRIPTION__": description,
         "__URL__": PAGE_URL,
         "__SITE__": SITE,
         "__REPO__": REPO,
-        "__TOTAL__": str(payload["total"]),
+        "__TOTAL__": f"{payload['total']:,}",
+        "__TOTAL_COUNT__": str(payload["total"]),
+        "__COMMUNITY_TOTAL_COUNT__": str(payload["communityTotal"]),
+        "__CATEGORY_COUNT__": str(len(payload["categories"])),
         "__CHIPS__": build_chips(payload["categories"], payload["total"]),
         "__SECTIONS__": build_sections(payload["categories"], payload["skills"]),
         "__ITEMLIST__": item_list,
@@ -974,9 +1175,92 @@ def load_payload(source: Path) -> dict:
     if not source.is_file():
         raise SystemExit(f"skills data not found: {source}")
     with source.open(encoding="utf-8") as handle:
-        payload = json.load(handle)
-    validate(payload)
+        original = json.load(handle)
+    validate(original)
+
+    batch_files = sorted(COMMUNITY_DIR.glob("batch-*.json"))
+    if len(batch_files) != COMMUNITY_TOTAL // 100:
+        raise SystemExit(f"expected 45 community batches, found {len(batch_files)}")
+    community: list[dict] = []
+    for expected_batch, batch_path in enumerate(batch_files, start=1):
+        with batch_path.open(encoding="utf-8") as handle:
+            batch = json.load(handle)
+        if batch.get("schemaVersion") != 1 or batch.get("batch") != expected_batch:
+            raise SystemExit(f"malformed community batch: {batch_path.name}")
+        skills = batch.get("skills")
+        if not isinstance(skills, list) or len(skills) != 100 or batch.get("batchSize") != 100:
+            raise SystemExit(f"{batch_path.name} must contain exactly 100 skills")
+        community.extend(skills)
+
+    if len(community) != COMMUNITY_TOTAL:
+        raise SystemExit(f"expected {COMMUNITY_TOTAL} community skills, found {len(community)}")
+    ids = [skill.get("id") for skill in community]
+    if len(ids) != len(set(ids)) or set(ids) & {skill["id"] for skill in original["skills"]}:
+        raise SystemExit("community skill IDs must be unique and separate from original IDs")
+    for skill in community:
+        for field in ("id", "name", "description", "topic", "sourceUrl", "sourceRepo", "license", "licenseUrl"):
+            if not str(skill.get(field, "")).strip():
+                raise SystemExit(f"community skill is missing {field}: {skill.get('id')}")
+        if not re.fullmatch(r"EX-[A-F0-9]{12}", skill["id"]):
+            raise SystemExit(f"malformed community skill id: {skill['id']}")
+        if skill["category"] != "Community Skills":
+            raise SystemExit(f"{skill['id']} has an unexpected category")
+        if not skill["sourceUrl"].startswith("https://github.com/"):
+            raise SystemExit(f"{skill['id']} must link to its GitHub source")
+
+    payload = dict(original)
+    payload["name"] = "AI Skills Catalog"
+    payload["description"] = (
+        "5,000 searchable skill entries: 500 original MIT prompts and 4,500 source-linked "
+        "community skills with per-entry license information."
+    )
+    payload["license"] = "Mixed per entry; see each skill's license and source."
+    payload["originalTotal"] = len(original["skills"])
+    payload["communityTotal"] = len(community)
+    payload["total"] = len(original["skills"]) + len(community)
+    payload["categories"] = original["categories"] + [{
+        "name": "Community Skills",
+        "prefix": "EX",
+        "file": "community-skills/index",
+        "count": len(community),
+    }]
+    payload["skills"] = original["skills"] + community
+    if payload["total"] != CATALOG_TOTAL:
+        raise SystemExit(f"catalog must contain {CATALOG_TOTAL} records, found {payload['total']}")
     return payload
+
+
+def build_public_index(payload: dict) -> dict:
+    first_party = [skill for skill in payload["skills"] if not skill.get("sourceUrl")]
+    community_source_by_id = {skill["id"]: skill for skill in payload["skills"] if skill.get("sourceUrl")}
+    community = [
+        {
+            field: skill[field]
+            for field in ("id", "name", "description", "topic", "sourceUrl", "sourceRepo", "license", "attributionUrl")
+            if field in skill
+        }
+        for skill in payload["skills"] if skill.get("sourceUrl")
+    ]
+    for skill in community:
+        if skill["license"] == "MIT":
+            skill["licenseUrl"] = "https://spdx.org/licenses/MIT.html"
+        elif skill["license"] == "Apache-2.0":
+            skill["licenseUrl"] = "https://spdx.org/licenses/Apache-2.0.html"
+        else:
+            skill["licenseUrl"] = community_source_by_id[skill["id"]]["licenseUrl"]
+    return {
+        "schemaVersion": 2,
+        "name": payload["name"],
+        "description": payload["description"],
+        "repo": payload["repo"],
+        "license": payload["license"],
+        "total": payload["total"],
+        "originalTotal": payload["originalTotal"],
+        "communityTotal": payload["communityTotal"],
+        "categories": payload["categories"],
+        "skills": first_party,
+        "communitySkills": community,
+    }
 
 
 def main() -> int:
@@ -987,7 +1271,7 @@ def main() -> int:
 
     payload = load_payload(args.source)
     page = render(payload)
-    compact_json = json.dumps(payload, ensure_ascii=False, separators=(",", ":")) + "\n"
+    compact_json = json.dumps(build_public_index(payload), ensure_ascii=False, separators=(",", ":")) + "\n"
 
     if args.check:
         problems = []
