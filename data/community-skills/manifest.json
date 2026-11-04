@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "total": 4500,
+  "batches": 45,
+  "generatedFrom": [
+    {
+      "name": "skymined/awesome-claude-codex-skills",
+      "verifiedValidFrontmatter": 3206,
+      "selectedDistinct": 2357,
+      "repoLicenses": {
+        "MIT": 2259,
+        "Apache-2.0": 98
+      }
+    },
+    {
+      "name": "sickn33/agentic-awesome-skills",
+      "verifiedValidFrontmatter": 2922,
+      "selectedDistinct": 2143,
+      "licenseNote": "Names and source links only; repository content license allows upstream exceptions."
+    }
+  ],
+  "dedupe": "Exact normalized name plus description, against the original 500 and across selected sources.",
+  "reviewStatus": "External skills are links to their original SKILL.md files and have not been reviewed by this catalog.",
+  "generatedAt": "2026-11-04",
+  "selectionPolicy": {
+    "licenseVerifiedSkyminedEntries": "Include only source repositories whose GitHub license metadata was MIT or Apache-2.0; retain the skill name/description, exact source link, repository, and license link.",
+    "agenticAwesomeEntries": "Include names, topic categories, and exact SKILL.md links only. Use a generic site-authored description because the collection documents upstream license exceptions.",
+    "filter": "Exclude records marked offensive by the discovery index; select the remaining AAS records proportionally across source topics until the catalog has exactly 4,500 external entries.",
+    "deduplication": "Normalize name and description, remove exact pairs repeated across selected sources, then assign stable IDs from source repository and file path."
+  },
+  "sources": [
+    {
+      "name": "skymined/awesome-claude-codex-skills",
+      "url": "https://github.com/skymined/awesome-claude-codex-skills",
+      "role": "Discovery index; each included record links to its original SKILL.md."
+    },
+    {
+      "name": "sickn33/agentic-awesome-skills",
+      "url": "https://github.com/sickn33/agentic-awesome-skills",
+      "role": "Discovery/source collection; each included record links to its SKILL.md.",
+      "licenseUrl": "https://github.com/sickn33/agentic-awesome-skills/blob/main/LICENSE-CONTENT",
+      "upstreamNoticesUrl": "https://github.com/sickn33/agentic-awesome-skills/blob/main/docs/sources/sources.md"
+    }
+  ],
+  "copiedSkillBodies": false,
+  "catalogReview": "External instructions have not been security-reviewed or executed by this site."
+}
