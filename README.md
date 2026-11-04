@@ -23,15 +23,16 @@ This is the personal website of Aydin Ayanzadeh, Ph.D. Student in Computer Scien
   - Technical Skills
   - Awards & Honors
   - Contact Information
-- **AI Skills Catalog**: `/skills/` lists all 500 skills from
-  [Claude-Skills-Bank](https://github.com/Ayanzadeh93/Claude-Skills-Bank) as static HTML,
-  so every skill is indexable and linkable, with client-side search, category filters
-  and copy-ready prompts. The page is generated from `data/skills-bank.json`.
+- **AI Skills Catalog**: `/skills/` combines 500 original entries from
+  [Claude-Skills-Bank](https://github.com/Ayanzadeh93/Claude-Skills-Bank) with 4,500
+  source-linked community skill references. Search covers all 5,000 entries; community
+  results show their upstream file and per-entry license details, 100 at a time.
 
 ## Technologies Used
 
-No framework, no bundler, no build step — the browser runs these files exactly as
-they are committed. Modern platform APIs do the work a library would otherwise:
+No framework or bundler. Pages are static, and the skills generator writes the
+committed catalog HTML and JSON when source data changes. Modern platform APIs do the
+work a library would otherwise:
 
 - HTML5
 - CSS3 — custom properties for theming, container queries, `:has()`, `color-scheme`
@@ -66,7 +67,7 @@ they are committed. Modern platform APIs do the work a library would otherwise:
 │       ├── pub-explorer.js #   <pub-explorer>
 │       └── cite-dialog.js  #   <cite-dialog>
 ├── projects/               # One page per project
-├── skills/                 # Generated 500-skill catalog + public skills.json
+├── skills/                 # Generated 5,000-entry catalog + public skills.json
 ├── data/                   # projects.json + vendored skills-bank.json
 ├── scripts/                # build_skills_catalog.py (stdlib only)
 ├── tests/                  # validate_content.py
@@ -113,8 +114,11 @@ citation formats are derived from that markup. Verify a DOI at
 
 ### Updating the skills catalog
 
-`data/skills-bank.json` is a vendored copy of
-`skills.json` from `Ayanzadeh93/Claude-Skills-Bank`. After it changes:
+`data/skills-bank.json` remains a vendored copy of the original 500-entry
+`skills.json` from `Ayanzadeh93/Claude-Skills-Bank`. The separate
+`data/community-skills/batch-*.json` files contain 45 incremental batches of 100
+community references, with upstream links and per-entry license information. After
+either source changes:
 
 ```bash
 python scripts/build_skills_catalog.py           # rewrite skills/index.html + skills/skills.json
@@ -122,9 +126,11 @@ python scripts/build_skills_catalog.py --check   # verify the committed catalog 
 python tests/validate_content.py                 # data, route and catalog checks
 ```
 
-The generator refuses anything that is not 500 skills in 10 categories of 50, and it
-rejects malformed or duplicate IDs. CI runs both the validator and `--check`, so a
-stale or hand-edited catalog fails the pull request.
+The generator validates the original 500 skills in 10 categories of 50, then validates
+all 4,500 community entries and combines them into the public index. The page keeps the
+original cards statically rendered and loads community results from the same-origin JSON
+index with 100 results per page. CI runs the validator and `--check`, so stale catalogs,
+missing source/license links or batch-count drift fail the pull request.
 
 ## License
 
