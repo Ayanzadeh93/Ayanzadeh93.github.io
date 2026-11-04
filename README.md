@@ -67,7 +67,7 @@ work a library would otherwise:
 │       ├── pub-explorer.js #   <pub-explorer>
 │       └── cite-dialog.js  #   <cite-dialog>
 ├── projects/               # One page per project
-├── skills/                 # Generated 500-skill catalog + public skills.json
+├── skills/                 # Generated 5,000-entry catalog + public skills.json
 ├── data/                   # projects.json + vendored skills-bank.json
 ├── scripts/                # build_skills_catalog.py (stdlib only)
 ├── tests/                  # validate_content.py
