@@ -139,6 +139,9 @@ def validate_skills_bank():
     catalog = (ROOT / "skills" / "index.html").read_text(encoding="utf-8")
     assert_true(catalog.count('<article class="skill"') == 500, "skills catalog must statically render the 500 original skill cards")
     assert_true('id="community-grid"' in catalog, "skills catalog must provide the paginated community results grid")
+    assert_true("Read complete SKILL.md" in catalog, "community cards must provide a full-skill reader")
+    assert_true("https://raw.githubusercontent.com" in catalog, "full-skill reader must fetch upstream Markdown")
+    assert_true("connect-src 'self' https://raw.githubusercontent.com" in catalog, "CSP must allow the upstream full-skill fetch")
     assert_true('data-total="5000"' in catalog, "skills catalog must advertise 5,000 entries")
     assert_true("https://www.ayanzadeh.com/skills/" in catalog, "skills catalog needs its canonical URL")
     assert_true('"numberOfItems":5000' in catalog, "skills catalog JSON-LD must describe all 5,000 entries")
@@ -160,8 +163,8 @@ def validate_skills_bank():
     assert_true(len(community) == 4500, "public index must include 4,500 community references")
     assert_true(len({skill.get("id") for skill in public_json["skills"] + community}) == 5000, "public skill IDs must be unique")
     assert_true(
-        all(skill.get("sourceUrl", "").startswith("https://github.com/") and skill.get("licenseUrl") for skill in community),
-        "each community entry must link its source and license details",
+        all(skill.get("sourceUrl", "").startswith("https://github.com/") and "/blob/" in skill.get("sourceUrl", "") and skill.get("licenseUrl") for skill in community),
+        "each community entry must link its full GitHub file and license details",
     )
 
     batches = sorted((ROOT / "data" / "community-skills").glob("batch-*.json"))

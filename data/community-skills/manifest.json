@@ -43,5 +43,6 @@
     }
   ],
   "copiedSkillBodies": false,
+  "fullTextDelivery": "Complete SKILL.md files are fetched on demand from raw.githubusercontent.com and shown as plain text; the catalog does not store or execute their bodies.",
   "catalogReview": "External instructions have not been security-reviewed or executed by this site."
 }
