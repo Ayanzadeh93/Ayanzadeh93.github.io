@@ -60,7 +60,7 @@ CATEGORY_BLURBS = {
     "PS": "Product specs, user stories, UX review, positioning and business analysis.",
     "RS": "Literature search, paper reading, synthesis, evidence mapping and research planning.",
     "WS": "Drafting, structure, editing, tone, argumentation and publication-ready prose.",
-    "EX": "Source-linked community skills. Every entry links to its original file and shows the available license information.",
+    "EX": "Full community SKILL.md files load from their source repositories when opened.",
 }
 
 ICON_SEARCH = (
@@ -180,14 +180,14 @@ def build_sections(categories: list[dict], skills: list[dict]) -> str:
             else:
                 cards.append(
                     f'''<article class="skill" id="{sid}">
-<div class="skill-top"><a class="skill-id" href="#{sid}">{sid}</a><button type="button" class="copy" data-id="{sid}" aria-label="Copy {sid}"><span>Copy</span></button></div>
+<div class="skill-top"><a class="skill-id" href="#{sid}">{sid}</a><span class="skill-origin">Original prompt</span><button type="button" class="copy" data-id="{sid}" aria-label="Copy {sid}"><span>Copy</span></button></div>
 <h3>{name}</h3>
 <p>{description}</p>
 </article>'''
                 )
         if prefix == "EX":
             cards.extend([
-                '<div class="community-results" id="community-grid" aria-live="polite"><p class="community-loading" id="community-loading">Loading 4,500 community skill references…</p></div>',
+                '<div class="community-results" id="community-grid" aria-live="polite"><p class="community-loading" id="community-loading">Loading 4,500 community skills…</p></div>',
                 '<nav class="community-pagination" id="community-pagination" aria-label="Community skill pages" hidden>'
                 '<button type="button" class="btn btn-ghost" id="community-prev">Previous</button>'
                 '<span id="community-page-status" role="status" aria-live="polite"></span>'
@@ -286,7 +286,7 @@ PAGE = r'''<!doctype html>
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0b1220" media="(prefers-color-scheme: dark)">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'; form-action 'none'; frame-src 'none'; manifest-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://raw.githubusercontent.com; form-action 'none'; frame-src 'none'; manifest-src 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>__TITLE__</title>
 <link rel="canonical" href="__URL__">
@@ -605,10 +605,16 @@ h1 .accent { color: var(--accent); font-style: italic; }
 .copy:hover { border-color: var(--accent-line); color: var(--accent); }
 .copy.done { background: var(--ok-bg); border-color: var(--ok-line); color: var(--ok); }
 .skill-badge { margin-left: auto; color: var(--muted); font-size: 10.5px; font-weight: 700; letter-spacing: .02em; }
+.skill-origin { color: var(--muted); font-size: 10.5px; font-weight: 700; }
 .skill-topic { color: var(--muted) !important; font-size: 12px !important; }
 .skill-links { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin-top: auto; padding-top: 5px; font-size: 11.5px; }
 .skill-links a { font-weight: 700; text-decoration: none; }
 .skill-links a:hover { text-decoration: underline; }
+.skill-full { margin-top: 4px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-2); }
+.skill-full summary { padding: 8px 10px; color: var(--accent); font-size: 12px; font-weight: 700; cursor: pointer; }
+.skill-full[open] summary { border-bottom: 1px solid var(--line); }
+.skill-full-status { padding: 8px 10px; color: var(--muted) !important; font-size: 12px !important; }
+.skill-full-text { max-height: 540px; overflow: auto; margin: 0; padding: 12px; color: var(--body); white-space: pre-wrap; overflow-wrap: anywhere; font: 12px/1.6 var(--font-mono); }
 .community-results { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fill, minmax(292px, 1fr)); gap: 11px; }
 .community-loading { grid-column: 1 / -1; color: var(--muted); }
 .community-pagination { grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 8px; }
@@ -721,7 +727,7 @@ h1 .accent { color: var(--accent); font-style: italic; }
     <div class="hero-in">
       <p class="eyebrow"><span class="dot" aria-hidden="true"></span>Source-linked catalog &middot; per-skill licenses &middot; no signup</p>
       <h1 id="page-title">__TOTAL__ AI skills, <span class="accent">ready to explore.</span></h1>
-      <p class="lead">Search 500 original MIT prompts and 4,500 community skill references. Every community entry links to its original file and shows the license information available for that source. Review upstream instructions before use.</p>
+      <p class="lead">Browse 500 concise original prompts and 4,500 community skills. Open a community card to read its complete upstream SKILL.md in place; source and license details stay attached.</p>
       <div class="actions">
         <a class="btn btn-primary" href="__REPO__" target="_blank" rel="noopener">__ICON_STAR__ Star on GitHub</a>
         <a class="btn btn-ghost" href="#how">How it works</a>
@@ -738,7 +744,7 @@ h1 .accent { color: var(--accent); font-style: italic; }
 
   <section class="how" id="how" aria-label="How to use a skill">
     <div class="step"><span class="step-num" aria-hidden="true">1</span><div><b>Find the skill</b><p>Search all 5,000 entries by name, task, topic, ID or source repository.</p></div></div>
-    <div class="step"><span class="step-num" aria-hidden="true">2</span><div><b>Copy or open</b><p>Copy an original prompt, or follow the source link to read a community skill.</p></div></div>
+    <div class="step"><span class="step-num" aria-hidden="true">2</span><div><b>Read the full skill</b><p>Expand any community card to load the complete SKILL.md from its source repository. The 500 original entries are concise prompts.</p></div></div>
     <div class="step"><span class="step-num" aria-hidden="true">3</span><div><b>Check its terms</b><p>Community skills are external and not reviewed here. Each card links to its source and license information.</p></div></div>
   </section>
 
@@ -772,7 +778,7 @@ h1 .accent { color: var(--accent); font-style: italic; }
       <div>
         <h2 id="about-title">A searchable catalog, with sources.</h2>
         <p>The original 500 MIT prompts stay grouped in their ten categories. Another 4,500 entries link to community-maintained skill files across development, research, design, business and other topics.</p>
-        <p>Community records show their source repository and available license details. Full community instructions remain at the upstream source; this catalog does not execute skill files. The original bank remains available as a separate MIT-licensed source.</p>
+        <p>Open a community card to load and read its complete SKILL.md directly from the upstream GitHub repository. The catalog does not copy or execute community files. The original bank remains available as 500 concise MIT-licensed prompt entries.</p>
       </div>
       <div class="about-actions">
         <a class="btn btn-primary" href="__REPO__" target="_blank" rel="noopener">__ICON_GITHUB__ View the repository</a>
@@ -826,6 +832,7 @@ h1 .accent { color: var(--accent); font-style: italic; }
   var pageSize = 100;
   var communitySkills = [];
   var communityItems = [];
+  var fullSkillCache = Object.create(null);
   var communityReady = false;
   var state = { q: '', cat: 'all', communityPage: 1 };
 
@@ -844,12 +851,16 @@ h1 .accent { color: var(--accent); font-style: italic; }
     return url.pathname + url.search + url.hash;
   }
 
-  function safeSourceUrl(value) {
+  function safeHttpsUrl(value, hosts) {
     try {
       var url = new URL(value, window.location.href);
-      if (url.protocol !== 'https:' || url.hostname !== 'github.com') { return ''; }
+      if (url.protocol !== 'https:' || hosts.indexOf(url.hostname) === -1) { return ''; }
       return url.href;
     } catch (error) { return ''; }
+  }
+
+  function safeSourceUrl(value) {
+    return safeHttpsUrl(value, ['github.com']);
   }
 
   function appendText(parent, tag, className, value) {
@@ -861,7 +872,7 @@ h1 .accent { color: var(--accent); font-style: italic; }
   }
 
   function appendSourceLink(parent, href, label) {
-    var safeHref = safeSourceUrl(href);
+    var safeHref = safeHttpsUrl(href, ['github.com', 'spdx.org']);
     if (!safeHref) { return; }
     var link = document.createElement('a');
     link.href = safeHref;
@@ -869,6 +880,62 @@ h1 .accent { color: var(--accent); font-style: italic; }
     link.rel = 'noopener';
     link.textContent = label;
     parent.appendChild(link);
+  }
+
+  function rawSkillUrl(value) {
+    var safeHref = safeSourceUrl(value);
+    if (!safeHref) { return ''; }
+    var url = new URL(safeHref);
+    var marker = '/blob/';
+    var index = url.pathname.indexOf(marker);
+    if (index < 0) { return ''; }
+    return 'https://raw.githubusercontent.com' + url.pathname.slice(0, index) + '/' + url.pathname.slice(index + marker.length);
+  }
+
+  function appendFullSkill(parent, skill) {
+    var details = document.createElement('details');
+    details.className = 'skill-full';
+    appendText(details, 'summary', '', 'Read complete SKILL.md');
+    var status = appendText(details, 'p', 'skill-full-status', 'The full, unreviewed file loads from ' + (skill.sourceRepo || 'the source repository') + ' when opened.');
+    var body = document.createElement('pre');
+    body.className = 'skill-full-text';
+    body.hidden = true;
+    details.appendChild(body);
+    var loaded = false;
+    var loading = false;
+    var cacheKey = skill.sourceUrl;
+    if (Object.prototype.hasOwnProperty.call(fullSkillCache, cacheKey)) {
+      body.textContent = fullSkillCache[cacheKey];
+      body.hidden = false;
+      status.textContent = 'Loaded from ' + (skill.sourceRepo || 'the source repository') + '. This content has not been reviewed by this catalog.';
+      loaded = true;
+    }
+    details.addEventListener('toggle', function () {
+      if (!details.open || loaded || loading) { return; }
+      var url = rawSkillUrl(skill.sourceUrl);
+      if (!url) {
+        status.textContent = 'Could not derive a raw GitHub URL. Use the source link below to open the file.';
+        return;
+      }
+      loading = true;
+      status.textContent = 'Loading the complete SKILL.md from ' + (skill.sourceRepo || 'GitHub') + '…';
+      fetch(url, { credentials: 'omit' }).then(function (response) {
+        if (!response.ok) { throw new Error('HTTP ' + response.status); }
+        return response.text();
+      }).then(function (text) {
+        if (!text.trim()) { throw new Error('The source file is empty.'); }
+        fullSkillCache[cacheKey] = text;
+        body.textContent = text;
+        body.hidden = false;
+        status.textContent = 'Loaded from ' + (skill.sourceRepo || 'the source repository') + '. This content has not been reviewed by this catalog.';
+        loaded = true;
+      }).catch(function () {
+        status.textContent = 'The full file could not be loaded here. Use the source link below to open it on GitHub.';
+      }).finally(function () {
+        loading = false;
+      });
+    });
+    parent.appendChild(details);
   }
 
   function renderCommunity(matches) {
@@ -895,6 +962,7 @@ h1 .accent { color: var(--accent); font-style: italic; }
       appendText(card, 'h3', '', skill.name);
       appendText(card, 'p', '', skill.description);
       appendText(card, 'p', 'skill-topic', 'Topic: ' + (skill.topic || 'Community'));
+      appendFullSkill(card, skill);
       var links = document.createElement('div');
       links.className = 'skill-links';
       appendSourceLink(links, skill.sourceUrl, (skill.sourceRepo || 'Source') + ' · open SKILL.md');
@@ -1123,7 +1191,7 @@ h1 .accent { color: var(--accent); font-style: italic; }
       message.textContent = 'The community index could not be loaded. Download the JSON index to browse all records.';
       communityGrid.appendChild(message);
       communitySection.hidden = false;
-      count.textContent = '500 original skills · community index unavailable';
+      count.textContent = '500 original prompts · community index unavailable';
       empty.hidden = true;
     });
 })();
@@ -1135,8 +1203,8 @@ h1 .accent { color: var(--accent); font-style: italic; }
 
 def render(payload: dict) -> str:
     description = (
-        "Browse 5,000 AI skill entries: 500 original MIT prompts and 4,500 source-linked "
-        "community references. Each community entry links to its source and shows available license details."
+        "Browse 5,000 entries: 500 concise original MIT prompts and 4,500 source-linked community skills. "
+        "Open a community card to read its complete upstream SKILL.md and check its license."
     )
     item_list, collection, breadcrumb = build_structured_data(payload)
     page = PAGE
@@ -1205,8 +1273,8 @@ def load_payload(source: Path) -> dict:
             raise SystemExit(f"malformed community skill id: {skill['id']}")
         if skill["category"] != "Community Skills":
             raise SystemExit(f"{skill['id']} has an unexpected category")
-        if not skill["sourceUrl"].startswith("https://github.com/"):
-            raise SystemExit(f"{skill['id']} must link to its GitHub source")
+        if not skill["sourceUrl"].startswith("https://github.com/") or "/blob/" not in skill["sourceUrl"]:
+            raise SystemExit(f"{skill['id']} must link to a GitHub SKILL.md file")
 
     payload = dict(original)
     payload["name"] = "AI Skills Catalog"
