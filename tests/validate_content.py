@@ -137,9 +137,11 @@ def validate_skills_bank():
             assert_true(str(skill.get(field, "")).strip(), f"{skill['id']} is missing {field}")
 
     catalog = (ROOT / "skills" / "index.html").read_text(encoding="utf-8")
-    assert_true(catalog.count('<article class="skill"') == 500, "skills catalog must render 500 skill cards")
+    assert_true(catalog.count('<article class="skill"') == 500, "skills catalog must statically render the 500 original skill cards")
+    assert_true('id="community-grid"' in catalog, "skills catalog must provide the paginated community results grid")
+    assert_true('data-total="5000"' in catalog, "skills catalog must advertise 5,000 entries")
     assert_true("https://www.ayanzadeh.com/skills/" in catalog, "skills catalog needs its canonical URL")
-    assert_true('"numberOfItems":500' in catalog, "skills catalog JSON-LD must list all 500 skills")
+    assert_true('"numberOfItems":5000' in catalog, "skills catalog JSON-LD must describe all 5,000 entries")
     for skill_id in ids:
         assert_true(f'id="{skill_id}"' in catalog, f"skills catalog is missing {skill_id}")
     for category in categories:
@@ -149,9 +151,24 @@ def validate_skills_bank():
         }[category["prefix"]]
         assert_true(f'id="category-{slug}"' in catalog, f"skills catalog is missing the {category['name']} section")
 
-    # The public JSON must be the same document as the vendored source.
+    # The public index combines the unchanged source bank and the separately licensed community index.
     public_json = read_json("skills/skills.json")
-    assert_true(public_json == payload, "skills/skills.json must match data/skills-bank.json")
+    assert_true(public_json.get("schemaVersion") == 2, "skills/skills.json must use the merged catalog schema")
+    assert_true(public_json.get("total") == 5000, "skills/skills.json must describe 5,000 entries")
+    assert_true(len(public_json.get("skills", [])) == 500, "public index must preserve the 500 original skills")
+    community = public_json.get("communitySkills", [])
+    assert_true(len(community) == 4500, "public index must include 4,500 community references")
+    assert_true(len({skill.get("id") for skill in public_json["skills"] + community}) == 5000, "public skill IDs must be unique")
+    assert_true(
+        all(skill.get("sourceUrl", "").startswith("https://github.com/") and skill.get("licenseUrl") for skill in community),
+        "each community entry must link its source and license details",
+    )
+
+    batches = sorted((ROOT / "data" / "community-skills").glob("batch-*.json"))
+    assert_true(len(batches) == 45, "community index must contain 45 incremental batches")
+    for index, path in enumerate(batches, start=1):
+        batch = json.loads(path.read_text(encoding="utf-8"))
+        assert_true(batch.get("batch") == index and len(batch.get("skills", [])) == 100, f"{path.name} must contain 100 entries")
 
     page = (ROOT / "projects" / "ai-skills-bank.html").read_text(encoding="utf-8")
     assert_true("https://github.com/Ayanzadeh93/Claude-Skills-Bank" in page, "project page must link the repository")
