@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>LLM-Guided Agentic Floor Plan Parsing for Accessible Indoor Navigation of Blind and Low-Vision People</title><meta name="description" content="An agentic framework that converts a single floor plan image into a structured, retrievable knowledge base for safe, accessible indoor navigation. CVPR 2026 Workshop (GRAIL-V)."><meta property="og:title" content="LLM-Guided Agentic Floor Plan Parsing for Accessible Indoor Navigation of Blind and Low-Vision People"><meta property="og:description" content="An agentic framework that converts a single floor plan image into a structured, retrievable knowledge base for safe, accessible indoor navigation. CVPR 2026 Workshop (GRAIL-V)."><meta property="og:type" content="article"><meta name="twitter:card" content="summary_large_image"><link rel="canonical" href="https://www.ayanzadeh.com/cvpr-2026-floorplan-agentic/"><link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"><style>
+:root{--bg:oklch(0.985 0.003 300);--fg:oklch(0.24 0.015 300);--card:oklch(1 0 0);--primary:oklch(0.32 0.04 300);--muted:oklch(0.48 0.025 300);--border:oklch(0.89 0.012 300);--accent:oklch(0.47 0.09 300);--secondary:oklch(0.945 0.016 300);--shadow:0 1px 2px oklch(0.2 0.03 40 / .06),0 12px 32px -12px oklch(0.2 0.03 40 / .18)}*{box-sizing:border-box;margin:0;padding:0}body{background:var(--bg);color:var(--fg);font-family:'IBM Plex Sans',system-ui,sans-serif;line-height:1.6;letter-spacing:0;-webkit-font-smoothing:antialiased}.wrap{max-width:56rem;margin:auto;padding:0 2rem;min-width:0}header{border-bottom:1px solid var(--border)}.head{text-align:center;padding-top:5rem;padding-bottom:3rem}.eyebrow,.step{font-family:'IBM Plex Mono',monospace;font-size:.75rem;color:var(--accent);text-transform:uppercase}h1,h2,h3{font-family:'Newsreader',Georgia,serif;color:var(--primary);font-weight:600}h1{font-size:3rem;line-height:1.25;margin-top:1.5rem;overflow-wrap:break-word}h1 span{color:var(--accent)}.authors{list-style:none;display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem 1.5rem;margin-top:2rem;font-size:1.125rem;font-weight:500}sup{color:var(--accent);font-size:.7rem;margin-left:.15rem}.affil{margin-top:.75rem;color:var(--muted)}nav{display:flex;flex-wrap:wrap;justify-content:center;gap:.75rem;margin-top:2.25rem}nav a{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:.5rem 1.5rem;border:1px solid var(--border);border-radius:999px;background:var(--card);color:var(--fg);font-weight:500;text-decoration:none;box-shadow:var(--shadow)}nav a:hover{color:var(--accent);border-color:var(--accent)}nav a[aria-disabled="true"]{color:var(--muted);cursor:default}nav a[aria-disabled="true"]:hover{color:var(--muted);border-color:var(--border)}a:focus-visible,pre:focus-visible{outline:2px solid var(--accent);outline-offset:4px}figure{border:1px solid var(--border);border-top:0;background:var(--card);box-shadow:var(--shadow)}figure img{display:block;width:100%;height:auto;max-height:600px;object-fit:contain;padding:1.5rem}figure svg{display:block;width:100%;height:auto;padding:1.5rem}figcaption{border-top:1px solid var(--border);padding:.75rem 1.25rem;font-size:.875rem;color:var(--muted)}section{padding:4rem 0}section+section{border-top:1px solid var(--border)}h2{font-size:1.875rem}.abstract{margin-top:1.25rem;font-size:1.125rem;line-height:1.78;color:var(--muted)}.note{margin-top:1.25rem;font-size:1rem;line-height:1.7;color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.25rem;margin-top:2rem}.card{min-width:0;border:1px solid var(--border);border-radius:.5rem;background:var(--card);padding:1.5rem;box-shadow:var(--shadow)}h3{font-size:1.5rem;margin-top:.75rem}.card p{margin-top:.5rem;color:var(--muted)}.steps{margin-top:2rem;display:grid;gap:1rem}.steps .card{display:flex;gap:1rem;align-items:flex-start}.steps .step{font-size:1rem;margin-top:.35rem}dl{border:1px solid var(--border);border-radius:.5rem;background:var(--card);margin-top:2rem;box-shadow:var(--shadow)}dl>div{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.5rem;padding:1.25rem}dl>div+div{border-top:1px solid var(--border)}dt{font-weight:500}dd{min-width:0;overflow-wrap:anywhere}dd a{color:var(--accent);font-family:'IBM Plex Mono',monospace;font-size:.875rem;text-underline-offset:4px}pre{max-width:100%;overflow-x:auto;margin-top:1.5rem;border:1px solid var(--border);border-radius:.5rem;background:var(--secondary);padding:1.25rem;font-family:'IBM Plex Mono',monospace;font-size:.875rem;line-height:1.7;color:var(--primary)}footer{text-align:center;border-top:1px solid var(--border);padding:2.5rem 1rem;font-size:.875rem;color:var(--muted)}@media(max-width:639px){.wrap{padding-left:1rem;padding-right:1rem}.head{padding-top:2.5rem;padding-bottom:2rem}h1{font-size:1.875rem}.authors{font-size:1rem;margin-top:1.5rem}.affil{font-size:.875rem}nav{margin-top:1.5rem}figure img,figure svg{padding:1rem}figcaption{padding:.75rem 1rem}section{padding:2.5rem 0}h2{font-size:1.5rem}.abstract{font-size:1rem}.grid{grid-template-columns:minmax(0,1fr)}.card{padding:1.25rem}h3{font-size:1.25rem}dl>div{grid-template-columns:minmax(0,1fr)}pre{font-size:.75rem}}
+</style>
+</head>
+<body>
+<header>
+<div class="wrap head">
+<p class="eyebrow">CVPR 2026 Workshop · GRAIL-V</p>
+<h1><span>LLM-Guided Agentic Floor Plan Parsing</span> for Accessible Indoor Navigation of Blind and Low-Vision People</h1>
+<ul class="authors">
+<li>Aydin Ayanzadeh</li>
+<li>Tim Oates</li>
+</ul>
+<p class="affil">University of Maryland, Baltimore County</p>
+<nav aria-label="Paper resources">
+<a href="https://arxiv.org/abs/2604.23970" target="_blank" rel="noreferrer">Paper</a>
+<a aria-disabled="true" title="Coming soon">Code</a>
+<a aria-disabled="true" title="Coming soon">Slides</a>
+</nav>
+</div>
+</header>
+<main class="wrap">
+<figure>
+<img src="https://arxiv.org/html/2604.23970v1/fig/agentic_pipeline.png" alt="Overview of the agentic pipeline showing the five-agent workflow and three-tier RAG knowledge store.">
+<figcaption>Figure 1. Overview of our agentic pipeline showing the five-agent workflow and three-tier RAG knowledge store. Original figure from the arXiv HTML version of the paper.</figcaption>
+</figure>
+<section>
+<h2>Abstract</h2>
+<p class="abstract">Indoor navigation remains a critical accessibility challenge for the blind and low-vision (BLV) individuals, as existing solutions rely on costly per-building infrastructure. We present an agentic framework that converts a single floor plan image into a structured, retrievable knowledge base to generate safe, accessible navigation instructions with lightweight infrastructure. The system has two phases: a multi-agent module that parses the floor plan into a spatial knowledge graph through a self-correcting pipeline with iterative retry loops and corrective feedback; and a Path Planner that generates accessible navigation instructions, with a Safety Evaluator agent assessing potential hazards along each route. We evaluate the system on the real-world UMBC Math and Psychology building (floors MP-1 and MP-3) and on the CVC-FP benchmark. On MP-1, we achieve success rates of 92.31%, 76.92%, and 61.54% for short, medium, and long routes, outperforming the strongest single-call baseline (Claude 3.7 Sonnet) at 84.62%, 69.23%, and 53.85%. On MP-3, we reach 76.92%, 61.54%, and 38.46%, compared to the best baseline at 61.54%, 46.15%, and 23.08%. These results show consistent gains over single-call LLM baselines and demonstrate that our workflow is a scalable solution for accessible indoor navigation for BLV individuals.</p>
+</section>
+<section>
+<h2>Framework</h2>
+<div class="grid">
+<article class="card">
+<span class="step">01</span>
+<h3>Multi-agent parsing</h3>
+<p>The Parser extracts rooms and adjacencies, the Graph Builder constructs a validated floor-plan graph, and the Self-Critic enforces structural checks with feedback loops.</p>
+</article>
+<article class="card">
+<span class="step">02</span>
+<h3>Safety Evaluator</h3>
+<p>An agent flags hazards along each route, such as narrow passages and dead ends.</p>
+</article>
+<article class="card">
+<span class="step">03</span>
+<h3>Three-tier RAG knowledge store</h3>
+<p>Results are stored as graph, vector, and visual tiers for retrieval.</p>
+</article>
+<article class="card">
+<span class="step">04</span>
+<h3>Path Planner</h3>
+<p>The RAG Navigator retrieves context and the Planner generates BFS-based navigation with landmarks and safety notes, re-routing on hazard alerts.</p>
+</article>
+</div>
+</section>
+<section>
+<h2>Resources</h2>
+<dl>
+<div>
+<dt>Preprint</dt>
+<dd>
+<a href="https://arxiv.org/abs/2604.23970" target="_blank" rel="noreferrer">arXiv:2604.23970</a>
+</dd>
+</div>
+<div>
+<dt>Open access (CVF)</dt>
+<dd>
+<a href="https://openaccess.thecvf.com/content/CVPR2026W/GRAIL-V/papers/Ayanzadeh_LLM-Guided_Agentic_Floor_Plan_Parsing_for_Accessible_Indoor_Navigation_of_CVPRW_2026_paper.pdf" target="_blank" rel="noreferrer">CVPRW 2026 paper (PDF)</a>
+</dd>
+</div>
+<div>
+<dt>DOI</dt>
+<dd>
+<a href="https://doi.org/10.48550/arXiv.2604.23970" target="_blank" rel="noreferrer">10.48550/arXiv.2604.23970</a>
+</dd>
+</div>
+</dl>
+</section>
+<section>
+<h2>BibTeX</h2>
+<pre tabindex="0" aria-label="BibTeX citation">@inproceedings{ayanzadeh2026llm,
+  title = {LLM-Guided Agentic Floor Plan Parsing for Accessible Indoor Navigation of Blind and Low-Vision People},
+  author = {Ayanzadeh, Aydin and Oates, Tim},
+  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) Workshops},
+  year = {2026},
+  eprint = {2604.23970},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.AI},
+  doi = {10.48550/arXiv.2604.23970},
+  url = {https://arxiv.org/abs/2604.23970}
+}</pre>
+</section>
+</main>
+<footer>CVPR 2026 Workshop (GRAIL-V) · IEEE/CVF Conference on Computer Vision and Pattern Recognition Workshops</footer>
+</body>
+</html>
