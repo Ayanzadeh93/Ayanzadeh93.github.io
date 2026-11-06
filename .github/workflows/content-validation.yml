@@ -6,7 +6,6 @@ on:
       - 'data/**'
       - 'projects/**'
       - 'skills/**'
-      - 'scripts/build_skills_catalog.py'
       - 'apps/claude-code-catalog.html'
       - 'apps/claude-code-encyclopedia.html'
       - 'js/projects-index.js'
@@ -23,7 +22,6 @@ on:
       - 'data/**'
       - 'projects/**'
       - 'skills/**'
-      - 'scripts/build_skills_catalog.py'
       - 'apps/claude-code-catalog.html'
       - 'apps/claude-code-encyclopedia.html'
       - 'js/**'
@@ -45,5 +43,3 @@ jobs:
           python-version: '3.12'
       - name: Validate project and skills data
         run: python tests/validate_content.py
-      - name: Check skills catalog is current
-        run: python scripts/build_skills_catalog.py --check
