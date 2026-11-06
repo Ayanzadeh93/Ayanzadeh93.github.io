@@ -305,6 +305,10 @@ body {
   padding: 4px 0;
 }
 
+.affiliation-logo--itu {
+  max-height: 72px;
+}
+
 .affiliation-logo--lab {
   max-width: 156px;
 }
@@ -346,6 +350,12 @@ body {
   background: #fff;
   border-radius: 6px;
   padding: 4px 6px;
+}
+
+[data-theme="dark"] .affiliation-logo--itu {
+  background: #fff;
+  border-radius: 8px;
+  padding: 4px;
 }
 
 @media (max-width: 640px) {
