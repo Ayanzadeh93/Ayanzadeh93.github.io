@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Automated analysis of phase-contrast optical microscopy time-lapse images: application to wound healing and cell motility assays of breast cancer</title><meta name="description" content="An end-to-end workflow for analyzing phase-contrast microscopy data from cell motility and wound healing assays. Book chapter, Academic Press, 2023."><meta property="og:title" content="Automated analysis of phase-contrast optical microscopy time-lapse images: application to wound healing and cell motility assays of breast cancer"><meta property="og:description" content="An end-to-end workflow for analyzing phase-contrast microscopy data from cell motility and wound healing assays. Book chapter, Academic Press, 2023."><meta property="og:type" content="article"><meta name="twitter:card" content="summary_large_image"><link rel="canonical" href="https://www.ayanzadeh.com/wound-healing-microscopy-chapter/"><link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"><style>
+:root{--bg:oklch(0.985 0.003 350);--fg:oklch(0.24 0.015 350);--card:oklch(1 0 0);--primary:oklch(0.32 0.04 350);--muted:oklch(0.48 0.025 350);--border:oklch(0.89 0.012 350);--accent:oklch(0.47 0.09 350);--secondary:oklch(0.945 0.016 350);--shadow:0 1px 2px oklch(0.2 0.03 40 / .06),0 12px 32px -12px oklch(0.2 0.03 40 / .18)}*{box-sizing:border-box;margin:0;padding:0}body{background:var(--bg);color:var(--fg);font-family:'IBM Plex Sans',system-ui,sans-serif;line-height:1.6;letter-spacing:0;-webkit-font-smoothing:antialiased}.wrap{max-width:56rem;margin:auto;padding:0 2rem;min-width:0}header{border-bottom:1px solid var(--border)}.head{text-align:center;padding-top:5rem;padding-bottom:3rem}.eyebrow,.step{font-family:'IBM Plex Mono',monospace;font-size:.75rem;color:var(--accent);text-transform:uppercase}h1,h2,h3{font-family:'Newsreader',Georgia,serif;color:var(--primary);font-weight:600}h1{font-size:3rem;line-height:1.25;margin-top:1.5rem;overflow-wrap:break-word}h1 span{color:var(--accent)}.authors{list-style:none;display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem 1.5rem;margin-top:2rem;font-size:1.125rem;font-weight:500}sup{color:var(--accent);font-size:.7rem;margin-left:.15rem}.affil{margin-top:.75rem;color:var(--muted)}nav{display:flex;flex-wrap:wrap;justify-content:center;gap:.75rem;margin-top:2.25rem}nav a{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:.5rem 1.5rem;border:1px solid var(--border);border-radius:999px;background:var(--card);color:var(--fg);font-weight:500;text-decoration:none;box-shadow:var(--shadow)}nav a:hover{color:var(--accent);border-color:var(--accent)}nav a[aria-disabled="true"]{color:var(--muted);cursor:default}nav a[aria-disabled="true"]:hover{color:var(--muted);border-color:var(--border)}a:focus-visible,pre:focus-visible{outline:2px solid var(--accent);outline-offset:4px}figure{border:1px solid var(--border);border-top:0;background:var(--card);box-shadow:var(--shadow)}figure img{display:block;width:100%;height:auto;max-height:600px;object-fit:contain;padding:1.5rem}figure svg{display:block;width:100%;height:auto;padding:1.5rem}figcaption{border-top:1px solid var(--border);padding:.75rem 1.25rem;font-size:.875rem;color:var(--muted)}section{padding:4rem 0}section+section{border-top:1px solid var(--border)}h2{font-size:1.875rem}.abstract{margin-top:1.25rem;font-size:1.125rem;line-height:1.78;color:var(--muted)}.note{margin-top:1.25rem;font-size:1rem;line-height:1.7;color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.25rem;margin-top:2rem}.card{min-width:0;border:1px solid var(--border);border-radius:.5rem;background:var(--card);padding:1.5rem;box-shadow:var(--shadow)}h3{font-size:1.5rem;margin-top:.75rem}.card p{margin-top:.5rem;color:var(--muted)}.steps{margin-top:2rem;display:grid;gap:1rem}.steps .card{display:flex;gap:1rem;align-items:flex-start}.steps .step{font-size:1rem;margin-top:.35rem}dl{border:1px solid var(--border);border-radius:.5rem;background:var(--card);margin-top:2rem;box-shadow:var(--shadow)}dl>div{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.5rem;padding:1.25rem}dl>div+div{border-top:1px solid var(--border)}dt{font-weight:500}dd{min-width:0;overflow-wrap:anywhere}dd a{color:var(--accent);font-family:'IBM Plex Mono',monospace;font-size:.875rem;text-underline-offset:4px}pre{max-width:100%;overflow-x:auto;margin-top:1.5rem;border:1px solid var(--border);border-radius:.5rem;background:var(--secondary);padding:1.25rem;font-family:'IBM Plex Mono',monospace;font-size:.875rem;line-height:1.7;color:var(--primary)}footer{text-align:center;border-top:1px solid var(--border);padding:2.5rem 1rem;font-size:.875rem;color:var(--muted)}@media(max-width:639px){.wrap{padding-left:1rem;padding-right:1rem}.head{padding-top:2.5rem;padding-bottom:2rem}h1{font-size:1.875rem}.authors{font-size:1rem;margin-top:1.5rem}.affil{font-size:.875rem}nav{margin-top:1.5rem}figure img,figure svg{padding:1rem}figcaption{padding:.75rem 1rem}section{padding:2.5rem 0}h2{font-size:1.5rem}.abstract{font-size:1rem}.grid{grid-template-columns:minmax(0,1fr)}.card{padding:1.25rem}h3{font-size:1.25rem}dl>div{grid-template-columns:minmax(0,1fr)}pre{font-size:.75rem}}
+</style>
+</head>
+<body>
+<header>
+<div class="wrap head">
+<p class="eyebrow">Book chapter · Academic Press · 2023</p>
+<h1><span>Automated analysis of phase-contrast optical microscopy time-lapse images:</span> application to wound healing and cell motility assays of breast cancer</h1>
+<ul class="authors">
+<li>Yusuf Sait Erdem</li>
+<li>Aydin Ayanzadeh</li>
+<li>Berkay Mayalı</li>
+<li>Muhammed Balıkçi</li>
+<li>Özge Nur Belli</li>
+<li>Mahmut Uçar</li>
+<li>Özden Yalçın Özyusal</li>
+<li>Devrim Pesen Okvur</li>
+<li>Sevgi Önal</li>
+<li>Kenan Morani</li>
+<li>Leonardo Obinna Iheme</li>
+<li>Behçet Uğur Töreyin</li>
+<li>Devrim Ünay</li>
+</ul>
+<nav aria-label="Paper resources">
+<a href="https://doi.org/10.1016/B978-0-323-96129-5.00013-5" target="_blank" rel="noreferrer">Paper</a>
+<a aria-disabled="true" title="Coming soon">Code</a>
+<a aria-disabled="true" title="Coming soon">Slides</a>
+</nav>
+</div>
+</header>
+<main class="wrap">
+<figure>
+<svg viewBox="0 0 640 120" role="img" aria-label="Schematic flow diagram"><rect x="-19" y="28" width="118" height="64" rx="10" fill="#fff" stroke="#1c4f6b" stroke-width="1.5"/><text x="40" y="54" text-anchor="middle" font-size="12" fill="#334155">Acquire</text><path d="M 102.0 60.0 L 118.0 60.0" stroke="#1c4f6b" stroke-width="2" fill="none"/><path d="M 118.0 56.0 L 122.0 60.0 L 118.0 64.0 Z" fill="#1c4f6b"/><rect x="121" y="28" width="118" height="64" rx="10" fill="#fff" stroke="#1c4f6b" stroke-width="1.5"/><text x="180" y="54" text-anchor="middle" font-size="12" fill="#334155">Restore</text><path d="M 242.0 60.0 L 258.0 60.0" stroke="#1c4f6b" stroke-width="2" fill="none"/><path d="M 258.0 56.0 L 262.0 60.0 L 258.0 64.0 Z" fill="#1c4f6b"/><rect x="261" y="28" width="118" height="64" rx="10" fill="#fff" stroke="#1c4f6b" stroke-width="1.5"/><text x="320" y="54" text-anchor="middle" font-size="12" fill="#334155">Segment</text><path d="M 382.0 60.0 L 398.0 60.0" stroke="#1c4f6b" stroke-width="2" fill="none"/><path d="M 398.0 56.0 L 402.0 60.0 L 398.0 64.0 Z" fill="#1c4f6b"/><rect x="401" y="28" width="118" height="64" rx="10" fill="#fff" stroke="#1c4f6b" stroke-width="1.5"/><text x="460" y="54" text-anchor="middle" font-size="12" fill="#334155">Track</text><path d="M 522.0 60.0 L 538.0 60.0" stroke="#1c4f6b" stroke-width="2" fill="none"/><path d="M 538.0 56.0 L 542.0 60.0 L 538.0 64.0 Z" fill="#1c4f6b"/><rect x="541" y="28" width="118" height="64" rx="10" fill="#fff" stroke="#1c4f6b" stroke-width="1.5"/><text x="600" y="54" text-anchor="middle" font-size="12" fill="#334155">Quantify</text></svg>
+<figcaption>Schematic of the chapter&#x27;s end-to-end workflow, drawn from the publisher summary. This is a schematic, not the chapter&#x27;s figure.</figcaption>
+</figure>
+<section>
+<h2>Chapter summary</h2>
+<p class="abstract">This chapter describes a workflow for analyzing phase-contrast microscopy (PCM) data from two fundamental types of biomedical assays: assays for cell motility and assays for wound healing. The workflow of the analysis is composed of the methods for acquiring, restoring, segmenting, and quantifying biomedical data. In the literature, there have been separate methods aimed at specific stages of PCM data analysis. Nonetheless, there has never been a complete workflow for all stages of analysis. This work is an innovation that proposes an end-to-end workflow for image pre-processing, deep learning segmentation, tracking, and quantification stages in cell motility and wound healing assay analyses. The findings indicate that domain knowledge can be used to make simple but significant improvements to the results of cutting-edge methods. Furthermore, even for deep learning-based methods, pre-processing is clearly a necessary step in the workflow.</p>
+</section>
+<section>
+<h2>Framework</h2>
+<div class="grid">
+<article class="card">
+<span class="step">01</span>
+<h3>Acquire and restore</h3>
+<p>Phase-contrast microscopy data from motility and wound healing assays is acquired and restored.</p>
+</article>
+<article class="card">
+<span class="step">02</span>
+<h3>Segment</h3>
+<p>Deep learning segmentation isolates cells in the time-lapse images.</p>
+</article>
+<article class="card">
+<span class="step">03</span>
+<h3>Track and quantify</h3>
+<p>Cell tracking and quantification measure motility and wound healing over time.</p>
+</article>
+<article class="card">
+<span class="step">04</span>
+<h3>Domain knowledge</h3>
+<p>Simple, domain-informed improvements lift the results of cutting-edge methods, and pre-processing proves necessary even for deep learning.</p>
+</article>
+</div>
+</section>
+<section>
+<h2>Resources</h2>
+<dl>
+<div>
+<dt>Chapter DOI</dt>
+<dd>
+<a href="https://doi.org/10.1016/B978-0-323-96129-5.00013-5" target="_blank" rel="noreferrer">10.1016/B978-0-323-96129-5.00013-5</a>
+</dd>
+</div>
+<div>
+<dt>Book</dt>
+<dd>
+<a href="https://www.sciencedirect.com/book/9780323961295" target="_blank" rel="noreferrer">ScienceDirect book page</a>
+</dd>
+</div>
+</dl>
+</section>
+<section>
+<h2>BibTeX</h2>
+<pre tabindex="0" aria-label="BibTeX citation">@incollection{erdem2023automated,
+  title = {Automated analysis of phase-contrast optical microscopy time-lapse images: application to wound healing and cell motility assays of breast cancer},
+  author = {Erdem, Yusuf Sait and Ayanzadeh, Aydin and Mayal{\i}, Berkay and Bal{\i}k{\c{c}}i, Muhammed and Belli, {\&quot;O}zge Nur and U{\c{c}}ar, Mahmut and Yal{\c{c}}{\i}n {\&quot;O}zyusal, {\&quot;O}zden and Pesen Okvur, Devrim and {\&quot;O}nal, Sevgi and Morani, Kenan and Iheme, Leonardo Obinna and T{\&quot;o}reyin, Beh{\c{c}}et U{\u{g}}ur and {\&quot;U}nay, Devrim},
+  booktitle = {Diagnostic Biomedical Signal and Image Processing Applications with Deep Learning Methods},
+  editor = {Polat, Kemal and {\&quot;O}zt{\&quot;u}rk, Saban},
+  publisher = {Elsevier / Academic Press},
+  pages = {137--154},
+  year = {2023},
+  doi = {10.1016/B978-0-323-96129-5.00013-5},
+  url = {https://doi.org/10.1016/B978-0-323-96129-5.00013-5}
+}</pre>
+</section>
+</main>
+<footer>In Diagnostic Biomedical Signal and Image Processing Applications with Deep Learning Methods, pp. 137-154, Academic Press, 2023</footer>
+</body>
+</html>
