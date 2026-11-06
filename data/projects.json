@@ -163,62 +163,6 @@
       ]
     },
     {
-      "id": "ai-skills-bank",
-      "title": "AI Skills Bank",
-      "subtitle": "5,000 searchable skill references",
-      "category": "Developer Tools",
-      "status": "Live",
-      "featured": true,
-      "year": 2026,
-      "role": "Sole builder",
-      "outcome": "5,000 catalog entries: 500 original MIT prompts plus 4,500 source-linked community skills, with 6 original CLI platform packs",
-      "icon": "terminal",
-      "summary": "A searchable catalog of 5,000 skill entries: 500 original MIT-licensed prompts and 4,500 community references with upstream source and license details.",
-      "highlights": [
-        "The original bank has 500 skills in 10 categories, each with a stable ID such as CS-009.",
-        "The public skills.json index combines those 500 prompts with 4,500 source-linked community references.",
-        "CI validates the original IDs, all 45 community batches, source links and generated-index drift.",
-        "The catalog searches all 5,000 entries and renders community results 100 at a time."
-      ],
-      "methods": [
-        "Markdown source of truth",
-        "Python catalog generator",
-        "JSON index",
-        "GitHub Actions",
-        "Static HTML catalog",
-        "Vanilla JavaScript"
-      ],
-      "tags": [
-        "AI Skills",
-        "Claude Code",
-        "Codex CLI",
-        "Gemini CLI",
-        "Developer Tools",
-        "Open Source"
-      ],
-      "legacyPage": "ai-skills-bank.html",
-      "links": [
-        {
-          "label": "Project writeup",
-          "href": "ai-skills-bank.html",
-          "kind": "page"
-        },
-        {
-          "label": "Skills catalog",
-          "href": "https://www.ayanzadeh.com/skills/",
-          "kind": "app"
-        },
-        {
-          "label": "GitHub repository",
-          "href": "https://github.com/Ayanzadeh93/Claude-Skills-Bank",
-          "kind": "code"
-        }
-      ],
-      "related": [
-        "claude-code-encyclopedia"
-      ]
-    },
-    {
       "id": "adhd-study-pack",
       "title": "ADHD Study Pack",
       "subtitle": "Pomodoro workspace for an ADHD attention system",
