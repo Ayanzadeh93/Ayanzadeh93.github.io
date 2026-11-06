@@ -13,16 +13,9 @@
 - [Home / portfolio](https://www.ayanzadeh.com/): biography, publications, projects, CV
 - [Publications](https://www.ayanzadeh.com/publications.html): peer-reviewed papers and preprints
 - [Projects](https://www.ayanzadeh.com/projects/): FloorPlan2Guide, WildfireVLM, medical segmentation, and more
-- [AI Skills Bank](https://www.ayanzadeh.com/projects/ai-skills-bank.html): 500 original reusable AI prompts, plus a public catalog of 4,500 source-linked community skills
-- [Skills catalog](https://www.ayanzadeh.com/skills/): searchable catalog of 5,000 entries; original prompts are MIT licensed and community records link to their source and license details
 - [Contact](https://www.ayanzadeh.com/contact.html): collaboration contact details
 - [Blog](https://www.ayanzadeh.com/blog.html): research notes
 - [CV (PDF)](https://www.ayanzadeh.com/Aydin_Ayanzadeh_CV__final.pdf)
-
-## Machine-readable indexes
-- [skills.json](https://www.ayanzadeh.com/skills/skills.json): 500 original skills plus 4,500 community references, with source and license fields, schema version 2
-- Upstream source: https://github.com/Ayanzadeh93/Claude-Skills-Bank (MIT) — same 500 skills as Markdown, plus packs for six AI coding CLIs
-- Skill IDs are stable and ASCII: `AS`, `CS`, `CR`, `DS`, `ES`, `GS`, `OS`, `PS`, `RS`, `WS`, each followed by a three-digit number (e.g. `CS-009` = Code Review Partner)
 
 ## Profiles
 - LinkedIn: https://www.linkedin.com/in/ayanzadeh93
