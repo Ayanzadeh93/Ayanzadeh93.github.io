@@ -652,25 +652,65 @@
 .intro__profiles a:hover { color: var(--c-brand); text-decoration: underline; }
 .intro__profiles .icon { width: 0.8em; height: 0.8em; opacity: 0.7; }
 
-.portrait { position: relative; justify-self: end; width: 100%; }
+/* Portrait, framed the way a detector would draw it: four corner brackets and
+   a class label. One quiet nod to the field; the photo itself stays plain. */
+.portrait {
+  position: relative;
+  justify-self: end;
+  width: 100%;
+  padding: 0.85rem;
+  isolation: isolate;
+}
 .portrait::before {
   content: '';
   position: absolute;
-  inset: 0.9rem -0.9rem -0.9rem 0.9rem;
-  border: 1px solid var(--c-accent);
-  border-radius: var(--r-lg);
-  opacity: 0.55;
+  inset: -12%;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--c-brand) 16%, transparent), transparent 100%);
+  pointer-events: none;
 }
 .portrait img {
-  position: relative;
+  display: block;
   width: 100%;
   aspect-ratio: 4 / 5;
   object-fit: cover;
-  object-position: 50% 20%;
-  border-radius: var(--r-lg);
+  object-position: 50% 18%;
+  border-radius: 0.75rem;
   background: var(--c-bg-sunk);
-  box-shadow: var(--e-2);
+  box-shadow: 0 0 0 1px var(--c-line), var(--e-2);
 }
+.portrait__corners i {
+  position: absolute;
+  width: 1.6rem;
+  height: 1.6rem;
+  border: 2px solid var(--c-accent);
+}
+.portrait__corners i:nth-child(1) { top: 0; left: 0; border-right: 0; border-bottom: 0; border-top-left-radius: 0.6rem; }
+.portrait__corners i:nth-child(2) { top: 0; right: 0; border-left: 0; border-bottom: 0; border-top-right-radius: 0.6rem; }
+.portrait__corners i:nth-child(3) { bottom: 0; left: 0; border-right: 0; border-top: 0; border-bottom-left-radius: 0.6rem; }
+.portrait__corners i:nth-child(4) { bottom: 0; right: 0; border-left: 0; border-top: 0; border-bottom-right-radius: 0.6rem; }
+.portrait__label {
+  position: absolute;
+  left: 1.9rem;
+  top: 0;
+  z-index: 1;
+  transform: translateY(-50%);
+  padding: 0.1rem 0.5rem;
+  border-radius: 0.3rem;
+  background: var(--c-accent);
+  color: var(--c-bg);
+  font: 700 0.7rem/1.5 var(--f-mono);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .portrait__corners { animation: portrait-lock 900ms var(--ease) 200ms both; display: block; position: absolute; inset: 0; }
+  .portrait__label { animation: portrait-label 400ms var(--ease) 900ms both; }
+  @keyframes portrait-lock { from { inset: -0.9rem; opacity: 0; } to { inset: 0; opacity: 1; } }
+  @keyframes portrait-label { from { opacity: 0; } to { opacity: 1; } }
+}
+.portrait__corners { position: absolute; inset: 0; pointer-events: none; }
 
 .facts {
   display: grid;
@@ -695,9 +735,10 @@
 
 @media (max-width: 760px) {
   .intro__grid { grid-template-columns: minmax(0, 1fr); }
-  .portrait { grid-row: 1; justify-self: start; width: 8.5rem; }
-  .portrait::before { inset: 0.5rem -0.5rem -0.5rem 0.5rem; }
+  .portrait { grid-row: 1; justify-self: start; width: 9.5rem; padding: 0.6rem; margin-top: 0.5rem; }
   .portrait img { aspect-ratio: 1; }
+  .portrait__corners i { width: 1.1rem; height: 1.1rem; }
+  .portrait__label { left: 1.3rem; font-size: 0.62rem; }
   .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .facts > li { padding: var(--s-4) var(--s-3) var(--s-3) 0; }
   .facts > li + li { padding-left: 0; border-left: 0; }
