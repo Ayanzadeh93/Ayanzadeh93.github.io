@@ -1,82 +1,243 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Improved cell segmentation using deep learning in label-free optical microscopy images</title><meta name="description" content="A modified U-Net with a pretrained ResNet-18 encoder, residual decoder blocks, and a redesigned skip-connection for cell segmentation in label-free microscopy images. Turkish Journal of Electrical Engineering and Computer Sciences, 2021."><meta property="og:title" content="Improved cell segmentation using deep learning in label-free optical microscopy images"><meta property="og:description" content="A modified U-Net with a pretrained ResNet-18 encoder, residual decoder blocks, and a redesigned skip-connection for cell segmentation in label-free microscopy images. Turkish Journal of Electrical Engineering and Computer Sciences, 2021."><meta property="og:type" content="article"><meta name="twitter:card" content="summary_large_image"><link rel="canonical" href="https://www.ayanzadeh.com/cell-segmentation-microscopy/"><link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"><style>
-:root{--bg:oklch(0.985 0.003 150);--fg:oklch(0.24 0.015 150);--card:oklch(1 0 0);--primary:oklch(0.32 0.04 150);--muted:oklch(0.48 0.025 150);--border:oklch(0.89 0.012 150);--accent:oklch(0.47 0.09 150);--secondary:oklch(0.945 0.016 150);--shadow:0 1px 2px oklch(0.2 0.03 40 / .06),0 12px 32px -12px oklch(0.2 0.03 40 / .18)}*{box-sizing:border-box;margin:0;padding:0}body{background:var(--bg);color:var(--fg);font-family:'IBM Plex Sans',system-ui,sans-serif;line-height:1.6;letter-spacing:0;-webkit-font-smoothing:antialiased}.wrap{max-width:56rem;margin:auto;padding:0 2rem;min-width:0}header{border-bottom:1px solid var(--border)}.head{text-align:center;padding-top:5rem;padding-bottom:3rem}.eyebrow,.step{font-family:'IBM Plex Mono',monospace;font-size:.75rem;color:var(--accent);text-transform:uppercase}h1,h2,h3{font-family:'Newsreader',Georgia,serif;color:var(--primary);font-weight:600}h1{font-size:3rem;line-height:1.25;margin-top:1.5rem;overflow-wrap:break-word}h1 span{color:var(--accent)}.authors{list-style:none;display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem 1.5rem;margin-top:2rem;font-size:1.125rem;font-weight:500}sup{color:var(--accent);font-size:.7rem;margin-left:.15rem}.affil{margin-top:.75rem;color:var(--muted)}nav{display:flex;flex-wrap:wrap;justify-content:center;gap:.75rem;margin-top:2.25rem}nav a{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:.5rem 1.5rem;border:1px solid var(--border);border-radius:999px;background:var(--card);color:var(--fg);font-weight:500;text-decoration:none;box-shadow:var(--shadow)}nav a:hover{color:var(--accent);border-color:var(--accent)}nav a[aria-disabled="true"]{color:var(--muted);cursor:default}nav a[aria-disabled="true"]:hover{color:var(--muted);border-color:var(--border)}a:focus-visible,pre:focus-visible{outline:2px solid var(--accent);outline-offset:4px}figure{border:1px solid var(--border);border-top:0;background:var(--card);box-shadow:var(--shadow)}figure img{display:block;width:100%;height:auto;max-height:600px;object-fit:contain;padding:1.5rem}figure svg{display:block;width:100%;height:auto;padding:1.5rem}figcaption{border-top:1px solid var(--border);padding:.75rem 1.25rem;font-size:.875rem;color:var(--muted)}section{padding:4rem 0}section+section{border-top:1px solid var(--border)}h2{font-size:1.875rem}.abstract{margin-top:1.25rem;font-size:1.125rem;line-height:1.78;color:var(--muted)}.note{margin-top:1.25rem;font-size:1rem;line-height:1.7;color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.25rem;margin-top:2rem}.card{min-width:0;border:1px solid var(--border);border-radius:.5rem;background:var(--card);padding:1.5rem;box-shadow:var(--shadow)}h3{font-size:1.5rem;margin-top:.75rem}.card p{margin-top:.5rem;color:var(--muted)}.steps{margin-top:2rem;display:grid;gap:1rem}.steps .card{display:flex;gap:1rem;align-items:flex-start}.steps .step{font-size:1rem;margin-top:.35rem}dl{border:1px solid var(--border);border-radius:.5rem;background:var(--card);margin-top:2rem;box-shadow:var(--shadow)}dl>div{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.5rem;padding:1.25rem}dl>div+div{border-top:1px solid var(--border)}dt{font-weight:500}dd{min-width:0;overflow-wrap:anywhere}dd a{color:var(--accent);font-family:'IBM Plex Mono',monospace;font-size:.875rem;text-underline-offset:4px}pre{max-width:100%;overflow-x:auto;margin-top:1.5rem;border:1px solid var(--border);border-radius:.5rem;background:var(--secondary);padding:1.25rem;font-family:'IBM Plex Mono',monospace;font-size:.875rem;line-height:1.7;color:var(--primary)}footer{text-align:center;border-top:1px solid var(--border);padding:2.5rem 1rem;font-size:.875rem;color:var(--muted)}@media(max-width:639px){.wrap{padding-left:1rem;padding-right:1rem}.head{padding-top:2.5rem;padding-bottom:2rem}h1{font-size:1.875rem}.authors{font-size:1rem;margin-top:1.5rem}.affil{font-size:.875rem}nav{margin-top:1.5rem}figure img,figure svg{padding:1rem}figcaption{padding:.75rem 1rem}section{padding:2.5rem 0}h2{font-size:1.5rem}.abstract{font-size:1rem}.grid{grid-template-columns:minmax(0,1fr)}.card{padding:1.25rem}h3{font-size:1.25rem}dl>div{grid-template-columns:minmax(0,1fr)}pre{font-size:.75rem}}
-</style>
+<!-- Generated by scripts/build_site.py from data/. Edit the data, not this file. -->
+<html lang="en" class="ds-root" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https:; connect-src 'self' https://formspree.io; form-action 'self' https://formspree.io; frame-src 'none'; manifest-src 'self'">
+<title>Improved cell segmentation using deep learning in label-free optical microscopy images | Aydin Ayanzadeh</title>
+<meta name="description" content="A modified U-Net with a pretrained ResNet-18 encoder, residual decoder blocks, and a redesigned skip-connection for cell segmentation in label-free microscopy images. Turkish Journal of Electrical Engineering and Computer Sciences, 2021.">
+<meta name="author" content="Aydin Ayanzadeh">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#1c4f6b">
+<meta name="color-scheme" content="light dark">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<link rel="canonical" href="https://www.ayanzadeh.com/cell-segmentation-microscopy/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Aydin Ayanzadeh">
+<meta property="og:url" content="https://www.ayanzadeh.com/cell-segmentation-microscopy/">
+<meta property="og:title" content="Improved cell segmentation using deep learning in label-free optical microscopy images">
+<meta property="og:description" content="A modified U-Net with a pretrained ResNet-18 encoder, residual decoder blocks, and a redesigned skip-connection for cell segmentation in label-free microscopy images. Turkish Journal of Electrical Engineering and Computer Sciences, 2021.">
+<meta property="og:image" content="https://www.ayanzadeh.com/images/profile-compressed.jpg">
+<meta property="og:image:alt" content="Improved cell segmentation using deep learning in label-free optical microscopy images — Turkish Journal of Electrical Engineering and Computer Sciences">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:creator" content="@aydin_ayanzadeh">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="manifest" href="/manifest.json">
+<link rel="preload" href="/fonts/newsreader-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/atkinson-hyperlegible-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/site.css">
+<script src="/js/theme-init.js"></script>
+<meta name="citation_title" content="Improved cell segmentation using deep learning in label-free optical microscopy images">
+<meta name="citation_author" content="Aydin Ayanzadeh">
+<meta name="citation_author" content="Özden Yalçın Özuysal">
+<meta name="citation_author" content="Devrim Pesen Okvur">
+<meta name="citation_author" content="Sevgi Önal">
+<meta name="citation_author" content="Behçet Uğur Töreyin">
+<meta name="citation_author" content="Devrim Ünay">
+<meta name="citation_publication_date" content="2021">
+<meta name="citation_journal_title" content="Turkish Journal of Electrical Engineering and Computer Sciences">
+<meta name="citation_volume" content="29">
+<meta name="citation_issue" content="8">
+<meta name="citation_firstpage" content="2855">
+<meta name="citation_lastpage" content="2868">
+<meta name="citation_doi" content="10.3906/elk-2105-244">
+<meta name="citation_abstract_html_url" content="https://www.ayanzadeh.com/cell-segmentation-microscopy/">
+<meta property="article:author" content="https://www.ayanzadeh.com/">
+<script type="application/ld+json">
+{
+  "@type": "ScholarlyArticle",
+  "@id": "https://www.ayanzadeh.com/cell-segmentation-microscopy/#work",
+  "name": "Improved cell segmentation using deep learning in label-free optical microscopy images",
+  "headline": "Improved cell segmentation using deep learning in label-free optical microscopy images",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Aydin Ayanzadeh",
+      "@id": "https://www.ayanzadeh.com/#person",
+      "url": "https://www.ayanzadeh.com/"
+    },
+    {
+      "@type": "Person",
+      "name": "Özden Yalçın Özuysal"
+    },
+    {
+      "@type": "Person",
+      "name": "Devrim Pesen Okvur"
+    },
+    {
+      "@type": "Person",
+      "name": "Sevgi Önal"
+    },
+    {
+      "@type": "Person",
+      "name": "Behçet Uğur Töreyin"
+    },
+    {
+      "@type": "Person",
+      "name": "Devrim Ünay"
+    }
+  ],
+  "datePublished": "2021",
+  "inLanguage": "en",
+  "url": "https://www.ayanzadeh.com/cell-segmentation-microscopy/",
+  "isPartOf": {
+    "@type": "PublicationVolume",
+    "volumeNumber": "29",
+    "isPartOf": {
+      "@type": "Periodical",
+      "name": "Turkish Journal of Electrical Engineering and Computer Sciences"
+    }
+  },
+  "pageStart": "2855",
+  "pageEnd": "2868",
+  "sameAs": [
+    "https://doi.org/10.3906/elk-2105-244"
+  ],
+  "identifier": [
+    {
+      "@type": "PropertyValue",
+      "propertyID": "DOI",
+      "value": "10.3906/elk-2105-244"
+    }
+  ],
+  "abstract": "The recently popular deep neural networks (DNNs) have a significant effect on the improvement of segmentation accuracy from various perspectives, including robustness and completeness in comparison to conventional methods. We determined that the naive U-Net has some lacks in specific perspectives and there is high potential for further enhancements on the model. Therefore, we employed some modifications in different folds of the U-Net to overcome this problem. Based on the probable opportunity for improvement, we develop a novel architecture by using an alternative feature extractor in the encoder of U-Net and replacing the plain blocks with residual blocks in the decoder. This alteration makes the model superconvergent yielding improved performance results on two challenging optical microscopy image series: a phase-contrast dataset of our own (MDA-MB-231) and a brightfield dataset from a well-known challenge (DSB2018). We utilized the U-Net with pretrained ResNet-18 as the encoder for the segmentation task. Hence, following the modifications, we redesign a novel skip-connection to reduce the semantic gap between the encoder and the decoder. The proposed skip-connection increases the accuracy of the model on both datasets. The proposed segmentation approach results in Jaccard Index values of 85.0% and 89.2% on the DSB2018 and MDA-MB-231 datasets, respectively. The results reveal that our method achieves competitive results compared to the state-of-the-art approaches and surpasses the performance of baseline approaches",
+  "description": "A modified U-Net with a pretrained ResNet-18 encoder, residual decoder blocks, and a redesigned skip-connection for cell segmentation in label-free microscopy images.",
+  "@context": "https://schema.org",
+  "mainEntityOfPage": "https://www.ayanzadeh.com/cell-segmentation-microscopy/",
+  "isAccessibleForFree": true
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://www.ayanzadeh.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Publications",
+      "item": "https://www.ayanzadeh.com/publications.html"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Improved cell segmentation using deep learning in label-free optical microscopy images",
+      "item": "https://www.ayanzadeh.com/cell-segmentation-microscopy/"
+    }
+  ]
+}
+</script>
+<script type="application/json" id="pub-data">{"cell-segmentation-microscopy":{"title":"Improved cell segmentation using deep learning in label-free optical microscopy images","authors":["Aydin Ayanzadeh","Özden Yalçın Özuysal","Devrim Pesen Okvur","Sevgi Önal","Behçet Uğur Töreyin","Devrim Ünay"],"venue":"Turkish Journal of Electrical Engineering and Computer Sciences","venueShort":"Turkish Journal of Electrical Engineering and Computer Sciences","year":"2021","type":"article","url":"https://doi.org/10.3906/elk-2105-244","status":"","bibtex":"@article{ayanzadeh2021improved,\n  title = {Improved cell segmentation using deep learning in label-free optical microscopy images},\n  author = {Ayanzadeh, Aydin and {\\\"O}zuysal, {\\\"O}zden Yal{\\c{c}}in and Okvur, Devrim Pesen and {\\\"O}nal, Sevgi and T{\\\"o}reyin, Beh{\\c{c}}et U{\\u{g}}ur and {\\\"U}nay, Devrim},\n  journal = {Turkish Journal of Electrical Engineering and Computer Sciences},\n  volume = {29},\n  number = {8},\n  pages = {2855--2868},\n  year = {2021},\n  doi = {10.3906/elk-2105-244}\n}","keywords":"Journal article Biomedical image analysis A modified U-Net with a pretrained ResNet-18 encoder, residual decoder blocks, and a redesigned skip-connection for cell segmentation in label-free microscopy images.","volume":"29","number":"8","pages":"2855-2868","doi":"10.3906/elk-2105-244"},"wound-healing-microscopy-chapter":{"title":"Automated analysis of phase-contrast optical microscopy time-lapse images: application to wound healing and cell motility assays of breast cancer","authors":["Yusuf Sait Erdem","Aydin Ayanzadeh","Berkay Mayalı","Muhammed Balıkçi","Özge Nur Belli","Mahmut Uçar","Özden Yalçın Özyusal","Devrim Pesen Okvur","Sevgi Önal","Kenan Morani","Leonardo Obinna Iheme","Behçet Uğur Töreyin","Devrim Ünay"],"venue":"Diagnostic Biomedical Signal and Image Processing Applications with Deep Learning Methods","venueShort":"Book chapter, Academic Press","year":"2023","type":"incollection","url":"https://doi.org/10.1016/B978-0-323-96129-5.00013-5","status":"","bibtex":"@incollection{erdem2023automated,\n  title = {Automated analysis of phase-contrast optical microscopy time-lapse images: application to wound healing and cell motility assays of breast cancer},\n  author = {Erdem, Yusuf Sait and Ayanzadeh, Aydin and Mayal{\\i}, Berkay and Bal{\\i}k{\\c{c}}i, Muhammed and Belli, {\\\"O}zge Nur and U{\\c{c}}ar, Mahmut and Yal{\\c{c}}{\\i}n {\\\"O}zyusal, {\\\"O}zden and Pesen Okvur, Devrim and {\\\"O}nal, Sevgi and Morani, Kenan and Iheme, Leonardo Obinna and T{\\\"o}reyin, Beh{\\c{c}}et U{\\u{g}}ur and {\\\"U}nay, Devrim},\n  booktitle = {Diagnostic Biomedical Signal and Image Processing Applications with Deep Learning Methods},\n  editor = {Polat, Kemal and {\\\"O}zt{\\\"u}rk, Saban},\n  publisher = {Elsevier / Academic Press},\n  pages = {137--154},\n  year = {2023},\n  doi = {10.1016/B978-0-323-96129-5.00013-5},\n  url = {https://doi.org/10.1016/B978-0-323-96129-5.00013-5}\n}","keywords":"Book chapter Biomedical image analysis An end-to-end workflow for analyzing phase-contrast microscopy data from cell motility and wound healing assays.","pages":"137-154","publisher":"Academic Press","doi":"10.1016/B978-0-323-96129-5.00013-5"},"siu-2020-segmentation-pipeline":{"title":"Deep Learning based Segmentation Pipeline for Label-Free Phase-Contrast Microscopy Images","authors":["Aydin Ayanzadeh","Özden Yalçın Özuysal","Devrim Pesen Okvur","Sevgi Önal","Behçet Uğur Töreyin","Devrim Ünay"],"venue":"2020 28th Signal Processing and Communications Applications Conference (SIU)","venueShort":"SIU 2020","year":"2020","type":"inproceedings","url":"https://gcris.iyte.edu.tr/bitstream/11147/11785/1/Deep_Learning_based_Segmentation_Pipeline.pdf","status":"","bibtex":"@inproceedings{ayanzadeh2020deep,\n  title = {Deep Learning based Segmentation Pipeline for Label-Free Phase-Contrast Microscopy Images},\n  author = {Ayanzadeh, Aydin and {\\\"O}zuysal, {\\\"O}zden Yal{\\c{c}}in and Okvur, Devrim Pesen and {\\\"O}nal, Sevgi and T{\\\"o}reyin, Beh{\\c{c}}et U{\\u{g}}ur and {\\\"U}nay, Devrim},\n  booktitle = {2020 28th Signal Processing and Communications Applications Conference (SIU)},\n  pages = {1--4},\n  year = {2020},\n  organization = {IEEE},\n  doi = {10.1109/SIU49456.2020.9302304}\n}","keywords":"Conference paper Biomedical image analysis A deep learning segmentation pipeline for label-free phase-contrast microscopy images, improving U-Net and FPN with an ImageNet-pretrained ResNet-18 encoder.","pages":"1-4","publisher":"IEEE","doi":"10.1109/SIU49456.2020.9302304"},"tiptekno-2019-cell-segmentation":{"title":"Cell Segmentation of 2D Phase-Contrast Microscopy Images with Deep Learning Method","authors":["Aydin Ayanzadeh","Hüseyin Onur Yağar","Özden Yalçın Özuysal","Devrim Pesen Okvur","Behçet Uğur Töreyin","Devrim Ünay","Sevgi Önal"],"venue":"2019 Medical Technologies Congress (TIPTEKNO)","venueShort":"TIPTEKNO 2019","year":"2019","type":"inproceedings","url":"https://doi.org/10.1109/TIPTEKNO.2019.8894978","status":"","bibtex":"@inproceedings{ayanzadeh2019cell,\n  title = {Cell Segmentation of 2D Phase-Contrast Microscopy Images with Deep Learning Method},\n  author = {Ayanzadeh, Aydin and Ya{\\u{g}}ar, H{\\\"u}seyin Onur and {\\\"O}zuysal, {\\\"O}zden Yal{\\c{c}}in and Okvur, Devrim Pesen and T{\\\"o}reyin, Beh{\\c{c}}et U{\\u{g}}ur and {\\\"U}nay, Devrim and {\\\"O}nal, Sevgi},\n  booktitle = {2019 Medical Technologies Congress (TIPTEKNO)},\n  pages = {1--4},\n  year = {2019},\n  organization = {IEEE},\n  doi = {10.1109/TIPTEKNO.2019.8894978}\n}","keywords":"Conference paper Biomedical image analysis A multiresolution U-Net with multi-combination augmentation for cell segmentation in 2D phase-contrast microscopy images.","pages":"1-4","publisher":"IEEE","doi":"10.1109/TIPTEKNO.2019.8894978"},"tiptekno-2019-cell-time-series":{"title":"Automated Segmentation of Cells in Phase Contrast Optical Microscopy Time Series Images","authors":["Rıfkı Can Binici","Umut Şahin","Aydin Ayanzadeh","Behçet Uğur Töreyin","Sevgi Önal","Devrim Pesen Okvur","Özden Yalçın Özuysal","Devrim Ünay"],"venue":"2019 Medical Technologies Congress (TIPTEKNO)","venueShort":"TIPTEKNO 2019","year":"2019","type":"inproceedings","url":"https://doi.org/10.1109/TIPTEKNO.2019.8895080","status":"","bibtex":"@inproceedings{binici2019automated,\n  title = {Automated Segmentation of Cells in Phase Contrast Optical Microscopy Time Series Images},\n  author = {Binici, R{\\i}fk{\\i} Can and {\\c{S}}ahin, Umut and Ayanzadeh, Aydin and T{\\\"o}reyin, Beh{\\c{c}}et U{\\u{g}}ur and {\\\"O}nal, Sevgi and Okvur, Devrim Pesen and {\\\"O}zuysal, {\\\"O}zden Yal{\\c{c}}{\\i}n and {\\\"U}nay, Devrim},\n  booktitle = {2019 Medical Technologies Congress (TIPTEKNO)},\n  pages = {1--4},\n  year = {2019},\n  organization = {IEEE},\n  doi = {10.1109/TIPTEKNO.2019.8895080}\n}","keywords":"Conference paper Biomedical image analysis Traditional image processing and deep learning approaches for automated cell segmentation from phase-contrast microscopy time series, evaluated against manually annotated datasets.","pages":"1-4","publisher":"IEEE","doi":"10.1109/TIPTEKNO.2019.8895080"}}</script>
 </head>
-<body>
-<header>
-<div class="wrap head">
-<p class="eyebrow">Turkish Journal of Electrical Engineering and Computer Sciences · 2021</p>
-<h1><span>Improved cell segmentation</span> using deep learning in label-free optical microscopy images</h1>
-<ul class="authors">
-<li>Aydin Ayanzadeh</li>
-<li>Özden Yalçın Özuysal</li>
-<li>Devrim Pesen Okvur</li>
-<li>Sevgi Önal</li>
-<li>Behçet Uğur Töreyin</li>
-<li>Devrim Ünay</li>
-</ul>
-<nav aria-label="Paper resources">
-<a href="https://doi.org/10.3906/elk-2105-244" target="_blank" rel="noreferrer">Paper</a>
-<a aria-disabled="true" title="Coming soon">Code</a>
-<a aria-disabled="true" title="Coming soon">Slides</a>
-</nav>
-</div>
+<body class="ds">
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" class="sr-only" aria-hidden="true" focusable="false">
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 7.5 8.5 6 8.5-6"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h6"/></symbol>
+  <symbol id="i-external" viewBox="0 0 24 24"><path d="M14 5h5v5"/><path d="M19 5 10 14"/><path d="M18 14v4a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h4"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></symbol>
+  <symbol id="i-quote" viewBox="0 0 24 24"><path d="M10 7H6a1 1 0 0 0-1 1v4h5V8"/><path d="M10 12c0 3-1.5 4.5-4.5 5"/><path d="M19 7h-4a1 1 0 0 0-1 1v4h5V8"/><path d="M19 12c0 3-1.5 4.5-4.5 5"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11"/><path d="m7 11 5 5 5-5"/><path d="M5 20h14"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></symbol>
+  <symbol id="i-code" viewBox="0 0 24 24"><path d="m8 8-4 4 4 4"/><path d="m16 8 4 4-4 4"/><path d="m13.5 5-3 14"/></symbol>
+  <symbol id="i-slides" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M12 16v4M8 20h8"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/></symbol>
+  <symbol id="i-expand" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></symbol>
+  <symbol id="i-github" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></symbol>
+  <symbol id="i-linkedin" viewBox="0 0 16 16"><path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854V1.146zm4.943 12.248V6.169H2.542v7.225h2.401zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248-.822 0-1.359.54-1.359 1.248 0 .694.521 1.248 1.327 1.248h.016zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016a5.54 5.54 0 0 1 .016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225h2.4z"/></symbol>
+</svg>
+<a class="skip-link ds" href="#main">Skip to main content</a>
+<header class="site-header ds" data-site-header>
+  <div class="site-header__inner">
+    <a class="brand" href="/" aria-label="Aydin Ayanzadeh, home">
+      <svg class="brand__mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect class="m-plate" width="32" height="32" rx="8"/><path class="m-glyph" d="M9.5 23.5 16 8.5l6.5 15M12.2 18.5h7.6" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle class="m-dot" cx="25" cy="7" r="2.6"/></svg>
+      <span class="brand__name">Aydin Ayanzadeh</span>
+    </a>
+    <nav class="site-nav" id="site-nav" aria-label="Primary">
+      <ul class="site-nav__list">
+        <li><a class="site-nav__link" href="/#research">Research</a></li>
+        <li><a class="site-nav__link" href="/publications.html" aria-current="page">Publications</a></li>
+        <li><a class="site-nav__link" href="/#projects">Projects</a></li>
+        <li><a class="site-nav__link" href="/#experience">Experience</a></li>
+        <li><a class="site-nav__link" href="/#teaching">Teaching</a></li>
+        <li><a class="site-nav__link" href="/#news">News</a></li>
+        <li><a class="site-nav__link" href="/blog.html">Blog</a></li>
+        <li><a class="site-nav__link" href="/#contact">Contact</a></li>
+      </ul>
+    </nav>
+    <div class="site-header__tools">
+      <a class="btn btn--sm btn--cv" href="/Aydin_Ayanzadeh_CV__final.pdf"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-file"/></svg><span>CV</span></a>
+      <button class="icon-btn" type="button" data-theme-toggle aria-pressed="false" aria-label="Switch to dark theme">
+        <svg class="icon icon--moon" aria-hidden="true" focusable="false"><use href="#i-moon"/></svg><svg class="icon icon--sun" aria-hidden="true" focusable="false"><use href="#i-sun"/></svg>
+      </button>
+      <button class="icon-btn nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="site-nav" aria-label="Menu">
+        <svg class="icon icon--menu" aria-hidden="true" focusable="false"><use href="#i-menu"/></svg><svg class="icon icon--close" aria-hidden="true" focusable="false"><use href="#i-close"/></svg>
+      </button>
+    </div>
+  </div>
 </header>
-<main class="wrap">
-<figure>
-<svg viewBox="0 0 1160 640" role="img" aria-label="Redraw of Figure 2: architecture of the proposed model"><defs><marker id="arrK" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#1e293b"/></marker><marker id="arrB" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/></marker><marker id="arrR" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#dc2626"/></marker><marker id="arrO" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#ea580c"/></marker></defs><rect x="0" y="0" width="1160" height="640" fill="#fff"/><rect x="16" y="70" width="54" height="110" fill="#fff" stroke="#1e293b" stroke-width="1.5"/><text x="43" y="125" text-anchor="middle" font-size="10.5" fill="#1e293b" transform="rotate(-90 43 125)">Input Image 512×512</text><line x1="70" y1="125" x2="94" y2="125" stroke="#1e293b" stroke-width="1.8" marker-end="url(#arrK)"/><rect x="96" y="70" width="54" height="110" fill="#fef3c7" stroke="#1e293b" stroke-width="1.5"/><text x="123" y="125" text-anchor="middle" font-size="11" fill="#1e293b" transform="rotate(-90 123 125)">ResNet18 Backbone</text><text x="163" y="58" text-anchor="middle" font-size="10" fill="#1e293b">64×64</text><line x1="150" y1="125" x2="174" y2="125" stroke="#1e293b" stroke-width="1.8" marker-end="url(#arrK)"/><rect x="176" y="70" width="34" height="110" fill="#86efac" stroke="#1e293b" stroke-width="1.5"/><text x="193" y="125" text-anchor="middle" font-size="8" fill="#1e293b" transform="rotate(-90 193 125)">4×4 Transposed conv2D</text><line x1="210" y1="125" x2="217" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><rect x="218" y="70" width="32" height="110" fill="#fca5a5" stroke="#1e293b" stroke-width="1.5"/><text x="234" y="125" text-anchor="middle" font-size="9" fill="#1e293b" transform="rotate(-90 234 125)">Concat</text><line x1="250" y1="125" x2="257" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><rect x="258" y="70" width="38" height="110" fill="#93c5fd" stroke="#1e293b" stroke-width="1.5"/><text x="277" y="125" text-anchor="middle" font-size="8" fill="#1e293b" transform="rotate(-90 277 125)">BN+ReLU+Conv2D 3×3</text><text x="277" y="58" text-anchor="middle" font-size="10" fill="#1e293b" font-weight="600">512</text><rect x="304" y="70" width="38" height="110" fill="#93c5fd" stroke="#1e293b" stroke-width="1.5"/><text x="323" y="125" text-anchor="middle" font-size="8" fill="#1e293b" transform="rotate(-90 323 125)">BN+ReLU+Conv2D 3×3</text><text x="323" y="58" text-anchor="middle" font-size="10" fill="#1e293b" font-weight="600">512</text><line x1="296" y1="125" x2="303" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><line x1="342" y1="125" x2="349" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><circle cx="360" cy="125" r="10" fill="#fff" stroke="#1e293b" stroke-width="1.5"/><line x1="353" y1="125" x2="367" y2="125" stroke="#1e293b" stroke-width="1.5"/><line x1="360" y1="118" x2="360" y2="132" stroke="#1e293b" stroke-width="1.5"/><path d="M 234 70 C 234 12, 360 12, 360 113" stroke="#2563eb" stroke-width="1.6" fill="none" marker-end="url(#arrB)"/><line x1="371" y1="125" x2="384" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><text x="377" y="58" text-anchor="middle" font-size="10" fill="#1e293b">128×128</text><rect x="388" y="70" width="34" height="110" fill="#86efac" stroke="#1e293b" stroke-width="1.5"/><text x="405" y="125" text-anchor="middle" font-size="8" fill="#1e293b" transform="rotate(-90 405 125)">4×4 Transposed conv2D</text><line x1="422" y1="125" x2="429" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><rect x="430" y="70" width="32" height="110" fill="#fca5a5" stroke="#1e293b" stroke-width="1.5"/><text x="446" y="125" text-anchor="middle" font-size="9" fill="#1e293b" transform="rotate(-90 446 125)">Concat</text><line x1="462" y1="125" x2="469" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><rect x="470" y="70" width="38" height="110" fill="#93c5fd" stroke="#1e293b" stroke-width="1.5"/><text x="489" y="125" text-anchor="middle" font-size="8" fill="#1e293b" transform="rotate(-90 489 125)">BN+ReLU+Conv2D 3×3</text><text x="489" y="58" text-anchor="middle" font-size="10" fill="#1e293b" font-weight="600">256</text><rect x="516" y="70" width="38" height="110" fill="#93c5fd" stroke="#1e293b" stroke-width="1.5"/><text x="535" y="125" text-anchor="middle" font-size="8" fill="#1e293b" transform="rotate(-90 535 125)">BN+ReLU+Conv2D 3×3</text><text x="535" y="58" text-anchor="middle" font-size="10" fill="#1e293b" font-weight="600">256</text><line x1="508" y1="125" x2="515" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><line x1="554" y1="125" x2="561" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><circle cx="572" cy="125" r="10" fill="#fff" stroke="#1e293b" stroke-width="1.5"/><line x1="565" y1="125" x2="579" y2="125" stroke="#1e293b" stroke-width="1.5"/><line x1="572" y1="118" x2="572" y2="132" stroke="#1e293b" stroke-width="1.5"/><path d="M 446 70 C 446 12, 572 12, 572 113" stroke="#2563eb" stroke-width="1.6" fill="none" marker-end="url(#arrB)"/><line x1="583" y1="125" x2="596" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><text x="589" y="58" text-anchor="middle" font-size="10" fill="#1e293b">256×256</text><rect x="600" y="70" width="34" height="110" fill="#86efac" stroke="#1e293b" stroke-width="1.5"/><text x="617" y="125" text-anchor="middle" font-size="8" fill="#1e293b" transform="rotate(-90 617 125)">4×4 Transposed conv2D</text><line x1="634" y1="125" x2="641" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><rect x="642" y="70" width="32" height="110" fill="#fca5a5" stroke="#1e293b" stroke-width="1.5"/><text x="658" y="125" text-anchor="middle" font-size="9" fill="#1e293b" transform="rotate(-90 658 125)">Concat</text><line x1="674" y1="125" x2="681" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><rect x="682" y="70" width="38" height="110" fill="#93c5fd" stroke="#1e293b" stroke-width="1.5"/><text x="701" y="125" text-anchor="middle" font-size="8" fill="#1e293b" transform="rotate(-90 701 125)">BN+ReLU+Conv2D 3×3</text><text x="701" y="58" text-anchor="middle" font-size="10" fill="#1e293b" font-weight="600">128</text><rect x="728" y="70" width="38" height="110" fill="#93c5fd" stroke="#1e293b" stroke-width="1.5"/><text x="747" y="125" text-anchor="middle" font-size="8" fill="#1e293b" transform="rotate(-90 747 125)">BN+ReLU+Conv2D 3×3</text><text x="747" y="58" text-anchor="middle" font-size="10" fill="#1e293b" font-weight="600">128</text><line x1="720" y1="125" x2="727" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><line x1="766" y1="125" x2="773" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><circle cx="784" cy="125" r="10" fill="#fff" stroke="#1e293b" stroke-width="1.5"/><line x1="777" y1="125" x2="791" y2="125" stroke="#1e293b" stroke-width="1.5"/><line x1="784" y1="118" x2="784" y2="132" stroke="#1e293b" stroke-width="1.5"/><path d="M 658 70 C 658 12, 784 12, 784 113" stroke="#2563eb" stroke-width="1.6" fill="none" marker-end="url(#arrB)"/><line x1="795" y1="125" x2="808" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><text x="801" y="58" text-anchor="middle" font-size="10" fill="#1e293b">512×512</text><rect x="812" y="70" width="34" height="110" fill="#86efac" stroke="#1e293b" stroke-width="1.5"/><text x="829" y="125" text-anchor="middle" font-size="8" fill="#1e293b" transform="rotate(-90 829 125)">4×4 Transposed conv2D</text><line x1="846" y1="125" x2="853" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><rect x="854" y="70" width="32" height="110" fill="#fca5a5" stroke="#1e293b" stroke-width="1.5"/><text x="870" y="125" text-anchor="middle" font-size="9" fill="#1e293b" transform="rotate(-90 870 125)">Concat</text><line x1="886" y1="125" x2="893" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><rect x="894" y="70" width="38" height="110" fill="#93c5fd" stroke="#1e293b" stroke-width="1.5"/><text x="913" y="125" text-anchor="middle" font-size="8" fill="#1e293b" transform="rotate(-90 913 125)">BN+ReLU+Conv2D 3×3</text><text x="913" y="58" text-anchor="middle" font-size="10" fill="#1e293b" font-weight="600">64</text><rect x="940" y="70" width="38" height="110" fill="#93c5fd" stroke="#1e293b" stroke-width="1.5"/><text x="959" y="125" text-anchor="middle" font-size="8" fill="#1e293b" transform="rotate(-90 959 125)">BN+ReLU+Conv2D 3×3</text><text x="959" y="58" text-anchor="middle" font-size="10" fill="#1e293b" font-weight="600">64</text><line x1="932" y1="125" x2="939" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><line x1="978" y1="125" x2="985" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><circle cx="996" cy="125" r="10" fill="#fff" stroke="#1e293b" stroke-width="1.5"/><line x1="989" y1="125" x2="1003" y2="125" stroke="#1e293b" stroke-width="1.5"/><line x1="996" y1="118" x2="996" y2="132" stroke="#1e293b" stroke-width="1.5"/><path d="M 870 70 C 870 12, 996 12, 996 113" stroke="#2563eb" stroke-width="1.6" fill="none" marker-end="url(#arrB)"/><line x1="1007" y1="125" x2="1022" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><rect x="1024" y="70" width="52" height="110" fill="#5eead4" stroke="#1e293b" stroke-width="1.5"/><text x="1050" y="125" text-anchor="middle" font-size="8.5" fill="#1e293b" transform="rotate(-90 1050 125)">1×1 Conv2D+Sigmoid</text><text x="1050" y="58" text-anchor="middle" font-size="10" fill="#1e293b" font-weight="600">1</text><text x="1050" y="198" text-anchor="middle" font-size="10" fill="#1e293b">512×512</text><line x1="1076" y1="125" x2="1092" y2="125" stroke="#1e293b" stroke-width="1.8" marker-end="url(#arrK)"/><rect x="1094" y="70" width="52" height="110" fill="#fff" stroke="#1e293b" stroke-width="1.5"/><text x="1120" y="125" text-anchor="middle" font-size="10.5" fill="#1e293b" transform="rotate(-90 1120 125)">Output Image 512×512</text><rect x="174" y="330" width="120" height="50" fill="#cbd5e1" stroke="#1e293b" stroke-width="1.5"/><text x="234" y="360" text-anchor="middle" font-size="11" fill="#1e293b">Res1 × (1)</text><text x="234" y="318" text-anchor="middle" font-size="10" fill="#1e293b">256</text><line x1="234" y1="328" x2="234" y2="182" stroke="#1e293b" stroke-width="1.8" marker-end="url(#arrK)"/><path d="M 123 180 C 123 250, 149 290, 189 290 L 189 328" stroke="#1e293b" stroke-width="1.6" fill="none" marker-end="url(#arrK)"/><rect x="386" y="330" width="120" height="50" fill="#cbd5e1" stroke="#1e293b" stroke-width="1.5"/><text x="446" y="360" text-anchor="middle" font-size="11" fill="#1e293b">Res2 × (2)</text><text x="446" y="318" text-anchor="middle" font-size="10" fill="#1e293b">128</text><line x1="446" y1="328" x2="446" y2="182" stroke="#1e293b" stroke-width="1.8" marker-end="url(#arrK)"/><path d="M 123 180 C 123 250, 361 290, 401 290 L 401 328" stroke="#1e293b" stroke-width="1.6" fill="none" marker-end="url(#arrK)"/><rect x="598" y="330" width="120" height="50" fill="#cbd5e1" stroke="#1e293b" stroke-width="1.5"/><text x="658" y="360" text-anchor="middle" font-size="11" fill="#1e293b">Res3 × (3)</text><text x="658" y="318" text-anchor="middle" font-size="10" fill="#1e293b">64</text><line x1="658" y1="328" x2="658" y2="182" stroke="#1e293b" stroke-width="1.8" marker-end="url(#arrK)"/><path d="M 123 180 C 123 250, 573 290, 613 290 L 613 328" stroke="#1e293b" stroke-width="1.6" fill="none" marker-end="url(#arrK)"/><rect x="810" y="330" width="120" height="50" fill="#cbd5e1" stroke="#1e293b" stroke-width="1.5"/><text x="870" y="360" text-anchor="middle" font-size="11" fill="#1e293b">Res4 × (4)</text><text x="870" y="318" text-anchor="middle" font-size="10" fill="#1e293b">32</text><line x1="870" y1="328" x2="870" y2="182" stroke="#1e293b" stroke-width="1.8" marker-end="url(#arrK)"/><path d="M 123 180 C 123 250, 785 290, 825 290 L 825 328" stroke="#1e293b" stroke-width="1.6" fill="none" marker-end="url(#arrK)"/><rect x="880" y="430" width="260" height="190" fill="none" stroke="#475569" stroke-width="1.5" stroke-dasharray="6 4"/><rect x="898" y="440" width="44" height="24" fill="#cbd5e1" stroke="#1e293b" stroke-width="1.2"/><text x="920" y="457" text-anchor="middle" font-size="11" fill="#1e293b">Res</text><line x1="892" y1="540" x2="918" y2="540" stroke="#1e293b" stroke-width="1.8" marker-end="url(#arrK)"/><rect x="920" y="500" width="60" height="80" fill="#93c5fd" stroke="#1e293b" stroke-width="1.5"/><text x="950" y="540" text-anchor="middle" font-size="9" fill="#1e293b" transform="rotate(-90 950 540)">Conv2D 3×3</text><line x1="980" y1="540" x2="998" y2="540" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><rect x="1000" y="500" width="60" height="80" fill="#93c5fd" stroke="#1e293b" stroke-width="1.5"/><text x="1030" y="540" text-anchor="middle" font-size="9" fill="#1e293b" transform="rotate(-90 1030 540)">Conv2D 3×3</text><line x1="1060" y1="540" x2="1078" y2="540" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><circle cx="1090" cy="540" r="10" fill="#fff" stroke="#1e293b" stroke-width="1.5"/><line x1="1083" y1="540" x2="1097" y2="540" stroke="#1e293b" stroke-width="1.5"/><line x1="1090" y1="533" x2="1090" y2="547" stroke="#1e293b" stroke-width="1.5"/><line x1="1101" y1="540" x2="1128" y2="540" stroke="#1e293b" stroke-width="1.8" marker-end="url(#arrK)"/><path d="M 912 540 C 912 478, 960 472, 1000 472 C 1040 472, 1090 472, 1090 528" stroke="#2563eb" stroke-width="1.6" fill="none" marker-end="url(#arrB)"/></svg>
-<figcaption>Figure 2. The architecture of the proposed model contains the backbones of the ResNet-18 in the encoder side. The skip-connections provide access to low-level semantic information via the residual blocks. To match image dimensions, the number of skip-connections is set to four and residual blocks are concatenated recursively. Skip-connections are forwarded with residual block to the decoder which sequentially increased by increasing of dimension. The residual pathway includes residual blocks each of which contains successive 3 × 3 convolution with the same number of output channels for each block. Redraw of the paper&#x27;s Figure 2.</figcaption>
-</figure>
-<section>
-<h2>Abstract</h2>
-<p class="abstract">The recently popular deep neural networks (DNNs) have a significant effect on the improvement of segmentation accuracy from various perspectives, including robustness and completeness in comparison to conventional methods. We determined that the naive U-Net has some lacks in specific perspectives and there is high potential for further enhancements on the model. Therefore, we employed some modifications in different folds of the U-Net to overcome this problem. Based on the probable opportunity for improvement, we develop a novel architecture by using an alternative feature extractor in the encoder of U-Net and replacing the plain blocks with residual blocks in the decoder. This alteration makes the model superconvergent yielding improved performance results on two challenging optical microscopy image series: a phase-contrast dataset of our own (MDA-MB-231) and a brightfield dataset from a well-known challenge (DSB2018). We utilized the U-Net with pretrained ResNet-18 as the encoder for the segmentation task. Hence, following the modifications, we redesign a novel skip-connection to reduce the semantic gap between the encoder and the decoder. The proposed skip-connection increases the accuracy of the model on both datasets. The proposed segmentation approach results in Jaccard Index values of 85.0% and 89.2% on the DSB2018 and MDA-MB-231 datasets, respectively. The results reveal that our method achieves competitive results compared to the state-of-the-art approaches and surpasses the performance of baseline approaches</p>
-</section>
-<section>
-<h2>Framework</h2>
-<div class="grid">
-<article class="card">
-<span class="step">01</span>
-<h3>Alternative encoder</h3>
-<p>A pretrained ResNet-18 replaces the plain U-Net encoder as the feature extractor.</p>
-</article>
-<article class="card">
-<span class="step">02</span>
-<h3>Residual decoder</h3>
-<p>Plain blocks in the decoder are replaced with residual blocks.</p>
-</article>
-<article class="card">
-<span class="step">03</span>
-<h3>Redesigned skip-connection</h3>
-<p>A new skip-connection reduces the semantic gap between encoder and decoder.</p>
-</article>
-<article class="card">
-<span class="step">04</span>
-<h3>Two datasets</h3>
-<p>Evaluated on a phase-contrast MDA-MB-231 dataset and the brightfield DSB2018 challenge dataset, reaching Jaccard Index values of 89.2% and 85.0%.</p>
-</article>
-</div>
-</section>
-<section>
-<h2>Resources</h2>
-<dl>
-<div>
-<dt>Journal</dt>
-<dd>
-<a href="https://journals.tubitak.gov.tr/elektrik/vol29/iss8/18/" target="_blank" rel="noreferrer">TÜBİTAK journal page</a>
-</dd>
-</div>
-<div>
-<dt>DOI</dt>
-<dd>
-<a href="https://doi.org/10.3906/elk-2105-244" target="_blank" rel="noreferrer">10.3906/elk-2105-244</a>
-</dd>
-</div>
-</dl>
-</section>
-<section>
-<h2>BibTeX</h2>
-<pre tabindex="0" aria-label="BibTeX citation">@article{ayanzadeh2021improved,
+<main id="main">
+  <header class="paper-hero">
+    <div class="wrap">
+      <nav aria-label="Breadcrumb">
+        <ol class="crumbs">
+          <li><a href="/">Home</a></li>
+          <li><a href="/publications.html">Publications</a></li>
+          <li aria-current="page">Turkish Journal of Electrical Engineering and Computer Sciences</li>
+        </ol>
+      </nav>
+      <p class="paper-hero__venue"><span class="eyebrow">Turkish Journal of Electrical Engineering and Computer Sciences · 2021</span></p>
+      <h1 class="paper-hero__title"><span>Improved cell segmentation</span> using deep learning in label-free optical microscopy images</h1>
+      <ul class="paper-authors" aria-label="Authors"><li class="me">Aydin Ayanzadeh</li><li>Özden Yalçın Özuysal</li><li>Devrim Pesen Okvur</li><li>Sevgi Önal</li><li>Behçet Uğur Töreyin</li><li>Devrim Ünay</li></ul>
+      <p class="paper-actions"><a class="btn btn--primary" href="https://doi.org/10.3906/elk-2105-244" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-external"/></svg>Publisher version</a><a class="btn" href="#cite"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-quote"/></svg>Cite</a></p>
+    </div>
+  </header>
+  <div class="wrap paper-layout">
+    <div class="paper-main">
+      <section aria-label="Figures">
+        <figure class="figure" data-figure id="fig-1">
+          <div class="figure__plate">
+            <svg viewBox="0 0 1160 640" role="img" aria-label="Redraw of Figure 2: architecture of the proposed model"><defs><marker id="arrK" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#1e293b"/></marker><marker id="arrB" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/></marker><marker id="arrR" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#dc2626"/></marker><marker id="arrO" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#ea580c"/></marker></defs><rect x="0" y="0" width="1160" height="640" fill="#fff"/><rect x="16" y="70" width="54" height="110" fill="#fff" stroke="#1e293b" stroke-width="1.5"/><text x="43" y="125" text-anchor="middle" font-size="10.5" fill="#1e293b" transform="rotate(-90 43 125)">Input Image 512×512</text><line x1="70" y1="125" x2="94" y2="125" stroke="#1e293b" stroke-width="1.8" marker-end="url(#arrK)"/><rect x="96" y="70" width="54" height="110" fill="#fef3c7" stroke="#1e293b" stroke-width="1.5"/><text x="123" y="125" text-anchor="middle" font-size="11" fill="#1e293b" transform="rotate(-90 123 125)">ResNet18 Backbone</text><text x="163" y="58" text-anchor="middle" font-size="10" fill="#1e293b">64×64</text><line x1="150" y1="125" x2="174" y2="125" stroke="#1e293b" stroke-width="1.8" marker-end="url(#arrK)"/><rect x="176" y="70" width="34" height="110" fill="#86efac" stroke="#1e293b" stroke-width="1.5"/><text x="193" y="125" text-anchor="middle" font-size="8" fill="#1e293b" transform="rotate(-90 193 125)">4×4 Transposed conv2D</text><line x1="210" y1="125" x2="217" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><rect x="218" y="70" width="32" height="110" fill="#fca5a5" stroke="#1e293b" stroke-width="1.5"/><text x="234" y="125" text-anchor="middle" font-size="9" fill="#1e293b" transform="rotate(-90 234 125)">Concat</text><line x1="250" y1="125" x2="257" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><rect x="258" y="70" width="38" height="110" fill="#93c5fd" stroke="#1e293b" stroke-width="1.5"/><text x="277" y="125" text-anchor="middle" font-size="8" fill="#1e293b" transform="rotate(-90 277 125)">BN+ReLU+Conv2D 3×3</text><text x="277" y="58" text-anchor="middle" font-size="10" fill="#1e293b" font-weight="600">512</text><rect x="304" y="70" width="38" height="110" fill="#93c5fd" stroke="#1e293b" stroke-width="1.5"/><text x="323" y="125" text-anchor="middle" font-size="8" fill="#1e293b" transform="rotate(-90 323 125)">BN+ReLU+Conv2D 3×3</text><text x="323" y="58" text-anchor="middle" font-size="10" fill="#1e293b" font-weight="600">512</text><line x1="296" y1="125" x2="303" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><line x1="342" y1="125" x2="349" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><circle cx="360" cy="125" r="10" fill="#fff" stroke="#1e293b" stroke-width="1.5"/><line x1="353" y1="125" x2="367" y2="125" stroke="#1e293b" stroke-width="1.5"/><line x1="360" y1="118" x2="360" y2="132" stroke="#1e293b" stroke-width="1.5"/><path d="M 234 70 C 234 12, 360 12, 360 113" stroke="#2563eb" stroke-width="1.6" fill="none" marker-end="url(#arrB)"/><line x1="371" y1="125" x2="384" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><text x="377" y="58" text-anchor="middle" font-size="10" fill="#1e293b">128×128</text><rect x="388" y="70" width="34" height="110" fill="#86efac" stroke="#1e293b" stroke-width="1.5"/><text x="405" y="125" text-anchor="middle" font-size="8" fill="#1e293b" transform="rotate(-90 405 125)">4×4 Transposed conv2D</text><line x1="422" y1="125" x2="429" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><rect x="430" y="70" width="32" height="110" fill="#fca5a5" stroke="#1e293b" stroke-width="1.5"/><text x="446" y="125" text-anchor="middle" font-size="9" fill="#1e293b" transform="rotate(-90 446 125)">Concat</text><line x1="462" y1="125" x2="469" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><rect x="470" y="70" width="38" height="110" fill="#93c5fd" stroke="#1e293b" stroke-width="1.5"/><text x="489" y="125" text-anchor="middle" font-size="8" fill="#1e293b" transform="rotate(-90 489 125)">BN+ReLU+Conv2D 3×3</text><text x="489" y="58" text-anchor="middle" font-size="10" fill="#1e293b" font-weight="600">256</text><rect x="516" y="70" width="38" height="110" fill="#93c5fd" stroke="#1e293b" stroke-width="1.5"/><text x="535" y="125" text-anchor="middle" font-size="8" fill="#1e293b" transform="rotate(-90 535 125)">BN+ReLU+Conv2D 3×3</text><text x="535" y="58" text-anchor="middle" font-size="10" fill="#1e293b" font-weight="600">256</text><line x1="508" y1="125" x2="515" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><line x1="554" y1="125" x2="561" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><circle cx="572" cy="125" r="10" fill="#fff" stroke="#1e293b" stroke-width="1.5"/><line x1="565" y1="125" x2="579" y2="125" stroke="#1e293b" stroke-width="1.5"/><line x1="572" y1="118" x2="572" y2="132" stroke="#1e293b" stroke-width="1.5"/><path d="M 446 70 C 446 12, 572 12, 572 113" stroke="#2563eb" stroke-width="1.6" fill="none" marker-end="url(#arrB)"/><line x1="583" y1="125" x2="596" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><text x="589" y="58" text-anchor="middle" font-size="10" fill="#1e293b">256×256</text><rect x="600" y="70" width="34" height="110" fill="#86efac" stroke="#1e293b" stroke-width="1.5"/><text x="617" y="125" text-anchor="middle" font-size="8" fill="#1e293b" transform="rotate(-90 617 125)">4×4 Transposed conv2D</text><line x1="634" y1="125" x2="641" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><rect x="642" y="70" width="32" height="110" fill="#fca5a5" stroke="#1e293b" stroke-width="1.5"/><text x="658" y="125" text-anchor="middle" font-size="9" fill="#1e293b" transform="rotate(-90 658 125)">Concat</text><line x1="674" y1="125" x2="681" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><rect x="682" y="70" width="38" height="110" fill="#93c5fd" stroke="#1e293b" stroke-width="1.5"/><text x="701" y="125" text-anchor="middle" font-size="8" fill="#1e293b" transform="rotate(-90 701 125)">BN+ReLU+Conv2D 3×3</text><text x="701" y="58" text-anchor="middle" font-size="10" fill="#1e293b" font-weight="600">128</text><rect x="728" y="70" width="38" height="110" fill="#93c5fd" stroke="#1e293b" stroke-width="1.5"/><text x="747" y="125" text-anchor="middle" font-size="8" fill="#1e293b" transform="rotate(-90 747 125)">BN+ReLU+Conv2D 3×3</text><text x="747" y="58" text-anchor="middle" font-size="10" fill="#1e293b" font-weight="600">128</text><line x1="720" y1="125" x2="727" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><line x1="766" y1="125" x2="773" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><circle cx="784" cy="125" r="10" fill="#fff" stroke="#1e293b" stroke-width="1.5"/><line x1="777" y1="125" x2="791" y2="125" stroke="#1e293b" stroke-width="1.5"/><line x1="784" y1="118" x2="784" y2="132" stroke="#1e293b" stroke-width="1.5"/><path d="M 658 70 C 658 12, 784 12, 784 113" stroke="#2563eb" stroke-width="1.6" fill="none" marker-end="url(#arrB)"/><line x1="795" y1="125" x2="808" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><text x="801" y="58" text-anchor="middle" font-size="10" fill="#1e293b">512×512</text><rect x="812" y="70" width="34" height="110" fill="#86efac" stroke="#1e293b" stroke-width="1.5"/><text x="829" y="125" text-anchor="middle" font-size="8" fill="#1e293b" transform="rotate(-90 829 125)">4×4 Transposed conv2D</text><line x1="846" y1="125" x2="853" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><rect x="854" y="70" width="32" height="110" fill="#fca5a5" stroke="#1e293b" stroke-width="1.5"/><text x="870" y="125" text-anchor="middle" font-size="9" fill="#1e293b" transform="rotate(-90 870 125)">Concat</text><line x1="886" y1="125" x2="893" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><rect x="894" y="70" width="38" height="110" fill="#93c5fd" stroke="#1e293b" stroke-width="1.5"/><text x="913" y="125" text-anchor="middle" font-size="8" fill="#1e293b" transform="rotate(-90 913 125)">BN+ReLU+Conv2D 3×3</text><text x="913" y="58" text-anchor="middle" font-size="10" fill="#1e293b" font-weight="600">64</text><rect x="940" y="70" width="38" height="110" fill="#93c5fd" stroke="#1e293b" stroke-width="1.5"/><text x="959" y="125" text-anchor="middle" font-size="8" fill="#1e293b" transform="rotate(-90 959 125)">BN+ReLU+Conv2D 3×3</text><text x="959" y="58" text-anchor="middle" font-size="10" fill="#1e293b" font-weight="600">64</text><line x1="932" y1="125" x2="939" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><line x1="978" y1="125" x2="985" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><circle cx="996" cy="125" r="10" fill="#fff" stroke="#1e293b" stroke-width="1.5"/><line x1="989" y1="125" x2="1003" y2="125" stroke="#1e293b" stroke-width="1.5"/><line x1="996" y1="118" x2="996" y2="132" stroke="#1e293b" stroke-width="1.5"/><path d="M 870 70 C 870 12, 996 12, 996 113" stroke="#2563eb" stroke-width="1.6" fill="none" marker-end="url(#arrB)"/><line x1="1007" y1="125" x2="1022" y2="125" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><rect x="1024" y="70" width="52" height="110" fill="#5eead4" stroke="#1e293b" stroke-width="1.5"/><text x="1050" y="125" text-anchor="middle" font-size="8.5" fill="#1e293b" transform="rotate(-90 1050 125)">1×1 Conv2D+Sigmoid</text><text x="1050" y="58" text-anchor="middle" font-size="10" fill="#1e293b" font-weight="600">1</text><text x="1050" y="198" text-anchor="middle" font-size="10" fill="#1e293b">512×512</text><line x1="1076" y1="125" x2="1092" y2="125" stroke="#1e293b" stroke-width="1.8" marker-end="url(#arrK)"/><rect x="1094" y="70" width="52" height="110" fill="#fff" stroke="#1e293b" stroke-width="1.5"/><text x="1120" y="125" text-anchor="middle" font-size="10.5" fill="#1e293b" transform="rotate(-90 1120 125)">Output Image 512×512</text><rect x="174" y="330" width="120" height="50" fill="#cbd5e1" stroke="#1e293b" stroke-width="1.5"/><text x="234" y="360" text-anchor="middle" font-size="11" fill="#1e293b">Res1 × (1)</text><text x="234" y="318" text-anchor="middle" font-size="10" fill="#1e293b">256</text><line x1="234" y1="328" x2="234" y2="182" stroke="#1e293b" stroke-width="1.8" marker-end="url(#arrK)"/><path d="M 123 180 C 123 250, 149 290, 189 290 L 189 328" stroke="#1e293b" stroke-width="1.6" fill="none" marker-end="url(#arrK)"/><rect x="386" y="330" width="120" height="50" fill="#cbd5e1" stroke="#1e293b" stroke-width="1.5"/><text x="446" y="360" text-anchor="middle" font-size="11" fill="#1e293b">Res2 × (2)</text><text x="446" y="318" text-anchor="middle" font-size="10" fill="#1e293b">128</text><line x1="446" y1="328" x2="446" y2="182" stroke="#1e293b" stroke-width="1.8" marker-end="url(#arrK)"/><path d="M 123 180 C 123 250, 361 290, 401 290 L 401 328" stroke="#1e293b" stroke-width="1.6" fill="none" marker-end="url(#arrK)"/><rect x="598" y="330" width="120" height="50" fill="#cbd5e1" stroke="#1e293b" stroke-width="1.5"/><text x="658" y="360" text-anchor="middle" font-size="11" fill="#1e293b">Res3 × (3)</text><text x="658" y="318" text-anchor="middle" font-size="10" fill="#1e293b">64</text><line x1="658" y1="328" x2="658" y2="182" stroke="#1e293b" stroke-width="1.8" marker-end="url(#arrK)"/><path d="M 123 180 C 123 250, 573 290, 613 290 L 613 328" stroke="#1e293b" stroke-width="1.6" fill="none" marker-end="url(#arrK)"/><rect x="810" y="330" width="120" height="50" fill="#cbd5e1" stroke="#1e293b" stroke-width="1.5"/><text x="870" y="360" text-anchor="middle" font-size="11" fill="#1e293b">Res4 × (4)</text><text x="870" y="318" text-anchor="middle" font-size="10" fill="#1e293b">32</text><line x1="870" y1="328" x2="870" y2="182" stroke="#1e293b" stroke-width="1.8" marker-end="url(#arrK)"/><path d="M 123 180 C 123 250, 785 290, 825 290 L 825 328" stroke="#1e293b" stroke-width="1.6" fill="none" marker-end="url(#arrK)"/><rect x="880" y="430" width="260" height="190" fill="none" stroke="#475569" stroke-width="1.5" stroke-dasharray="6 4"/><rect x="898" y="440" width="44" height="24" fill="#cbd5e1" stroke="#1e293b" stroke-width="1.2"/><text x="920" y="457" text-anchor="middle" font-size="11" fill="#1e293b">Res</text><line x1="892" y1="540" x2="918" y2="540" stroke="#1e293b" stroke-width="1.8" marker-end="url(#arrK)"/><rect x="920" y="500" width="60" height="80" fill="#93c5fd" stroke="#1e293b" stroke-width="1.5"/><text x="950" y="540" text-anchor="middle" font-size="9" fill="#1e293b" transform="rotate(-90 950 540)">Conv2D 3×3</text><line x1="980" y1="540" x2="998" y2="540" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><rect x="1000" y="500" width="60" height="80" fill="#93c5fd" stroke="#1e293b" stroke-width="1.5"/><text x="1030" y="540" text-anchor="middle" font-size="9" fill="#1e293b" transform="rotate(-90 1030 540)">Conv2D 3×3</text><line x1="1060" y1="540" x2="1078" y2="540" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrB)"/><circle cx="1090" cy="540" r="10" fill="#fff" stroke="#1e293b" stroke-width="1.5"/><line x1="1083" y1="540" x2="1097" y2="540" stroke="#1e293b" stroke-width="1.5"/><line x1="1090" y1="533" x2="1090" y2="547" stroke="#1e293b" stroke-width="1.5"/><line x1="1101" y1="540" x2="1128" y2="540" stroke="#1e293b" stroke-width="1.8" marker-end="url(#arrK)"/><path d="M 912 540 C 912 478, 960 472, 1000 472 C 1040 472, 1090 472, 1090 528" stroke="#2563eb" stroke-width="1.6" fill="none" marker-end="url(#arrB)"/></svg>
+            <button class="figure__zoom" type="button" data-zoom aria-label="Enlarge figure 1" hidden><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-expand"/></svg></button>
+          </div>
+          <figcaption>Figure 2. The architecture of the proposed model contains the backbones of the ResNet-18 in the encoder side. The skip-connections provide access to low-level semantic information via the residual blocks. To match image dimensions, the number of skip-connections is set to four and residual blocks are concatenated recursively. Skip-connections are forwarded with residual block to the decoder which sequentially increased by increasing of dimension. The residual pathway includes residual blocks each of which contains successive 3 × 3 convolution with the same number of output channels for each block. Redraw of the paper&#x27;s Figure 2.</figcaption>
+        </figure>
+      </section>
+      <section id="abstract" aria-labelledby="abstract-h">
+        <h2 id="abstract-h">Abstract</h2>
+        <p class="abstract">The recently popular deep neural networks (DNNs) have a significant effect on the improvement of segmentation accuracy from various perspectives, including robustness and completeness in comparison to conventional methods. We determined that the naive U-Net has some lacks in specific perspectives and there is high potential for further enhancements on the model. Therefore, we employed some modifications in different folds of the U-Net to overcome this problem. Based on the probable opportunity for improvement, we develop a novel architecture by using an alternative feature extractor in the encoder of U-Net and replacing the plain blocks with residual blocks in the decoder. This alteration makes the model superconvergent yielding improved performance results on two challenging optical microscopy image series: a phase-contrast dataset of our own (MDA-MB-231) and a brightfield dataset from a well-known challenge (DSB2018). We utilized the U-Net with pretrained ResNet-18 as the encoder for the segmentation task. Hence, following the modifications, we redesign a novel skip-connection to reduce the semantic gap between the encoder and the decoder. The proposed skip-connection increases the accuracy of the model on both datasets. The proposed segmentation approach results in Jaccard Index values of 85.0% and 89.2% on the DSB2018 and MDA-MB-231 datasets, respectively. The results reveal that our method achieves competitive results compared to the state-of-the-art approaches and surpasses the performance of baseline approaches</p>
+      </section>
+      <section id="method" aria-labelledby="method-h">
+        <h2 id="method-h">Framework</h2>
+        <ol class="steps">
+          <li><h3>Alternative encoder</h3><p>A pretrained ResNet-18 replaces the plain U-Net encoder as the feature extractor.</p></li>
+          <li><h3>Residual decoder</h3><p>Plain blocks in the decoder are replaced with residual blocks.</p></li>
+          <li><h3>Redesigned skip-connection</h3><p>A new skip-connection reduces the semantic gap between encoder and decoder.</p></li>
+          <li><h3>Two datasets</h3><p>Evaluated on a phase-contrast MDA-MB-231 dataset and the brightfield DSB2018 challenge dataset, reaching Jaccard Index values of 89.2% and 85.0%.</p></li>
+        </ol>
+      </section>
+      <section id="resources" aria-labelledby="resources-h">
+        <h2 id="resources-h">Resources</h2>
+        <dl class="kv">
+          <div><dt>Journal</dt><dd><a href="https://journals.tubitak.gov.tr/elektrik/vol29/iss8/18/" target="_blank" rel="noopener noreferrer">TÜBİTAK journal page</a></dd></div>
+          <div><dt>DOI</dt><dd><a href="https://doi.org/10.3906/elk-2105-244" target="_blank" rel="noopener noreferrer">10.3906/elk-2105-244</a></dd></div>
+        </dl>
+      </section>
+      <section id="cite" aria-labelledby="cite-h">
+        <h2 id="cite-h">Cite this work</h2>
+        <div class="bibtex" data-bibtex>
+          <pre tabindex="0" aria-label="BibTeX entry">@article{ayanzadeh2021improved,
   title = {Improved cell segmentation using deep learning in label-free optical microscopy images},
   author = {Ayanzadeh, Aydin and {\&quot;O}zuysal, {\&quot;O}zden Yal{\c{c}}in and Okvur, Devrim Pesen and {\&quot;O}nal, Sevgi and T{\&quot;o}reyin, Beh{\c{c}}et U{\u{g}}ur and {\&quot;U}nay, Devrim},
   journal = {Turkish Journal of Electrical Engineering and Computer Sciences},
@@ -86,8 +247,129 @@
   year = {2021},
   doi = {10.3906/elk-2105-244}
 }</pre>
-</section>
+          <p class="bibtex__actions">
+            <button class="btn btn--sm btn--primary" type="button" data-bibtex-copy hidden><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-copy"/></svg>Copy BibTeX</button>
+            <button class="btn btn--sm" type="button" data-bibtex-download hidden><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-download"/></svg>Download .bib</button>
+            <button class="btn btn--sm" type="button" data-cite="cell-segmentation-microscopy" hidden><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-quote"/></svg>APA, MLA, IEEE</button>
+            <span class="bibtex__status" role="status" aria-live="polite" data-bibtex-status></span>
+          </p>
+        </div>
+      </section>
+      <section id="related" aria-labelledby="related-h">
+        <h2 id="related-h">Related publications</h2>
+        <p class="muted">More from the research thread <a href="/publications.html?topic=biomedical">Biomedical image analysis</a>.</p>
+        <ul class="related stack">
+          <li>
+            <article class="pub">
+              <h3 class="pub__title"><a href="/wound-healing-microscopy-chapter/">Automated analysis of phase-contrast optical microscopy time-lapse images: application to wound healing and cell motility assays of breast cancer</a></h3>
+              <p class="pub__authors">Yusuf Sait Erdem, <span class="me">Aydin Ayanzadeh</span>, Berkay Mayalı, Muhammed Balıkçi, Özge Nur Belli, Mahmut Uçar, Özden Yalçın Özyusal, Devrim Pesen Okvur, Sevgi Önal, Kenan Morani, Leonardo Obinna Iheme, Behçet Uğur Töreyin, and Devrim Ünay</p>
+              <p class="pub__venue"><span>In <cite>Diagnostic Biomedical Signal and Image Processing Applications with Deep Learning Methods</cite>, pp. 137-154, Academic Press, 2023</span><span class="tag">Book chapter</span></p>
+              <p class="pub__links"><a class="pub__link pub__link--page" href="/wound-healing-microscopy-chapter/"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-file"/></svg>Paper page</a><a class="pub__link" href="https://doi.org/10.1016/B978-0-323-96129-5.00013-5" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-external"/></svg>Publisher</a><a class="pub__link" href="https://www.sciencedirect.com/book/9780323961295" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-book"/></svg>Book</a><button class="pub__link" type="button" data-cite="wound-healing-microscopy-chapter" hidden><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-quote"/></svg>Cite</button></p>
+            </article>
+          </li>
+          <li>
+            <article class="pub">
+              <h3 class="pub__title"><a href="/siu-2020-segmentation-pipeline/">Deep Learning based Segmentation Pipeline for Label-Free Phase-Contrast Microscopy Images</a></h3>
+              <p class="pub__authors"><span class="me">Aydin Ayanzadeh</span>, Özden Yalçın Özuysal, Devrim Pesen Okvur, Sevgi Önal, Behçet Uğur Töreyin, and Devrim Ünay</p>
+              <p class="pub__venue"><span><cite>2020 28th Signal Processing and Communications Applications Conference (SIU)</cite>, pp. 1-4, IEEE, 2020</span><span class="tag">Conference paper</span></p>
+              <p class="pub__links"><a class="pub__link pub__link--page" href="/siu-2020-segmentation-pipeline/"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-file"/></svg>Paper page</a><a class="pub__link" href="https://gcris.iyte.edu.tr/bitstream/11147/11785/1/Deep_Learning_based_Segmentation_Pipeline.pdf" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-file"/></svg>PDF</a><a class="pub__link" href="https://doi.org/10.1109/SIU49456.2020.9302304" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-external"/></svg>Publisher</a><button class="pub__link" type="button" data-cite="siu-2020-segmentation-pipeline" hidden><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-quote"/></svg>Cite</button></p>
+            </article>
+          </li>
+          <li>
+            <article class="pub">
+              <h3 class="pub__title"><a href="/tiptekno-2019-cell-segmentation/">Cell Segmentation of 2D Phase-Contrast Microscopy Images with Deep Learning Method</a></h3>
+              <p class="pub__authors"><span class="me">Aydin Ayanzadeh</span>, Hüseyin Onur Yağar, Özden Yalçın Özuysal, Devrim Pesen Okvur, Behçet Uğur Töreyin, Devrim Ünay, and Sevgi Önal</p>
+              <p class="pub__venue"><span><cite>2019 Medical Technologies Congress (TIPTEKNO)</cite>, pp. 1-4, IEEE, 2019</span><span class="tag">Conference paper</span></p>
+              <p class="pub__links"><a class="pub__link pub__link--page" href="/tiptekno-2019-cell-segmentation/"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-file"/></svg>Paper page</a><a class="pub__link" href="https://doi.org/10.1109/TIPTEKNO.2019.8894978" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-external"/></svg>Publisher</a><button class="pub__link" type="button" data-cite="tiptekno-2019-cell-segmentation" hidden><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-quote"/></svg>Cite</button></p>
+            </article>
+          </li>
+          <li>
+            <article class="pub">
+              <h3 class="pub__title"><a href="/tiptekno-2019-cell-time-series/">Automated Segmentation of Cells in Phase Contrast Optical Microscopy Time Series Images</a></h3>
+              <p class="pub__authors">Rıfkı Can Binici, Umut Şahin, <span class="me">Aydin Ayanzadeh</span>, Behçet Uğur Töreyin, Sevgi Önal, Devrim Pesen Okvur, Özden Yalçın Özuysal, and Devrim Ünay</p>
+              <p class="pub__venue"><span><cite>2019 Medical Technologies Congress (TIPTEKNO)</cite>, pp. 1-4, IEEE, 2019</span><span class="tag">Conference paper</span></p>
+              <p class="pub__links"><a class="pub__link pub__link--page" href="/tiptekno-2019-cell-time-series/"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-file"/></svg>Paper page</a><a class="pub__link" href="https://doi.org/10.1109/TIPTEKNO.2019.8895080" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-external"/></svg>Publisher</a><button class="pub__link" type="button" data-cite="tiptekno-2019-cell-time-series" hidden><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-quote"/></svg>Cite</button></p>
+            </article>
+          </li>
+        </ul>
+      </section>
+    </div>
+    <aside class="paper-aside" aria-label="About this paper">
+      <div>
+        <h2 class="sub__title">At a glance</h2>
+        <dl class="kv kv--stack">
+          <div><dt>Venue</dt><dd><cite>Turkish Journal of Electrical Engineering and Computer Sciences</cite>, vol. 29, no. 8, pp. 2855-2868, 2021</dd></div>
+          <div><dt>Year</dt><dd>2021</dd></div>
+          <div><dt>Type</dt><dd>Journal article</dd></div>
+          <div><dt>Research thread</dt><dd><a href="/publications.html?topic=biomedical">Biomedical image analysis</a></dd></div>
+          <div><dt>DOI</dt><dd><a href="https://doi.org/10.3906/elk-2105-244" target="_blank" rel="noopener noreferrer">10.3906/elk-2105-244</a></dd></div>
+        </dl>
+      </div>
+      <nav class="aside-nav" aria-label="On this page">
+        <h2 class="sub__title">On this page</h2>
+        <ul>
+          <li><a href="#abstract">Abstract</a></li>
+          <li><a href="#method">Framework</a></li>
+          <li><a href="#resources">Resources</a></li>
+          <li><a href="#cite">Cite</a></li>
+          <li><a href="#related">Related</a></li>
+        </ul>
+      </nav>
+    </aside>
+  </div>
 </main>
-<footer>Turkish Journal of Electrical Engineering and Computer Sciences, vol. 29, no. 8, pp. 2855-2868, 2021</footer>
+<footer class="site-footer ds">
+  <div class="wrap">
+    <div class="site-footer__grid">
+      <div class="site-footer__about">
+        <a class="brand" href="/"><svg class="brand__mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect class="m-plate" width="32" height="32" rx="8"/><path class="m-glyph" d="M9.5 23.5 16 8.5l6.5 15M12.2 18.5h7.6" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle class="m-dot" cx="25" cy="7" r="2.6"/></svg><span class="brand__name">Aydin Ayanzadeh</span></a>
+        <p>Ph.D. student in Computer Science at UMBC working on computer vision, multimodal learning and medical image analysis, with a focus on AI that is useful in clinics, in the field and in assistive technology.</p>
+      </div>
+      <nav aria-label="Site">
+        <h2>Site</h2>
+        <ul class="site-footer__links">
+          <li><a href="/#research">Research</a></li>
+          <li><a href="/publications.html">Publications</a></li>
+          <li><a href="/#projects">Projects</a></li>
+          <li><a href="/#experience">Experience</a></li>
+          <li><a href="/#teaching">Teaching</a></li>
+          <li><a href="/#news">News</a></li>
+          <li><a href="/blog.html">Blog</a></li>
+          <li><a href="/#contact">Contact</a></li>
+        </ul>
+      </nav>
+      <nav aria-label="Profiles">
+        <h2>Profiles</h2>
+        <ul class="site-footer__links">
+          <li><a href="https://scholar.google.com/citations?user=B17tai4AAAAJ" rel="me noopener">Google Scholar</a></li>
+          <li><a href="https://orcid.org/0000-0002-8816-3204" rel="me noopener">ORCID</a></li>
+          <li><a href="https://dblp.org/pid/207/7890" rel="me noopener">DBLP</a></li>
+          <li><a href="https://github.com/Ayanzadeh93" rel="me noopener">GitHub</a></li>
+          <li><a href="https://www.linkedin.com/in/ayanzadeh93" rel="me noopener">LinkedIn</a></li>
+          <li><a href="https://huggingface.co/Ayanzadeh93" rel="me noopener">Hugging Face</a></li>
+          <li><a href="https://ieeexplore.ieee.org/author/37085790008" rel="me noopener">IEEE Xplore</a></li>
+          <li><a href="https://www.researchgate.net/profile/Aydin-Ayanzadeh" rel="me noopener">ResearchGate</a></li>
+          <li><a href="https://x.com/aydin_ayanzadeh" rel="me noopener">X</a></li>
+        </ul>
+      </nav>
+      <nav aria-label="Downloads">
+        <h2>Downloads</h2>
+        <ul class="site-footer__links">
+          <li><a href="/Aydin_Ayanzadeh_CV__final.pdf">Curriculum vitae (PDF)</a></li>
+          <li><a href="/assets/publications.bib" download>All publications (BibTeX)</a></li>
+          <li><a href="/sitemap.xml">Sitemap</a></li>
+          <li><a href="mailto:a.ayanzadeh@gmail.com">a.ayanzadeh@gmail.com</a></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="site-footer__base">
+      <p>&copy; 2026 Aydin Ayanzadeh. Last updated 13 Nov 2026.</p>
+      <p>Set in Newsreader and Atkinson Hyperlegible, a typeface designed for low-vision readers. No tracking cookies.</p>
+    </div>
+  </div>
+</footer>
+<cite-dialog></cite-dialog>
+<script defer src="/js/site.js"></script>
+<script type="module" src="/js/components/index.js"></script>
 </body>
 </html>

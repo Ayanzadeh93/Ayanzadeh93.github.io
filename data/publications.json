@@ -1,0 +1,1147 @@
+{
+  "schemaVersion": 1,
+  "topics": [
+    {
+      "id": "navigation",
+      "name": "Accessible navigation",
+      "summary": "Indoor navigation for blind and low-vision people: parsing floor plans into spatial knowledge graphs, agentic route planning with safety checks, and characterizing the on-device multimodal workload."
+    },
+    {
+      "id": "environment",
+      "name": "Wildfire and environmental AI",
+      "summary": "Vision-language models for early wildfire detection from satellite imagery, and auditable deep learning mechanisms for next-day wildfire spread prediction."
+    },
+    {
+      "id": "biomedical",
+      "name": "Biomedical image analysis",
+      "summary": "Deep learning for cell segmentation in label-free phase-contrast microscopy, from still images to time-lapse wound-healing and cell-motility assays."
+    },
+    {
+      "id": "efficient",
+      "name": "Efficient and representation learning",
+      "summary": "Knowledge distillation with clustered hint points, and residual variational graph autoencoders for link prediction."
+    },
+    {
+      "id": "foundations",
+      "name": "Image processing and optimization",
+      "summary": "Earlier work on edge detection, transfer learning for fine-grained classification, and scaling matrices for trust-region methods."
+    }
+  ],
+  "publications": [
+    {
+      "id": "nextday-wildfire",
+      "title": "Modular Deep Learning Mechanisms for Auditable Next-Day Wildfire Spread Prediction",
+      "title_lead": "Modular Deep Learning Mechanisms",
+      "authors": [
+        "Miguel Esparza",
+        "Aydin Ayanzadeh",
+        "Ahmad Mousavi",
+        "Ali Mostafavi"
+      ],
+      "affiliations": "Texas A&M University · University of Maryland, Baltimore County · American University",
+      "type": "preprint",
+      "year": 2026,
+      "venue": "arXiv preprint",
+      "venue_short": "arXiv 2026",
+      "venue_line": "Under submission · arXiv preprint arXiv:2609.17763 (2026)",
+      "status": "under-submission",
+      "doi": "10.48550/arXiv.2609.17763",
+      "arxiv": "2609.17763",
+      "topic": "environment",
+      "selected": true,
+      "summary": "Modular deep learning augmentations for next-day wildfire spread prediction: wind- and slope-conditioned attention, retrieval-augmented correction, and dual-stream gating.",
+      "bibtex": "@misc{esparza2026modular,\n  title = {Modular Deep Learning Mechanisms for Auditable Next-Day Wildfire Spread Prediction},\n  author = {Esparza, Miguel and Ayanzadeh, Aydin and Mousavi, Ahmad and Mostafavi, Ali},\n  year = {2026},\n  eprint = {2609.17763},\n  archivePrefix = {arXiv},\n  primaryClass = {cs.LG},\n  doi = {10.48550/arXiv.2609.17763},\n  url = {https://arxiv.org/abs/2609.17763}\n}",
+      "page": {
+        "description": "Modular deep learning augmentations for next-day wildfire spread prediction: wind- and slope-conditioned attention, retrieval-augmented correction, and dual-stream gating. Under submission, arXiv:2609.17763.",
+        "figures": [
+          {
+            "caption": "Figure 1. The proposed mechanisms: (1) dual-stream gate; (2) wind- and slope-conditioned attention biases (WCAB and SCAB); (3) physics-feature retrieval-augmented output correction (PFRAOC). Original figure from the arXiv HTML version of the paper.",
+            "src": "https://arxiv.org/html/2609.17763v2/figures/WorkflowRev2.png",
+            "alt": "The proposed mechanisms: dual-stream gate, wind- and slope-conditioned attention biases, and physics-feature retrieval-augmented output correction."
+          }
+        ],
+        "abstract_heading": "Abstract",
+        "abstract": [
+          "Next-day wildfire prediction requires models whose forecasts can be evaluated alongside the assumptions and historical evidence used in their computation. Although deep learning can learn spatial patterns from remote-sensing data, predictive performance alone does not establish physical fidelity or operational trustworthiness. This study investigates three modular augmentations for next-day active-fire prediction: wind- and slope-conditioned attention biases, physics-feature retrieval-augmented output correction, and fire conditioned dual-stream gating. The attention biases expose prescribed directional preferences, while the retrieval module selects historical tiles using a nine-dimensional environmental and fire-state descriptor and applies a learned correction to a frozen model's logits. The modules are evaluated across five backbones on the Next Day Wildfire Spread benchmark, using staged ablations, directional audits, retrieval perturbations, calibration measures, and computational comparisons. The three-seed mean F1 score and area under the precision--recall curve (AUC-PR) of a SwinUNETR model with all three augmentations are 0.4216 and 0.3673. Then, a mixed ensemble (two augmented architectures and one non-augmented architecture) model achieves 0.4292 and 0.3790. Benefits vary across architectures, and retrieval-related improvements in AUC-PR do not consistently translate into higher F1. The constructed wind bias aligns closely with input wind, but its alignment with observed next-day fire displacement is much weaker, distinguishing prior inspectability from predictive physical fidelity. The study contributes a framework for exposing and evaluating selected domain-informed components within wildfire prediction models. Together, the results presented show that predictive performance, operational trustworthiness, and computational practicality need not be competing objectives."
+        ],
+        "method_heading": "Framework",
+        "method_layout": "grid",
+        "method": [
+          {
+            "title": "Wind- and slope-conditioned attention",
+            "text": "Attention biases that expose prescribed directional preferences from wind and terrain slope."
+          },
+          {
+            "title": "Retrieval-augmented output correction",
+            "text": "A nine-dimensional environmental and fire-state descriptor selects historical tiles, and a learned correction adjusts a frozen model's logits."
+          },
+          {
+            "title": "Fire-conditioned dual-stream gating",
+            "text": "Gating driven by the previous fire mask separates fire and context streams."
+          },
+          {
+            "title": "Staged evaluation",
+            "text": "Five backbones on the Next Day Wildfire Spread benchmark, with ablations, directional audits, retrieval perturbations, and calibration measures."
+          }
+        ],
+        "resources": [
+          {
+            "label": "Preprint",
+            "text": "arXiv:2609.17763",
+            "url": "https://arxiv.org/abs/2609.17763"
+          },
+          {
+            "label": "DOI",
+            "text": "10.48550/arXiv.2609.17763",
+            "url": "https://doi.org/10.48550/arXiv.2609.17763"
+          }
+        ]
+      }
+    },
+    {
+      "id": "iiswc-2026-workload",
+      "title": "Characterizing an On-Device Depth-Aware Multimodal Workload in Assistive Navigation for Blind and Low-Vision Users",
+      "title_lead": "Characterizing an On-Device Depth-Aware Multimodal Workload",
+      "authors": [
+        "Aydin Ayanzadeh",
+        "Tim Oates"
+      ],
+      "affiliations": "University of Maryland, Baltimore County",
+      "type": "inproceedings",
+      "year": 2026,
+      "venue": "IEEE International Symposium on Workload Characterization (IISWC)",
+      "venue_short": "IISWC 2026",
+      "venue_line": "IEEE International Symposium on Workload Characterization (IISWC) 2026",
+      "status": "accepted",
+      "topic": "navigation",
+      "selected": true,
+      "summary": "An end-to-end characterization of an on-device, depth-aware multimodal workload for assistive indoor navigation for blind and low-vision users.",
+      "bibtex": "@inproceedings{ayanzadeh2026characterizing,\n  title = {Characterizing an On-Device Depth-Aware Multimodal Workload in Assistive Navigation for Blind and Low-Vision Users},\n  author = {Ayanzadeh, Aydin and Oates, Tim},\n  booktitle = {Proceedings of the IEEE International Symposium on Workload Characterization (IISWC)},\n  year = {2026},\n  address = {Boulder, CO, USA}\n}",
+      "page": {
+        "description": "An on-device depth-aware multimodal workload for assistive indoor navigation for blind and low-vision users. Accepted at IISWC 2026.",
+        "figures": [
+          {
+            "caption": "Figure 2. Two-stage workload with the sMLLM split into vision-encoder, prefill, and decode sub-stages. The dashed region is wrapped with NVML/DCGM (GPU energy, clocks, throttle), RAPL+pyJoules (CPU and DRAM energy), Nsight Systems (kernel timeline), and perf (CPU IPC, DRAM bandwidth). Redraw of the paper’s Figure 2.",
+            "svg": "assets/figures/iiswc-2026-workload-fig1.svg"
+          },
+          {
+            "caption": "Figure 1. Three views of the workload-characterization gap that this paper closes. (a) Quality–latency frontier: local sMLLM navigators sit precariously close to the 300 ms safety SLO; existing studies report only the headline points, not their distributions. (b) Per-frame latency follows a long-tailed distribution; the tail crosses the SLO on the densest, most safety-critical frames. (c) Stage-level decomposition reveals decode (red) and the visual-token-driven prefill (blue) as the dominant cost components; the detector contributes only a small constant. We characterize the workload at the granularity that exposes these effects. Redraw of the paper’s Figure 1.",
+            "svg": "assets/figures/iiswc-2026-workload-fig2.svg"
+          },
+          {
+            "caption": "Figure 3. Reconstructed per-frame timeline (illustrative). Prefill is a single dense bar (yellow); decode is a long tail of small steps (light red) and dominates the wall-clock latency. Redraw of the paper’s Figure 3.",
+            "svg": "assets/figures/iiswc-2026-workload-fig3.svg"
+          }
+        ],
+        "abstract_heading": "Abstract",
+        "abstract": [
+          "Assistive visual navigation for blind and low-vision users is shifting from geometry-only pipelines to detector-plus-small-multimodal-LLM (sMLLM) pipelines that deliver semantically grounded guidance. The resulting workload, however, has not been systematically characterized: prior studies emphasize API latency or natural-language quality and ignore on-device systems behaviour. We present the first end-to-end workload characterization of a two-stage YOLO + sMLLM pipeline operating under a hard 300 ms per-frame safety service-level objective (SLO). We expose all five execution phases—detector inference, vision-encoder embedding, MLLM prefill, autoregressive decode, and KV-cache materialization—and introduce a thirteen-group metric taxonomy that unifies compute, memory hierarchy, interconnect, energy, latency tails, throughput, LLM-phase, visual-token, scheduling, thermal/DVFS, SLO, quality, and robustness. The taxonomy is instantiated through NVML, DCGM, Nsight Systems/Compute, RAPL, pyJoules, and Linux perf. Across four detector × sMLLM configurations and three urgency-stratified scene suites, we identify two principal bottlenecks: decode-bound tail latency that produces an order-of-magnitude gap between mean and p99, and visual-token inflation that drives prefill cost super-linearly with input resolution. We further show that detector-side optimization is a low-leverage knob (4–6% of frame energy), whereas output-token capping, INT8 quantization, and visual-token pruning recover up to 27% of safety goodput. We release a per-frame CSV schema, instrumentation hooks, and figure-regenerating scripts as a reproducible IISWC artifact."
+        ],
+        "notes": [
+          "Abstract from the manuscript in the author’s IISWC 2026 paper repository. The paper was accepted at the IEEE International Symposium on Workload Characterization (IISWC) 2026 in Boulder, Colorado; the proceedings record is not public yet, so no DOI or page numbers are listed here. They will be added once the proceedings version is available.",
+          "Note: the IISWC 2026 program lists this paper under a slightly different title, “Characterizing an On-Device Depth-Aware Multimodal Pipeline for Real-Time Assistive Navigation Assistance to Blind Users”."
+        ],
+        "resources": [
+          {
+            "label": "Conference program",
+            "text": "IISWC 2026 program",
+            "url": "https://iiswc.org/iiswc2026/program.html"
+          }
+        ]
+      }
+    },
+    {
+      "id": "cvpr-2026-floorplan-agentic",
+      "title": "LLM-Guided Agentic Floor Plan Parsing for Accessible Indoor Navigation of Blind and Low-Vision People",
+      "title_lead": "LLM-Guided Agentic Floor Plan Parsing",
+      "authors": [
+        "Aydin Ayanzadeh",
+        "Tim Oates"
+      ],
+      "affiliations": "University of Maryland, Baltimore County",
+      "type": "inproceedings",
+      "year": 2026,
+      "venue": "IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) Workshops",
+      "venue_short": "CVPR 2026 Workshop (GRAIL-V)",
+      "venue_line": "CVPR 2026 Workshop (GRAIL-V) · IEEE/CVF Conference on Computer Vision and Pattern Recognition Workshops",
+      "status": "published",
+      "doi": "10.48550/arXiv.2604.23970",
+      "arxiv": "2604.23970",
+      "topic": "navigation",
+      "selected": true,
+      "summary": "An agentic framework that converts a single floor plan image into a structured, retrievable knowledge base for safe, accessible indoor navigation.",
+      "links": {
+        "pdf": "https://openaccess.thecvf.com/content/CVPR2026W/GRAIL-V/papers/Ayanzadeh_LLM-Guided_Agentic_Floor_Plan_Parsing_for_Accessible_Indoor_Navigation_of_CVPRW_2026_paper.pdf"
+      },
+      "bibtex": "@inproceedings{ayanzadeh2026llm,\n  title = {LLM-Guided Agentic Floor Plan Parsing for Accessible Indoor Navigation of Blind and Low-Vision People},\n  author = {Ayanzadeh, Aydin and Oates, Tim},\n  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) Workshops},\n  year = {2026},\n  eprint = {2604.23970},\n  archivePrefix = {arXiv},\n  primaryClass = {cs.AI},\n  doi = {10.48550/arXiv.2604.23970},\n  url = {https://arxiv.org/abs/2604.23970}\n}",
+      "page": {
+        "description": "An agentic framework that converts a single floor plan image into a structured, retrievable knowledge base for safe, accessible indoor navigation. CVPR 2026 Workshop (GRAIL-V).",
+        "figures": [
+          {
+            "caption": "Figure 1. Overview of our agentic pipeline showing the five-agent workflow and three-tier RAG knowledge store. Original figure from the arXiv HTML version of the paper.",
+            "src": "https://arxiv.org/html/2604.23970v1/fig/agentic_pipeline.png",
+            "alt": "Overview of the agentic pipeline showing the five-agent workflow and three-tier RAG knowledge store."
+          }
+        ],
+        "abstract_heading": "Abstract",
+        "abstract": [
+          "Indoor navigation remains a critical accessibility challenge for the blind and low-vision (BLV) individuals, as existing solutions rely on costly per-building infrastructure. We present an agentic framework that converts a single floor plan image into a structured, retrievable knowledge base to generate safe, accessible navigation instructions with lightweight infrastructure. The system has two phases: a multi-agent module that parses the floor plan into a spatial knowledge graph through a self-correcting pipeline with iterative retry loops and corrective feedback; and a Path Planner that generates accessible navigation instructions, with a Safety Evaluator agent assessing potential hazards along each route. We evaluate the system on the real-world UMBC Math and Psychology building (floors MP-1 and MP-3) and on the CVC-FP benchmark. On MP-1, we achieve success rates of 92.31%, 76.92%, and 61.54% for short, medium, and long routes, outperforming the strongest single-call baseline (Claude 3.7 Sonnet) at 84.62%, 69.23%, and 53.85%. On MP-3, we reach 76.92%, 61.54%, and 38.46%, compared to the best baseline at 61.54%, 46.15%, and 23.08%. These results show consistent gains over single-call LLM baselines and demonstrate that our workflow is a scalable solution for accessible indoor navigation for BLV individuals."
+        ],
+        "method_heading": "Framework",
+        "method_layout": "grid",
+        "method": [
+          {
+            "title": "Multi-agent parsing",
+            "text": "The Parser extracts rooms and adjacencies, the Graph Builder constructs a validated floor-plan graph, and the Self-Critic enforces structural checks with feedback loops."
+          },
+          {
+            "title": "Safety Evaluator",
+            "text": "An agent flags hazards along each route, such as narrow passages and dead ends."
+          },
+          {
+            "title": "Three-tier RAG knowledge store",
+            "text": "Results are stored as graph, vector, and visual tiers for retrieval."
+          },
+          {
+            "title": "Path Planner",
+            "text": "The RAG Navigator retrieves context and the Planner generates BFS-based navigation with landmarks and safety notes, re-routing on hazard alerts."
+          }
+        ],
+        "resources": [
+          {
+            "label": "Preprint",
+            "text": "arXiv:2604.23970",
+            "url": "https://arxiv.org/abs/2604.23970"
+          },
+          {
+            "label": "Open access (CVF)",
+            "text": "CVPRW 2026 paper (PDF)",
+            "url": "https://openaccess.thecvf.com/content/CVPR2026W/GRAIL-V/papers/Ayanzadeh_LLM-Guided_Agentic_Floor_Plan_Parsing_for_Accessible_Indoor_Navigation_of_CVPRW_2026_paper.pdf"
+          },
+          {
+            "label": "DOI",
+            "text": "10.48550/arXiv.2604.23970",
+            "url": "https://doi.org/10.48550/arXiv.2604.23970"
+          }
+        ]
+      }
+    },
+    {
+      "id": "wildfirevlm",
+      "title": "WildfireVLM: AI-Powered Analysis for Early Wildfire Detection Using Satellite Imagery",
+      "title_lead": "WildfireVLM:",
+      "authors": [
+        "Aydin Ayanzadeh",
+        "Prakhar Dixit",
+        "Sadia Kamal",
+        "Milton Halem"
+      ],
+      "type": "inproceedings",
+      "year": 2026,
+      "venue": "IEEE International Geoscience and Remote Sensing Symposium (IGARSS)",
+      "venue_short": "IGARSS 2026",
+      "venue_line": "IEEE International Geoscience and Remote Sensing Symposium (IGARSS) 2026",
+      "status": "accepted",
+      "arxiv": "2602.13305",
+      "topic": "environment",
+      "selected": true,
+      "summary": "A vision-language model for early wildfire detection and risk assessment from satellite imagery.",
+      "links": {
+        "slides": "assets/slides/wildfire-vlm-igarss-2026.pdf"
+      },
+      "external_page": "https://www.ayanzadeh.com/wildfirevlm-page/",
+      "bibtex": "@inproceedings{ayanzadeh2026wildfirevlm,\n  title = {{WildfireVLM}: AI-Powered Analysis for Early Wildfire Detection Using Satellite Imagery},\n  author = {Ayanzadeh, Aydin and Dixit, Prakhar and Kamal, Sadia and Halem, Milton},\n  booktitle = {IEEE International Geoscience and Remote Sensing Symposium (IGARSS)},\n  year = {2026},\n  eprint = {2602.13305},\n  archivePrefix = {arXiv},\n  url = {https://arxiv.org/abs/2602.13305},\n  note = {Accepted}\n}"
+    },
+    {
+      "id": "IEEEBigData2025",
+      "title": "Floorplan2Guide: LLM-Guided Floorplan Parsing for BLV Indoor Navigation",
+      "title_lead": "Floorplan2Guide:",
+      "authors": [
+        "Aydin Ayanzadeh",
+        "Tim Oates"
+      ],
+      "affiliations": "University of Maryland, Baltimore County",
+      "type": "inproceedings",
+      "year": 2025,
+      "venue": "2025 IEEE International Conference on Big Data (BigData)",
+      "venue_short": "IEEE BigData 2025",
+      "venue_line": "2025 IEEE International Conference on Big Data (BigData)",
+      "status": "published",
+      "pages": "7477-7485",
+      "publisher": "IEEE",
+      "doi": "10.1109/BigData66926.2025.11401868",
+      "arxiv": "2512.12177",
+      "topic": "navigation",
+      "selected": true,
+      "summary": "Floorplan2Guide transforms floorplans into spatial knowledge graphs and language-guided indoor navigation for blind and low-vision users.",
+      "bibtex": "@inproceedings{ayanzadeh2025floorplan2guide,\n  title     = {Floorplan2Guide: LLM-Guided Floorplan Parsing for BLV Indoor Navigation},\n  author    = {Ayanzadeh, Aydin and Oates, Tim},\n  booktitle = {2025 IEEE International Conference on Big Data (BigData)},\n  pages     = {7477--7485},\n  year      = {2025},\n  doi       = {10.1109/BigData66926.2025.11401868}\n}",
+      "page": {
+        "description": "Floorplan2Guide transforms floorplans into spatial knowledge graphs and language-guided indoor navigation for Blind and Low Vision users. IEEE BigData 2025.",
+        "figures": [
+          {
+            "caption": "Figure 1. Architecture of the LLM-based indoor navigation system. Floorplans are parsed into a spatial knowledge graph, which the language model uses to generate navigation instructions from user queries. Original figure from the Floorplan2Guide arXiv preprint (CC BY 4.0).",
+            "src": "https://id-preview--d0ef47de-0bec-4fbb-a80d-2468c593106f.lovable.app/__l5e/assets-v1/02b66d2e-e05d-475e-b8ee-db415fce4067/floorplan-architecture.png",
+            "alt": "Floorplan2Guide system architecture showing a floorplan converted into a spatial knowledge graph and interpreted by a language model to produce indoor navigation instructions."
+          }
+        ],
+        "abstract_heading": "Abstract",
+        "abstract": [
+          "Indoor navigation remains a critical challenge for people with visual impairments. The current solutions mainly rely on infrastructure-based systems, which limit their ability to navigate safely in dynamic environments. We propose a novel navigation approach that utilizes a foundation model to transform floor plans into navigable knowledge graphs and generate human-readable navigation instructions. Floorplan2Guide integrates a large language model (LLM) to extract spatial information from architectural layouts, reducing the manual preprocessing required by earlier floorplan parsing methods. Experimental results indicate that few-shot learning improves navigation accuracy in comparison to zero-shot learning on simulated and real-world evaluations. Claude 3.7 Sonnet achieves the highest accuracy among the evaluated models, with 92.31%, 76.92%, and 61.54% on the short, medium, and long routes, respectively, under 5-shot prompting of the MP-1 floor plan. The success rate of graph-based spatial structure is 15.4% higher than that of direct visual reasoning among all models, which confirms that graphical representation and in-context learning enhance navigation performance and make our solution more precise for indoor navigation of Blind and Low Vision (BLV) users."
+        ],
+        "method_heading": "Framework",
+        "method_layout": "grid",
+        "method": [
+          {
+            "title": "Floorplan parsing",
+            "text": "Textual and geometric features are extracted from architectural layouts using OCR and visual analysis."
+          },
+          {
+            "title": "Spatial knowledge graph",
+            "text": "The language model constructs and validates a graph of spatial entities and their connections, enriched with ArUco marker information."
+          },
+          {
+            "title": "Language-guided navigation",
+            "text": "User queries are translated into step-by-step, context-aware indoor navigation instructions."
+          },
+          {
+            "title": "Route-aware localization",
+            "text": "Marker-based localization supports route tracking and alerts users when they deviate from the planned route."
+          }
+        ],
+        "resources": [
+          {
+            "label": "Published paper",
+            "text": "IEEE Xplore",
+            "url": "https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=11401868"
+          },
+          {
+            "label": "DOI",
+            "text": "10.1109/BigData66926.2025.11401868",
+            "url": "https://doi.org/10.1109/BigData66926.2025.11401868"
+          }
+        ]
+      }
+    },
+    {
+      "id": "pursuhint",
+      "title": "PURSUhInT: In Search of Informative Hint Points Based on Layer Clustering for Knowledge Distillation",
+      "title_lead": "PURSUhInT:",
+      "authors": [
+        "Reyhan Kevser Keser",
+        "Aydin Ayanzadeh",
+        "Omid Abdollahi Aghdam",
+        "Çağlar Kılcıoğlu",
+        "Behçet Uğur Töreyin",
+        "Nazım Kemal Üre"
+      ],
+      "type": "article",
+      "year": 2023,
+      "venue": "Expert Systems with Applications",
+      "venue_short": "Expert Systems with Applications",
+      "venue_line": "Expert Systems with Applications, vol. 213, 119040, 2023",
+      "status": "published",
+      "volume": "213",
+      "pages": "119040",
+      "doi": "10.1016/j.eswa.2022.119040",
+      "arxiv": "2103.00053",
+      "topic": "efficient",
+      "selected": true,
+      "summary": "A clustering-based hint selection method for knowledge distillation: teacher layers are clustered and the cluster centers become the hint points.",
+      "links": {
+        "code": "https://codeocean.com/capsule/4245746/tree/v1"
+      },
+      "bibtex": "@article{keser2023pursuhint,\n  title = {{PURSUhInT}: In Search of Informative Hint Points Based on Layer Clustering for Knowledge Distillation},\n  author = {Keser, Reyhan Kevser and Ayanzadeh, Aydin and Aghdam, Omid Abdollahi and Kilcioglu, Caglar and Toreyin, Behcet Ugur and Ure, Nazim Kemal},\n  journal = {Expert Systems with Applications},\n  volume = {213},\n  pages = {119040},\n  year = {2023},\n  doi = {10.1016/j.eswa.2022.119040},\n  url = {https://doi.org/10.1016/j.eswa.2022.119040},\n  eprint = {2103.00053},\n  archivePrefix = {arXiv},\n  primaryClass = {cs.LG}\n}",
+      "page": {
+        "description": "A clustering-based hint selection method for knowledge distillation: teacher layers are clustered and the cluster centers become the hint points. Expert Systems with Applications, 2023.",
+        "figures": [
+          {
+            "caption": "Figure 1: The workflow of PURSUhInT consists of three steps: (a) The acquisition of layer representations. For this purpose, feature maps for a certain number of samples (N) are obtained from all of the sub-blocks of pre-trained teacher and averaged in dimensions of height and width to form matrices with the size of N×C. (b) Clustering layer representations to obtain clusters of sub-blocks utilizing k-means. To remove redundancy, we choose one hint point for each cluster, specifically center positions of the clusters. (c) Distillation with the determined hint positions in the previous step. In the diagrams, HP represents the index of hint point, H depicts the transformation which determines the hint type and CL shows the determined cluster. Best viewed in color. Figure 1 from the paper, hosted on arXiv.",
+            "src": "https://arxiv.org/html/2103.00053v3/all_steps2.svg",
+            "alt": "Figure 1 from the PURSUhInT paper: the three-step workflow of layer representation acquisition, clustering, and distillation"
+          }
+        ],
+        "abstract_heading": "Abstract",
+        "abstract": [
+          "One of the most efficient methods for model compression is hint distillation, where the student model is injected with information (hints) from several different layers of the teacher model. Although the selection of hint points can drastically alter the compression performance, conventional distillation approaches overlook this fact and use the same hint points as in the early studies. Therefore, we propose a clustering based hint selection methodology, where the layers of teacher model are clustered with respect to several metrics and the cluster centers are used as the hint points. Our method is applicable for any student network, once it is applied on a chosen teacher network. The proposed approach is validated in CIFAR-100 and ImageNet datasets, using various teacher-student pairs and numerous hint distillation methods. Our results show that hint points selected by our algorithm results in superior compression performance compared to state-of-the-art knowledge distillation algorithms on the same student models and datasets."
+        ],
+        "method_heading": "Method",
+        "method_layout": "steps",
+        "method": [
+          {
+            "title": "Acquire layer representations",
+            "text": "Feature maps for a number of samples are obtained from all sub-blocks of the pre-trained teacher and averaged to form matrices."
+          },
+          {
+            "title": "Cluster the layers",
+            "text": "Layer representations are clustered with k-means; one hint point per cluster, at the cluster center, removes redundancy."
+          },
+          {
+            "title": "Distill with the chosen hints",
+            "text": "The student is distilled with the determined hint positions, for any student network once applied on a chosen teacher."
+          }
+        ],
+        "resources": [
+          {
+            "label": "Preprint",
+            "text": "arXiv:2103.00053",
+            "url": "https://arxiv.org/abs/2103.00053"
+          },
+          {
+            "label": "Journal",
+            "text": "ScienceDirect",
+            "url": "https://www.sciencedirect.com/science/article/abs/pii/S0957417422020589"
+          },
+          {
+            "label": "DOI",
+            "text": "10.1016/j.eswa.2022.119040",
+            "url": "https://doi.org/10.1016/j.eswa.2022.119040"
+          }
+        ]
+      }
+    },
+    {
+      "id": "wound-healing-microscopy-chapter",
+      "title": "Automated analysis of phase-contrast optical microscopy time-lapse images: application to wound healing and cell motility assays of breast cancer",
+      "title_lead": "Automated analysis of phase-contrast optical microscopy time-lapse images:",
+      "authors": [
+        "Yusuf Sait Erdem",
+        "Aydin Ayanzadeh",
+        "Berkay Mayalı",
+        "Muhammed Balıkçi",
+        "Özge Nur Belli",
+        "Mahmut Uçar",
+        "Özden Yalçın Özyusal",
+        "Devrim Pesen Okvur",
+        "Sevgi Önal",
+        "Kenan Morani",
+        "Leonardo Obinna Iheme",
+        "Behçet Uğur Töreyin",
+        "Devrim Ünay"
+      ],
+      "type": "incollection",
+      "year": 2023,
+      "venue": "Diagnostic Biomedical Signal and Image Processing Applications with Deep Learning Methods",
+      "venue_short": "Book chapter, Academic Press",
+      "venue_line": "In Diagnostic Biomedical Signal and Image Processing Applications with Deep Learning Methods, pp. 137-154, Academic Press, 2023",
+      "status": "published",
+      "pages": "137-154",
+      "publisher": "Academic Press",
+      "doi": "10.1016/B978-0-323-96129-5.00013-5",
+      "topic": "biomedical",
+      "summary": "An end-to-end workflow for analyzing phase-contrast microscopy data from cell motility and wound healing assays.",
+      "links": {
+        "book": "https://www.sciencedirect.com/book/9780323961295"
+      },
+      "bibtex": "@incollection{erdem2023automated,\n  title = {Automated analysis of phase-contrast optical microscopy time-lapse images: application to wound healing and cell motility assays of breast cancer},\n  author = {Erdem, Yusuf Sait and Ayanzadeh, Aydin and Mayal{\\i}, Berkay and Bal{\\i}k{\\c{c}}i, Muhammed and Belli, {\\\"O}zge Nur and U{\\c{c}}ar, Mahmut and Yal{\\c{c}}{\\i}n {\\\"O}zyusal, {\\\"O}zden and Pesen Okvur, Devrim and {\\\"O}nal, Sevgi and Morani, Kenan and Iheme, Leonardo Obinna and T{\\\"o}reyin, Beh{\\c{c}}et U{\\u{g}}ur and {\\\"U}nay, Devrim},\n  booktitle = {Diagnostic Biomedical Signal and Image Processing Applications with Deep Learning Methods},\n  editor = {Polat, Kemal and {\\\"O}zt{\\\"u}rk, Saban},\n  publisher = {Elsevier / Academic Press},\n  pages = {137--154},\n  year = {2023},\n  doi = {10.1016/B978-0-323-96129-5.00013-5},\n  url = {https://doi.org/10.1016/B978-0-323-96129-5.00013-5}\n}",
+      "page": {
+        "description": "An end-to-end workflow for analyzing phase-contrast microscopy data from cell motility and wound healing assays. Book chapter, Academic Press, 2023.",
+        "figures": [
+          {
+            "caption": "Schematic of the chapter's end-to-end workflow, drawn from the publisher summary. This is a schematic, not the chapter's figure.",
+            "svg": "assets/figures/wound-healing-microscopy-chapter-fig1.svg"
+          }
+        ],
+        "abstract_heading": "Chapter summary",
+        "abstract": [
+          "This chapter describes a workflow for analyzing phase-contrast microscopy (PCM) data from two fundamental types of biomedical assays: assays for cell motility and assays for wound healing. The workflow of the analysis is composed of the methods for acquiring, restoring, segmenting, and quantifying biomedical data. In the literature, there have been separate methods aimed at specific stages of PCM data analysis. Nonetheless, there has never been a complete workflow for all stages of analysis. This work is an innovation that proposes an end-to-end workflow for image pre-processing, deep learning segmentation, tracking, and quantification stages in cell motility and wound healing assay analyses. The findings indicate that domain knowledge can be used to make simple but significant improvements to the results of cutting-edge methods. Furthermore, even for deep learning-based methods, pre-processing is clearly a necessary step in the workflow."
+        ],
+        "method_heading": "Framework",
+        "method_layout": "grid",
+        "method": [
+          {
+            "title": "Acquire and restore",
+            "text": "Phase-contrast microscopy data from motility and wound healing assays is acquired and restored."
+          },
+          {
+            "title": "Segment",
+            "text": "Deep learning segmentation isolates cells in the time-lapse images."
+          },
+          {
+            "title": "Track and quantify",
+            "text": "Cell tracking and quantification measure motility and wound healing over time."
+          },
+          {
+            "title": "Domain knowledge",
+            "text": "Simple, domain-informed improvements lift the results of cutting-edge methods, and pre-processing proves necessary even for deep learning."
+          }
+        ],
+        "resources": [
+          {
+            "label": "Chapter DOI",
+            "text": "10.1016/B978-0-323-96129-5.00013-5",
+            "url": "https://doi.org/10.1016/B978-0-323-96129-5.00013-5"
+          },
+          {
+            "label": "Book",
+            "text": "ScienceDirect book page",
+            "url": "https://www.sciencedirect.com/book/9780323961295"
+          }
+        ]
+      }
+    },
+    {
+      "id": "cell-segmentation-microscopy",
+      "title": "Improved cell segmentation using deep learning in label-free optical microscopy images",
+      "title_lead": "Improved cell segmentation",
+      "authors": [
+        "Aydin Ayanzadeh",
+        "Özden Yalçın Özuysal",
+        "Devrim Pesen Okvur",
+        "Sevgi Önal",
+        "Behçet Uğur Töreyin",
+        "Devrim Ünay"
+      ],
+      "type": "article",
+      "year": 2021,
+      "venue": "Turkish Journal of Electrical Engineering and Computer Sciences",
+      "venue_short": "Turkish Journal of Electrical Engineering and Computer Sciences",
+      "venue_line": "Turkish Journal of Electrical Engineering and Computer Sciences, vol. 29, no. 8, pp. 2855-2868, 2021",
+      "status": "published",
+      "volume": "29",
+      "number": "8",
+      "pages": "2855-2868",
+      "doi": "10.3906/elk-2105-244",
+      "topic": "biomedical",
+      "summary": "A modified U-Net with a pretrained ResNet-18 encoder, residual decoder blocks, and a redesigned skip-connection for cell segmentation in label-free microscopy images.",
+      "links": {
+        "publisher": "https://journals.tubitak.gov.tr/elektrik/vol29/iss8/18/"
+      },
+      "bibtex": "@article{ayanzadeh2021improved,\n  title = {Improved cell segmentation using deep learning in label-free optical microscopy images},\n  author = {Ayanzadeh, Aydin and {\\\"O}zuysal, {\\\"O}zden Yal{\\c{c}}in and Okvur, Devrim Pesen and {\\\"O}nal, Sevgi and T{\\\"o}reyin, Beh{\\c{c}}et U{\\u{g}}ur and {\\\"U}nay, Devrim},\n  journal = {Turkish Journal of Electrical Engineering and Computer Sciences},\n  volume = {29},\n  number = {8},\n  pages = {2855--2868},\n  year = {2021},\n  doi = {10.3906/elk-2105-244}\n}",
+      "page": {
+        "description": "A modified U-Net with a pretrained ResNet-18 encoder, residual decoder blocks, and a redesigned skip-connection for cell segmentation in label-free microscopy images. Turkish Journal of Electrical Engineering and Computer Sciences, 2021.",
+        "figures": [
+          {
+            "caption": "Figure 2. The architecture of the proposed model contains the backbones of the ResNet-18 in the encoder side. The skip-connections provide access to low-level semantic information via the residual blocks. To match image dimensions, the number of skip-connections is set to four and residual blocks are concatenated recursively. Skip-connections are forwarded with residual block to the decoder which sequentially increased by increasing of dimension. The residual pathway includes residual blocks each of which contains successive 3 × 3 convolution with the same number of output channels for each block. Redraw of the paper's Figure 2.",
+            "svg": "assets/figures/cell-segmentation-microscopy-fig1.svg"
+          }
+        ],
+        "abstract_heading": "Abstract",
+        "abstract": [
+          "The recently popular deep neural networks (DNNs) have a significant effect on the improvement of segmentation accuracy from various perspectives, including robustness and completeness in comparison to conventional methods. We determined that the naive U-Net has some lacks in specific perspectives and there is high potential for further enhancements on the model. Therefore, we employed some modifications in different folds of the U-Net to overcome this problem. Based on the probable opportunity for improvement, we develop a novel architecture by using an alternative feature extractor in the encoder of U-Net and replacing the plain blocks with residual blocks in the decoder. This alteration makes the model superconvergent yielding improved performance results on two challenging optical microscopy image series: a phase-contrast dataset of our own (MDA-MB-231) and a brightfield dataset from a well-known challenge (DSB2018). We utilized the U-Net with pretrained ResNet-18 as the encoder for the segmentation task. Hence, following the modifications, we redesign a novel skip-connection to reduce the semantic gap between the encoder and the decoder. The proposed skip-connection increases the accuracy of the model on both datasets. The proposed segmentation approach results in Jaccard Index values of 85.0% and 89.2% on the DSB2018 and MDA-MB-231 datasets, respectively. The results reveal that our method achieves competitive results compared to the state-of-the-art approaches and surpasses the performance of baseline approaches"
+        ],
+        "method_heading": "Framework",
+        "method_layout": "grid",
+        "method": [
+          {
+            "title": "Alternative encoder",
+            "text": "A pretrained ResNet-18 replaces the plain U-Net encoder as the feature extractor."
+          },
+          {
+            "title": "Residual decoder",
+            "text": "Plain blocks in the decoder are replaced with residual blocks."
+          },
+          {
+            "title": "Redesigned skip-connection",
+            "text": "A new skip-connection reduces the semantic gap between encoder and decoder."
+          },
+          {
+            "title": "Two datasets",
+            "text": "Evaluated on a phase-contrast MDA-MB-231 dataset and the brightfield DSB2018 challenge dataset, reaching Jaccard Index values of 89.2% and 85.0%."
+          }
+        ],
+        "resources": [
+          {
+            "label": "Journal",
+            "text": "TÜBİTAK journal page",
+            "url": "https://journals.tubitak.gov.tr/elektrik/vol29/iss8/18/"
+          },
+          {
+            "label": "DOI",
+            "text": "10.3906/elk-2105-244",
+            "url": "https://doi.org/10.3906/elk-2105-244"
+          }
+        ]
+      }
+    },
+    {
+      "id": "resvgae-graph-autoencoders",
+      "title": "Representation learning using graph autoencoders with residual connections",
+      "title_lead": "Representation learning",
+      "authors": [
+        "Indrit Nallbani",
+        "Aydin Ayanzadeh",
+        "Reyhan Kevser Keser",
+        "Nurullah Çalık",
+        "Behçet Uğur Töreyin"
+      ],
+      "type": "preprint",
+      "year": 2021,
+      "venue": "arXiv preprint",
+      "venue_short": "arXiv 2021",
+      "venue_line": "arXiv preprint arXiv:2105.00695 (2021)",
+      "status": "preprint",
+      "doi": "10.48550/arXiv.2105.00695",
+      "arxiv": "2105.00695",
+      "topic": "efficient",
+      "summary": "Residual connections for deep graph autoencoders: ResVGAE, a deep variational graph autoencoder with multiple residual modules, for link prediction.",
+      "bibtex": "@misc{nallbani2021representation,\n  title = {Representation learning using graph autoencoders with residual connections},\n  author = {Nallbani, Indrit and Ayanzadeh, Aydin and Keser, Reyhan Kevser and {\\c{C}}al{\\i}k, Nurullah and T{\\\"o}reyin, Beh{\\c{c}}et U{\\u{g}}ur},\n  year = {2021},\n  eprint = {2105.00695},\n  archivePrefix = {arXiv},\n  primaryClass = {cs.LG},\n  doi = {10.48550/arXiv.2105.00695},\n  url = {https://arxiv.org/abs/2105.00695}\n}",
+      "page": {
+        "description": "Residual connections for deep graph autoencoders: ResVGAE, a deep variational graph autoencoder with multiple residual modules, for link prediction. arXiv preprint, 2021.",
+        "figures": [
+          {
+            "caption": "Figure 1. End-to-end framework of ResVGAE: given two distant nodes X and Y, the model predicts a link between them. Original figure from the arXiv HTML version of the paper.",
+            "src": "https://arxiv.org/html/2105.00695v2/ndrawio1.png",
+            "alt": "End-to-end framework of ResVGAE: given two distant nodes X and Y, the model predicts a link between them."
+          }
+        ],
+        "abstract_heading": "Abstract",
+        "abstract": [
+          "Graph autoencoders are efficient at embedding graph-based data sets. Most graph autoencoder architectures have shallow depths which limits their ability to capture meaningful relations between nodes separated by multi-hops. In this paper, we propose Residual Variational Graph Autoencoder, ResVGAE, a deep variational graph autoencoder model with multiple residual modules. We show that our multiple residual modules, a convolutional layer with residual connection, improve the average precision of the graph autoencoders. Experimental results suggest that our proposed model with residual modules outperforms the models without residual modules and achieves similar results when compared with other state-of-the-art methods."
+        ],
+        "notes": [
+          "The arXiv record was revised in 2022 under the title “ResVGAE: Going Deeper with Residual Modules for Link Prediction”. This page uses the title and author order as listed by the author, with the current arXiv abstract above."
+        ],
+        "method_heading": "Framework",
+        "method_layout": "grid",
+        "method": [
+          {
+            "title": "Residual modules",
+            "text": "A convolutional layer with a residual connection is added to the graph autoencoder, letting it go deeper without losing accuracy."
+          },
+          {
+            "title": "Deep variational autoencoder",
+            "text": "ResVGAE stacks multiple residual modules in a deep variational graph autoencoder."
+          },
+          {
+            "title": "Link prediction",
+            "text": "The model is evaluated on link prediction, where it outperforms the same models without residual modules."
+          }
+        ],
+        "resources": [
+          {
+            "label": "Preprint",
+            "text": "arXiv:2105.00695",
+            "url": "https://arxiv.org/abs/2105.00695"
+          },
+          {
+            "label": "DOI",
+            "text": "10.48550/arXiv.2105.00695",
+            "url": "https://doi.org/10.48550/arXiv.2105.00695"
+          }
+        ]
+      }
+    },
+    {
+      "id": "siu-2020-segmentation-pipeline",
+      "title": "Deep Learning based Segmentation Pipeline for Label-Free Phase-Contrast Microscopy Images",
+      "title_lead": "Deep Learning based Segmentation Pipeline",
+      "authors": [
+        "Aydin Ayanzadeh",
+        "Özden Yalçın Özuysal",
+        "Devrim Pesen Okvur",
+        "Sevgi Önal",
+        "Behçet Uğur Töreyin",
+        "Devrim Ünay"
+      ],
+      "type": "inproceedings",
+      "year": 2020,
+      "venue": "2020 28th Signal Processing and Communications Applications Conference (SIU)",
+      "venue_short": "SIU 2020",
+      "venue_line": "2020 28th Signal Processing and Communications Applications Conference (SIU), pp. 1-4, IEEE, 2020",
+      "status": "published",
+      "pages": "1-4",
+      "publisher": "IEEE",
+      "doi": "10.1109/SIU49456.2020.9302304",
+      "topic": "biomedical",
+      "summary": "A deep learning segmentation pipeline for label-free phase-contrast microscopy images, improving U-Net and FPN with an ImageNet-pretrained ResNet-18 encoder.",
+      "links": {
+        "pdf": "https://gcris.iyte.edu.tr/bitstream/11147/11785/1/Deep_Learning_based_Segmentation_Pipeline.pdf"
+      },
+      "bibtex": "@inproceedings{ayanzadeh2020deep,\n  title = {Deep Learning based Segmentation Pipeline for Label-Free Phase-Contrast Microscopy Images},\n  author = {Ayanzadeh, Aydin and {\\\"O}zuysal, {\\\"O}zden Yal{\\c{c}}in and Okvur, Devrim Pesen and {\\\"O}nal, Sevgi and T{\\\"o}reyin, Beh{\\c{c}}et U{\\u{g}}ur and {\\\"U}nay, Devrim},\n  booktitle = {2020 28th Signal Processing and Communications Applications Conference (SIU)},\n  pages = {1--4},\n  year = {2020},\n  organization = {IEEE},\n  doi = {10.1109/SIU49456.2020.9302304}\n}",
+      "page": {
+        "description": "A deep learning segmentation pipeline for label-free phase-contrast microscopy images, improving U-Net and FPN with an ImageNet-pretrained ResNet-18 encoder. SIU 2020, IEEE.",
+        "figures": [
+          {
+            "caption": "Schematic of the pipeline: a ResNet-18 encoder pretrained on ImageNet feeds U-Net and Feature Pyramid Network decoders. This is a schematic, not the paper's figure.",
+            "svg": "assets/figures/siu-2020-segmentation-pipeline-fig1.svg"
+          }
+        ],
+        "abstract_heading": "Abstract",
+        "abstract": [
+          "The segmentation of cells is necessary for biologists in the morphological statistics for quantitative and qualitative analysis in Phase-contrast Microscopy (PCM) images. In this paper, we address the cell segmentation problem in PCM images. Deep Neural Networks (DNNs) commonly is initialized with weights from a network pre-trained on a large annotated data set like ImageNet have superior performance than those trained from scratch on a small dataset. Here, we demonstrate how encoder-decoder type architectures such as U-Net and Feature Pyramid Network (FPN) can be improved by an alternative encoder which pre-trained on the ImageNet dataset. In particular, our experimental results confirm that the image descriptors from ResNet-18 are highly effective in accurate prediction of the cell boundary and have higher Intersection over Union (IoU) in comparison to the classical U-Net and require fewer training epochs."
+        ],
+        "method_heading": "Method",
+        "method_layout": "steps",
+        "method": [
+          {
+            "title": "Pretrained encoder",
+            "text": "An ImageNet-pretrained ResNet-18 replaces the plain encoder of U-Net and FPN."
+          },
+          {
+            "title": "Two decoders",
+            "text": "Both U-Net and Feature Pyramid Network decoders are tested with the new encoder."
+          },
+          {
+            "title": "Sharper boundaries",
+            "text": "ResNet-18 image descriptors predict cell boundaries accurately, with higher IoU than classical U-Net and fewer training epochs."
+          }
+        ],
+        "resources": [
+          {
+            "label": "Publisher",
+            "text": "IEEE Xplore",
+            "url": "https://ieeexplore.ieee.org/abstract/document/9302304"
+          },
+          {
+            "label": "Open access",
+            "text": "Full text (IYTE GCRIS)",
+            "url": "https://gcris.iyte.edu.tr/bitstream/11147/11785/1/Deep_Learning_based_Segmentation_Pipeline.pdf"
+          },
+          {
+            "label": "DOI",
+            "text": "10.1109/SIU49456.2020.9302304",
+            "url": "https://doi.org/10.1109/SIU49456.2020.9302304"
+          }
+        ]
+      }
+    },
+    {
+      "id": "siu-2020-graph-embedding",
+      "title": "Graph Embedding For Link Prediction Using Residual Variational Graph Autoencoders",
+      "title_lead": "Graph Embedding For Link Prediction",
+      "authors": [
+        "Reyhan Kevser Keser",
+        "Indrit Nallbani",
+        "Nurullah Çalık",
+        "Aydin Ayanzadeh",
+        "Behçet Uğur Töreyin"
+      ],
+      "type": "inproceedings",
+      "year": 2020,
+      "venue": "2020 28th Signal Processing and Communications Applications Conference (SIU)",
+      "venue_short": "SIU 2020",
+      "venue_line": "2020 28th Signal Processing and Communications Applications Conference (SIU), pp. 1-4, IEEE, 2020",
+      "status": "published",
+      "pages": "1-4",
+      "publisher": "IEEE",
+      "doi": "10.1109/SIU49456.2020.9302271",
+      "topic": "efficient",
+      "summary": "Residual Variational Graph Autoencoder (RVGAE): residual connections boost variational graph autoencoders for link prediction.",
+      "bibtex": "@inproceedings{keser2020graph,\n  title = {Graph Embedding For Link Prediction Using Residual Variational Graph Autoencoders},\n  author = {Keser, Reyhan Kevser and Nallbani, Indrit and {\\c{C}}al{\\i}k, Nurullah and Ayanzadeh, Aydin and T{\\\"o}reyin, Beh{\\c{c}}et U{\\u{g}}ur},\n  booktitle = {2020 28th Signal Processing and Communications Applications Conference (SIU)},\n  pages = {1--4},\n  year = {2020},\n  organization = {IEEE},\n  doi = {10.1109/SIU49456.2020.9302271}\n}",
+      "page": {
+        "description": "Residual Variational Graph Autoencoder (RVGAE): residual connections boost variational graph autoencoders for link prediction. SIU 2020, IEEE.",
+        "figures": [
+          {
+            "caption": "Figure 2 (from the extended arXiv version of this work, arXiv:2105.00695): Model architecture of ResVGAE. Residual connections start after the first Hidden Layer (HL) since the input and the output size of layers with residual modules must be the same. The encoder takes the adjacency matrix A and the feature matrix X as inputs and outputs the node embeddings Z. The decoder takes as input the embedding matrix Z and outputs the reconstructed adjacency matrix Â. The blocks in blue indicate the graph convolutional layers that embed 32-dimensional node feature vectors into a matrix. Similarly, yellow blocks constitute the graph convolutional layers that embed 16-dimensional hidden layer features into the output Z matrix. The upper and lower branches of the encoder represent variational graph autoencoder and graph autoencoder architectures, respectively. The SIU 2020 paper itself is paywalled, so the figure is shown from the extended arXiv version.",
+            "src": "https://ar5iv.labs.arxiv.org/html/2105.00695/assets/res.png",
+            "alt": "Model architecture of ResVGAE from the extended arXiv version of this work"
+          }
+        ],
+        "abstract_heading": "Abstract",
+        "abstract": [
+          "Graphs are usually represented by high dimensional data. Hence, graph embedding is an essential task, which aims to represent a graph in a lower dimension while protecting the original graph's properties. In this paper, we propose a novel graph embedding method called Residual Variational Graph Autoencoder (RVGAE), which boosts variational graph autoencoder's performance utilizing residual connections. Our method's performance is evaluated on the link prediction task. The results demonstrate that our model can achieve better results than graph convolutional neural network (GCN) and variational graph autoencoder (VGAE)."
+        ],
+        "method_heading": "Framework",
+        "method_layout": "grid",
+        "method": [
+          {
+            "title": "Residual encoder",
+            "text": "Residual connections are added to the variational graph autoencoder's encoder."
+          },
+          {
+            "title": "Low-dimensional embedding",
+            "text": "The graph is embedded in a lower dimension while protecting its original properties."
+          },
+          {
+            "title": "Link prediction",
+            "text": "Evaluated on link prediction, RVGAE beats both GCN and VGAE."
+          }
+        ],
+        "resources": [
+          {
+            "label": "Publisher",
+            "text": "IEEE Xplore",
+            "url": "https://ieeexplore.ieee.org/abstract/document/9302271"
+          },
+          {
+            "label": "DOI",
+            "text": "10.1109/SIU49456.2020.9302271",
+            "url": "https://doi.org/10.1109/SIU49456.2020.9302271"
+          }
+        ]
+      }
+    },
+    {
+      "id": "scaling-matrices-trust-region",
+      "title": "A New Class of Scaling Matrices for Scaled Trust Region Algorithms",
+      "title_lead": "A New Class of Scaling Matrices",
+      "authors": [
+        "Aydin Ayanzadeh",
+        "Shokoufeh Yazdanian",
+        "Ehsan Shahamatnia"
+      ],
+      "type": "preprint",
+      "year": 2019,
+      "venue": "arXiv preprint",
+      "venue_short": "arXiv 2019",
+      "venue_line": "arXiv preprint arXiv:1904.09209 (2019)",
+      "status": "preprint",
+      "arxiv": "1904.09209",
+      "topic": "foundations",
+      "summary": "A new class of affine scaling matrices for interior point Newton-type methods, defined as a convex combination of well-known scaling matrices.",
+      "bibtex": "@misc{ayanzadeh2019scaling,\n  title = {A New Class of Scaling Matrices for Scaled Trust Region Algorithms},\n  author = {Ayanzadeh, Aydin and Yazdanian, Shokoufeh and Shahamatnia, Ehsan},\n  year = {2019},\n  eprint = {1904.09209},\n  archivePrefix = {arXiv},\n  primaryClass = {math.OC},\n  url = {https://arxiv.org/abs/1904.09209}\n}",
+      "page": {
+        "description": "A new class of affine scaling matrices for interior point Newton-type methods, defined as a convex combination of well-known scaling matrices. arXiv preprint, 2019.",
+        "abstract_heading": "Abstract",
+        "abstract": [
+          "A new class of affine scaling matrices for the interior point Newton-type methods is considered to solve the nonlinear systems with simple bounds. We review the essential properties of a scaling matrix and consider several well-known scaling matrices proposed in the literature. We define a new scaling matrix that is the convex combination of these matrices. The proposed scaling matrix inherits those interesting properties of the individual matrices and satisfies additional desired requirements. The numerical experiments demonstrate the superiority of the new scaling matrix in solving several important test problems."
+        ],
+        "method_heading": "Method",
+        "method_layout": "steps",
+        "method": [
+          {
+            "title": "Review of scaling matrices",
+            "text": "The essential properties of a scaling matrix are reviewed, with several well-known matrices from the literature."
+          },
+          {
+            "title": "A new scaling matrix",
+            "text": "A new matrix is defined as the convex combination of the reviewed matrices, inheriting their properties and satisfying additional requirements."
+          },
+          {
+            "title": "Numerical experiments",
+            "text": "Experiments on several important test problems demonstrate the superiority of the new scaling matrix."
+          }
+        ],
+        "resources": [
+          {
+            "label": "Preprint",
+            "text": "arXiv:1904.09209",
+            "url": "https://arxiv.org/abs/1904.09209"
+          }
+        ]
+      }
+    },
+    {
+      "id": "tiptekno-2019-cell-segmentation",
+      "title": "Cell Segmentation of 2D Phase-Contrast Microscopy Images with Deep Learning Method",
+      "title_lead": "Cell Segmentation of 2D Phase-Contrast Microscopy Images",
+      "authors": [
+        "Aydin Ayanzadeh",
+        "Hüseyin Onur Yağar",
+        "Özden Yalçın Özuysal",
+        "Devrim Pesen Okvur",
+        "Behçet Uğur Töreyin",
+        "Devrim Ünay",
+        "Sevgi Önal"
+      ],
+      "type": "inproceedings",
+      "year": 2019,
+      "venue": "2019 Medical Technologies Congress (TIPTEKNO)",
+      "venue_short": "TIPTEKNO 2019",
+      "venue_line": "2019 Medical Technologies Congress (TIPTEKNO), pp. 1-4, IEEE, 2019",
+      "status": "published",
+      "pages": "1-4",
+      "publisher": "IEEE",
+      "doi": "10.1109/TIPTEKNO.2019.8894978",
+      "topic": "biomedical",
+      "summary": "A multiresolution U-Net with multi-combination augmentation for cell segmentation in 2D phase-contrast microscopy images.",
+      "bibtex": "@inproceedings{ayanzadeh2019cell,\n  title = {Cell Segmentation of 2D Phase-Contrast Microscopy Images with Deep Learning Method},\n  author = {Ayanzadeh, Aydin and Ya{\\u{g}}ar, H{\\\"u}seyin Onur and {\\\"O}zuysal, {\\\"O}zden Yal{\\c{c}}in and Okvur, Devrim Pesen and T{\\\"o}reyin, Beh{\\c{c}}et U{\\u{g}}ur and {\\\"U}nay, Devrim and {\\\"O}nal, Sevgi},\n  booktitle = {2019 Medical Technologies Congress (TIPTEKNO)},\n  pages = {1--4},\n  year = {2019},\n  organization = {IEEE},\n  doi = {10.1109/TIPTEKNO.2019.8894978}\n}",
+      "page": {
+        "description": "A multiresolution U-Net with multi-combination augmentation for cell segmentation in 2D phase-contrast microscopy images. TIPTEKNO 2019, IEEE.",
+        "figures": [
+          {
+            "caption": "Fig. 1: Schematic structure of our proposed architecture. Redraw of the paper's Figure 1.",
+            "svg": "assets/figures/tiptekno-2019-cell-segmentation-fig1.svg"
+          }
+        ],
+        "abstract_heading": "Abstract",
+        "abstract": [
+          "The quantitative and qualitative ascertainment of cell culture is integral to the robust determination of the cell structure analysis. Microscopy cell analysis and the epithet structures of cells in cell cultures are momentous in the fields of the biological research process. In this paper, we addressed the problem of phase-contrast microscopy under cell segmentation application. In our proposed method, we utilized the state-of-the-art deep learning models trained on our proposed dataset. Due to the low number of annotated images, we propose a multiresolution network which is based on the U-Net architecture. Moreover, we applied multi-combination augmentation to our dataset which has increased the performance of segmentation accuracy significantly. Experimental results suggest that the proposed model provides superior performance in comparison to traditional state-of-the-art segmentation algorithms."
+        ],
+        "method_heading": "Framework",
+        "method_layout": "grid",
+        "method": [
+          {
+            "title": "Multiresolution U-Net",
+            "text": "A multiresolution network based on the U-Net architecture handles the low number of annotated images."
+          },
+          {
+            "title": "Multi-combination augmentation",
+            "text": "Augmentation of the proposed dataset increases segmentation accuracy significantly."
+          },
+          {
+            "title": "Superior performance",
+            "text": "Experiments show the model outperforms traditional state-of-the-art segmentation algorithms."
+          }
+        ],
+        "resources": [
+          {
+            "label": "Publisher",
+            "text": "IEEE Xplore (DOI)",
+            "url": "https://doi.org/10.1109/TIPTEKNO.2019.8894978"
+          },
+          {
+            "label": "Dataset",
+            "text": "Phase Contrast Microscopy of cells (Figshare)",
+            "url": "https://doi.org/10.6084/m9.figshare.8965820"
+          },
+          {
+            "label": "DOI",
+            "text": "10.1109/TIPTEKNO.2019.8894978",
+            "url": "https://doi.org/10.1109/TIPTEKNO.2019.8894978"
+          }
+        ]
+      }
+    },
+    {
+      "id": "tiptekno-2019-cell-time-series",
+      "title": "Automated Segmentation of Cells in Phase Contrast Optical Microscopy Time Series Images",
+      "title_lead": "Automated Segmentation of Cells",
+      "authors": [
+        "Rıfkı Can Binici",
+        "Umut Şahin",
+        "Aydin Ayanzadeh",
+        "Behçet Uğur Töreyin",
+        "Sevgi Önal",
+        "Devrim Pesen Okvur",
+        "Özden Yalçın Özuysal",
+        "Devrim Ünay"
+      ],
+      "type": "inproceedings",
+      "year": 2019,
+      "venue": "2019 Medical Technologies Congress (TIPTEKNO)",
+      "venue_short": "TIPTEKNO 2019",
+      "venue_line": "2019 Medical Technologies Congress (TIPTEKNO), pp. 1-4, IEEE, 2019",
+      "status": "published",
+      "pages": "1-4",
+      "publisher": "IEEE",
+      "doi": "10.1109/TIPTEKNO.2019.8895080",
+      "topic": "biomedical",
+      "summary": "Traditional image processing and deep learning approaches for automated cell segmentation from phase-contrast microscopy time series, evaluated against manually annotated datasets.",
+      "bibtex": "@inproceedings{binici2019automated,\n  title = {Automated Segmentation of Cells in Phase Contrast Optical Microscopy Time Series Images},\n  author = {Binici, R{\\i}fk{\\i} Can and {\\c{S}}ahin, Umut and Ayanzadeh, Aydin and T{\\\"o}reyin, Beh{\\c{c}}et U{\\u{g}}ur and {\\\"O}nal, Sevgi and Okvur, Devrim Pesen and {\\\"O}zuysal, {\\\"O}zden Yal{\\c{c}}{\\i}n and {\\\"U}nay, Devrim},\n  booktitle = {2019 Medical Technologies Congress (TIPTEKNO)},\n  pages = {1--4},\n  year = {2019},\n  organization = {IEEE},\n  doi = {10.1109/TIPTEKNO.2019.8895080}\n}",
+      "page": {
+        "description": "Traditional image processing and deep learning approaches for automated cell segmentation from phase-contrast microscopy time series, evaluated against manually annotated datasets. TIPTEKNO 2019, IEEE.",
+        "figures": [
+          {
+            "caption": "Schematic of the study: time-series phase-contrast images are segmented by traditional and deep learning approaches and evaluated against manual annotations. This is a schematic, not the paper's figure.",
+            "svg": "assets/figures/tiptekno-2019-cell-time-series-fig1.svg"
+          }
+        ],
+        "abstract_heading": "Abstract",
+        "abstract": [
+          "Phase contrast optical microscopy is a preferred imaging technique for live-cell, temporal analysis. Segmentation of cells from time series data acquired with this technique is a labor-intensive and time-consuming task that cell biology researchers need solution for. In this study traditional image processing and deep learning based approaches for automated cell segmentation from phase contrast optical microscopy time series are presented, and their performances are evaluated against manually annotated datasets."
+        ],
+        "method_heading": "Method",
+        "method_layout": "steps",
+        "method": [
+          {
+            "title": "Time-series data",
+            "text": "Phase-contrast microscopy time series of live cells, frame by frame."
+          },
+          {
+            "title": "Two approaches",
+            "text": "Traditional image processing and deep learning based approaches for automated segmentation."
+          },
+          {
+            "title": "Manual evaluation",
+            "text": "Both approaches are evaluated against manually annotated datasets."
+          }
+        ],
+        "resources": [
+          {
+            "label": "Publisher",
+            "text": "IEEE Xplore (DOI)",
+            "url": "https://doi.org/10.1109/TIPTEKNO.2019.8895080"
+          },
+          {
+            "label": "DOI",
+            "text": "10.1109/TIPTEKNO.2019.8895080",
+            "url": "https://doi.org/10.1109/TIPTEKNO.2019.8895080"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dog-breeds-identification",
+      "title": "Modified Deep Neural Networks for Dog Breeds Identification",
+      "title_lead": "Modified Deep Neural Networks",
+      "authors": [
+        "Aydin Ayanzadeh",
+        "Sahand Vahidnia"
+      ],
+      "type": "preprint",
+      "year": 2018,
+      "venue": "Preprints",
+      "venue_short": "Preprints 2018",
+      "venue_line": "Preprints (2018), doi:10.20944/preprints201812.0232.v1",
+      "status": "preprint",
+      "doi": "10.20944/preprints201812.0232.v1",
+      "topic": "foundations",
+      "summary": "Fine-tuned pretrained ImageNet models for dog breed identification, reaching 89.66% test accuracy on the Stanford Dogs dataset.",
+      "links": {
+        "publisher": "https://www.preprints.org/manuscript/201812.0232/v1",
+        "code": "https://github.com/Ayanzadeh93/Dog-Breeds-Identification"
+      },
+      "bibtex": "@article{ayanzadeh2018modified,\n  title = {Modified Deep Neural Networks for Dog Breeds Identification},\n  author = {Ayanzadeh, Aydin and Vahidnia, Sahand},\n  journal = {Preprints},\n  year = {2018},\n  doi = {10.20944/preprints201812.0232.v1},\n  url = {https://www.preprints.org/manuscript/201812.0232/v1}\n}",
+      "page": {
+        "description": "Fine-tuned pretrained ImageNet models for dog breed identification, reaching 89.66% test accuracy on the Stanford Dogs dataset. Preprints, 2018.",
+        "figures": [
+          {
+            "caption": "Schematic of the approach: a pretrained ImageNet model extracts features, then fine-tuning and data augmentation improve breed classification. This is a schematic, not the paper's figure.",
+            "svg": "assets/figures/dog-breeds-identification-fig1.svg"
+          }
+        ],
+        "abstract_heading": "Abstract",
+        "abstract": [
+          "In this paper, we leverage state of the art models on Imagenet data-sets. We use the pre-trained model and learned weighs to extract the feature from the Dog breeds identification data-set. Afterwards, we applied fine-tuning and dataaugmentation to increase the performance of our test accuracy in classification of dog breeds datasets. The performance of the proposed approaches are compared with the state of the art models of Image-Net datasets such as ResNet-50, DenseNet-121, DenseNet-169 and GoogleNet. we achieved 89.66% , 85.37% 84.01% and 82.08% test accuracy respectively which shows the superior performance of proposed method to the previous works on Stanford dog breeds datasets."
+        ],
+        "method_heading": "Framework",
+        "method_layout": "grid",
+        "method": [
+          {
+            "title": "Pretrained features",
+            "text": "A model pretrained on ImageNet extracts features from the dog breeds dataset."
+          },
+          {
+            "title": "Fine-tuning and augmentation",
+            "text": "Fine-tuning and data augmentation increase test accuracy."
+          },
+          {
+            "title": "Comparison",
+            "text": "Compared with ResNet-50, DenseNet-121, DenseNet-169, and GoogleNet, the proposed method reaches 89.66% test accuracy, the best of the compared models."
+          }
+        ],
+        "resources": [
+          {
+            "label": "Preprint",
+            "text": "Preprints.org",
+            "url": "https://www.preprints.org/manuscript/201812.0232/v1"
+          },
+          {
+            "label": "DOI",
+            "text": "10.20944/preprints201812.0232.v1",
+            "url": "https://doi.org/10.20944/preprints201812.0232.v1"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ant-colony-edge-detection",
+      "title": "A Modified Ant colony Based Approach to Digital Image Edge Detection",
+      "title_lead": "A Modified Ant colony Based Approach",
+      "authors": [
+        "Aydin Ayanzadeh",
+        "Hossein Pourghaemi",
+        "Yousef Seyfari"
+      ],
+      "type": "inproceedings",
+      "year": 2015,
+      "venue": "2015 2nd International Conference on Knowledge-Based Engineering and Innovation (KBEI)",
+      "venue_short": "KBEI 2015",
+      "venue_line": "2015 2nd International Conference on Knowledge-Based Engineering and Innovation (KBEI), pp. 504-509, IEEE, 2015",
+      "status": "published",
+      "pages": "504-509",
+      "publisher": "IEEE",
+      "doi": "10.1109/KBEI.2015.7436096",
+      "topic": "foundations",
+      "summary": "A modified ant colony optimization method for digital image edge detection, faster and more efficient than former ant colony based methods.",
+      "links": {
+        "code": "https://github.com/Ayanzadeh93/Antcolony-edgedetection"
+      },
+      "bibtex": "@inproceedings{ayanzadeh2015modified,\n  title = {A modified ant colony based approach to digital image edge detection},\n  author = {Ayanzadeh, Aydin and Pourghaemi, Hossein and Seyfari, Yousef},\n  booktitle = {2015 2nd International Conference on Knowledge-Based Engineering and Innovation (KBEI)},\n  pages = {504--509},\n  year = {2015},\n  organization = {IEEE},\n  doi = {10.1109/KBEI.2015.7436096}\n}",
+      "page": {
+        "description": "A modified ant colony optimization method for digital image edge detection, faster and more efficient than former ant colony based methods. KBEI 2015, IEEE.",
+        "figures": [
+          {
+            "caption": "Schematic of the method: ants traverse the image guided by pheromone trails, and a tuned threshold selects the edges. This is a schematic, not the paper's figure.",
+            "svg": "assets/figures/ant-colony-edge-detection-fig1.svg"
+          }
+        ],
+        "abstract_heading": "Abstract",
+        "abstract": [
+          "Ant Colony Optimization (ACO) is a nature inspired meta-heuristic algorithms, which can be applied to a wide range of optimization problems. In this paper we present a modified method for edge detection based on the Ant Colony Optimization. Because of disadvantages of traditional edge detection methods, ACO as a relatively new meta-heuristic approach has been used to solve the edge detection problem. The performance of proposed method is compared with traditional ant colony methods, also we have large number of experiments to find out the suitable threshold for proposed method. The experimental results clearly indicate how the ACO can extracts edges in efficient way, also we speed up the proposed method by modifying the effective parameters in speed of the problem and replacing them by optimized values. The results show that this method is faster and more efficient than other former Ant Colony-based edge detection methods."
+        ],
+        "method_heading": "Method",
+        "method_layout": "steps",
+        "method": [
+          {
+            "title": "Ant colony search",
+            "text": "Ants move across the image, guided by pheromone trails that mark likely edges."
+          },
+          {
+            "title": "Tuned threshold",
+            "text": "A large set of experiments finds the suitable threshold for the proposed method."
+          },
+          {
+            "title": "Faster detection",
+            "text": "Effective parameters are modified and optimized, making the method faster and more efficient than former ant colony based edge detection."
+          }
+        ],
+        "resources": [
+          {
+            "label": "Publisher",
+            "text": "IEEE Xplore (DOI)",
+            "url": "https://doi.org/10.1109/KBEI.2015.7436096"
+          },
+          {
+            "label": "DOI",
+            "text": "10.1109/KBEI.2015.7436096",
+            "url": "https://doi.org/10.1109/KBEI.2015.7436096"
+          }
+        ]
+      }
+    },
+    {
+      "id": "gaussian-svm-edge-detection",
+      "title": "Gaussian Three-Dimensional kernel SVM for Edge Detection Applications",
+      "title_lead": "Gaussian Three-Dimensional kernel SVM",
+      "authors": [
+        "Safar Irandoust-Pakchin",
+        "Aydin Ayanzadeh",
+        "Siamak Beikzadeh"
+      ],
+      "type": "inproceedings",
+      "year": 2015,
+      "venue": "International Conference on New Research Findings in Electrical Engineering and Computer Science",
+      "venue_short": "Conference 2015 · arXiv 2017",
+      "venue_line": "International Conference on New Research Findings in Electrical Engineering and Computer Science, Tehran, 2015 · arXiv:1710.01260",
+      "status": "published",
+      "doi": "10.48550/arXiv.1710.01260",
+      "arxiv": "1710.01260",
+      "topic": "foundations",
+      "summary": "A support vector machine with a three-dimensional Gaussian radial basis function kernel for edge detection, outperforming Canny and Sobel detectors.",
+      "bibtex": "@misc{irandoust2017gaussian,\n  title = {Gaussian Three-Dimensional kernel SVM for Edge Detection Applications},\n  author = {Irandoust-Pakchin, Safar and Ayanzadeh, Aydin and Beikzadeh, Siamak},\n  year = {2017},\n  eprint = {1710.01260},\n  archivePrefix = {arXiv},\n  primaryClass = {cs.CV},\n  doi = {10.48550/arXiv.1710.01260},\n  url = {https://arxiv.org/abs/1710.01260},\n  note = {Originally presented at the International Conference on New Research Findings in Electrical Engineering and Computer Science, Tehran, 2015}\n}",
+      "page": {
+        "description": "A support vector machine with a three-dimensional Gaussian radial basis function kernel for edge detection, outperforming Canny and Sobel detectors. Presented 2015, arXiv 2017.",
+        "figures": [
+          {
+            "caption": "Schematic of the method: training edge images train a 3D Gaussian-kernel SVM, which produces edge maps compared against Canny and Sobel. This is a schematic, not the paper's figure.",
+            "svg": "assets/figures/gaussian-svm-edge-detection-fig1.svg"
+          }
+        ],
+        "abstract_heading": "Abstract",
+        "abstract": [
+          "This paper presents a novel and uniform algorithm for edge detection based on SVM (support vector machine) with Three-dimensional Gaussian radial basis function with kernel. Because of disadvantages in traditional edge detection such as inaccurate edge location, rough edge and careless on detect soft edge. The experimental results indicate how the SVM can detect edge in efficient way. The performance of the proposed algorithm is compared with existing methods, including Sobel and canny detectors. The results show that this method is better than classical algorithm such as canny and Sobel detector."
+        ],
+        "method_heading": "Framework",
+        "method_layout": "grid",
+        "method": [
+          {
+            "title": "3D Gaussian kernel",
+            "text": "A support vector machine uses a three-dimensional Gaussian radial basis function kernel."
+          },
+          {
+            "title": "Trained on edges",
+            "text": "Training images teach the SVM where edges are, including soft edges that classical detectors miss."
+          },
+          {
+            "title": "Beats the classics",
+            "text": "Compared with Sobel and Canny detectors, the method detects edges more accurately."
+          }
+        ],
+        "resources": [
+          {
+            "label": "Preprint",
+            "text": "arXiv:1710.01260",
+            "url": "https://arxiv.org/abs/1710.01260"
+          },
+          {
+            "label": "DOI",
+            "text": "10.48550/arXiv.1710.01260",
+            "url": "https://doi.org/10.48550/arXiv.1710.01260"
+          }
+        ]
+      }
+    }
+  ]
+}

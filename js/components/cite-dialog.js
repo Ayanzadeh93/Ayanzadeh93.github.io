@@ -1,7 +1,8 @@
 /**
  * <cite-dialog> — a citation exporter built on the native <dialog> element.
  *
- * One instance lives on the page; publication cards open it with a record.
+ * One instance lives on the page; any [data-cite] button opens it with a record
+ * (see index.js). It renders inside a `.ds` host so it picks up css/site.css.
  * Using showModal() rather than a hand-rolled overlay means the focus trap,
  * Escape-to-close, inertness of the page behind, and the ::backdrop all come
  * from the platform instead of from code we would have to maintain.
@@ -78,22 +79,22 @@ export class CiteDialog extends HTMLElement {
 
         this.#copyButton = el('button', {
             type: 'button',
-            class: 'cite-dialog__action cite-dialog__action--primary',
+            class: 'btn btn--sm btn--primary',
             onClick: () => this.#copy()
-        }, el('i', { class: 'fas fa-copy', 'aria-hidden': 'true' }), ' Copy');
+        }, 'Copy');
 
         this.#downloadButton = el('button', {
             type: 'button',
-            class: 'cite-dialog__action',
+            class: 'btn btn--sm',
             onClick: () => this.#downloadBib()
-        }, el('i', { class: 'fas fa-download', 'aria-hidden': 'true' }), ' Download .bib');
+        }, 'Download .bib');
 
         this.#sourceLink = el('a', {
-            class: 'cite-dialog__action',
+            class: 'btn btn--sm',
             target: '_blank',
             rel: 'noopener noreferrer',
             hidden: true
-        }, el('i', { class: 'fas fa-external-link-alt', 'aria-hidden': 'true' }), ' View source');
+        }, 'View source');
 
         this.#status = el('p', {
             class: 'cite-dialog__status',
@@ -103,10 +104,10 @@ export class CiteDialog extends HTMLElement {
 
         const closeButton = el('button', {
             type: 'button',
-            class: 'cite-dialog__close',
+            class: 'btn btn--sm cite-dialog__close',
             'aria-label': 'Close citation dialog',
             onClick: () => this.close()
-        }, el('i', { class: 'fas fa-times', 'aria-hidden': 'true' }));
+        }, 'Close');
 
         this.#dialog = el('dialog', {
             class: 'cite-dialog',
