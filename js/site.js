@@ -369,37 +369,68 @@
         });
     }
 
-    /* ── Research threads: one readout for hover and keyboard focus ───────── */
+    /* ── Research threads: one tooltip for hover and keyboard focus ───────── */
     function initThreads() {
         var chart = document.querySelector('[data-threads]');
         if (!chart) return;
-        var readout = chart.querySelector('[data-threads-readout]');
-        if (!readout) return;
-        var idle = readout.textContent;
+
+        var tip = document.createElement('div');
+        tip.className = 'threads__tip';
+        tip.setAttribute('role', 'presentation');
+        tip.hidden = true;
+        chart.appendChild(tip);
         var active = null;
 
         function show(dot) {
             if (active) active.removeAttribute('data-active');
             active = dot;
             dot.setAttribute('data-active', '');
-            while (readout.firstChild) readout.removeChild(readout.firstChild);
+
+            while (tip.firstChild) tip.removeChild(tip.firstChild);
             var title = document.createElement('strong');
             title.textContent = dot.getAttribute('data-title');
-            readout.appendChild(title);
-            readout.appendChild(document.createTextNode(dot.getAttribute('data-meta')));
+            tip.appendChild(title);
+            tip.appendChild(document.createTextNode(dot.getAttribute('data-meta')));
+            tip.hidden = false;
+
+            // Centre the card over the mark, kept inside the chart; flip below
+            // when there is no room above.
+            var box = chart.getBoundingClientRect();
+            var mark = dot.getBoundingClientRect();
+            var half = tip.offsetWidth / 2;
+            var x = mark.left + mark.width / 2 - box.left;
+            x = Math.max(half + 8, Math.min(box.width - half - 8, x));
+            var above = mark.top - box.top > tip.offsetHeight + 24;
+            tip.toggleAttribute('data-below', !above);
+            tip.style.left = x + 'px';
+            tip.style.top = (above ? mark.top - box.top : mark.bottom - box.top) + 'px';
         }
-        function clear() {
+        function hide() {
             if (active) active.removeAttribute('data-active');
             active = null;
-            readout.textContent = idle;
+            tip.hidden = true;
         }
 
         chart.querySelectorAll('.dot').forEach(function (dot) {
             dot.addEventListener('pointerenter', function () { show(dot); });
+            dot.addEventListener('pointerleave', hide);
             dot.addEventListener('focus', function () { show(dot); });
-            dot.addEventListener('blur', clear);
+            dot.addEventListener('blur', hide);
         });
-        chart.addEventListener('pointerleave', clear);
+    }
+
+    /* ── Toolkit marquee: a visible way to stop anything that moves ───────── */
+    function initMarquee() {
+        var marquee = document.querySelector('[data-marquee]');
+        var toggle = document.querySelector('[data-marquee-toggle]');
+        if (!marquee || !toggle) return;
+        toggle.hidden = false;
+        toggle.addEventListener('click', function () {
+            var paused = !marquee.hasAttribute('data-paused');
+            marquee.toggleAttribute('data-paused', paused);
+            toggle.setAttribute('aria-pressed', String(paused));
+            toggle.setAttribute('aria-label', paused ? 'Resume the moving list' : 'Pause the moving list');
+        });
     }
 
     /* ── News: older items collapse behind one button ─────────────────────── */
@@ -553,6 +584,7 @@
         run('bibtex', initBibtex);
         run('figures', initFigures);
         run('threads', initThreads);
+        run('marquee', initMarquee);
         run('news', initNews);
         run('filters', initFilters);
         run('contact form', initContactForm);

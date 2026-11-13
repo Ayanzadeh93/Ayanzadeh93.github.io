@@ -27,7 +27,7 @@ function card(pub) {
     const authors = shown.map((name) => (name === me ? `<b>${esc(name)}</b>` : esc(name))).join(', ')
         + (pub.authors.length > shown.length ? `, +${pub.authors.length - shown.length} more` : '');
     const status = STATUS[pub.status] ? `<span class="status">${STATUS[pub.status]}</span>` : '';
-    const venue = pub.venue_short.includes(String(pub.year)) ? pub.venue_short : `${pub.venue_short} · ${pub.year}`;
+    const venue = (!pub.year || pub.venue_short.includes(String(pub.year))) ? pub.venue_short : `${pub.venue_short} · ${pub.year}`;
     const size = pub.title.length > 110 ? 46 : pub.title.length > 80 ? 52 : 60;
     return `<!doctype html><html><head><meta charset="utf-8">
 <link rel="stylesheet" href="${BASE}/css/site.css">
@@ -83,5 +83,37 @@ function card(pub) {
         await page.screenshot({ path: path.join(out, `${pub.id}.png`) });
         console.log(`wrote assets/og/${pub.id}.png`);
     }
+    // Site-level cards: the homepage (with the portrait) and the library.
+    const years = data.publications.map((p) => p.year);
+    const siteCards = {
+        home: { eyebrow: 'Computer vision · Multimodal learning · Medical AI', title: site.person.name,
+            text: `${site.person.role} at ${site.person.affiliation}, ${site.person.lab}`, portrait: true },
+        publications: { eyebrow: `${data.publications.length} publications · ${Math.min(...years)}–${Math.max(...years)}`, title: 'Publications',
+            text: 'Accessible navigation, wildfire and environmental AI, biomedical image analysis, efficient learning', portrait: false },
+    };
+    for (const [name, spec] of Object.entries(siteCards)) {
+        const html = card({ title: spec.title, authors: [], venue_short: spec.eyebrow, year: '', status: '' })
+            .replace(/ · <\/span>/, '</span>')
+            .replace('<p class="authors"></p>', `<p class="authors">${esc(spec.text)}</p>`)
+            .replace('</style>', `h1 { font-size: 84px !important; } .wrap { display: flex; gap: 56px; align-items: center; } .wrap > div { flex: 1; min-width: 0; } .wrap img { width: 300px; height: 375px; object-fit: cover; object-position: 50% 18%; border-radius: 18px; box-shadow: 0 0 0 1px #e0e6ed, 0 24px 48px -24px rgba(15,23,42,.45); }</style>`)
+            .replace('<body>\n<div>', `<body>\n<div class="wrap"><div>`)
+            .replace('</p>\n</div>\n<footer>', `</p>\n</div>${spec.portrait ? `<img src="${BASE}/images/profile-640.webp" alt="">` : ''}</div>\n<footer>`);
+        await page.route(`${BASE}/__card__`, (route) => route.fulfill({ contentType: 'text/html; charset=utf-8', body: html }));
+        await page.goto(`${BASE}/__card__`, { waitUntil: 'networkidle' });
+        await page.evaluate(() => document.fonts.ready);
+        await page.screenshot({ path: path.join(out, `${name}.png`) });
+        await page.unroute(`${BASE}/__card__`);
+        console.log(`wrote assets/og/${name}.png`);
+    }
+
+    // Touch and install icons, drawn from favicon.svg.
+    for (const [file, size] of [['apple-touch-icon.png', 180], ['icon-192.png', 192], ['icon-512.png', 512]]) {
+        const icon = await browser.newPage({ viewport: { width: size, height: size }, deviceScaleFactor: 1 });
+        await icon.setContent(`<body style="margin:0;background:#1c4f6b"><img src="${BASE}/favicon.svg" width="${size}" height="${size}" style="display:block;transform:scale(1.02)"></body>`, { waitUntil: 'networkidle' });
+        await icon.screenshot({ path: path.join(ROOT, file) });
+        await icon.close();
+        console.log(`wrote ${file}`);
+    }
+
     await browser.close();
 })();

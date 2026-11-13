@@ -13,7 +13,7 @@ Outputs (do not edit by hand — rerun this script):
     assets/publications.bib  every curated BibTeX entry
     sitemap.xml              in-scope URLs (Projects entries are kept verbatim)
     regions marked <!-- build:NAME --> … <!-- /build:NAME --> inside
-    index.html, contact.html, blog.html, blog-post.html and 404.html
+    index.html, contact.html, blog.html, blog-post.html, 404.html and llms.txt
 
 Usage:
     python scripts/build_site.py           write outputs
@@ -111,6 +111,13 @@ SPRITE = """<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" class="
   <symbol id="i-code" viewBox="0 0 24 24"><path d="m8 8-4 4 4 4"/><path d="m16 8 4 4-4 4"/><path d="m13.5 5-3 14"/></symbol>
   <symbol id="i-slides" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M12 16v4M8 20h8"/></symbol>
   <symbol id="i-book" viewBox="0 0 24 24"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><path d="M9 6v12M15 6v12"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l10-6.5z"/></symbol>
+  <symbol id="i-t-route" viewBox="0 0 24 24"><circle cx="6" cy="18" r="2.2"/><circle cx="18" cy="6" r="2.2"/><path d="M8.2 17.6c6-.6 1.6-10.6 7.6-11.2"/></symbol>
+  <symbol id="i-t-flame" viewBox="0 0 24 24"><path d="M12 3c.6 3.2 5 5.2 5 10a5 5 0 0 1-10 0c0-1.9.8-3.2 2-4.4.2 1.7.9 2.6 1.9 2.9C10.6 8.600 10.800 6 12 3z"/></symbol>
+  <symbol id="i-t-cell" viewBox="0 0 24 24"><path d="M12 3.5c4.800 0 8.500 3.300 8.500 8 0 5-4 9-8.800 9C7 20.500 3.500 17 3.500 12.200 3.500 7.300 7.200 3.500 12 3.500z"/><circle cx="10.5" cy="11" r="2.6"/><circle cx="15.800" cy="15" r="0.9"/></symbol>
+  <symbol id="i-t-layers" viewBox="0 0 24 24"><path d="M12 4 4 8l8 4 8-4z"/><path d="m4 12 8 4 8-4"/><path d="m4 16 8 4 8-4"/></symbol>
+  <symbol id="i-t-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16M10 4v16M14 14l3 3"/></symbol>
   <symbol id="i-expand" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></symbol>
   <symbol id="i-github" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></symbol>
   <symbol id="i-linkedin" viewBox="0 0 16 16"><path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854V1.146zm4.943 12.248V6.169H2.542v7.225h2.401zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248-.822 0-1.359.54-1.359 1.248 0 .694.521 1.248 1.327 1.248h.016zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016a5.54 5.54 0 0 1 .016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225h2.4z"/></symbol>
@@ -130,6 +137,7 @@ def head_assets() -> str:
     return "\n".join([
         '<link rel="preload" href="/fonts/newsreader-var-latin.woff2" as="font" type="font/woff2" crossorigin>',
         '<link rel="preload" href="/fonts/atkinson-hyperlegible-400-latin.woff2" as="font" type="font/woff2" crossorigin>',
+        '<link rel="apple-touch-icon" href="/apple-touch-icon.png">',
         '<link rel="stylesheet" href="/css/site.css">',
         '<script src="/js/theme-init.js"></script>',
     ])
@@ -585,6 +593,21 @@ def render_paper(pub: dict, pubs: list[dict], topics: dict, site: dict) -> str:
     notes = "\n" + notes if notes else ""
 
     toc = [("abstract", abstract_heading)]
+    results_section = ""
+    if page.get("highlights"):
+        tiles = "\n".join(
+            f'          <li><span class="stat__v">{esc(h["value"])}</span><span class="stat__k">{esc(h["label"])}</span></li>'
+            for h in page["highlights"]
+        )
+        toc.append(("results", "Reported results"))
+        results_section = f"""
+      <section id="results" aria-labelledby="results-h">
+        <h2 id="results-h">Reported results</h2>
+        <ul class="stats">
+{tiles}
+        </ul>
+        <p class="stats__note">Figures as stated in the abstract.</p>
+      </section>"""
     method_section = ""
     if page.get("method"):
         layout = " steps--list" if page.get("method_layout") == "steps" else ""
@@ -667,7 +690,7 @@ def render_paper(pub: dict, pubs: list[dict], topics: dict, site: dict) -> str:
       <section id="abstract" aria-labelledby="abstract-h">
         <h2 id="abstract-h">{esc(abstract_heading)}</h2>
 {abstract}{notes}
-      </section>{method_section}{resources_section}
+      </section>{results_section}{method_section}{resources_section}
       <section id="cite" aria-labelledby="cite-h">
         <h2 id="cite-h">Cite this work</h2>
         <div class="bibtex" data-bibtex>
@@ -726,6 +749,7 @@ def render_paper(pub: dict, pubs: list[dict], topics: dict, site: dict) -> str:
         site=site,
         pubs=pubs,
         current="publications",
+        robots="index, follow, max-snippet:-1, max-image-preview:large",
     )
 
 
@@ -844,7 +868,8 @@ def render_library(pubs: list[dict], topic_list: list[dict], topics: dict, site:
                      "with abstracts, links and BibTeX."),
         canonical=f"{base}/publications.html",
         og_type="website",
-        og_image=f"{base}/images/profile-compressed.jpg",
+        og_image=(f"{base}/assets/og/publications.png" if (ROOT / "assets/og/publications.png").is_file()
+                  else f"{base}/images/profile-compressed.jpg"),
         head_extra="\n".join([json_ld(collection), json_ld(crumbs), data_island(pubs, topics)]),
         body=body,
         site=site,
@@ -858,7 +883,7 @@ def render_library(pubs: list[dict], topic_list: list[dict], topics: dict, site:
 def render_selected(pubs: list[dict], site: dict) -> str:
     me = site["person"]["name"]
     rows = "\n".join(
-        f'<li>\n  <p class="pub__year">{p["year"]}</p>\n{indent(pub_entry(p, me, heading="h3"), 2)}\n</li>'
+        f'<li>\n  <p class="pub__year">{p["year"]}</p>\n{indent(pub_entry(p, me, heading="h3", summary=False), 2)}\n</li>'
         for p in pubs if p.get("selected")
     )
     return f'<ol class="pubs-selected">\n{rows}\n</ol>'
@@ -867,8 +892,9 @@ def render_selected(pubs: list[dict], site: dict) -> str:
 def render_threads(pubs: list[dict], topic_list: list[dict]) -> str:
     """Research threads as lanes over a shared year axis; one mark per paper.
 
-    Position carries identity (the lane) and time (the column); the fill carries
-    one extra bit — peer-reviewed or preprint — so a single hue is enough.
+    Position carries identity (the lane) and time (the column). A bar shows the
+    years a thread was active, the fill of a mark says peer-reviewed or
+    preprint, and each lane has its own hue and icon as redundant cues.
     """
     first, last = min(p["year"] for p in pubs), max(p["year"] for p in pubs)
     years = list(range(first, last + 1))
@@ -879,49 +905,117 @@ def render_threads(pubs: list[dict], topic_list: list[dict]) -> str:
         if not papers:
             continue
         cells = []
-        for year in years:
+        for column, year in enumerate(years, 1):
             dots = []
             for p in [x for x in papers if x["year"] == year]:
-                open_mark = p["type"] == "preprint"
-                kind = TYPE_LABEL[p["type"]] + (f', {STATUS_LABEL[p["status"]].lower()}' if p["status"] in STATUS_LABEL else "")
+                kind = TYPE_LABEL[p["type"]] + (", under review" if p["status"] == "under-review" else "")
                 meta = f'{p["venue_short"]} · {kind}'
+                classes = "dot" + (" dot--open" if p["type"] == "preprint" else "") + (" dot--live" if year == last else "")
                 dots.append(
-                    f'<a class="dot{" dot--open" if open_mark else ""}" href="{esc(pub_url(p))}" '
+                    f'<a class="{classes}" href="{esc(pub_url(p))}" '
                     f'data-title="{esc(p["title"])}" data-meta="{esc(meta)}" '
                     f'aria-label="{esc(p["title"])}. {esc(meta)}."></a>'
                 )
-            cells.append(f'<span class="thread__cell">{"".join(dots)}</span>')
+            cells.append(f'<span class="thread__cell" style="grid-column:{column}">{"".join(dots)}</span>')
         lo, hi = min(p["year"] for p in papers), max(p["year"] for p in papers)
         span = str(lo) if lo == hi else f"{lo}–{hi}"
+        bar = ""
+        if hi > lo:
+            start, end = lo - first + 1, hi - first + 2
+            bar = f'<span class="thread__span" style="grid-column:{start}/{end};--k:{end - start}"></span>'
         count = len(papers)
-        lanes.append(f"""  <div class="thread" role="listitem">
-    <div>
-      <h4 class="thread__name">{esc(topic["name"])}</h4>
-      <p class="thread__sum">{esc(topic["summary"])}</p>
-      <p class="thread__n"><a href="/publications.html?topic={esc(topic["id"])}">{count} paper{"s" if count != 1 else ""}</a> · {span}</p>
+        lanes.append(f"""  <div class="thread thread--{esc(topic["id"])}" role="listitem">
+    <div class="thread__info">
+      <span class="thread__icon">{icon("t-" + topic["icon"])}</span>
+      <div>
+        <h4 class="thread__name">{esc(topic["name"])}</h4>
+        <p class="thread__sum">{esc(topic["summary"])}</p>
+        <p class="thread__n"><a href="/publications.html?topic={esc(topic["id"])}">{count} paper{"s" if count != 1 else ""}</a> · {span}</p>
+      </div>
     </div>
-    <div class="thread__track">{"".join(cells)}</div>
+    <div class="thread__track">{bar}{"".join(cells)}</div>
   </div>""")
 
-    # Label every third year so the axis stays legible on a phone.
+    # Every year is labelled on wide screens; every third on a phone.
     labels = "".join(
         f'<span{"" if (year - first) % 3 == 0 or year == last else " data-minor"}>{year}</span>' for year in years
     )
-    if (last - first) % 3 == 1:  # avoid two adjacent labels colliding at the right edge
-        labels = labels.replace(f"<span>{last - 1}</span>", f"<span data-minor>{last - 1}</span>")
-    legend_dot = '<svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="5" fill="var(--c-brand)"/></svg>'
-    legend_ring = '<svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="4" fill="none" stroke="var(--c-brand)" stroke-width="2"/></svg>'
-    return f"""<div class="threads" data-threads>
+    legend_dot = '<svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="5" fill="currentColor"/></svg>'
+    legend_ring = '<svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="4" fill="none" stroke="currentColor" stroke-width="2"/></svg>'
+    legend_bar = '<svg viewBox="0 0 22 12" aria-hidden="true"><rect x="1" y="3.500" width="20" height="5" rx="2.500" fill="currentColor" opacity="0.35"/></svg>'
+    return f"""<div class="threads" data-threads style="--n:{len(years)}">
   <div class="threads__head">
     <h3 class="threads__title">Research threads, {first}–{last}</h3>
-    <p class="threads__legend"><span>{legend_dot}Peer-reviewed paper</span><span>{legend_ring}Preprint</span></p>
+    <p class="threads__legend"><span>{legend_dot}Peer-reviewed</span><span>{legend_ring}Preprint</span><span class="threads__legend-bar">{legend_bar}Active years</span></p>
   </div>
   <div role="list">
 {chr(10).join(lanes)}
   </div>
   <div class="threads__axis" aria-hidden="true"><span></span><div class="threads__years">{labels}</div></div>
-  <p class="threads__readout" data-threads-readout>Each mark is one paper, placed in the year it appeared. Select a mark to open its page; the same {len(pubs)} papers are listed in the <a href="/publications.html">publication library</a>.</p>
+  <p class="threads__note">One mark per paper, in the year it appeared. Select a mark to open the paper; the same {len(pubs)} papers are in the <a href="/publications.html">publication library</a>.</p>
 </div>"""
+
+
+def render_toolkit(site: dict) -> str:
+    """The tools the work is built with, as a slowly moving row of logo tiles.
+
+    The second copy of the list exists only to make the loop seamless and is
+    hidden from assistive technology. With reduced motion the row is static.
+    """
+    items = [(item["name"], item["icon"], group["group"]) for group in site["toolkit"] for item in group["items"]]
+
+    def track(duplicate: bool) -> str:
+        rows = "".join(
+            f'<li class="tool"><span class="tool__icon"><svg aria-hidden="true" focusable="false">'
+            f'<use href="/assets/icons/tech.svg#{esc(slug)}"/></svg></span>'
+            f'<span class="tool__text"><span class="tool__name">{esc(name)}</span>'
+            f'<span class="tool__group">{esc(group)}</span></span></li>'
+            for name, slug, group in items
+        )
+        hidden = ' aria-hidden="true"' if duplicate else ""
+        return f'<ul class="marquee__track"{hidden}>{rows}</ul>'
+
+    return f"""<div class="wrap toolkit__head">
+  <h2 class="toolkit__title" id="toolkit-title">Toolkit</h2>
+  <p class="toolkit__lede">Languages, frameworks and platforms the work is built with.</p>
+  <button class="icon-btn toolkit__toggle" type="button" data-marquee-toggle aria-pressed="false" aria-label="Pause the moving list" hidden>
+    {icon("pause", "icon--pause")}{icon("play", "icon--play")}
+  </button>
+</div>
+<div class="marquee" data-marquee>
+  {track(False)}
+  {track(True)}
+</div>"""
+
+
+def render_home_ld(pubs: list[dict], site: dict) -> str:
+    """Selected publications as an ItemList, so the homepage points at the papers."""
+    base = site["url"]
+    selected = [p for p in pubs if p.get("selected")]
+    items = [
+        {"@type": "ListItem", "position": index, "name": p["title"],
+         "url": f'{base}/{p["id"]}/' if p.get("page") else p.get("external_page", "")}
+        for index, p in enumerate(selected, 1)
+    ]
+    return json_ld({
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        "@id": f"{base}/#selected-publications",
+        "name": f'Selected publications of {site["person"]["name"]}',
+        "numberOfItems": len(items),
+        "itemListElement": items,
+    })
+
+
+def render_llms(pubs: list[dict], site: dict) -> str:
+    """Publication list for llms.txt: one line per paper, newest first."""
+    base = site["url"]
+    lines = []
+    for p in pubs:
+        url = f'{base}/{p["id"]}/' if p.get("page") else p.get("external_page", "")
+        where = p["venue_short"] if str(p["year"]) in p["venue_short"] else f'{p["venue_short"]}, {p["year"]}'
+        lines.append(f'- [{p["title"]}]({url}): {where}. {p["summary"]}')
+    return "\n".join(lines)
 
 
 def news_sort_key(date: str) -> tuple:
@@ -1137,15 +1231,18 @@ def build() -> dict[str, str]:
         "index.html": dict(shared, header=render_header(site, home=True),
                            facts=render_facts(pubs, index_html),
                            threads=render_threads(pubs, topic_list),
+                           toolkit=render_toolkit(site),
                            contact=render_contact(site, heading="h3"),
                            **{"selected-publications": render_selected(pubs, site),
                               "news": render_news(pubs, news),
-                              "pub-data": data_island(selected, topics)}),
+                              "pub-data": data_island(selected, topics),
+                              "structured-data": render_home_ld(pubs, site)}),
         "contact.html": dict(shared, header=render_header(site, current="contact"),
                              contact=render_contact(site, heading="h2")),
         "blog.html": dict(shared, header=render_header(site, current="blog")),
         "blog-post.html": dict(shared, header=render_header(site, current="blog")),
         "404.html": dict(shared, header=render_header(site)),
+        "llms.txt": {"publications": render_llms(pubs, site)},
     }
     for path, regions in pages.items():
         source = index_html if path == "index.html" else (ROOT / path).read_text(encoding="utf-8")

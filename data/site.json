@@ -16,31 +16,197 @@
     "blurb": "Ph.D. student in Computer Science at UMBC working on computer vision, multimodal learning and medical image analysis, with a focus on AI that is useful in clinics, in the field and in assistive technology."
   },
   "nav": [
-    { "id": "research", "label": "Research", "href": "/#research" },
-    { "id": "publications", "label": "Publications", "href": "/publications.html" },
-    { "id": "projects", "label": "Projects", "href": "/#projects" },
-    { "id": "experience", "label": "Experience", "href": "/#experience" },
-    { "id": "teaching", "label": "Teaching", "href": "/#teaching" },
-    { "id": "news", "label": "News", "href": "/#news" },
-    { "id": "blog", "label": "Blog", "href": "/blog.html" },
-    { "id": "contact", "label": "Contact", "href": "/#contact" }
+    {
+      "id": "research",
+      "label": "Research",
+      "href": "/#research"
+    },
+    {
+      "id": "publications",
+      "label": "Publications",
+      "href": "/publications.html"
+    },
+    {
+      "id": "projects",
+      "label": "Projects",
+      "href": "/#projects"
+    },
+    {
+      "id": "experience",
+      "label": "Experience",
+      "href": "/#experience"
+    },
+    {
+      "id": "teaching",
+      "label": "Teaching",
+      "href": "/#teaching"
+    },
+    {
+      "id": "news",
+      "label": "News",
+      "href": "/#news"
+    },
+    {
+      "id": "blog",
+      "label": "Blog",
+      "href": "/blog.html"
+    },
+    {
+      "id": "contact",
+      "label": "Contact",
+      "href": "/#contact"
+    }
   ],
   "profiles": [
-    { "label": "Google Scholar", "url": "https://scholar.google.com/citations?user=B17tai4AAAAJ", "primary": true },
-    { "label": "ORCID", "url": "https://orcid.org/0000-0002-8816-3204", "primary": true },
-    { "label": "DBLP", "url": "https://dblp.org/pid/207/7890", "primary": true },
-    { "label": "GitHub", "url": "https://github.com/Ayanzadeh93", "primary": true },
-    { "label": "LinkedIn", "url": "https://www.linkedin.com/in/ayanzadeh93", "primary": true },
-    { "label": "Hugging Face", "url": "https://huggingface.co/Ayanzadeh93", "primary": true },
-    { "label": "IEEE Xplore", "url": "https://ieeexplore.ieee.org/author/37085790008" },
-    { "label": "ResearchGate", "url": "https://www.researchgate.net/profile/Aydin-Ayanzadeh" },
-    { "label": "X", "url": "https://x.com/aydin_ayanzadeh" }
+    {
+      "label": "Google Scholar",
+      "url": "https://scholar.google.com/citations?user=B17tai4AAAAJ",
+      "primary": true
+    },
+    {
+      "label": "ORCID",
+      "url": "https://orcid.org/0000-0002-8816-3204",
+      "primary": true
+    },
+    {
+      "label": "DBLP",
+      "url": "https://dblp.org/pid/207/7890",
+      "primary": true
+    },
+    {
+      "label": "GitHub",
+      "url": "https://github.com/Ayanzadeh93",
+      "primary": true
+    },
+    {
+      "label": "LinkedIn",
+      "url": "https://www.linkedin.com/in/ayanzadeh93",
+      "primary": true
+    },
+    {
+      "label": "Hugging Face",
+      "url": "https://huggingface.co/Ayanzadeh93",
+      "primary": true
+    },
+    {
+      "label": "IEEE Xplore",
+      "url": "https://ieeexplore.ieee.org/author/37085790008"
+    },
+    {
+      "label": "ResearchGate",
+      "url": "https://www.researchgate.net/profile/Aydin-Ayanzadeh"
+    },
+    {
+      "label": "X",
+      "url": "https://x.com/aydin_ayanzadeh"
+    }
   ],
   "sitemap": [
-    { "loc": "/", "changefreq": "monthly", "priority": "1.0" },
-    { "loc": "/publications.html", "changefreq": "monthly", "priority": "0.9" },
-    { "loc": "/blog.html", "changefreq": "monthly", "priority": "0.6" },
-    { "loc": "/blog-post.html", "changefreq": "yearly", "priority": "0.4" },
-    { "loc": "/contact.html", "changefreq": "yearly", "priority": "0.5" }
+    {
+      "loc": "/",
+      "changefreq": "monthly",
+      "priority": "1.0"
+    },
+    {
+      "loc": "/publications.html",
+      "changefreq": "monthly",
+      "priority": "0.9"
+    },
+    {
+      "loc": "/blog.html",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "loc": "/blog-post.html",
+      "changefreq": "yearly",
+      "priority": "0.4"
+    },
+    {
+      "loc": "/contact.html",
+      "changefreq": "yearly",
+      "priority": "0.5"
+    }
+  ],
+  "toolkit": [
+    {
+      "group": "Languages",
+      "items": [
+        {
+          "name": "Python",
+          "icon": "python"
+        },
+        {
+          "name": "MATLAB",
+          "icon": "matlab"
+        },
+        {
+          "name": "C",
+          "icon": "c"
+        },
+        {
+          "name": "SQL",
+          "icon": "sql"
+        }
+      ]
+    },
+    {
+      "group": "Frameworks & libraries",
+      "items": [
+        {
+          "name": "PyTorch",
+          "icon": "pytorch"
+        },
+        {
+          "name": "TensorFlow",
+          "icon": "tensorflow"
+        },
+        {
+          "name": "Keras",
+          "icon": "keras"
+        },
+        {
+          "name": "OpenCV",
+          "icon": "opencv"
+        },
+        {
+          "name": "Scikit-Learn",
+          "icon": "scikitlearn"
+        },
+        {
+          "name": "Pandas",
+          "icon": "pandas"
+        },
+        {
+          "name": "NumPy",
+          "icon": "numpy"
+        }
+      ]
+    },
+    {
+      "group": "Tools & platforms",
+      "items": [
+        {
+          "name": "Git/GitHub",
+          "icon": "git"
+        },
+        {
+          "name": "Google Cloud Platform",
+          "icon": "googlecloud"
+        },
+        {
+          "name": "AWS",
+          "icon": "aws"
+        },
+        {
+          "name": "Linux",
+          "icon": "linux"
+        },
+        {
+          "name": "ImageJ/Fiji",
+          "icon": "imagej"
+        }
+      ]
+    }
   ]
 }
