@@ -401,6 +401,35 @@
                             microscopy, and making deep models efficient through knowledge distillation,
                             quantization for edge devices and graph representation learning.</p>
                     </div>
+                    <div class="about__side">
+                    <figure class="planfig">
+                        <svg viewBox="0 0 360 220" role="img" aria-labelledby="planfig-title planfig-desc">
+                            <title id="planfig-title">From floor plan to route</title>
+                            <desc id="planfig-desc">A floor plan with five rooms and a corridor. A graph of nodes and edges is laid over the rooms and doors, and a route is traced from the entrance, along the corridor, to the far room.</desc>
+                            <g class="pf-walls">
+                                <path d="M20 102V20h320v180H20v-82"/>
+                                <path d="M20 95h40M80 95h85M185 95h90M295 95h45"/>
+                                <path d="M20 125h70M110 125h140M270 125h70"/>
+                                <path d="M120 20v75M230 20v75M180 125v75"/>
+                            </g>
+                            <g class="pf-graph">
+                                <path class="pf-edges" d="M36 110H285M70 110V57M175 110V57M285 110V57M100 110v52M260 110v52"/>
+                                <g class="pf-nodes">
+                                    <circle cx="70" cy="57" r="4.5"/><circle cx="175" cy="57" r="4.5"/><circle cx="100" cy="162" r="4.5"/><circle cx="260" cy="162" r="4.5"/>
+                                    <circle cx="70" cy="110" r="3.5"/><circle cx="100" cy="110" r="3.5"/><circle cx="175" cy="110" r="3.5"/><circle cx="260" cy="110" r="3.5"/><circle cx="285" cy="110" r="3.5"/>
+                                </g>
+                            </g>
+                            <path class="pf-route" pathLength="100" d="M36 110H285V57"/>
+                            <circle class="pf-goal" cx="285" cy="57" r="6"/>
+                            <circle class="pf-start" cx="36" cy="110" r="5"/>
+                            <circle class="pf-walker" r="4.5"/>
+                            <g class="pf-labels">
+                                <text x="28" y="141">start</text>
+                                <text x="285" y="40" text-anchor="middle">goal</text>
+                            </g>
+                        </svg>
+                        <figcaption>Illustration: a floor plan becomes a graph of rooms and doors, and guidance is a path through it.</figcaption>
+                    </figure>
                     <dl class="interests" aria-label="Research interests">
                         <div>
                             <dt>Perception &amp; models</dt>
@@ -420,6 +449,7 @@
                             <dd>Accessibility AI · Environmental AI · Medical AI</dd>
                         </div>
                     </dl>
+                    </div>
                 </div>
                 <!-- build:threads -->
                 <div class="threads" data-threads style="--n:12">
