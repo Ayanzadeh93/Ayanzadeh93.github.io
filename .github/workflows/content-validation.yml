@@ -12,7 +12,11 @@ on:
       - 'js/project-detail.js'
       - 'js/lib/project-data.js'
       - 'css/projects-data.css'
-      - 'tests/validate_content.py'
+      - 'tests/**'
+      - 'scripts/build_site.py'
+      - 'assets/figures/**'
+      - '*.html'
+      - '*/index.html'
       - 'sitemap.xml'
       - 'llms.txt'
       - '.github/workflows/content-validation.yml'
@@ -26,7 +30,11 @@ on:
       - 'apps/claude-code-encyclopedia.html'
       - 'js/**'
       - 'css/projects-data.css'
-      - 'tests/validate_content.py'
+      - 'tests/**'
+      - 'scripts/build_site.py'
+      - 'assets/figures/**'
+      - '*.html'
+      - '*/index.html'
       - 'sitemap.xml'
       - 'llms.txt'
 
@@ -43,3 +51,9 @@ jobs:
           python-version: '3.12'
       - name: Validate project and skills data
         run: python tests/validate_content.py
+      - name: Generated pages are up to date
+        run: python scripts/build_site.py --check
+      - name: Validate publication data and internal links
+        run: |
+          python tests/validate_publications.py --self-test
+          python tests/validate_publications.py

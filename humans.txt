@@ -20,6 +20,6 @@ Kaggle: https://www.kaggle.com/ayanzadeh93
 X: https://x.com/aydin_ayanzadeh
 
 /* SITE */
-Standards: HTML5, CSS3, Schema.org Person
+Standards: HTML5, CSS3, Schema.org Person and ScholarlyArticle
 Language: English
-Last update: 2026-10-01
+Last update: 2026-11-13

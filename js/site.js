@@ -24,7 +24,7 @@
     function announce(message) {
         if (!liveRegion) {
             liveRegion = document.createElement('div');
-            liveRegion.className = 'sr-only';
+            liveRegion.className = 'visually-hidden';
             liveRegion.setAttribute('role', 'status');
             liveRegion.setAttribute('aria-live', 'polite');
             document.body.appendChild(liveRegion);
@@ -51,6 +51,41 @@
         try { ok = document.execCommand('copy'); } catch (error) { ok = false; }
         area.remove();
         return ok;
+    }
+
+    /* ── In-page links on the homepage ────────────────────────────────────── */
+    /* The legacy main.js (kept for the Projects sections) cancels every
+       in-page link and smooth-scrolls instead, which drops the URL hash and
+       ignores reduced-motion. For links inside this design system, take the
+       click first and do what the browser would: scroll, update the URL, and
+       move focus for the skip link. Pages without main.js are left native. */
+    function initHashLinks() {
+        if (!root.classList.contains('js-enabled')) return;
+        document.addEventListener('click', function (event) {
+            if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+            var link = event.target.closest ? event.target.closest('a[href^="#"]') : null;
+            if (!link || !link.closest('.ds')) return;
+            var id = link.getAttribute('href').slice(1);
+            var target = id ? document.getElementById(id) : null;
+            if (!target) return;
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            // Land the section just under the sticky header. (scrollIntoView
+            // double-counts the legacy scroll-padding on this page.)
+            var header = document.querySelector('[data-site-header]');
+            var offset = (header ? header.offsetHeight : 0) + 8;
+            var top = id === 'top' ? 0 : target.getBoundingClientRect().top + window.scrollY - offset;
+            window.scrollTo({ top: Math.max(0, top), behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+            try { window.history.pushState(null, '', '#' + id); } catch (error) { /* sandboxed */ }
+
+            if (link.classList.contains('skip-link')) {
+                if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
+                target.focus({ preventScroll: true });
+            }
+            var toggle = document.querySelector('[data-nav-toggle][aria-expanded="true"]');
+            if (toggle && link.closest('#site-nav')) toggle.click();
+        }, true);
     }
 
     /* ── Skip link: always move focus, whatever else handles the click ────── */
@@ -299,7 +334,7 @@
             caption.className = 'zoom-dialog__cap';
             var close = document.createElement('button');
             close.type = 'button';
-            close.className = 'btn btn--sm';
+            close.className = 'button button--sm';
             close.textContent = 'Close';
             close.addEventListener('click', function () { dialog.close(); });
             bar.appendChild(caption);
@@ -507,6 +542,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
+        run('hash links', initHashLinks);
         run('skip link', initSkipLink);
         run('header', initHeader);
         run('nav', initNav);

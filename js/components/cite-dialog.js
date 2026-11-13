@@ -79,18 +79,18 @@ export class CiteDialog extends HTMLElement {
 
         this.#copyButton = el('button', {
             type: 'button',
-            class: 'btn btn--sm btn--primary',
+            class: 'button button--sm button--primary',
             onClick: () => this.#copy()
         }, 'Copy');
 
         this.#downloadButton = el('button', {
             type: 'button',
-            class: 'btn btn--sm',
+            class: 'button button--sm',
             onClick: () => this.#downloadBib()
         }, 'Download .bib');
 
         this.#sourceLink = el('a', {
-            class: 'btn btn--sm',
+            class: 'button button--sm',
             target: '_blank',
             rel: 'noopener noreferrer',
             hidden: true
@@ -104,7 +104,7 @@ export class CiteDialog extends HTMLElement {
 
         const closeButton = el('button', {
             type: 'button',
-            class: 'btn btn--sm cite-dialog__close',
+            class: 'button button--sm cite-dialog__close',
             'aria-label': 'Close citation dialog',
             onClick: () => this.close()
         }, 'Close');

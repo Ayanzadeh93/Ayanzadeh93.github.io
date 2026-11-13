@@ -50,7 +50,7 @@ TYPE_CHIP = {
     "preprint": "Preprint",
 }
 STATUS_LABEL = {"accepted": "Accepted", "under-submission": "Under submission"}
-STATUS_CLASS = {"accepted": "tag--accepted", "under-submission": "tag--pending"}
+STATUS_CLASS = {"accepted": "pill--accepted", "under-submission": "pill--pending"}
 
 MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
@@ -91,7 +91,7 @@ def indent(block: str, spaces: int) -> str:
 
 # ── Shared chrome ──────────────────────────────────────────────────────────
 
-SPRITE = """<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" class="sr-only" aria-hidden="true" focusable="false">
+SPRITE = """<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" class="visually-hidden" aria-hidden="true" focusable="false">
   <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 7.5 8.5 6 8.5-6"/></symbol>
   <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h6"/></symbol>
   <symbol id="i-external" viewBox="0 0 24 24"><path d="M14 5h5v5"/><path d="M19 5 10 14"/><path d="M18 14v4a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h4"/></symbol>
@@ -159,7 +159,7 @@ def render_header(site: dict, current: str | None = None, home: bool = False) ->
       </ul>
     </nav>
     <div class="site-header__tools">
-      <a class="btn btn--sm btn--cv" href="{esc(site["person"]["cv"])}">{icon("file")}<span>CV</span></a>
+      <a class="button button--sm button--cv" href="{esc(site["person"]["cv"])}">{icon("file")}<span>CV</span></a>
       <button class="icon-btn" type="button" data-theme-toggle aria-pressed="false" aria-label="Switch to dark theme">
         {icon("moon", "icon--moon")}{icon("sun", "icon--sun")}
       </button>
@@ -351,7 +351,7 @@ def status_tag(pub: dict) -> str:
     label = STATUS_LABEL.get(pub["status"])
     if not label:
         return ""
-    return f'<span class="tag {STATUS_CLASS[pub["status"]]}">{label}</span>'
+    return f'<span class="pill {STATUS_CLASS[pub["status"]]}">{label}</span>'
 
 
 def pub_entry(pub: dict, me: str, heading: str = "h3", summary: bool = True) -> str:
@@ -368,7 +368,7 @@ def pub_entry(pub: dict, me: str, heading: str = "h3", summary: bool = True) -> 
 
     summary_html = f'\n  <p class="pub__summary">{esc(pub["summary"])}</p>' if summary and pub.get("summary") else ""
     tag = status_tag(pub)
-    type_tag = f'<span class="tag">{TYPE_LABEL[pub["type"]]}</span>'
+    type_tag = f'<span class="pill">{TYPE_LABEL[pub["type"]]}</span>'
     return f"""<article class="pub">
   <{heading} class="pub__title"><a href="{esc(url)}">{esc(pub["title"])}</a></{heading}>
   <p class="pub__authors">{authors_inline(pub, me)}</p>
@@ -564,9 +564,9 @@ def render_paper(pub: dict, pubs: list[dict], topics: dict, site: dict) -> str:
     actions = []
     for position, (label, href) in enumerate(resource_links(pub)):
         text = {"PDF": "Paper (PDF)", "Publisher": "Publisher version"}.get(label, label)
-        cls = "btn btn--primary" if position == 0 else "btn"
+        cls = "button button--primary" if position == 0 else "button"
         actions.append(f'<a class="{cls}" href="{esc(href)}"{ext_attrs(href)}>{icon(LINK_ICON[label])}{text}</a>')
-    cite_cls = "btn" if actions else "btn btn--primary"
+    cite_cls = "button" if actions else "button button--primary"
     actions.append(f'<a class="{cite_cls}" href="#cite">{icon("quote")}Cite</a>')
 
     tag = status_tag(pub)
@@ -654,7 +654,7 @@ def render_paper(pub: dict, pubs: list[dict], topics: dict, site: dict) -> str:
       </nav>
       <p class="paper-hero__venue"><span class="eyebrow">{esc(eyebrow)}</span>{tag}</p>
       <h1 class="paper-hero__title">{title_html}</h1>
-      <ul class="paper-authors" aria-label="Authors">{authors}</ul>{affil}
+      <ul class="paper-byline" aria-label="Authors">{authors}</ul>{affil}
       <p class="paper-actions">{"".join(actions)}</p>
     </div>
   </header>
@@ -669,9 +669,9 @@ def render_paper(pub: dict, pubs: list[dict], topics: dict, site: dict) -> str:
         <div class="bibtex" data-bibtex>
           <pre tabindex="0" aria-label="BibTeX entry">{esc(pub["bibtex"])}</pre>
           <p class="bibtex__actions">
-            <button class="btn btn--sm btn--primary" type="button" data-bibtex-copy hidden>{icon("copy")}Copy BibTeX</button>
-            <button class="btn btn--sm" type="button" data-bibtex-download hidden>{icon("download")}Download .bib</button>
-            <button class="btn btn--sm" type="button" data-cite="{esc(pub["id"])}" hidden>{icon("quote")}APA, MLA, IEEE</button>
+            <button class="button button--sm button--primary" type="button" data-bibtex-copy hidden>{icon("copy")}Copy BibTeX</button>
+            <button class="button button--sm" type="button" data-bibtex-download hidden>{icon("download")}Download .bib</button>
+            <button class="button button--sm" type="button" data-cite="{esc(pub["id"])}" hidden>{icon("quote")}APA, MLA, IEEE</button>
             <span class="bibtex__status" role="status" aria-live="polite" data-bibtex-status></span>
           </p>
         </div>
@@ -699,7 +699,10 @@ def render_paper(pub: dict, pubs: list[dict], topics: dict, site: dict) -> str:
     ld["mainEntityOfPage"] = canonical
     ld["isAccessibleForFree"] = True
     crumbs = breadcrumb_ld([("Home", f"{base}/"), ("Publications", f"{base}/publications.html"), (pub["title"], canonical)])
-    head_extra = "\n".join([
+    has_card = (ROOT / "assets" / "og" / f'{pub["id"]}.png').is_file()
+    card_size = ('<meta property="og:image:width" content="1200">\n'
+                 '<meta property="og:image:height" content="630">\n') if has_card else ""
+    head_extra = card_size + "\n".join([
         scholar_meta(pub, site),
         f'<meta property="article:author" content="{esc(base)}/">',
         json_ld(ld),
@@ -792,7 +795,7 @@ def render_library(pubs: list[dict], topic_list: list[dict], topics: dict, site:
         <div class="lib-toolbar__row">
           <div class="search" role="search">
             {icon("search")}
-            <label class="sr-only" for="lib-search">Search publications</label>
+            <label class="visually-hidden" for="lib-search">Search publications</label>
             <input id="lib-search" type="search" placeholder="Search title, author, venue or keyword" autocomplete="off" spellcheck="false">
             <kbd aria-hidden="true">/</kbd>
           </div>
@@ -808,7 +811,7 @@ def render_library(pubs: list[dict], topic_list: list[dict], topics: dict, site:
 {chr(10).join(groups)}
       <div class="lib-empty" data-empty hidden>
         <p>No publications match those filters.</p>
-        <button class="btn" type="button" data-reset>Clear filters</button>
+        <button class="button" type="button" data-reset>Clear filters</button>
       </div>
       <p class="lib-foot">Entries marked <em>Accepted</em> are awaiting their proceedings record. Citation counts are on <a href="https://scholar.google.com/citations?user=B17tai4AAAAJ" rel="me noopener" target="_blank">Google Scholar</a>.</p>
     </div>
@@ -951,12 +954,12 @@ def render_news(pubs: list[dict], news: dict, visible: int = 6) -> str:
         rows.append(
             f'  <li class="news__item"{older}>\n'
             f'    <time class="news__when" datetime="{esc(item["date"])}">{esc(human_date(item["date"]))}</time>\n'
-            f'    <p class="news__what">{what}<span class="tag news__kind">{esc(item["kind"])}</span></p>\n'
+            f'    <p class="news__what">{what}<span class="pill news__kind">{esc(item["kind"])}</span></p>\n'
             f'  </li>'
         )
     more = ""
     if len(items) > visible:
-        more = (f'\n<p class="news__more"><button class="btn btn--sm" type="button" data-news-more hidden>'
+        more = (f'\n<p class="news__more"><button class="button button--sm" type="button" data-news-more hidden>'
                 f'<span data-label>Show earlier updates</span></button></p>')
     return f'<ol class="news" data-news>\n{chr(10).join(rows)}\n</ol>{more}'
 
@@ -1043,7 +1046,7 @@ def render_contact(site: dict, heading: str = "h3") -> str:
       <label for="contact-message">Message</label>
       <textarea id="contact-message" name="message" rows="6" required></textarea>
     </div>
-    <p><button class="btn btn--primary" type="submit"><span data-label>Send message</span>{icon("arrow")}</button></p>
+    <p><button class="button button--primary" type="submit"><span data-label>Send message</span>{icon("arrow")}</button></p>
     <p class="form__status" role="status" aria-live="polite" data-form-status></p>
   </form>
 </div>"""
