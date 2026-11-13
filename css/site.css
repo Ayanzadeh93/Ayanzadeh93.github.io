@@ -770,6 +770,36 @@
 .prose strong { color: var(--c-ink); }
 .prose--lead > p:first-child { font-family: var(--f-display); font-size: var(--t-lg); line-height: 1.5; color: var(--c-ink); }
 
+.about__side { display: grid; gap: var(--s-5); min-width: 0; }
+/* Illustration: floor plan, the graph laid over it, then the route. */
+.planfig {
+  padding: var(--s-4) var(--s-4) var(--s-3);
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-lg);
+  background: var(--c-surface);
+  box-shadow: var(--e-1);
+}
+.planfig svg { width: 100%; height: auto; overflow: visible; }
+.planfig figcaption { margin-top: var(--s-2); font-size: var(--t-xs); line-height: 1.5; color: var(--c-ink-3); }
+.pf-walls path { fill: none; stroke: var(--c-ink-3); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.pf-edges { fill: none; stroke: var(--th-navigation); stroke-width: 1.4; stroke-dasharray: 3 4; opacity: 0.75; }
+.pf-nodes circle { fill: var(--c-surface); stroke: var(--th-navigation); stroke-width: 2; }
+.pf-route { fill: none; stroke: var(--c-accent); stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 100; stroke-dashoffset: 0; }
+.pf-start { fill: var(--c-surface); stroke: var(--c-accent); stroke-width: 2.5; }
+.pf-goal { fill: var(--c-accent); stroke: var(--c-surface); stroke-width: 2; }
+.pf-walker { fill: var(--c-ink); stroke: var(--c-surface); stroke-width: 2; offset-path: path('M36 110H285V57'); offset-distance: 100%; opacity: 0; }
+.pf-labels text { font: 700 9.5px var(--f-body); letter-spacing: 0.06em; text-transform: uppercase; fill: var(--c-ink-3); }
+@media (prefers-reduced-motion: no-preference) {
+  .pf-graph { animation: pf-graph 10s var(--ease) infinite; }
+  .pf-route { animation: pf-route 10s var(--ease) infinite; }
+  .pf-goal { animation: pf-goal 10s var(--ease) infinite; transform-box: fill-box; transform-origin: center; }
+  .pf-walker { animation: pf-walk 10s var(--ease) infinite; }
+  @keyframes pf-graph { 0%, 8% { opacity: 0; } 24%, 100% { opacity: 1; } }
+  @keyframes pf-route { 0%, 30% { stroke-dashoffset: 100; } 68%, 100% { stroke-dashoffset: 0; } }
+  @keyframes pf-walk { 0%, 30% { offset-distance: 0%; opacity: 0; } 33% { opacity: 1; } 68% { offset-distance: 100%; opacity: 1; } 74%, 100% { offset-distance: 100%; opacity: 0; } }
+  @keyframes pf-goal { 0%, 66% { transform: scale(1); } 72% { transform: scale(1.5); } 80%, 100% { transform: scale(1); } }
+}
+
 .interests { display: grid; gap: var(--s-4); }
 .interests > div { padding-left: var(--s-4); border-left: 2px solid var(--c-line); }
 .interests dt {
