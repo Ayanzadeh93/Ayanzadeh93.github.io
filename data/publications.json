@@ -4,27 +4,32 @@
     {
       "id": "navigation",
       "name": "Accessible navigation",
-      "summary": "Indoor navigation for blind and low-vision people: parsing floor plans into spatial knowledge graphs, agentic route planning with safety checks, and characterizing the on-device multimodal workload."
+      "summary": "Indoor navigation for blind and low-vision people: parsing floor plans into spatial knowledge graphs, agentic route planning with safety checks, and characterizing the on-device multimodal workload.",
+      "icon": "route"
     },
     {
       "id": "environment",
       "name": "Wildfire and environmental AI",
-      "summary": "Vision-language models for early wildfire detection from satellite imagery, and auditable deep learning mechanisms for next-day wildfire spread prediction."
+      "summary": "Vision-language models for early wildfire detection from satellite imagery, and auditable deep learning mechanisms for next-day wildfire spread prediction.",
+      "icon": "flame"
     },
     {
       "id": "biomedical",
       "name": "Biomedical image analysis",
-      "summary": "Deep learning for cell segmentation in label-free phase-contrast microscopy, from still images to time-lapse wound-healing and cell-motility assays."
+      "summary": "Deep learning for cell segmentation in label-free phase-contrast microscopy, from still images to time-lapse wound-healing and cell-motility assays.",
+      "icon": "cell"
     },
     {
       "id": "efficient",
       "name": "Efficient and representation learning",
-      "summary": "Knowledge distillation with clustered hint points, and residual variational graph autoencoders for link prediction."
+      "summary": "Knowledge distillation with clustered hint points, and residual variational graph autoencoders for link prediction.",
+      "icon": "layers"
     },
     {
       "id": "foundations",
       "name": "Image processing and optimization",
-      "summary": "Earlier work on edge detection, transfer learning for fine-grained classification, and scaling matrices for trust-region methods."
+      "summary": "Earlier work on edge detection, transfer learning for fine-grained classification, and scaling matrices for trust-region methods.",
+      "icon": "grid"
     }
   ],
   "publications": [
@@ -95,6 +100,24 @@
             "text": "10.48550/arXiv.2609.17763",
             "url": "https://doi.org/10.48550/arXiv.2609.17763"
           }
+        ],
+        "highlights": [
+          {
+            "value": "0.4292",
+            "label": "F1 of the mixed ensemble (two augmented architectures, one non-augmented)"
+          },
+          {
+            "value": "0.3790",
+            "label": "AUC-PR of the same mixed ensemble"
+          },
+          {
+            "value": "0.4216",
+            "label": "three-seed mean F1, SwinUNETR with all three augmentations"
+          },
+          {
+            "value": "0.3673",
+            "label": "three-seed mean AUC-PR, same model"
+          }
         ]
       }
     },
@@ -146,6 +169,20 @@
             "label": "Conference program",
             "text": "IISWC 2026 program",
             "url": "https://iiswc.org/iiswc2026/program.html"
+          }
+        ],
+        "highlights": [
+          {
+            "value": "300 ms",
+            "label": "per-frame safety service-level objective the pipeline is characterized under"
+          },
+          {
+            "value": "27%",
+            "label": "of safety goodput recovered, at most, by output-token capping, INT8 quantization and visual-token pruning"
+          },
+          {
+            "value": "4–6%",
+            "label": "of frame energy comes from the detector, which makes detector-side optimization a low-leverage knob"
           }
         ]
       }
@@ -222,6 +259,20 @@
             "label": "DOI",
             "text": "10.48550/arXiv.2604.23970",
             "url": "https://doi.org/10.48550/arXiv.2604.23970"
+          }
+        ],
+        "highlights": [
+          {
+            "value": "92.31%",
+            "label": "success rate on short routes, floor MP-1 (strongest single-call baseline: 84.62%)"
+          },
+          {
+            "value": "76.92%",
+            "label": "on medium routes, MP-1 (baseline: 69.23%)"
+          },
+          {
+            "value": "61.54%",
+            "label": "on long routes, MP-1 (baseline: 53.85%)"
           }
         ]
       }
@@ -318,6 +369,24 @@
             "label": "DOI",
             "text": "10.1109/BigData66926.2025.11401868",
             "url": "https://doi.org/10.1109/BigData66926.2025.11401868"
+          }
+        ],
+        "highlights": [
+          {
+            "value": "92.31%",
+            "label": "accuracy on short routes: Claude 3.7 Sonnet, 5-shot prompting, MP-1 floor plan"
+          },
+          {
+            "value": "76.92%",
+            "label": "on medium routes, same setting"
+          },
+          {
+            "value": "61.54%",
+            "label": "on long routes, same setting"
+          },
+          {
+            "value": "15.4%",
+            "label": "higher success rate with the graph-based spatial structure than with direct visual reasoning"
           }
         ]
       }
@@ -549,6 +618,16 @@
             "label": "DOI",
             "text": "10.3906/elk-2105-244",
             "url": "https://doi.org/10.3906/elk-2105-244"
+          }
+        ],
+        "highlights": [
+          {
+            "value": "85.0%",
+            "label": "Jaccard index on the DSB2018 brightfield dataset"
+          },
+          {
+            "value": "89.2%",
+            "label": "Jaccard index on the MDA-MB-231 phase-contrast dataset"
           }
         ]
       }
@@ -1011,6 +1090,12 @@
             "label": "DOI",
             "text": "10.20944/preprints201812.0232.v1",
             "url": "https://doi.org/10.20944/preprints201812.0232.v1"
+          }
+        ],
+        "highlights": [
+          {
+            "value": "89.66%",
+            "label": "best test accuracy reported on the Stanford Dogs dataset"
           }
         ]
       }

@@ -63,8 +63,8 @@ def validate_publications(data: dict, check_files: bool = True) -> list[str]:
     if not topics or len(topic_ids) != len(set(topic_ids)):
         errors.append("publications.json: topics must be a non-empty list with unique ids")
     for topic in topics:
-        if not (topic.get("name") and topic.get("summary")):
-            errors.append(f"topic {topic.get('id')}: needs a name and a summary")
+        if not (topic.get("name") and topic.get("summary") and topic.get("icon")):
+            errors.append(f"topic {topic.get('id')}: needs a name, a summary and an icon")
 
     pubs = data.get("publications") or []
     if not pubs:
@@ -147,6 +147,12 @@ def validate_publications(data: dict, check_files: bool = True) -> list[str]:
                     errors.append(f"{pid}: figure {index} is an image and needs alt text")
             else:
                 errors.append(f"{pid}: figure {index} needs an svg file or an https src")
+        for item in page.get("highlights") or []:
+            if not (str(item.get("value", "")).strip() and str(item.get("label", "")).strip()):
+                errors.append(f"{pid}: every highlight needs a value and a label")
+            elif not any(str(item["value"]).replace("–", "-").split()[0].rstrip("%") in paragraph.replace("–", "-")
+                         for paragraph in page.get("abstract") or []):
+                errors.append(f"{pid}: highlight {item['value']!r} does not appear in the abstract")
         for card in page.get("method") or []:
             if not (card.get("title") and card.get("text")):
                 errors.append(f"{pid}: every method card needs a title and text")
@@ -270,6 +276,7 @@ def self_test(data: dict) -> list[str]:
         "doi mismatch": lambda d: first(d).update(doi="10.9999/elsewhere"),
         "empty authors": lambda d: first(d).update(authors=[]),
         "title_lead mismatch": lambda d: first(d).update(title_lead="Not the title"),
+        "highlight not in abstract": lambda d: first(d)["page"].update(highlights=[{"value": "99.99%", "label": "x"}]),
     }
     return [f"self-test: rule did not fire for '{name}'" for name, mutate in cases.items() if not broken(mutate)]
 

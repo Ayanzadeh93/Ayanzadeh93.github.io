@@ -165,7 +165,10 @@ async function main() {
         ok(await page.evaluate(() => document.activeElement && document.activeElement.id === 'main'), 'home: skip link should move focus to main');
         const dot = page.locator('.dot').first();
         await dot.focus();
-        ok((await page.locator('[data-threads-readout] strong').count()) === 1, 'home: focusing a mark should fill the readout');
+        ok(await page.locator('.threads__tip strong').isVisible(), 'home: focusing a mark should show its tooltip');
+        // This context asks for reduced motion: the toolkit row must hold still.
+        ok(await page.locator('[data-marquee-toggle]').isHidden(), 'home: no pause control is needed when nothing moves');
+        ok(await page.evaluate(() => getComputedStyle(document.querySelector('.marquee__track')).animationName === 'none'), 'home: the toolkit row must not move under reduced motion');
         const more = page.locator('[data-news-more]');
         const before = await page.locator('.news__item:visible').count();
         await more.click();
@@ -173,6 +176,19 @@ async function main() {
         await page.locator('form[data-contact-form] button[type="submit"]').click();
         ok((await page.locator('.field__error').count()) >= 3, 'home: empty form should show field errors');
         ok(await page.locator('#contact-name').evaluate((el) => el === document.activeElement), 'home: focus should move to the first invalid field');
+        await ctx.close();
+    }
+
+    {
+        // With motion allowed, anything that moves can be paused.
+        const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: 'no-preference' });
+        await ctx.route((url) => !url.href.startsWith(BASE), (route) => route.abort());
+        const page = await ctx.newPage();
+        watch(page, 'motion');
+        await page.goto(`${BASE}/`);
+        await page.locator('[data-marquee-toggle]').click();
+        ok((await page.locator('[data-marquee][data-paused]').count()) === 1, 'home: the toolkit row should pause on request');
+        ok(await page.evaluate(() => getComputedStyle(document.querySelector('.marquee__track')).animationPlayState === 'paused'), 'home: paused means paused');
         await ctx.close();
     }
 
