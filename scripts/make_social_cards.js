@@ -17,7 +17,7 @@ const ROOT = path.join(__dirname, '..');
 const BASE = process.env.BASE_URL || 'http://127.0.0.1:8765';
 const data = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'publications.json'), 'utf8'));
 const site = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'site.json'), 'utf8'));
-const STATUS = { accepted: 'Accepted', 'under-submission': 'Under submission' };
+const STATUS = { 'under-review': 'Under review' };
 
 const esc = (value) => String(value).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 

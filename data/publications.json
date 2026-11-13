@@ -43,8 +43,8 @@
       "year": 2026,
       "venue": "arXiv preprint",
       "venue_short": "arXiv 2026",
-      "venue_line": "Under submission · arXiv preprint arXiv:2609.17763 (2026)",
-      "status": "under-submission",
+      "venue_line": "Under review · arXiv preprint arXiv:2609.17763 (2026)",
+      "status": "under-review",
       "doi": "10.48550/arXiv.2609.17763",
       "arxiv": "2609.17763",
       "topic": "environment",
@@ -52,7 +52,7 @@
       "summary": "Modular deep learning augmentations for next-day wildfire spread prediction: wind- and slope-conditioned attention, retrieval-augmented correction, and dual-stream gating.",
       "bibtex": "@misc{esparza2026modular,\n  title = {Modular Deep Learning Mechanisms for Auditable Next-Day Wildfire Spread Prediction},\n  author = {Esparza, Miguel and Ayanzadeh, Aydin and Mousavi, Ahmad and Mostafavi, Ali},\n  year = {2026},\n  eprint = {2609.17763},\n  archivePrefix = {arXiv},\n  primaryClass = {cs.LG},\n  doi = {10.48550/arXiv.2609.17763},\n  url = {https://arxiv.org/abs/2609.17763}\n}",
       "page": {
-        "description": "Modular deep learning augmentations for next-day wildfire spread prediction: wind- and slope-conditioned attention, retrieval-augmented correction, and dual-stream gating. Under submission, arXiv:2609.17763.",
+        "description": "Modular deep learning augmentations for next-day wildfire spread prediction: wind- and slope-conditioned attention, retrieval-augmented correction, and dual-stream gating. Under review, arXiv:2609.17763.",
         "figures": [
           {
             "caption": "Figure 1. The proposed mechanisms: (1) dual-stream gate; (2) wind- and slope-conditioned attention biases (WCAB and SCAB); (3) physics-feature retrieval-augmented output correction (PFRAOC). Original figure from the arXiv HTML version of the paper.",

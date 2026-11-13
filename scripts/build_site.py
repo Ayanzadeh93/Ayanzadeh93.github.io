@@ -49,8 +49,12 @@ TYPE_CHIP = {
     "incollection": "Book chapter",
     "preprint": "Preprint",
 }
-STATUS_LABEL = {"accepted": "Accepted", "under-submission": "Under submission"}
-STATUS_CLASS = {"accepted": "pill--accepted", "under-submission": "pill--pending"}
+# Only work that is still under review carries a visible status pill; an
+# accepted or published paper is simply listed under its venue.
+STATUS_LABEL = {"under-review": "Under review"}
+STATUS_CLASS = {"under-review": "pill--pending"}
+# Citation styles still need to say that an accepted paper is not out yet.
+CITATION_STATUS = {"accepted": "Accepted", "under-review": "Under review"}
 
 MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
@@ -388,7 +392,7 @@ def citation_record(pub: dict, topics: dict) -> dict:
         "year": str(pub["year"]),
         "type": pub["type"],
         "url": url or pub.get("external_page", ""),
-        "status": STATUS_LABEL.get(pub["status"], ""),
+        "status": CITATION_STATUS.get(pub["status"], ""),
         "bibtex": pub["bibtex"],
         "keywords": " ".join([TYPE_LABEL[pub["type"]], topics[pub["topic"]]["name"], pub.get("summary", "")]),
     }
@@ -451,8 +455,8 @@ def scholarly_ld(pub: dict, site: dict, with_abstract: bool = True) -> dict:
         data["pageStart"], data["pageEnd"] = pub["pages"].split("-")
     if pub["status"] == "accepted":
         data["creativeWorkStatus"] = "Accepted for publication"
-    elif pub["status"] == "under-submission":
-        data["creativeWorkStatus"] = "Preprint, under submission"
+    elif pub["status"] == "under-review":
+        data["creativeWorkStatus"] = "Preprint, under review"
 
     same_as, identifiers = [], []
     if pub.get("doi"):
@@ -813,7 +817,7 @@ def render_library(pubs: list[dict], topic_list: list[dict], topics: dict, site:
         <p>No publications match those filters.</p>
         <button class="button" type="button" data-reset>Clear filters</button>
       </div>
-      <p class="lib-foot">Entries marked <em>Accepted</em> are awaiting their proceedings record. Citation counts are on <a href="https://scholar.google.com/citations?user=B17tai4AAAAJ" rel="me noopener" target="_blank">Google Scholar</a>.</p>
+      <p class="lib-foot">Citation counts are on <a href="https://scholar.google.com/citations?user=B17tai4AAAAJ" rel="me noopener" target="_blank">Google Scholar</a>.</p>
     </div>
   </pub-library>
 </main>"""

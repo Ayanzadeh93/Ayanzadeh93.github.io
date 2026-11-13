@@ -30,7 +30,7 @@ from urllib.parse import unquote, urlparse
 ROOT = Path(__file__).resolve().parents[1]
 
 TYPES = {"article", "inproceedings", "incollection", "preprint"}
-STATUSES = {"published", "accepted", "under-submission", "preprint"}
+STATUSES = {"published", "accepted", "under-review", "preprint"}
 REQUIRED = {"id", "title", "authors", "type", "year", "venue", "venue_short", "venue_line",
             "status", "topic", "summary", "bibtex"}
 DOI = re.compile(r"^10\.\d{4,9}/\S+$")

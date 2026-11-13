@@ -161,7 +161,7 @@ Field notes:
 | Field | Notes |
 |-------|-------|
 | `type` | `article` · `inproceedings` · `incollection` · `preprint`. Drives the facet chips, the JSON-LD type and the Google Scholar tags. |
-| `status` | `published` · `accepted` · `under-submission` · `preprint`. Only *accepted* and *under submission* show a pill. |
+| `status` | `published` · `accepted` · `under-review` · `preprint`. Only *accepted* and *under submission* show a pill. |
 | `venue` | Container title only; `venue_line` is the prose line and should contain `venue` verbatim so it can be set as `<cite>`. |
 | `pages` | A range (`2855-2868`) or a bare article number (`119040`). |
 | `doi` / `arxiv` | Rendered as Publisher / arXiv buttons. An arXiv DOI (`10.48550/arXiv.…`) is not shown as a publisher link. |

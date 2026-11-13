@@ -69,7 +69,7 @@ python3 -m http.server 8765      # then open http://localhost:8765
    | `title`, `title_lead` | `title_lead` is the opening phrase shown in the accent colour; it must be the start of `title`. |
    | `authors` | Display names in order, diacritics included. |
    | `type` | `article`, `inproceedings`, `incollection` or `preprint`. |
-   | `status` | `published`, `accepted`, `under-submission` or `preprint`. |
+   | `status` | `published`, `accepted`, `under-review` or `preprint`. |
    | `venue`, `venue_short`, `venue_line` | Container title for citations, the short label, and the full human-readable line. |
    | `volume`, `number`, `pages`, `publisher`, `doi`, `arxiv` | Optional. Verify a DOI at `https://doi.org/<doi>` before adding it. |
    | `topic` | One of the ids under `topics` — the research thread it belongs to. |
