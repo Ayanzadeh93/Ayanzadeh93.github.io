@@ -11,7 +11,8 @@
 
 ## Key pages
 - [Home / portfolio](https://www.ayanzadeh.com/): biography, publications, projects, CV
-- [Publications](https://www.ayanzadeh.com/publications.html): peer-reviewed papers and preprints
+- [Publications](https://www.ayanzadeh.com/publications.html): peer-reviewed papers and preprints, each with its own page (abstract, figures, citation)
+- [All publications as BibTeX](https://www.ayanzadeh.com/assets/publications.bib)
 - [Projects](https://www.ayanzadeh.com/projects/): FloorPlan2Guide, WildfireVLM, medical segmentation, and more
 - [Contact](https://www.ayanzadeh.com/contact.html): collaboration contact details
 - [Blog](https://www.ayanzadeh.com/blog.html): research notes

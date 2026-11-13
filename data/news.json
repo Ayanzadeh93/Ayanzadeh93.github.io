@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "_comment": "Hand-written updates. Publications from the last two calendar years are added automatically by scripts/build_site.py, so a new paper only needs an entry in publications.json. date is YYYY, YYYY-MM or YYYY-MM-DD.",
+  "items": [
+    { "date": "2025-05-15", "kind": "Achievement", "text": "M.S. Graduation & International Alumni Scholarship" },
+    { "date": "2025-01", "kind": "Conference", "text": "Presenting at CMD-IT/ACM Richard Tapia Conference" },
+    { "date": "2024-12-15", "kind": "Research", "text": "New Paper: Improved Autoencoder for Nuclei Segmentation" },
+    { "date": "2024-10", "kind": "Conference", "text": "Presented at STARS Celebration Conference" },
+    { "date": "2024", "kind": "Project", "text": "WildfireVLM: Environmental AI Research", "url": "/projects/wildfire-vlm.html" },
+    { "date": "2023", "kind": "Publication", "text": "PURSUhInT Published in Expert Systems with Applications", "url": "/pursuhint/" },
+    { "date": "2019-05", "kind": "Award", "text": "Vodafone FutureLab Research Fellowship" }
+  ]
+}

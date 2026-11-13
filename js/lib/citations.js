@@ -2,14 +2,16 @@
  * citations.js — turn a structured publication record into the citation
  * formats an academic reader actually asks for: BibTeX, APA 7, MLA 9 and IEEE.
  *
- * Pure functions only. Records come from the DOM (see pub-explorer.js), so the
- * page markup stays the single source of truth for every publication.
+ * Pure functions only. Records come from the page's publication data island
+ * (see pub-data.js), which is generated from data/publications.json — the
+ * single source of truth for every publication.
  *
  * Record shape:
  * {
  *   title, authors: string[], etAl?: boolean,
  *   venue, year, type: 'article'|'inproceedings'|'incollection'|'preprint'|'misc',
- *   volume?, number?, pages?, publisher?, doi?, arxiv?, url?, status?
+ *   volume?, number?, pages?, publisher?, doi?, arxiv?, url?, status?,
+ *   bibtex?   // curated entry; when present it is used verbatim
  * }
  */
 
@@ -113,6 +115,10 @@ export function canonicalUrl(record) {
  * e.g. ayanzadeh2025floorplan2guide.
  */
 export function bibKey(record) {
+    // A curated entry already carries the key its author chose.
+    const curated = /^@\w+\{([^,\s]+)/.exec(record.bibtex || '');
+    if (curated) return curated[1];
+
     const first = record.authors[0] || 'unknown';
     const family = asciiFold(splitName(first).family).toLowerCase().replace(/[^a-z0-9]/g, '');
     const year = String(record.year || 'nd').replace(/[^0-9a-z]/gi, '');
@@ -147,6 +153,10 @@ const BIB_ENTRY_TYPE = {
 
 /** BibTeX entry. Braces around the title preserve author capitalisation. */
 export function formatBibTeX(record) {
+    // Hand-checked entries (LaTeX-escaped names, publisher fields) beat
+    // anything derived from display strings.
+    if (record.bibtex) return record.bibtex;
+
     const entryType = BIB_ENTRY_TYPE[record.type] || 'misc';
     const fields = [];
 

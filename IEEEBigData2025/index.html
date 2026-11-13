@@ -1,11 +1,344 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Floorplan2Guide: LLM-Guided Floorplan Parsing for BLV Indoor Navigation</title><meta name="description" content="Floorplan2Guide transforms floorplans into spatial knowledge graphs and language-guided indoor navigation for Blind and Low Vision users. IEEE BigData 2025."><meta property="og:title" content="Floorplan2Guide: LLM-Guided Floorplan Parsing for BLV Indoor Navigation"><meta property="og:description" content="Floorplan parsing, spatial knowledge graphs and language-guided indoor navigation for Blind and Low Vision users."><meta property="og:type" content="article"><meta name="twitter:card" content="summary_large_image"><meta property="og:image" content="https://id-preview--d0ef47de-0bec-4fbb-a80d-2468c593106f.lovable.app/__l5e/assets-v1/02b66d2e-e05d-475e-b8ee-db415fce4067/floorplan-architecture.png"><meta name="twitter:image" content="https://id-preview--d0ef47de-0bec-4fbb-a80d-2468c593106f.lovable.app/__l5e/assets-v1/02b66d2e-e05d-475e-b8ee-db415fce4067/floorplan-architecture.png"><link rel="canonical" href="https://www.ayanzadeh.com/IEEEBigData2025/"><link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"><style>
-:root{--bg:oklch(0.985 0.003 190);--fg:oklch(0.24 0.015 195);--card:oklch(1 0 0);--primary:oklch(0.32 0.04 195);--muted:oklch(0.48 0.025 195);--border:oklch(0.89 0.012 190);--accent:oklch(0.47 0.09 185);--secondary:oklch(0.945 0.016 185);--shadow:0 1px 2px oklch(0.2 0.03 40 / .06),0 12px 32px -12px oklch(0.2 0.03 40 / .18)}*{box-sizing:border-box;margin:0;padding:0}body{background:var(--bg);color:var(--fg);font-family:'IBM Plex Sans',system-ui,sans-serif;line-height:1.6;letter-spacing:0;-webkit-font-smoothing:antialiased}.wrap{max-width:56rem;margin:auto;padding:0 2rem;min-width:0}header{border-bottom:1px solid var(--border)}.head{text-align:center;padding-top:5rem;padding-bottom:3rem}.eyebrow,.step{font-family:'IBM Plex Mono',monospace;font-size:.75rem;color:var(--accent);text-transform:uppercase}h1,h2,h3{font-family:'Newsreader',Georgia,serif;color:var(--primary);font-weight:600}h1{font-size:3rem;line-height:1.25;margin-top:1.5rem;overflow-wrap:break-word}h1 span{color:var(--accent)}.authors{list-style:none;display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem 1.5rem;margin-top:2rem;font-size:1.125rem;font-weight:500}sup{color:var(--accent);font-size:.7rem;margin-left:.15rem}.affil{margin-top:.75rem;color:var(--muted)}nav{display:flex;flex-wrap:wrap;justify-content:center;gap:.75rem;margin-top:2.25rem}nav a{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:.5rem 1.5rem;border:1px solid var(--border);border-radius:999px;background:var(--card);color:var(--fg);font-weight:500;text-decoration:none;box-shadow:var(--shadow)}nav a:hover{color:var(--accent);border-color:var(--accent)}a:focus-visible,pre:focus-visible{outline:2px solid var(--accent);outline-offset:4px}figure{border:1px solid var(--border);border-top:0;background:var(--card);box-shadow:var(--shadow)}figure img{display:block;width:100%;height:auto;max-height:600px;object-fit:contain;padding:1.5rem}figcaption{border-top:1px solid var(--border);padding:.75rem 1.25rem;font-size:.875rem;color:var(--muted)}section{padding:4rem 0}section+section{border-top:1px solid var(--border)}h2{font-size:1.875rem}.abstract{margin-top:1.25rem;font-size:1.125rem;line-height:1.78;color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.25rem;margin-top:2rem}.card{min-width:0;border:1px solid var(--border);border-radius:.5rem;background:var(--card);padding:1.5rem;box-shadow:var(--shadow)}h3{font-size:1.5rem;margin-top:.75rem}.card p{margin-top:.5rem;color:var(--muted)}dl{border:1px solid var(--border);border-radius:.5rem;background:var(--card);margin-top:2rem;box-shadow:var(--shadow)}dl>div{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.5rem;padding:1.25rem}dl>div+div{border-top:1px solid var(--border)}dt{font-weight:500}dd{min-width:0;overflow-wrap:anywhere}dd a{color:var(--accent);font-family:'IBM Plex Mono',monospace;font-size:.875rem;text-underline-offset:4px}pre{max-width:100%;overflow-x:auto;margin-top:1.5rem;border:1px solid var(--border);border-radius:.5rem;background:var(--secondary);padding:1.25rem;font-family:'IBM Plex Mono',monospace;font-size:.875rem;line-height:1.7;color:var(--primary)}footer{text-align:center;border-top:1px solid var(--border);padding:2.5rem 1rem;font-size:.875rem;color:var(--muted)}@media(max-width:639px){.wrap{padding-left:1rem;padding-right:1rem}.head{padding-top:2.5rem;padding-bottom:2rem}h1{font-size:1.875rem}.authors{font-size:1rem;margin-top:1.5rem}.affil{font-size:.875rem}nav{margin-top:1.5rem}figure img{padding:1rem}figcaption{padding:.75rem 1rem}section{padding:2.5rem 0}h2{font-size:1.5rem}.abstract{font-size:1rem}.grid{grid-template-columns:minmax(0,1fr)}.card{padding:1.25rem}h3{font-size:1.25rem}dl>div{grid-template-columns:minmax(0,1fr)}pre{font-size:.75rem}}
-</style></head><body><header><div class="wrap head"><p class="eyebrow">IEEE BigData 2025</p><h1><span>Floorplan2Guide:</span> LLM-Guided Floorplan Parsing for BLV Indoor Navigation</h1><ul class="authors"><li>Aydin Ayanzadeh<sup>1</sup></li><li>Tim Oates<sup>1</sup></li></ul><p class="affil"><sup>1</sup> University of Maryland, Baltimore County</p><nav aria-label="Paper resources"><a href="https://arxiv.org/abs/2512.12177" target="_blank" rel="noreferrer">Paper</a><a aria-disabled="true" title="Coming soon">Code</a><a aria-disabled="true" title="Coming soon">Slides</a></nav></div></header><main class="wrap"><figure><img src="https://id-preview--d0ef47de-0bec-4fbb-a80d-2468c593106f.lovable.app/__l5e/assets-v1/02b66d2e-e05d-475e-b8ee-db415fce4067/floorplan-architecture.png" width="1518" height="1422" alt="Floorplan2Guide system architecture showing a floorplan converted into a spatial knowledge graph and interpreted by a language model to produce indoor navigation instructions."><figcaption>Figure 1. Architecture of the LLM-based indoor navigation system. Floorplans are parsed into a spatial knowledge graph, which the language model uses to generate navigation instructions from user queries. Original figure from the Floorplan2Guide arXiv preprint (CC BY 4.0).</figcaption></figure><section><h2>Abstract</h2><p class="abstract">Indoor navigation remains a critical challenge for people with visual impairments. The current solutions mainly rely on infrastructure-based systems, which limit their ability to navigate safely in dynamic environments. We propose a novel navigation approach that utilizes a foundation model to transform floor plans into navigable knowledge graphs and generate human-readable navigation instructions. Floorplan2Guide integrates a large language model (LLM) to extract spatial information from architectural layouts, reducing the manual preprocessing required by earlier floorplan parsing methods. Experimental results indicate that few-shot learning improves navigation accuracy in comparison to zero-shot learning on simulated and real-world evaluations. Claude 3.7 Sonnet achieves the highest accuracy among the evaluated models, with 92.31%, 76.92%, and 61.54% on the short, medium, and long routes, respectively, under 5-shot prompting of the MP-1 floor plan. The success rate of graph-based spatial structure is 15.4% higher than that of direct visual reasoning among all models, which confirms that graphical representation and in-context learning enhance navigation performance and make our solution more precise for indoor navigation of Blind and Low Vision (BLV) users.</p></section><section><h2>Framework</h2><div class="grid"><article class="card"><span class="step">01</span><h3>Floorplan parsing</h3><p>Textual and geometric features are extracted from architectural layouts using OCR and visual analysis.</p></article><article class="card"><span class="step">02</span><h3>Spatial knowledge graph</h3><p>The language model constructs and validates a graph of spatial entities and their connections, enriched with ArUco marker information.</p></article><article class="card"><span class="step">03</span><h3>Language-guided navigation</h3><p>User queries are translated into step-by-step, context-aware indoor navigation instructions.</p></article><article class="card"><span class="step">04</span><h3>Route-aware localization</h3><p>Marker-based localization supports route tracking and alerts users when they deviate from the planned route.</p></article></div></section><section><h2>Resources</h2><dl><div><dt>Published paper</dt><dd><a href="https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=11401868" target="_blank" rel="noreferrer">IEEE Xplore</a></dd></div><div><dt>DOI</dt><dd><a href="https://doi.org/10.1109/BigData66926.2025.11401868" target="_blank" rel="noreferrer">10.1109/BigData66926.2025.11401868</a></dd></div></dl></section><section><h2>BibTeX</h2><pre tabindex="0" aria-label="BibTeX citation">@inproceedings{ayanzadeh2025floorplan2guide,
+<!-- Generated by scripts/build_site.py from data/. Edit the data, not this file. -->
+<html lang="en" class="ds-root" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https:; connect-src 'self' https://formspree.io; form-action 'self' https://formspree.io; frame-src 'none'; manifest-src 'self'">
+<title>Floorplan2Guide: LLM-Guided Floorplan Parsing for BLV Indoor Navigation | Aydin Ayanzadeh</title>
+<meta name="description" content="Floorplan2Guide transforms floorplans into spatial knowledge graphs and language-guided indoor navigation for Blind and Low Vision users. IEEE BigData 2025.">
+<meta name="author" content="Aydin Ayanzadeh">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#1c4f6b">
+<meta name="color-scheme" content="light dark">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<link rel="canonical" href="https://www.ayanzadeh.com/IEEEBigData2025/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Aydin Ayanzadeh">
+<meta property="og:url" content="https://www.ayanzadeh.com/IEEEBigData2025/">
+<meta property="og:title" content="Floorplan2Guide: LLM-Guided Floorplan Parsing for BLV Indoor Navigation">
+<meta property="og:description" content="Floorplan2Guide transforms floorplans into spatial knowledge graphs and language-guided indoor navigation for Blind and Low Vision users. IEEE BigData 2025.">
+<meta property="og:image" content="https://www.ayanzadeh.com/assets/og/IEEEBigData2025.png">
+<meta property="og:image:alt" content="Floorplan2Guide: LLM-Guided Floorplan Parsing for BLV Indoor Navigation — IEEE BigData 2025">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:creator" content="@aydin_ayanzadeh">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="manifest" href="/manifest.json">
+<link rel="preload" href="/fonts/newsreader-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/atkinson-hyperlegible-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/site.css">
+<script src="/js/theme-init.js"></script>
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="citation_title" content="Floorplan2Guide: LLM-Guided Floorplan Parsing for BLV Indoor Navigation">
+<meta name="citation_author" content="Aydin Ayanzadeh">
+<meta name="citation_author" content="Tim Oates">
+<meta name="citation_publication_date" content="2025">
+<meta name="citation_conference_title" content="2025 IEEE International Conference on Big Data (BigData)">
+<meta name="citation_firstpage" content="7477">
+<meta name="citation_lastpage" content="7485">
+<meta name="citation_publisher" content="IEEE">
+<meta name="citation_doi" content="10.1109/BigData66926.2025.11401868">
+<meta name="citation_arxiv_id" content="2512.12177">
+<meta name="citation_abstract_html_url" content="https://www.ayanzadeh.com/IEEEBigData2025/">
+<meta property="article:author" content="https://www.ayanzadeh.com/">
+<script type="application/ld+json">
+{
+  "@type": "ScholarlyArticle",
+  "@id": "https://www.ayanzadeh.com/IEEEBigData2025/#work",
+  "name": "Floorplan2Guide: LLM-Guided Floorplan Parsing for BLV Indoor Navigation",
+  "headline": "Floorplan2Guide: LLM-Guided Floorplan Parsing for BLV Indoor Navigation",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Aydin Ayanzadeh",
+      "@id": "https://www.ayanzadeh.com/#person",
+      "url": "https://www.ayanzadeh.com/"
+    },
+    {
+      "@type": "Person",
+      "name": "Tim Oates"
+    }
+  ],
+  "datePublished": "2025",
+  "inLanguage": "en",
+  "url": "https://www.ayanzadeh.com/IEEEBigData2025/",
+  "isPartOf": {
+    "@type": "PublicationEvent",
+    "name": "2025 IEEE International Conference on Big Data (BigData)"
+  },
+  "pageStart": "7477",
+  "pageEnd": "7485",
+  "sameAs": [
+    "https://doi.org/10.1109/BigData66926.2025.11401868",
+    "https://arxiv.org/abs/2512.12177"
+  ],
+  "identifier": [
+    {
+      "@type": "PropertyValue",
+      "propertyID": "DOI",
+      "value": "10.1109/BigData66926.2025.11401868"
+    },
+    {
+      "@type": "PropertyValue",
+      "propertyID": "arXiv",
+      "value": "2512.12177"
+    }
+  ],
+  "abstract": "Indoor navigation remains a critical challenge for people with visual impairments. The current solutions mainly rely on infrastructure-based systems, which limit their ability to navigate safely in dynamic environments. We propose a novel navigation approach that utilizes a foundation model to transform floor plans into navigable knowledge graphs and generate human-readable navigation instructions. Floorplan2Guide integrates a large language model (LLM) to extract spatial information from architectural layouts, reducing the manual preprocessing required by earlier floorplan parsing methods. Experimental results indicate that few-shot learning improves navigation accuracy in comparison to zero-shot learning on simulated and real-world evaluations. Claude 3.7 Sonnet achieves the highest accuracy among the evaluated models, with 92.31%, 76.92%, and 61.54% on the short, medium, and long routes, respectively, under 5-shot prompting of the MP-1 floor plan. The success rate of graph-based spatial structure is 15.4% higher than that of direct visual reasoning among all models, which confirms that graphical representation and in-context learning enhance navigation performance and make our solution more precise for indoor navigation of Blind and Low Vision (BLV) users.",
+  "description": "Floorplan2Guide transforms floorplans into spatial knowledge graphs and language-guided indoor navigation for blind and low-vision users.",
+  "@context": "https://schema.org",
+  "mainEntityOfPage": "https://www.ayanzadeh.com/IEEEBigData2025/",
+  "isAccessibleForFree": true
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://www.ayanzadeh.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Publications",
+      "item": "https://www.ayanzadeh.com/publications.html"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Floorplan2Guide: LLM-Guided Floorplan Parsing for BLV Indoor Navigation",
+      "item": "https://www.ayanzadeh.com/IEEEBigData2025/"
+    }
+  ]
+}
+</script>
+<script type="application/json" id="pub-data">{"IEEEBigData2025":{"title":"Floorplan2Guide: LLM-Guided Floorplan Parsing for BLV Indoor Navigation","authors":["Aydin Ayanzadeh","Tim Oates"],"venue":"2025 IEEE International Conference on Big Data (BigData)","venueShort":"IEEE BigData 2025","year":"2025","type":"inproceedings","url":"https://doi.org/10.1109/BigData66926.2025.11401868","status":"","bibtex":"@inproceedings{ayanzadeh2025floorplan2guide,\n  title     = {Floorplan2Guide: LLM-Guided Floorplan Parsing for BLV Indoor Navigation},\n  author    = {Ayanzadeh, Aydin and Oates, Tim},\n  booktitle = {2025 IEEE International Conference on Big Data (BigData)},\n  pages     = {7477--7485},\n  year      = {2025},\n  doi       = {10.1109/BigData66926.2025.11401868}\n}","keywords":"Conference paper Accessible navigation Floorplan2Guide transforms floorplans into spatial knowledge graphs and language-guided indoor navigation for blind and low-vision users.","pages":"7477-7485","publisher":"IEEE","doi":"10.1109/BigData66926.2025.11401868","arxiv":"2512.12177"},"iiswc-2026-workload":{"title":"Characterizing an On-Device Depth-Aware Multimodal Workload in Assistive Navigation for Blind and Low-Vision Users","authors":["Aydin Ayanzadeh","Tim Oates"],"venue":"IEEE International Symposium on Workload Characterization (IISWC)","venueShort":"IISWC 2026","year":"2026","type":"inproceedings","url":"","status":"Accepted","bibtex":"@inproceedings{ayanzadeh2026characterizing,\n  title = {Characterizing an On-Device Depth-Aware Multimodal Workload in Assistive Navigation for Blind and Low-Vision Users},\n  author = {Ayanzadeh, Aydin and Oates, Tim},\n  booktitle = {Proceedings of the IEEE International Symposium on Workload Characterization (IISWC)},\n  year = {2026},\n  address = {Boulder, CO, USA}\n}","keywords":"Conference paper Accessible navigation An end-to-end characterization of an on-device, depth-aware multimodal workload for assistive indoor navigation for blind and low-vision users."},"cvpr-2026-floorplan-agentic":{"title":"LLM-Guided Agentic Floor Plan Parsing for Accessible Indoor Navigation of Blind and Low-Vision People","authors":["Aydin Ayanzadeh","Tim Oates"],"venue":"IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) Workshops","venueShort":"CVPR 2026 Workshop (GRAIL-V)","year":"2026","type":"inproceedings","url":"https://openaccess.thecvf.com/content/CVPR2026W/GRAIL-V/papers/Ayanzadeh_LLM-Guided_Agentic_Floor_Plan_Parsing_for_Accessible_Indoor_Navigation_of_CVPRW_2026_paper.pdf","status":"","bibtex":"@inproceedings{ayanzadeh2026llm,\n  title = {LLM-Guided Agentic Floor Plan Parsing for Accessible Indoor Navigation of Blind and Low-Vision People},\n  author = {Ayanzadeh, Aydin and Oates, Tim},\n  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) Workshops},\n  year = {2026},\n  eprint = {2604.23970},\n  archivePrefix = {arXiv},\n  primaryClass = {cs.AI},\n  doi = {10.48550/arXiv.2604.23970},\n  url = {https://arxiv.org/abs/2604.23970}\n}","keywords":"Conference paper Accessible navigation An agentic framework that converts a single floor plan image into a structured, retrievable knowledge base for safe, accessible indoor navigation.","doi":"10.48550/arXiv.2604.23970","arxiv":"2604.23970"}}</script>
+</head>
+<body class="ds">
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" class="visually-hidden" aria-hidden="true" focusable="false">
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 7.5 8.5 6 8.5-6"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h6"/></symbol>
+  <symbol id="i-external" viewBox="0 0 24 24"><path d="M14 5h5v5"/><path d="M19 5 10 14"/><path d="M18 14v4a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h4"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></symbol>
+  <symbol id="i-quote" viewBox="0 0 24 24"><path d="M10 7H6a1 1 0 0 0-1 1v4h5V8"/><path d="M10 12c0 3-1.5 4.5-4.5 5"/><path d="M19 7h-4a1 1 0 0 0-1 1v4h5V8"/><path d="M19 12c0 3-1.5 4.5-4.5 5"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11"/><path d="m7 11 5 5 5-5"/><path d="M5 20h14"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></symbol>
+  <symbol id="i-code" viewBox="0 0 24 24"><path d="m8 8-4 4 4 4"/><path d="m16 8 4 4-4 4"/><path d="m13.5 5-3 14"/></symbol>
+  <symbol id="i-slides" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M12 16v4M8 20h8"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/></symbol>
+  <symbol id="i-expand" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></symbol>
+  <symbol id="i-github" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></symbol>
+  <symbol id="i-linkedin" viewBox="0 0 16 16"><path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854V1.146zm4.943 12.248V6.169H2.542v7.225h2.401zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248-.822 0-1.359.54-1.359 1.248 0 .694.521 1.248 1.327 1.248h.016zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016a5.54 5.54 0 0 1 .016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225h2.4z"/></symbol>
+</svg>
+<a class="skip-link ds" href="#main">Skip to main content</a>
+<header class="site-header ds" data-site-header>
+  <div class="site-header__inner">
+    <a class="brand" href="/" aria-label="Aydin Ayanzadeh, home">
+      <svg class="brand__mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect class="m-plate" width="32" height="32" rx="8"/><path class="m-glyph" d="M9.5 23.5 16 8.5l6.5 15M12.2 18.5h7.6" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle class="m-dot" cx="25" cy="7" r="2.6"/></svg>
+      <span class="brand__name">Aydin Ayanzadeh</span>
+    </a>
+    <nav class="site-nav" id="site-nav" aria-label="Primary">
+      <ul class="site-nav__list">
+        <li><a class="site-nav__link" href="/#research">Research</a></li>
+        <li><a class="site-nav__link" href="/publications.html" aria-current="page">Publications</a></li>
+        <li><a class="site-nav__link" href="/#projects">Projects</a></li>
+        <li><a class="site-nav__link" href="/#experience">Experience</a></li>
+        <li><a class="site-nav__link" href="/#teaching">Teaching</a></li>
+        <li><a class="site-nav__link" href="/#news">News</a></li>
+        <li><a class="site-nav__link" href="/blog.html">Blog</a></li>
+        <li><a class="site-nav__link" href="/#contact">Contact</a></li>
+      </ul>
+    </nav>
+    <div class="site-header__tools">
+      <a class="button button--sm button--cv" href="/Aydin_Ayanzadeh_CV__final.pdf"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-file"/></svg><span>CV</span></a>
+      <button class="icon-btn" type="button" data-theme-toggle aria-pressed="false" aria-label="Switch to dark theme">
+        <svg class="icon icon--moon" aria-hidden="true" focusable="false"><use href="#i-moon"/></svg><svg class="icon icon--sun" aria-hidden="true" focusable="false"><use href="#i-sun"/></svg>
+      </button>
+      <button class="icon-btn nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="site-nav" aria-label="Menu">
+        <svg class="icon icon--menu" aria-hidden="true" focusable="false"><use href="#i-menu"/></svg><svg class="icon icon--close" aria-hidden="true" focusable="false"><use href="#i-close"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+<main id="main">
+  <header class="paper-hero">
+    <div class="wrap">
+      <nav aria-label="Breadcrumb">
+        <ol class="crumbs">
+          <li><a href="/">Home</a></li>
+          <li><a href="/publications.html">Publications</a></li>
+          <li aria-current="page">IEEE BigData 2025</li>
+        </ol>
+      </nav>
+      <p class="paper-hero__venue"><span class="eyebrow">IEEE BigData 2025</span></p>
+      <h1 class="paper-hero__title"><span>Floorplan2Guide:</span> LLM-Guided Floorplan Parsing for BLV Indoor Navigation</h1>
+      <ul class="paper-byline" aria-label="Authors"><li class="me">Aydin Ayanzadeh</li><li>Tim Oates</li></ul>
+      <p class="paper-affil">University of Maryland, Baltimore County</p>
+      <p class="paper-actions"><a class="button button--primary" href="https://doi.org/10.1109/BigData66926.2025.11401868" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-external"/></svg>Publisher version</a><a class="button" href="https://arxiv.org/abs/2512.12177" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-external"/></svg>arXiv</a><a class="button" href="#cite"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-quote"/></svg>Cite</a></p>
+    </div>
+  </header>
+  <div class="wrap paper-layout">
+    <div class="paper-main">
+      <section aria-label="Figures">
+        <figure class="figure" data-figure id="fig-1">
+          <div class="figure__plate">
+            <img src="https://id-preview--d0ef47de-0bec-4fbb-a80d-2468c593106f.lovable.app/__l5e/assets-v1/02b66d2e-e05d-475e-b8ee-db415fce4067/floorplan-architecture.png" alt="Floorplan2Guide system architecture showing a floorplan converted into a spatial knowledge graph and interpreted by a language model to produce indoor navigation instructions." loading="lazy" decoding="async" referrerpolicy="no-referrer">
+            <button class="figure__zoom" type="button" data-zoom aria-label="Enlarge figure 1" hidden><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-expand"/></svg></button>
+            <p class="figure__missing">This figure is hosted with the paper and could not be loaded here. It is available in the paper linked above.</p>
+          </div>
+          <figcaption>Figure 1. Architecture of the LLM-based indoor navigation system. Floorplans are parsed into a spatial knowledge graph, which the language model uses to generate navigation instructions from user queries. Original figure from the Floorplan2Guide arXiv preprint (CC BY 4.0).</figcaption>
+        </figure>
+      </section>
+      <section id="abstract" aria-labelledby="abstract-h">
+        <h2 id="abstract-h">Abstract</h2>
+        <p class="abstract">Indoor navigation remains a critical challenge for people with visual impairments. The current solutions mainly rely on infrastructure-based systems, which limit their ability to navigate safely in dynamic environments. We propose a novel navigation approach that utilizes a foundation model to transform floor plans into navigable knowledge graphs and generate human-readable navigation instructions. Floorplan2Guide integrates a large language model (LLM) to extract spatial information from architectural layouts, reducing the manual preprocessing required by earlier floorplan parsing methods. Experimental results indicate that few-shot learning improves navigation accuracy in comparison to zero-shot learning on simulated and real-world evaluations. Claude 3.7 Sonnet achieves the highest accuracy among the evaluated models, with 92.31%, 76.92%, and 61.54% on the short, medium, and long routes, respectively, under 5-shot prompting of the MP-1 floor plan. The success rate of graph-based spatial structure is 15.4% higher than that of direct visual reasoning among all models, which confirms that graphical representation and in-context learning enhance navigation performance and make our solution more precise for indoor navigation of Blind and Low Vision (BLV) users.</p>
+      </section>
+      <section id="method" aria-labelledby="method-h">
+        <h2 id="method-h">Framework</h2>
+        <ol class="steps">
+          <li><h3>Floorplan parsing</h3><p>Textual and geometric features are extracted from architectural layouts using OCR and visual analysis.</p></li>
+          <li><h3>Spatial knowledge graph</h3><p>The language model constructs and validates a graph of spatial entities and their connections, enriched with ArUco marker information.</p></li>
+          <li><h3>Language-guided navigation</h3><p>User queries are translated into step-by-step, context-aware indoor navigation instructions.</p></li>
+          <li><h3>Route-aware localization</h3><p>Marker-based localization supports route tracking and alerts users when they deviate from the planned route.</p></li>
+        </ol>
+      </section>
+      <section id="resources" aria-labelledby="resources-h">
+        <h2 id="resources-h">Resources</h2>
+        <dl class="kv">
+          <div><dt>Published paper</dt><dd><a href="https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=11401868" target="_blank" rel="noopener noreferrer">IEEE Xplore</a></dd></div>
+          <div><dt>DOI</dt><dd><a href="https://doi.org/10.1109/BigData66926.2025.11401868" target="_blank" rel="noopener noreferrer">10.1109/BigData66926.2025.11401868</a></dd></div>
+        </dl>
+      </section>
+      <section id="cite" aria-labelledby="cite-h">
+        <h2 id="cite-h">Cite this work</h2>
+        <div class="bibtex" data-bibtex>
+          <pre tabindex="0" aria-label="BibTeX entry">@inproceedings{ayanzadeh2025floorplan2guide,
   title     = {Floorplan2Guide: LLM-Guided Floorplan Parsing for BLV Indoor Navigation},
   author    = {Ayanzadeh, Aydin and Oates, Tim},
   booktitle = {2025 IEEE International Conference on Big Data (BigData)},
   pages     = {7477--7485},
   year      = {2025},
   doi       = {10.1109/BigData66926.2025.11401868}
-}</pre></section></main><footer>2025 IEEE International Conference on Big Data (BigData)</footer></body></html>
+}</pre>
+          <p class="bibtex__actions">
+            <button class="button button--sm button--primary" type="button" data-bibtex-copy hidden><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-copy"/></svg>Copy BibTeX</button>
+            <button class="button button--sm" type="button" data-bibtex-download hidden><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-download"/></svg>Download .bib</button>
+            <button class="button button--sm" type="button" data-cite="IEEEBigData2025" hidden><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-quote"/></svg>APA, MLA, IEEE</button>
+            <span class="bibtex__status" role="status" aria-live="polite" data-bibtex-status></span>
+          </p>
+        </div>
+      </section>
+      <section id="related" aria-labelledby="related-h">
+        <h2 id="related-h">Related publications</h2>
+        <p class="muted">More from the research thread <a href="/publications.html?topic=navigation">Accessible navigation</a>.</p>
+        <ul class="related stack">
+          <li>
+            <article class="pub">
+              <h3 class="pub__title"><a href="/iiswc-2026-workload/">Characterizing an On-Device Depth-Aware Multimodal Workload in Assistive Navigation for Blind and Low-Vision Users</a></h3>
+              <p class="pub__authors"><span class="me">Aydin Ayanzadeh</span> and Tim Oates</p>
+              <p class="pub__venue"><span><cite>IEEE International Symposium on Workload Characterization (IISWC)</cite> 2026</span><span class="pill">Conference paper</span><span class="pill pill--accepted">Accepted</span></p>
+              <p class="pub__links"><a class="pub__link pub__link--page" href="/iiswc-2026-workload/"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-file"/></svg>Paper page</a><button class="pub__link" type="button" data-cite="iiswc-2026-workload" hidden><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-quote"/></svg>Cite</button></p>
+            </article>
+          </li>
+          <li>
+            <article class="pub">
+              <h3 class="pub__title"><a href="/cvpr-2026-floorplan-agentic/">LLM-Guided Agentic Floor Plan Parsing for Accessible Indoor Navigation of Blind and Low-Vision People</a></h3>
+              <p class="pub__authors"><span class="me">Aydin Ayanzadeh</span> and Tim Oates</p>
+              <p class="pub__venue"><span>CVPR 2026 Workshop (GRAIL-V) · IEEE/CVF Conference on Computer Vision and Pattern Recognition Workshops</span><span class="pill">Conference paper</span></p>
+              <p class="pub__links"><a class="pub__link pub__link--page" href="/cvpr-2026-floorplan-agentic/"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-file"/></svg>Paper page</a><a class="pub__link" href="https://openaccess.thecvf.com/content/CVPR2026W/GRAIL-V/papers/Ayanzadeh_LLM-Guided_Agentic_Floor_Plan_Parsing_for_Accessible_Indoor_Navigation_of_CVPRW_2026_paper.pdf" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-file"/></svg>PDF</a><a class="pub__link" href="https://arxiv.org/abs/2604.23970" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-external"/></svg>arXiv</a><button class="pub__link" type="button" data-cite="cvpr-2026-floorplan-agentic" hidden><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-quote"/></svg>Cite</button></p>
+            </article>
+          </li>
+        </ul>
+      </section>
+    </div>
+    <aside class="paper-aside" aria-label="About this paper">
+      <div>
+        <h2 class="sub__title">At a glance</h2>
+        <dl class="kv kv--stack">
+          <div><dt>Venue</dt><dd><cite>2025 IEEE International Conference on Big Data (BigData)</cite></dd></div>
+          <div><dt>Year</dt><dd>2025</dd></div>
+          <div><dt>Type</dt><dd>Conference paper</dd></div>
+          <div><dt>Research thread</dt><dd><a href="/publications.html?topic=navigation">Accessible navigation</a></dd></div>
+          <div><dt>DOI</dt><dd><a href="https://doi.org/10.1109/BigData66926.2025.11401868" target="_blank" rel="noopener noreferrer">10.1109/BigData66926.2025.11401868</a></dd></div>
+          <div><dt>arXiv</dt><dd><a href="https://arxiv.org/abs/2512.12177" target="_blank" rel="noopener noreferrer">2512.12177</a></dd></div>
+        </dl>
+      </div>
+      <nav class="aside-nav" aria-label="On this page">
+        <h2 class="sub__title">On this page</h2>
+        <ul>
+          <li><a href="#abstract">Abstract</a></li>
+          <li><a href="#method">Framework</a></li>
+          <li><a href="#resources">Resources</a></li>
+          <li><a href="#cite">Cite</a></li>
+          <li><a href="#related">Related</a></li>
+        </ul>
+      </nav>
+    </aside>
+  </div>
+</main>
+<footer class="site-footer ds">
+  <div class="wrap">
+    <div class="site-footer__grid">
+      <div class="site-footer__about">
+        <a class="brand" href="/"><svg class="brand__mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect class="m-plate" width="32" height="32" rx="8"/><path class="m-glyph" d="M9.5 23.5 16 8.5l6.5 15M12.2 18.5h7.6" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle class="m-dot" cx="25" cy="7" r="2.6"/></svg><span class="brand__name">Aydin Ayanzadeh</span></a>
+        <p>Ph.D. student in Computer Science at UMBC working on computer vision, multimodal learning and medical image analysis, with a focus on AI that is useful in clinics, in the field and in assistive technology.</p>
+      </div>
+      <nav aria-label="Site">
+        <h2>Site</h2>
+        <ul class="site-footer__links">
+          <li><a href="/#research">Research</a></li>
+          <li><a href="/publications.html">Publications</a></li>
+          <li><a href="/#projects">Projects</a></li>
+          <li><a href="/#experience">Experience</a></li>
+          <li><a href="/#teaching">Teaching</a></li>
+          <li><a href="/#news">News</a></li>
+          <li><a href="/blog.html">Blog</a></li>
+          <li><a href="/#contact">Contact</a></li>
+        </ul>
+      </nav>
+      <nav aria-label="Profiles">
+        <h2>Profiles</h2>
+        <ul class="site-footer__links">
+          <li><a href="https://scholar.google.com/citations?user=B17tai4AAAAJ" rel="me noopener">Google Scholar</a></li>
+          <li><a href="https://orcid.org/0000-0002-8816-3204" rel="me noopener">ORCID</a></li>
+          <li><a href="https://dblp.org/pid/207/7890" rel="me noopener">DBLP</a></li>
+          <li><a href="https://github.com/Ayanzadeh93" rel="me noopener">GitHub</a></li>
+          <li><a href="https://www.linkedin.com/in/ayanzadeh93" rel="me noopener">LinkedIn</a></li>
+          <li><a href="https://huggingface.co/Ayanzadeh93" rel="me noopener">Hugging Face</a></li>
+          <li><a href="https://ieeexplore.ieee.org/author/37085790008" rel="me noopener">IEEE Xplore</a></li>
+          <li><a href="https://www.researchgate.net/profile/Aydin-Ayanzadeh" rel="me noopener">ResearchGate</a></li>
+          <li><a href="https://x.com/aydin_ayanzadeh" rel="me noopener">X</a></li>
+        </ul>
+      </nav>
+      <nav aria-label="Downloads">
+        <h2>Downloads</h2>
+        <ul class="site-footer__links">
+          <li><a href="/Aydin_Ayanzadeh_CV__final.pdf">Curriculum vitae (PDF)</a></li>
+          <li><a href="/assets/publications.bib" download>All publications (BibTeX)</a></li>
+          <li><a href="/sitemap.xml">Sitemap</a></li>
+          <li><a href="mailto:a.ayanzadeh@gmail.com">a.ayanzadeh@gmail.com</a></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="site-footer__base">
+      <p>&copy; 2026 Aydin Ayanzadeh. Last updated 13 Nov 2026.</p>
+      <p>Set in Newsreader and Atkinson Hyperlegible, a typeface designed for low-vision readers. No tracking cookies.</p>
+    </div>
+  </div>
+</footer>
+<cite-dialog></cite-dialog>
+<script defer src="/js/site.js"></script>
+<script type="module" src="/js/components/index.js"></script>
+</body>
+</html>
