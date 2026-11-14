@@ -1646,13 +1646,25 @@ html:not(.js) .marquee__track[aria-hidden='true'] { display: none; }
 .ticks--row > li + li { margin-top: 0; }
 @media (max-width: 860px) { .ticks--row { grid-template-columns: minmax(0, 1fr); } }
 
-.honors { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-4); }
-.honor { padding: var(--s-5); border: 1px solid var(--c-line); border-radius: var(--r-lg); background: var(--c-surface); }
-.honor__when { font: 700 var(--t-xs)/1.4 var(--f-body); letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-accent-strong); }
-.honor__title { margin-top: 0.4rem; font-family: var(--f-display); font-size: 1.3rem; font-weight: 600; line-height: 1.25; }
-.honor__org { margin-top: 0.3rem; font-size: var(--t-sm); color: var(--c-ink-3); }
-.honor__desc { margin-top: var(--s-3); font-size: 0.98rem; color: var(--c-ink-2); }
-@media (max-width: 860px) { .honors { grid-template-columns: minmax(0, 1fr); } }
+/* Honors: a dated, ruled list (an even row of cards reads as a template) */
+.honors { max-width: 58rem; margin-inline: auto; }
+.honor {
+  display: grid;
+  grid-template-columns: 10.5rem minmax(0, 1fr);
+  gap: 0.2rem var(--s-5);
+  padding-block: var(--s-5);
+  border-top: 1px solid var(--c-line);
+}
+.honor:last-child { border-bottom: 1px solid var(--c-line); }
+.honors + .panel { max-width: 58rem; margin-inline: auto; }
+.honor__when { grid-row: 1 / span 3; padding-top: 0.35rem; font: 700 var(--t-xs)/1.4 var(--f-body); letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-accent-strong); }
+.honor__title { font-family: var(--f-display); font-size: 1.35rem; font-weight: 600; line-height: 1.25; }
+.honor__org { font-size: var(--t-sm); color: var(--c-ink-3); }
+.honor__desc { max-width: 44rem; margin-top: 0.35rem; font-size: 0.98rem; color: var(--c-ink-2); }
+@media (max-width: 640px) {
+  .honor { grid-template-columns: minmax(0, 1fr); }
+  .honor__when { grid-row: auto; padding-top: 0; }
+}
 
 .inline-list { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: var(--s-3); }
 
@@ -1869,6 +1881,22 @@ html:not(.js) .marquee__track[aria-hidden='true'] { display: none; }
 .zoom-dialog__plate > svg, .zoom-dialog__plate > img { width: 100%; height: auto; }
 .zoom-dialog__bar { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--s-4); margin-bottom: var(--s-3); }
 .zoom-dialog__cap { font-size: var(--t-sm); color: var(--c-ink-2); max-width: 60rem; }
+
+/* Touch screens: every control is at least 44px tall, so it can be hit with a
+   thumb. Pointer devices keep the compact sizes. (Research-thread marks stay
+   24px: larger ones would overlap on a phone-width year axis.) */
+@media (pointer: coarse) {
+  .pub__link, .button, .chip, .copy-btn, .cite-dialog__tab { min-height: 44px; }
+  .copy-btn { padding-inline: 0.75rem; }
+  .icon-btn { width: 44px; height: 44px; }
+  .brand, .link-arrow, .intro__profiles a, .crumbs a, .site-footer__links a, .aside-nav a, .aside-links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  .site-footer__links li + li, .aside-links ul { margin-top: 0; gap: 0; }
+  .intro__profiles { gap: 0 1.1rem; }
+}
 
 /* 15 ── Utilities ────────────────────────────────────────────────────────── */
 

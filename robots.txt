@@ -9,6 +9,8 @@ Disallow: /projects/project.html
 Disallow: /browserconfig.xml
 Disallow: /.git
 Disallow: /.cursor/
+Disallow: /.claude/
+Disallow: /.stitch/
 
 # Identity / AI discovery files
 Allow: /humans.txt

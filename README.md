@@ -119,6 +119,8 @@ Never edit inside a `<!-- build:NAME -->` … `<!-- /build:NAME -->` region, a p
 
 ## Design system
 
+`.stitch/DESIGN.md` describes the design system in words: palette with roles, type hierarchy, components, layout and the patterns the site avoids. It was written with the `extract-design-md` skill and audited with `taste-design`, both from [google-labs-code/stitch-skills](https://github.com/google-labs-code/stitch-skills) and installed in `.claude/skills/` (see the README there).
+
 `css/site.css` holds the tokens (colour, type, spacing), light and dark themes, and every component. The
 typefaces are Newsreader for titles and long-form reading and Atkinson Hyperlegible, a face designed for
 low-vision readers, for everything else; both are self-hosted. Icons are a small inline SVG sprite.
