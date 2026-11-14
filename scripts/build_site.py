@@ -4,12 +4,14 @@
 Sources (edit these):
     data/publications.json   every publication: metadata, links, paper-page content
     data/news.json           hand-written news items
-    data/site.json           profile facts, navigation, profile links
+    data/profile.json        education, experience, teaching, service, honours
+    data/site.json           name, navigation, profile links, toolkit
     assets/figures/*.svg     redrawn figures inlined into paper pages
 
 Outputs (do not edit by hand — rerun this script):
     <id>/index.html          one page per publication that has a "page" block
     publications.html        the publication library
+    cv.html                  the web curriculum vitae
     assets/publications.bib  every curated BibTeX entry
     sitemap.xml              in-scope URLs (Projects entries are kept verbatim)
     regions marked <!-- build:NAME --> … <!-- /build:NAME --> inside
@@ -171,7 +173,7 @@ def render_header(site: dict, current: str | None = None, home: bool = False) ->
       </ul>
     </nav>
     <div class="site-header__tools">
-      <a class="button button--sm button--cv" href="{esc(site["person"]["cv"])}">{icon("file")}<span>CV</span></a>
+      <a class="button button--sm button--cv" href="{esc(site["person"]["cvPage"])}"{' aria-current="page"' if current == "cv" else ""}>{icon("file")}<span>CV</span></a>
       <button class="icon-btn" type="button" data-theme-toggle aria-pressed="false" aria-label="Switch to dark theme">
         {icon("moon", "icon--moon")}{icon("sun", "icon--sun")}
       </button>
@@ -214,6 +216,7 @@ def render_footer(site: dict, pubs: list[dict]) -> str:
       <nav aria-label="Downloads">
         <h2>Downloads</h2>
         <ul class="site-footer__links">
+          <li><a href="{esc(person["cvPage"])}">Curriculum vitae</a></li>
           <li><a href="{esc(person["cv"])}">Curriculum vitae (PDF)</a></li>
           <li><a href="/assets/publications.bib" download>All publications (BibTeX)</a></li>
           <li><a href="/sitemap.xml">Sitemap</a></li>
@@ -657,6 +660,25 @@ def render_paper(pub: dict, pubs: list[dict], topics: dict, site: dict) -> str:
         </ul>
       </section>"""
 
+    # Step through the papers in library order (newest first).
+    paged = [p for p in pubs if p.get("page")]
+    position = paged.index(pub)
+    newer = paged[position - 1] if position > 0 else None
+    older = paged[position + 1] if position + 1 < len(paged) else None
+    pager_links = []
+    if newer:
+        pager_links.append(f'<a class="pager__link" rel="prev" href="/{esc(newer["id"])}/"><span class="pager__dir">Newer</span>'
+                           f'<span class="pager__title">{esc(newer["title"])}</span></a>')
+    else:
+        pager_links.append("<span></span>")
+    if older:
+        pager_links.append(f'<a class="pager__link pager__link--next" rel="next" href="/{esc(older["id"])}/"><span class="pager__dir">Older</span>'
+                           f'<span class="pager__title">{esc(older["title"])}</span></a>')
+    pager = f"""
+      <nav class="pager" aria-label="Neighbouring publications">
+        {"".join(pager_links)}
+      </nav>"""
+
     facts = [("Venue", venue_html(pub)), ("Year", str(pub["year"])), ("Type", TYPE_LABEL[pub["type"]])]
     if STATUS_LABEL.get(pub["status"]):
         facts.append(("Status", STATUS_LABEL[pub["status"]]))
@@ -702,7 +724,7 @@ def render_paper(pub: dict, pubs: list[dict], topics: dict, site: dict) -> str:
             <span class="bibtex__status" role="status" aria-live="polite" data-bibtex-status></span>
           </p>
         </div>
-      </section>{related_section}
+      </section>{related_section}{pager}
     </div>
     <aside class="paper-aside" aria-label="About this paper">
       <div>
@@ -883,7 +905,7 @@ def render_library(pubs: list[dict], topic_list: list[dict], topics: dict, site:
 def render_selected(pubs: list[dict], site: dict) -> str:
     me = site["person"]["name"]
     rows = "\n".join(
-        f'<li>\n  <p class="pub__year">{p["year"]}</p>\n{indent(pub_entry(p, me, heading="h3", summary=False), 2)}\n</li>'
+        f'<li data-reveal>\n  <p class="pub__year">{p["year"]}</p>\n{indent(pub_entry(p, me, heading="h3", summary=False), 2)}\n</li>'
         for p in pubs if p.get("selected")
     )
     return f'<ol class="pubs-selected">\n{rows}\n</ol>'
@@ -943,7 +965,7 @@ def render_threads(pubs: list[dict], topic_list: list[dict]) -> str:
     legend_dot = '<svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="5" fill="currentColor"/></svg>'
     legend_ring = '<svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="4" fill="none" stroke="currentColor" stroke-width="2"/></svg>'
     legend_bar = '<svg viewBox="0 0 22 12" aria-hidden="true"><rect x="1" y="3.500" width="20" height="5" rx="2.500" fill="currentColor" opacity="0.35"/></svg>'
-    return f"""<div class="threads" data-threads style="--n:{len(years)}">
+    return f"""<div class="threads" data-threads data-reveal style="--n:{len(years)}">
   <div class="threads__head">
     <h3 class="threads__title">Research threads, {first}–{last}</h3>
     <p class="threads__legend"><span>{legend_dot}Peer-reviewed</span><span>{legend_ring}Preprint</span><span class="threads__legend-bar">{legend_bar}Active years</span></p>
@@ -1062,11 +1084,11 @@ def render_news(pubs: list[dict], news: dict, visible: int = 6) -> str:
     return f'<ol class="news" data-news>\n{chr(10).join(rows)}\n</ol>{more}'
 
 
-def render_facts(pubs: list[dict], index_html: str) -> str:
-    """Headline counts, derived from the data and the page's own markup."""
+def render_facts(pubs: list[dict], profile: dict) -> str:
+    """Headline counts, derived from the data rather than typed."""
     first, last = min(p["year"] for p in pubs), max(p["year"] for p in pubs)
-    reviewed = len(re.findall(r'data-count="journal"', index_html))
-    courses = len(re.findall(r'data-count="course"', index_html))
+    reviewed = len(profile["reviewing"])
+    courses = len(profile["teaching"]["courses"])
     peer = sum(1 for p in pubs if p["type"] != "preprint")
     facts = [
         (str(len(pubs)), f"publications, {first}–{last}", "/publications.html"),
@@ -1150,6 +1172,295 @@ def render_contact(site: dict, heading: str = "h3") -> str:
 </div>"""
 
 
+# ── Profile: experience, education, teaching, honours (data/profile.json) ──
+
+LOGOS = {
+    "umbc": '<img class="cv__logo cv__logo--plate" src="/images/affiliations/umbc-wordmark.svg" alt="" width="128" height="30" loading="lazy">',
+    "itu": '<img class="cv__logo cv__logo--tall cv__logo--plate" src="/images/affiliations/itu-emblem.webp" alt="" width="126" height="176" loading="lazy">',
+}
+
+
+def when_html(entry: dict) -> str:
+    """Date range with machine-readable start and end."""
+    text = entry["when"]
+    start, _, end = text.partition(" – ")
+    current = "<b>Current</b>" if entry.get("current") else ""
+    start_html = f'<time datetime="{esc(entry["start"])}">{esc(start)}</time>' if entry.get("start") else esc(start)
+    end_html = f'<time datetime="{esc(entry["end"])}">{esc(end)}</time>' if entry.get("end") else esc(end)
+    return f'<p class="cv__when">{current}{start_html} – {end_html}</p>'
+
+
+def render_experience(profile: dict, heading: str = "h3") -> str:
+    rows = []
+    for job in profile["experience"]:
+        blocks = []
+        for block in job["blocks"]:
+            if block.get("project"):
+                blocks.append(f'      <p class="cv__project"><strong>Project:</strong> {esc(block["project"])}</p>')
+            # notes may carry a link, so they are trusted HTML from the data file
+            notes = "".join(f"<li>{note}</li>" for note in block["notes"])
+            blocks.append(f'      <ul class="cv__notes">{notes}</ul>')
+        rows.append(f"""  <li data-reveal>
+    {when_html(job)}
+    <div>
+      <{heading} class="cv__title">{esc(job["org"])}</{heading}>
+      <p class="cv__role">{esc(job["role"])}</p>
+      <p class="cv__meta">{esc(job["location"])}</p>
+{chr(10).join(blocks)}
+    </div>
+  </li>""")
+    return f'<ol class="cv" aria-label="Research roles, newest first">\n{chr(10).join(rows)}\n</ol>'
+
+
+def render_education(profile: dict, heading: str = "h3", logos: bool = True) -> str:
+    rows = []
+    for degree in profile["education"]:
+        logo = f'\n      {LOGOS[degree["logo"]]}' if logos and degree.get("logo") in LOGOS else ""
+        details = "".join(f"<li>{esc(line)}</li>" for line in degree.get("details", []))
+        details = f'\n      <ul class="cv__notes">{details}</ul>' if details else ""
+        gpa = f'\n      <p class="cv__meta">GPA: {esc(degree["gpa"])}</p>' if degree.get("gpa") else ""
+        rows.append(f"""  <li data-reveal>
+    {when_html(degree)}
+    <div>{logo}
+      <{heading} class="cv__title">{esc(degree["degree"])}</{heading}>
+      <p class="cv__role">{esc(degree["org"])}</p>{gpa}{details}
+    </div>
+  </li>""")
+    return f'<ol class="cv" aria-label="Degrees, newest first">\n{chr(10).join(rows)}\n</ol>'
+
+
+def courses_html(profile: dict) -> str:
+    return "\n".join(
+        f'    <li data-count="course"><span class="rows__code">{esc(c["code"])}</span>'
+        f'<span class="rows__main">{esc(c["name"])}</span><span class="rows__side">{esc(c["terms"])}</span></li>'
+        for c in profile["teaching"]["courses"]
+    )
+
+
+def journals_html(profile: dict) -> str:
+    return "\n".join(
+        f'    <li data-count="journal"><span class="rows__main">{esc(j["journal"])} <small>{esc(j["publisher"])}</small></span>'
+        f'<span class="rows__side">{esc(j["when"])}</span></li>'
+        for j in profile["reviewing"]
+    )
+
+
+def render_teaching(profile: dict) -> str:
+    """Homepage: teaching on the left, reviewing and mentoring on the right."""
+    teaching = profile["teaching"]
+    notes = "".join(f"<li>{esc(n)}</li>" for n in teaching["notes"])
+    mentoring = "".join(f'<li><strong>{esc(m["lead"])}</strong> {esc(m["text"])}</li>' for m in profile["mentoring"])
+    return f"""<div class="split">
+  <div class="panel" data-reveal>
+    <h3 class="panel__title">{esc(teaching["role"])}</h3>
+    <p class="panel__lede">{esc(teaching["org"])} · {esc(teaching["when"])}</p>
+    <ul class="rows rows--courses" aria-label="Courses supported as TA">
+{courses_html(profile)}
+    </ul>
+    <ul class="ticks mt-5">{notes}</ul>
+  </div>
+  <div class="stack stack--5">
+    <div class="panel" id="service" data-reveal>
+      <h3 class="panel__title">Journal reviewer</h3>
+      <ul class="rows" aria-label="Journals reviewed for">
+{journals_html(profile)}
+      </ul>
+    </div>
+    <div class="panel" data-reveal>
+      <h3 class="panel__title">Mentoring</h3>
+      <ul class="ticks mt-4">{mentoring}</ul>
+    </div>
+  </div>
+</div>"""
+
+
+def render_awards(profile: dict, heading: str = "h3") -> str:
+    cards = "\n".join(
+        f"""  <li class="honor" data-reveal>
+    <p class="honor__when"><time datetime="{esc(a["date"])}">{esc(a["when"])}</time></p>
+    <{heading} class="honor__title">{esc(a["title"])}</{heading}>
+    <p class="honor__org">{esc(a["org"])}</p>
+    <p class="honor__desc">{esc(a["desc"])}</p>
+  </li>"""
+        for a in profile["awards"]
+    )
+    certificates = "".join(f"<li>{esc(c)}</li>" for c in profile["certificates"])
+    return f"""<ul class="honors">
+{cards}
+</ul>
+<div class="panel mt-6" data-reveal>
+  <{heading} class="panel__title">Highlighted certificates</{heading}>
+  <ul class="ticks ticks--row mt-4">{certificates}</ul>
+</div>"""
+
+
+def cv_publication(pub: dict, me: str) -> str:
+    title = f'<a href="{esc(pub_url(pub))}">{esc(pub["title"])}</a>'
+    note = " (under review)" if pub["status"] == "under-review" else ""
+    return (f'<li><span class="cvpub__authors">{authors_inline(pub, me)}.</span> '
+            f'<span class="cvpub__title">{title}.</span> '
+            f'<span class="cvpub__venue">{venue_html(pub)}{note}.</span></li>')
+
+
+def render_cv(profile: dict, pubs: list[dict], topics: dict, site: dict) -> str:
+    person = site["person"]
+    me = person["name"]
+    base = site["url"]
+
+    groups = [
+        ("Journal articles and book chapters", [p for p in pubs if p["type"] in ("article", "incollection")]),
+        ("Conference and workshop papers", [p for p in pubs if p["type"] == "inproceedings"]),
+        ("Preprints", [p for p in pubs if p["type"] == "preprint"]),
+    ]
+    publications = "\n".join(
+        f'        <h3 class="cv-sub">{esc(label)}</h3>\n        <ol class="cvpubs">\n'
+        + "\n".join("          " + cv_publication(p, me) for p in items) + "\n        </ol>"
+        for label, items in groups if items
+    )
+    presentations = "\n".join(
+        f'          <li><span class="cvpub__authors">{esc(t["authors"])}.</span> <span class="cvpub__title">{esc(t["title"])}.</span> '
+        f'<span class="cvpub__venue">{esc(t["where"])}.</span></li>'
+        for t in profile["presentations"]
+    )
+    teaching = profile["teaching"]
+    teaching_notes = "".join(f"<li>{esc(n)}</li>" for n in teaching["notes"])
+    awards = "\n".join(
+        f'          <li><span class="rows__main"><strong>{esc(a["title"])}</strong> <small>{esc(a["org"])}</small></span>'
+        f'<span class="rows__side"><time datetime="{esc(a["date"])}">{esc(a["when"])}</time></span></li>'
+        for a in profile["awards"]
+    )
+    certificates = "".join(f"<li>{esc(c)}</li>" for c in profile["certificates"] + profile.get("certificates_cv_only", []))
+    plain = lambda items: "".join(f"<li>{esc(item)}</li>" for item in items)  # noqa: E731
+    skills = "\n".join(
+        f'          <div><dt>{esc(group["group"])}</dt><dd>{" · ".join(esc(item["name"]) for item in group["items"])}</dd></div>'
+        for group in site["toolkit"]
+    )
+    links = " · ".join(
+        f'<a href="{esc(p["url"])}" rel="me noopener">{esc(p["label"])}</a>'
+        for p in site["profiles"] if p.get("primary")
+    )
+    sections = [("summary", "Summary"), ("education", "Education"), ("experience", "Research experience"),
+                ("publications", "Publications"), ("presentations", "Posters"), ("teaching", "Teaching"),
+                ("awards", "Honors and awards"), ("service", "Service and memberships"),
+                ("skills", "Technical skills"), ("languages", "Languages")]
+    toc = "\n".join(f'        <li><a href="#{anchor}">{esc(label)}</a></li>' for anchor, label in sections)
+
+    body = f"""<main id="main">
+  <header class="page-hero">
+    <div class="wrap">
+      <nav aria-label="Breadcrumb">
+        <ol class="crumbs"><li><a href="/">Home</a></li><li aria-current="page">Curriculum vitae</li></ol>
+      </nav>
+      <p class="eyebrow">Curriculum vitae</p>
+      <h1 class="page-hero__title">{esc(me)}</h1>
+      <p class="page-hero__lede">{esc(person["role"])}, {esc(person["affiliation"])} · {esc(person["lab"])}</p>
+      <p class="cv-contact"><a href="mailto:{esc(person["emailUniversity"])}">{esc(person["emailUniversity"])}</a> · <a href="mailto:{esc(person["email"])}">{esc(person["email"])}</a> · {esc(person["location"])}</p>
+      <p class="cv-contact">{links}</p>
+      <p class="paper-actions">
+        <a class="button button--primary" href="{esc(person["cv"])}">{icon("download")}Download PDF</a>
+        <button class="button" type="button" data-print hidden>{icon("file")}Print this page</button>
+      </p>
+    </div>
+  </header>
+  <div class="wrap cv-layout">
+    <nav class="aside-nav cv-nav" aria-label="Sections">
+      <h2 class="sub__title">Sections</h2>
+      <ul class="mt-4">
+{toc}
+      </ul>
+    </nav>
+    <div class="cv-main">
+      <section id="summary" aria-labelledby="summary-h">
+        <h2 id="summary-h">Summary</h2>
+        <p class="prose">{esc(profile["summary"])}</p>
+      </section>
+      <section id="education" aria-labelledby="education-h">
+        <h2 id="education-h">Education</h2>
+{indent(render_education(profile, heading="h3", logos=False), 8)}
+      </section>
+      <section id="experience" aria-labelledby="experience-h">
+        <h2 id="experience-h">Research experience</h2>
+{indent(render_experience(profile, heading="h3"), 8)}
+      </section>
+      <section id="publications" aria-labelledby="publications-h">
+        <h2 id="publications-h">Publications</h2>
+{publications}
+        <p class="muted mt-4">Abstracts, figures and BibTeX are in the <a href="/publications.html">publication library</a>.</p>
+      </section>
+      <section id="presentations" aria-labelledby="presentations-h">
+        <h2 id="presentations-h">Posters</h2>
+        <ol class="cvpubs">
+{presentations}
+        </ol>
+      </section>
+      <section id="teaching" aria-labelledby="teaching-h">
+        <h2 id="teaching-h">Teaching</h2>
+        <p><strong>{esc(teaching["role"])}</strong>, {esc(teaching["org"])} · {esc(teaching["when"])}</p>
+        <ul class="rows rows--courses" aria-label="Courses supported as TA">
+{indent(courses_html(profile), 6)}
+        </ul>
+        <ul class="ticks mt-5">{teaching_notes}</ul>
+      </section>
+      <section id="awards" aria-labelledby="awards-h">
+        <h2 id="awards-h">Honors and awards</h2>
+        <ul class="rows">
+{awards}
+        </ul>
+        <h3 class="cv-sub">Certificates</h3>
+        <ul class="ticks">{certificates}</ul>
+      </section>
+      <section id="service" aria-labelledby="service-h">
+        <h2 id="service-h">Service and memberships</h2>
+        <h3 class="cv-sub">Journal reviewer</h3>
+        <ul class="rows" aria-label="Journals reviewed for">
+{indent(journals_html(profile), 6)}
+        </ul>
+        <h3 class="cv-sub">Memberships</h3>
+        <ul class="ticks">{plain(profile["memberships"])}</ul>
+        <h3 class="cv-sub">Leadership</h3>
+        <ul class="ticks">{plain(profile["leadership"])}</ul>
+      </section>
+      <section id="skills" aria-labelledby="skills-h">
+        <h2 id="skills-h">Technical skills</h2>
+        <dl class="interests">
+{skills}
+        </dl>
+      </section>
+      <section id="languages" aria-labelledby="languages-h">
+        <h2 id="languages-h">Languages</h2>
+        <p>{" · ".join(esc(item) for item in profile["languages"])}</p>
+      </section>
+    </div>
+  </div>
+</main>"""
+
+    page_ld = {
+        "@context": "https://schema.org",
+        "@type": "ProfilePage",
+        "@id": f"{base}/cv.html#page",
+        "url": f"{base}/cv.html",
+        "name": f"Curriculum vitae of {me}",
+        "dateModified": site["updated"],
+        "mainEntity": person_ref(site),
+        "isPartOf": {"@id": f"{base}/#website"},
+    }
+    crumbs = breadcrumb_ld([("Home", f"{base}/"), ("Curriculum vitae", f"{base}/cv.html")])
+    card = ROOT / "assets" / "og" / "home.png"
+    return page_shell(
+        title=f"Curriculum vitae | {me}",
+        description=(f"Curriculum vitae of {me}, {person['role']} at {person['affiliationShort']}: education, research "
+                     "experience, publications, teaching, honors and service."),
+        canonical=f"{base}/cv.html",
+        og_type="profile",
+        og_image=f"{base}/assets/og/home.png" if card.is_file() else f"{base}/images/profile-compressed.jpg",
+        head_extra="\n".join([json_ld(page_ld), json_ld(crumbs)]),
+        body=body,
+        site=site,
+        pubs=pubs,
+        current="cv",
+    )
+
+
 # ── Files with injected regions ────────────────────────────────────────────
 
 REGION = re.compile(r"(?P<indent>[ \t]*)<!-- build:(?P<name>[\w-]+) -->.*?<!-- /build:(?P=name) -->", re.S)
@@ -1211,6 +1522,7 @@ def build() -> dict[str, str]:
     data = read_json("data/publications.json")
     site = read_json("data/site.json")
     news = read_json("data/news.json")
+    profile = read_json("data/profile.json")
     topic_list = data["topics"]
     topics = {topic["id"]: topic for topic in topic_list}
     # Newest first; within a year the hand-curated order of the file is kept.
@@ -1221,6 +1533,7 @@ def build() -> dict[str, str]:
         if pub.get("page"):
             outputs[f'{pub["id"]}/index.html'] = render_paper(pub, pubs, topics, site)
     outputs["publications.html"] = render_library(pubs, topic_list, topics, site)
+    outputs["cv.html"] = render_cv(profile, pubs, topics, site)
     outputs["assets/publications.bib"] = render_bib(pubs, site)
     outputs["sitemap.xml"] = render_sitemap(pubs, site, (ROOT / "sitemap.xml").read_text(encoding="utf-8"))
 
@@ -1229,9 +1542,13 @@ def build() -> dict[str, str]:
     shared = {"assets": head_assets(), "footer": render_footer(site, pubs)}
     pages = {
         "index.html": dict(shared, header=render_header(site, home=True),
-                           facts=render_facts(pubs, index_html),
+                           facts=render_facts(pubs, profile),
                            threads=render_threads(pubs, topic_list),
                            toolkit=render_toolkit(site),
+                           experience=render_experience(profile),
+                           education=render_education(profile),
+                           teaching=render_teaching(profile),
+                           awards=render_awards(profile),
                            contact=render_contact(site, heading="h3"),
                            **{"selected-publications": render_selected(pubs, site),
                               "news": render_news(pubs, news),
