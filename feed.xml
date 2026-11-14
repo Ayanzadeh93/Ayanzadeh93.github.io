@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+  <title>Aydin Ayanzadeh: publications and news</title>
+  <link>https://www.ayanzadeh.com/</link>
+  <atom:link href="https://www.ayanzadeh.com/feed.xml" rel="self" type="application/rss+xml"/>
+  <description>New papers and research updates from Aydin Ayanzadeh, UMBC.</description>
+  <language>en</language>
+  <lastBuildDate>Sat, 14 Nov 2026 00:00:00 +0000</lastBuildDate>
+  <item>
+    <title>Modular Deep Learning Mechanisms for Auditable Next-Day Wildfire Spread Prediction</title>
+    <link>https://www.ayanzadeh.com/nextday-wildfire/</link>
+    <guid isPermaLink="true">https://www.ayanzadeh.com/nextday-wildfire/</guid>
+    <category>Preprint</category>
+    <description>arXiv 2026, 2026. Modular deep learning augmentations for next-day wildfire spread prediction: wind- and slope-conditioned attention, retrieval-augmented correction, and dual-stream gating.</description>
+  </item>
+  <item>
+    <title>Characterizing an On-Device Depth-Aware Multimodal Workload in Assistive Navigation for Blind and Low-Vision Users</title>
+    <link>https://www.ayanzadeh.com/iiswc-2026-workload/</link>
+    <guid isPermaLink="true">https://www.ayanzadeh.com/iiswc-2026-workload/</guid>
+    <category>Conference paper</category>
+    <description>IISWC 2026, 2026. An end-to-end characterization of an on-device, depth-aware multimodal workload for assistive indoor navigation for blind and low-vision users.</description>
+  </item>
+  <item>
+    <title>LLM-Guided Agentic Floor Plan Parsing for Accessible Indoor Navigation of Blind and Low-Vision People</title>
+    <link>https://www.ayanzadeh.com/cvpr-2026-floorplan-agentic/</link>
+    <guid isPermaLink="true">https://www.ayanzadeh.com/cvpr-2026-floorplan-agentic/</guid>
+    <category>Conference paper</category>
+    <description>CVPR 2026 Workshop (GRAIL-V), 2026. An agentic framework that converts a single floor plan image into a structured, retrievable knowledge base for safe, accessible indoor navigation.</description>
+  </item>
+  <item>
+    <title>WildfireVLM: AI-Powered Analysis for Early Wildfire Detection Using Satellite Imagery</title>
+    <link>https://www.ayanzadeh.com/wildfirevlm-page/</link>
+    <guid isPermaLink="true">https://www.ayanzadeh.com/wildfirevlm-page/</guid>
+    <category>Conference paper</category>
+    <description>IGARSS 2026, 2026. A vision-language model for early wildfire detection and risk assessment from satellite imagery.</description>
+  </item>
+  <item>
+    <title>Floorplan2Guide: LLM-Guided Floorplan Parsing for BLV Indoor Navigation</title>
+    <link>https://www.ayanzadeh.com/IEEEBigData2025/</link>
+    <guid isPermaLink="true">https://www.ayanzadeh.com/IEEEBigData2025/</guid>
+    <category>Conference paper</category>
+    <description>IEEE BigData 2025, 2025. Floorplan2Guide transforms floorplans into spatial knowledge graphs and language-guided indoor navigation for blind and low-vision users.</description>
+  </item>
+  <item>
+    <title>PURSUhInT: In Search of Informative Hint Points Based on Layer Clustering for Knowledge Distillation</title>
+    <link>https://www.ayanzadeh.com/pursuhint/</link>
+    <guid isPermaLink="true">https://www.ayanzadeh.com/pursuhint/</guid>
+    <category>Journal article</category>
+    <description>Expert Systems with Applications, 2023. A clustering-based hint selection method for knowledge distillation: teacher layers are clustered and the cluster centers become the hint points.</description>
+  </item>
+  <item>
+    <title>Automated analysis of phase-contrast optical microscopy time-lapse images: application to wound healing and cell motility assays of breast cancer</title>
+    <link>https://www.ayanzadeh.com/wound-healing-microscopy-chapter/</link>
+    <guid isPermaLink="true">https://www.ayanzadeh.com/wound-healing-microscopy-chapter/</guid>
+    <category>Book chapter</category>
+    <description>Book chapter, Academic Press, 2023. An end-to-end workflow for analyzing phase-contrast microscopy data from cell motility and wound healing assays.</description>
+  </item>
+  <item>
+    <title>Improved cell segmentation using deep learning in label-free optical microscopy images</title>
+    <link>https://www.ayanzadeh.com/cell-segmentation-microscopy/</link>
+    <guid isPermaLink="true">https://www.ayanzadeh.com/cell-segmentation-microscopy/</guid>
+    <category>Journal article</category>
+    <description>Turkish Journal of Electrical Engineering and Computer Sciences, 2021. A modified U-Net with a pretrained ResNet-18 encoder, residual decoder blocks, and a redesigned skip-connection for cell segmentation in label-free microscopy images.</description>
+  </item>
+  <item>
+    <title>Representation learning using graph autoencoders with residual connections</title>
+    <link>https://www.ayanzadeh.com/resvgae-graph-autoencoders/</link>
+    <guid isPermaLink="true">https://www.ayanzadeh.com/resvgae-graph-autoencoders/</guid>
+    <category>Preprint</category>
+    <description>arXiv 2021, 2021. Residual connections for deep graph autoencoders: ResVGAE, a deep variational graph autoencoder with multiple residual modules, for link prediction.</description>
+  </item>
+  <item>
+    <title>Deep Learning based Segmentation Pipeline for Label-Free Phase-Contrast Microscopy Images</title>
+    <link>https://www.ayanzadeh.com/siu-2020-segmentation-pipeline/</link>
+    <guid isPermaLink="true">https://www.ayanzadeh.com/siu-2020-segmentation-pipeline/</guid>
+    <category>Conference paper</category>
+    <description>SIU 2020, 2020. A deep learning segmentation pipeline for label-free phase-contrast microscopy images, improving U-Net and FPN with an ImageNet-pretrained ResNet-18 encoder.</description>
+  </item>
+  <item>
+    <title>Graph Embedding For Link Prediction Using Residual Variational Graph Autoencoders</title>
+    <link>https://www.ayanzadeh.com/siu-2020-graph-embedding/</link>
+    <guid isPermaLink="true">https://www.ayanzadeh.com/siu-2020-graph-embedding/</guid>
+    <category>Conference paper</category>
+    <description>SIU 2020, 2020. Residual Variational Graph Autoencoder (RVGAE): residual connections boost variational graph autoencoders for link prediction.</description>
+  </item>
+  <item>
+    <title>A New Class of Scaling Matrices for Scaled Trust Region Algorithms</title>
+    <link>https://www.ayanzadeh.com/scaling-matrices-trust-region/</link>
+    <guid isPermaLink="true">https://www.ayanzadeh.com/scaling-matrices-trust-region/</guid>
+    <category>Preprint</category>
+    <description>arXiv 2019, 2019. A new class of affine scaling matrices for interior point Newton-type methods, defined as a convex combination of well-known scaling matrices.</description>
+  </item>
+  <item>
+    <title>Cell Segmentation of 2D Phase-Contrast Microscopy Images with Deep Learning Method</title>
+    <link>https://www.ayanzadeh.com/tiptekno-2019-cell-segmentation/</link>
+    <guid isPermaLink="true">https://www.ayanzadeh.com/tiptekno-2019-cell-segmentation/</guid>
+    <category>Conference paper</category>
+    <description>TIPTEKNO 2019, 2019. A multiresolution U-Net with multi-combination augmentation for cell segmentation in 2D phase-contrast microscopy images.</description>
+  </item>
+  <item>
+    <title>Automated Segmentation of Cells in Phase Contrast Optical Microscopy Time Series Images</title>
+    <link>https://www.ayanzadeh.com/tiptekno-2019-cell-time-series/</link>
+    <guid isPermaLink="true">https://www.ayanzadeh.com/tiptekno-2019-cell-time-series/</guid>
+    <category>Conference paper</category>
+    <description>TIPTEKNO 2019, 2019. Traditional image processing and deep learning approaches for automated cell segmentation from phase-contrast microscopy time series, evaluated against manually annotated datasets.</description>
+  </item>
+  <item>
+    <title>Modified Deep Neural Networks for Dog Breeds Identification</title>
+    <link>https://www.ayanzadeh.com/dog-breeds-identification/</link>
+    <guid isPermaLink="true">https://www.ayanzadeh.com/dog-breeds-identification/</guid>
+    <category>Preprint</category>
+    <description>Preprints 2018, 2018. Fine-tuned pretrained ImageNet models for dog breed identification, reaching 89.66% test accuracy on the Stanford Dogs dataset.</description>
+  </item>
+  <item>
+    <title>A Modified Ant colony Based Approach to Digital Image Edge Detection</title>
+    <link>https://www.ayanzadeh.com/ant-colony-edge-detection/</link>
+    <guid isPermaLink="true">https://www.ayanzadeh.com/ant-colony-edge-detection/</guid>
+    <category>Conference paper</category>
+    <description>KBEI 2015, 2015. A modified ant colony optimization method for digital image edge detection, faster and more efficient than former ant colony based methods.</description>
+  </item>
+  <item>
+    <title>Gaussian Three-Dimensional kernel SVM for Edge Detection Applications</title>
+    <link>https://www.ayanzadeh.com/gaussian-svm-edge-detection/</link>
+    <guid isPermaLink="true">https://www.ayanzadeh.com/gaussian-svm-edge-detection/</guid>
+    <category>Conference paper</category>
+    <description>Conference 2015 · arXiv 2017, 2015. A support vector machine with a three-dimensional Gaussian radial basis function kernel for edge detection, outperforming Canny and Sobel detectors.</description>
+  </item>
+  <item>
+    <title>M.S. Graduation &amp; International Alumni Scholarship</title>
+    <link>https://www.ayanzadeh.com/#news</link>
+    <guid isPermaLink="false">news-2025-05-15-m-s-graduation-international-alumni-scholarship</guid>
+    <category>Achievement</category>
+    <pubDate>Thu, 15 May 2025 00:00:00 +0000</pubDate>
+  </item>
+  <item>
+    <title>Presenting at CMD-IT/ACM Richard Tapia Conference</title>
+    <link>https://www.ayanzadeh.com/#news</link>
+    <guid isPermaLink="false">news-2025-01-presenting-at-cmd-it-acm-richard-tapia-conference</guid>
+    <category>Conference</category>
+  </item>
+  <item>
+    <title>New Paper: Improved Autoencoder for Nuclei Segmentation</title>
+    <link>https://www.ayanzadeh.com/#news</link>
+    <guid isPermaLink="false">news-2024-12-15-new-paper-improved-autoencoder-for-nuclei-segmentation</guid>
+    <category>Research</category>
+    <pubDate>Sun, 15 Dec 2024 00:00:00 +0000</pubDate>
+  </item>
+  <item>
+    <title>Presented at STARS Celebration Conference</title>
+    <link>https://www.ayanzadeh.com/#news</link>
+    <guid isPermaLink="false">news-2024-10-presented-at-stars-celebration-conference</guid>
+    <category>Conference</category>
+  </item>
+  <item>
+    <title>WildfireVLM: Environmental AI Research</title>
+    <link>https://www.ayanzadeh.com/projects/wildfire-vlm.html</link>
+    <guid isPermaLink="false">news-2024-wildfirevlm-environmental-ai-research</guid>
+    <category>Project</category>
+  </item>
+  <item>
+    <title>PURSUhInT Published in Expert Systems with Applications</title>
+    <link>https://www.ayanzadeh.com/pursuhint/</link>
+    <guid isPermaLink="false">news-2023-pursuhint-published-in-expert-systems-with-applications</guid>
+    <category>Publication</category>
+  </item>
+  <item>
+    <title>Vodafone FutureLab Research Fellowship</title>
+    <link>https://www.ayanzadeh.com/#news</link>
+    <guid isPermaLink="false">news-2019-05-vodafone-futurelab-research-fellowship</guid>
+    <category>Award</category>
+  </item>
+</channel>
+</rss>

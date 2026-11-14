@@ -42,7 +42,7 @@ that does not exist in the legacy sheets.
 ├── index.html                  # Homepage; generated regions marked <!-- build:NAME -->
 ├── publications.html           # GENERATED library
 ├── <paper-id>/index.html       # GENERATED paper pages
-├── contact.html / blog.html / blog-post.html / 404.html
+├── contact.html / blog.html / blog/<slug>/ / 404.html / accessibility.html
 ├── css/site.css                # Design system (tokens, components, both themes)
 ├── js/site.js                  # Shared behaviour for pages on site.css
 ├── js/components/              # <pub-library>, <cite-dialog>, index.js entry
@@ -160,9 +160,9 @@ Copy checklists from [reference.md](reference.md) when executing these tasks.
 
 ### Add or edit blog content
 
-1. `blog.html` is the listing (`.posts`); `blog-post.html` is the one published post (`.article`).
+1. `blog.html` is the listing (`.posts`); `blog/multi-task-learning/index.html` is the one published post (`.article`).
 2. A list entry links to a post only when that post exists; otherwise it is marked "Summary only".
-3. New post page: copy `blog-post.html`, register it in `build()` in `scripts/build_site.py`, and add it to `sitemap` in `data/site.json`.
+3. New post page: copy `blog/multi-task-learning/index.html` to `blog/<slug>/index.html`, register it in `build()` in `scripts/build_site.py`, and add it to `sitemap` in `data/site.json`.
 
 ### Change global navigation or theme
 

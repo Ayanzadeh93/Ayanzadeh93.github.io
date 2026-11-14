@@ -25,16 +25,22 @@
         <priority>0.6</priority>
     </url>
     <url>
-        <loc>https://www.ayanzadeh.com/blog-post.html</loc>
+        <loc>https://www.ayanzadeh.com/contact.html</loc>
+        <lastmod>2026-11-14</lastmod>
+        <changefreq>yearly</changefreq>
+        <priority>0.5</priority>
+    </url>
+    <url>
+        <loc>https://www.ayanzadeh.com/blog/multi-task-learning/</loc>
         <lastmod>2026-11-14</lastmod>
         <changefreq>yearly</changefreq>
         <priority>0.4</priority>
     </url>
     <url>
-        <loc>https://www.ayanzadeh.com/contact.html</loc>
+        <loc>https://www.ayanzadeh.com/accessibility.html</loc>
         <lastmod>2026-11-14</lastmod>
         <changefreq>yearly</changefreq>
-        <priority>0.5</priority>
+        <priority>0.3</priority>
     </url>
     <url>
         <loc>https://www.ayanzadeh.com/nextday-wildfire/</loc>
@@ -131,6 +137,12 @@
         <lastmod>2026-11-14</lastmod>
         <changefreq>yearly</changefreq>
         <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://www.ayanzadeh.com/blog-post.html</loc>
+        <lastmod>2026-11-14</lastmod>
+        <changefreq>yearly</changefreq>
+        <priority>0.4</priority>
     </url>
   <url>
     <loc>https://www.ayanzadeh.com/wildfirevlm-page/</loc>

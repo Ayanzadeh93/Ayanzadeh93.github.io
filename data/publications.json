@@ -185,6 +185,9 @@
             "label": "of frame energy comes from the detector, which makes detector-side optimization a low-leverage knob"
           }
         ]
+      },
+      "links": {
+        "code": "https://github.com/Ayanzadeh93/IISWIC-2026-paper_"
       }
     },
     {
@@ -298,7 +301,8 @@
       "selected": true,
       "summary": "A vision-language model for early wildfire detection and risk assessment from satellite imagery.",
       "links": {
-        "slides": "assets/slides/wildfire-vlm-igarss-2026.pdf"
+        "slides": "assets/slides/wildfire-vlm-igarss-2026.pdf",
+        "code": "https://github.com/Ayanzadeh93/wildfireVLM"
       },
       "external_page": "https://www.ayanzadeh.com/wildfirevlm-page/",
       "bibtex": "@inproceedings{ayanzadeh2026wildfirevlm,\n  title = {{WildfireVLM}: AI-Powered Analysis for Early Wildfire Detection Using Satellite Imagery},\n  author = {Ayanzadeh, Aydin and Dixit, Prakhar and Kamal, Sadia and Halem, Milton},\n  booktitle = {IEEE International Geoscience and Remote Sensing Symposium (IGARSS)},\n  year = {2026},\n  eprint = {2602.13305},\n  archivePrefix = {arXiv},\n  url = {https://arxiv.org/abs/2602.13305},\n  note = {Accepted}\n}"
@@ -960,6 +964,9 @@
             "url": "https://doi.org/10.1109/TIPTEKNO.2019.8894978"
           }
         ]
+      },
+      "links": {
+        "code": "https://github.com/Ayanzadeh93/Phase-Contrast-Microscopy-cell-segmentation-and-tracking"
       }
     },
     {

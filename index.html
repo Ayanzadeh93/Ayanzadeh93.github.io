@@ -75,6 +75,7 @@
     <link rel="preload" href="/fonts/newsreader-var-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="/fonts/atkinson-hyperlegible-400-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="alternate" type="application/rss+xml" title="Aydin Ayanzadeh: publications and news" href="/feed.xml">
     <link rel="stylesheet" href="/css/site.css">
     <script src="/js/theme-init.js"></script>
     <!-- /build:assets -->
@@ -222,6 +223,58 @@
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
+      "@type": "Person",
+      "@id": "https://www.ayanzadeh.com/#person",
+      "alumniOf": [
+        {
+          "@type": "CollegeOrUniversity",
+          "name": "University of Maryland"
+        },
+        {
+          "@type": "CollegeOrUniversity",
+          "name": "Istanbul Technical University"
+        },
+        {
+          "@type": "CollegeOrUniversity",
+          "name": "University of Tabriz"
+        }
+      ],
+      "memberOf": [
+        {
+          "@type": "Organization",
+          "name": "IEEE"
+        },
+        {
+          "@type": "Organization",
+          "name": "ACM"
+        },
+        {
+          "@type": "Organization",
+          "name": "AccessComputing"
+        }
+      ],
+      "award": [
+        "International Alumni Endowed Scholarship, University of Maryland, Baltimore County (UMBC), USA (May 2025)",
+        "Research Fellowship, Vodafone FutureLab, Turkey (May 2019)",
+        "Top 1% Ranking, Nationwide Universities Entrance Exam, Iran (Sept 2011)"
+      ],
+      "knowsLanguage": [
+        "English",
+        "Turkish",
+        "Persian",
+        "Azerbaijani"
+      ],
+      "hasOccupation": {
+        "@type": "Occupation",
+        "name": "Graduate research assistant",
+        "occupationalCategory": "Computer and information research scientists"
+      },
+      "seeks": "Ph.D. expected May 2028 · open to research internships and collaborations"
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
       "@type": "ItemList",
       "@id": "https://www.ayanzadeh.com/#selected-publications",
       "name": "Selected publications of Aydin Ayanzadeh",
@@ -313,7 +366,6 @@
             <li><a class="site-nav__link" href="#experience" data-spy="experience">Experience</a></li>
             <li><a class="site-nav__link" href="#teaching" data-spy="teaching">Teaching</a></li>
             <li><a class="site-nav__link" href="#news" data-spy="news">News</a></li>
-            <li><a class="site-nav__link" href="/blog.html">Blog</a></li>
             <li><a class="site-nav__link" href="#contact" data-spy="contact">Contact</a></li>
           </ul>
         </nav>
@@ -341,6 +393,9 @@
                         <p class="intro__role">Ph.D. student in Computer Science at the
                             <a href="https://umbc.edu/" rel="noopener">University of Maryland, Baltimore County</a>,
                             <a href="#experience">CORAL Lab</a>, advised by Prof. Tim Oates.</p>
+                        <!-- build:availability -->
+                        <p class="intro__status"><span class="status-dot" aria-hidden="true"></span>Ph.D. expected May 2028 · open to research internships and collaborations</p>
+                        <!-- /build:availability -->
                         <p class="intro__lead">I work on computer vision and multimodal learning for AI that is
                             useful in clinics, in the field and in assistive technology: indoor navigation for
                             people who are blind or have low vision, vision-language models for wildfire
@@ -553,7 +608,7 @@
                     <h3 class="pub__title"><a href="/nextday-wildfire/">Modular Deep Learning Mechanisms for Auditable Next-Day Wildfire Spread Prediction</a></h3>
                     <p class="pub__authors">Miguel Esparza, <span class="me">Aydin Ayanzadeh</span>, Ahmad Mousavi, and Ali Mostafavi</p>
                     <p class="pub__venue"><span>Under review · arXiv preprint arXiv:2609.17763 (2026)</span><span class="pill">Preprint</span><span class="pill pill--pending">Under review</span></p>
-                    <p class="pub__links"><a class="pub__link pub__link--page" href="/nextday-wildfire/"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-file"/></svg>Paper page</a><a class="pub__link" href="https://arxiv.org/abs/2609.17763" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-external"/></svg>arXiv</a><button class="pub__link" type="button" data-cite="nextday-wildfire" hidden><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-quote"/></svg>Cite</button></p>
+                    <p class="pub__links"><a class="pub__link pub__link--page" href="/nextday-wildfire/"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-file"/></svg>Paper page</a><a class="pub__link" href="https://arxiv.org/pdf/2609.17763" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-file"/></svg>PDF</a><a class="pub__link" href="https://arxiv.org/abs/2609.17763" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-external"/></svg>arXiv</a><button class="pub__link" type="button" data-cite="nextday-wildfire" hidden><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-quote"/></svg>Cite</button></p>
                   </article>
                 </li>
                 <li data-reveal>
@@ -562,7 +617,7 @@
                     <h3 class="pub__title"><a href="/iiswc-2026-workload/">Characterizing an On-Device Depth-Aware Multimodal Workload in Assistive Navigation for Blind and Low-Vision Users</a></h3>
                     <p class="pub__authors"><span class="me">Aydin Ayanzadeh</span> and Tim Oates</p>
                     <p class="pub__venue"><span><cite>IEEE International Symposium on Workload Characterization (IISWC)</cite> 2026</span><span class="pill">Conference paper</span></p>
-                    <p class="pub__links"><a class="pub__link pub__link--page" href="/iiswc-2026-workload/"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-file"/></svg>Paper page</a><button class="pub__link" type="button" data-cite="iiswc-2026-workload" hidden><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-quote"/></svg>Cite</button></p>
+                    <p class="pub__links"><a class="pub__link pub__link--page" href="/iiswc-2026-workload/"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-file"/></svg>Paper page</a><a class="pub__link" href="https://github.com/Ayanzadeh93/IISWIC-2026-paper_" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-code"/></svg>Code</a><button class="pub__link" type="button" data-cite="iiswc-2026-workload" hidden><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-quote"/></svg>Cite</button></p>
                   </article>
                 </li>
                 <li data-reveal>
@@ -580,7 +635,7 @@
                     <h3 class="pub__title"><a href="https://www.ayanzadeh.com/wildfirevlm-page/">WildfireVLM: AI-Powered Analysis for Early Wildfire Detection Using Satellite Imagery</a></h3>
                     <p class="pub__authors"><span class="me">Aydin Ayanzadeh</span>, Prakhar Dixit, Sadia Kamal, and Milton Halem</p>
                     <p class="pub__venue"><span><cite>IEEE International Geoscience and Remote Sensing Symposium (IGARSS)</cite> 2026</span><span class="pill">Conference paper</span></p>
-                    <p class="pub__links"><a class="pub__link pub__link--page" href="https://www.ayanzadeh.com/wildfirevlm-page/"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-external"/></svg>Project site</a><a class="pub__link" href="https://arxiv.org/abs/2602.13305" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-external"/></svg>arXiv</a><a class="pub__link" href="/assets/slides/wildfire-vlm-igarss-2026.pdf"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-slides"/></svg>Slides</a><button class="pub__link" type="button" data-cite="wildfirevlm" hidden><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-quote"/></svg>Cite</button></p>
+                    <p class="pub__links"><a class="pub__link pub__link--page" href="https://www.ayanzadeh.com/wildfirevlm-page/"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-external"/></svg>Project site</a><a class="pub__link" href="https://arxiv.org/pdf/2602.13305" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-file"/></svg>PDF</a><a class="pub__link" href="https://arxiv.org/abs/2602.13305" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-external"/></svg>arXiv</a><a class="pub__link" href="https://github.com/Ayanzadeh93/wildfireVLM" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-code"/></svg>Code</a><a class="pub__link" href="/assets/slides/wildfire-vlm-igarss-2026.pdf"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-slides"/></svg>Slides</a><button class="pub__link" type="button" data-cite="wildfirevlm" hidden><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-quote"/></svg>Cite</button></p>
                   </article>
                 </li>
                 <li data-reveal>
@@ -589,7 +644,7 @@
                     <h3 class="pub__title"><a href="/IEEEBigData2025/">Floorplan2Guide: LLM-Guided Floorplan Parsing for BLV Indoor Navigation</a></h3>
                     <p class="pub__authors"><span class="me">Aydin Ayanzadeh</span> and Tim Oates</p>
                     <p class="pub__venue"><span><cite>2025 IEEE International Conference on Big Data (BigData)</cite></span><span class="pill">Conference paper</span></p>
-                    <p class="pub__links"><a class="pub__link pub__link--page" href="/IEEEBigData2025/"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-file"/></svg>Paper page</a><a class="pub__link" href="https://doi.org/10.1109/BigData66926.2025.11401868" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-external"/></svg>Publisher</a><a class="pub__link" href="https://arxiv.org/abs/2512.12177" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-external"/></svg>arXiv</a><button class="pub__link" type="button" data-cite="IEEEBigData2025" hidden><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-quote"/></svg>Cite</button></p>
+                    <p class="pub__links"><a class="pub__link pub__link--page" href="/IEEEBigData2025/"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-file"/></svg>Paper page</a><a class="pub__link" href="https://arxiv.org/pdf/2512.12177" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-file"/></svg>PDF</a><a class="pub__link" href="https://doi.org/10.1109/BigData66926.2025.11401868" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-external"/></svg>Publisher</a><a class="pub__link" href="https://arxiv.org/abs/2512.12177" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-external"/></svg>arXiv</a><button class="pub__link" type="button" data-cite="IEEEBigData2025" hidden><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-quote"/></svg>Cite</button></p>
                   </article>
                 </li>
                 <li data-reveal>
@@ -598,7 +653,7 @@
                     <h3 class="pub__title"><a href="/pursuhint/">PURSUhInT: In Search of Informative Hint Points Based on Layer Clustering for Knowledge Distillation</a></h3>
                     <p class="pub__authors">Reyhan Kevser Keser, <span class="me">Aydin Ayanzadeh</span>, Omid Abdollahi Aghdam, Çağlar Kılcıoğlu, Behçet Uğur Töreyin, and Nazım Kemal Üre</p>
                     <p class="pub__venue"><span><cite>Expert Systems with Applications</cite>, vol. 213, 119040, 2023</span><span class="pill">Journal article</span></p>
-                    <p class="pub__links"><a class="pub__link pub__link--page" href="/pursuhint/"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-file"/></svg>Paper page</a><a class="pub__link" href="https://doi.org/10.1016/j.eswa.2022.119040" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-external"/></svg>Publisher</a><a class="pub__link" href="https://arxiv.org/abs/2103.00053" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-external"/></svg>arXiv</a><a class="pub__link" href="https://codeocean.com/capsule/4245746/tree/v1" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-code"/></svg>Code</a><button class="pub__link" type="button" data-cite="pursuhint" hidden><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-quote"/></svg>Cite</button></p>
+                    <p class="pub__links"><a class="pub__link pub__link--page" href="/pursuhint/"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-file"/></svg>Paper page</a><a class="pub__link" href="https://arxiv.org/pdf/2103.00053" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-file"/></svg>PDF</a><a class="pub__link" href="https://doi.org/10.1016/j.eswa.2022.119040" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-external"/></svg>Publisher</a><a class="pub__link" href="https://arxiv.org/abs/2103.00053" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-external"/></svg>arXiv</a><a class="pub__link" href="https://codeocean.com/capsule/4245746/tree/v1" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-code"/></svg>Code</a><button class="pub__link" type="button" data-cite="pursuhint" hidden><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-quote"/></svg>Cite</button></p>
                   </article>
                 </li>
                 </ol>
@@ -669,6 +724,15 @@
                 </ol>
                 <p class="news__more"><button class="button button--sm" type="button" data-news-more hidden><span data-label>Show earlier updates</span></button></p>
                 <!-- /build:news -->
+                <div class="news talks-wrap" data-reveal>
+                    <!-- build:talks -->
+                    <h3 class="talks__title">Talks and posters</h3>
+                    <ul class="talks">
+                      <li class="talk"><span class="pill">Slides</span><span class="talk__title">WildfireVLM: AI-Powered Analysis for Early Wildfire Detection Using Satellite Imagery</span><span class="talk__where">IEEE International Geoscience and Remote Sensing Symposium (IGARSS) 2026</span><a class="pub__link" href="/assets/slides/wildfire-vlm-igarss-2026.pdf"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-slides"/></svg>Slides</a></li>
+                      <li class="talk"><span class="pill">Poster</span><span class="talk__title">LLM-Based Indoor Navigation System for Individuals with Blindness or Low Vision</span><span class="talk__where">STARS Celebration Conference 2024; CMD-IT/ACM Richard Tapia Conference 2025</span></li>
+                    </ul>
+                    <!-- /build:talks -->
+                </div>
             </div>
         </section>
 
@@ -1169,7 +1233,7 @@
                       <h3 class="cv__title">Ph.D. in Computer Science</h3>
                       <p class="cv__role">University of Maryland, Baltimore County</p>
                       <p class="cv__meta">GPA: 3.78/4.00</p>
-                      <ul class="cv__notes"><li>Advisor: Dr. Tim Oates</li><li>Research focus: multimodal AI systems for assistive technologies</li><li>Expected May 2027</li></ul>
+                      <ul class="cv__notes"><li>Advisor: Dr. Tim Oates</li><li>Research focus: multimodal AI systems for assistive technologies</li><li>Expected May 2028</li></ul>
                     </div>
                   </li>
                   <li data-reveal>
@@ -1376,8 +1440,10 @@
               <li><a href="/#experience">Experience</a></li>
               <li><a href="/#teaching">Teaching</a></li>
               <li><a href="/#news">News</a></li>
-              <li><a href="/blog.html">Blog</a></li>
               <li><a href="/#contact">Contact</a></li>
+              <li><a href="/blog.html">Blog</a></li>
+              <li><a href="/accessibility.html">Accessibility</a></li>
+              <li><a href="/feed.xml">News feed (RSS)</a></li>
             </ul>
           </nav>
           <nav aria-label="Profiles">
@@ -1416,7 +1482,7 @@
     <!-- Citation exporter, shared by every Cite button -->
     <cite-dialog class="ds"></cite-dialog>
     <!-- build:pub-data -->
-    <script type="application/json" id="pub-data">{"nextday-wildfire":{"title":"Modular Deep Learning Mechanisms for Auditable Next-Day Wildfire Spread Prediction","authors":["Miguel Esparza","Aydin Ayanzadeh","Ahmad Mousavi","Ali Mostafavi"],"venue":"arXiv preprint","venueShort":"arXiv 2026","year":"2026","type":"preprint","url":"https://arxiv.org/abs/2609.17763","status":"Under review","bibtex":"@misc{esparza2026modular,\n  title = {Modular Deep Learning Mechanisms for Auditable Next-Day Wildfire Spread Prediction},\n  author = {Esparza, Miguel and Ayanzadeh, Aydin and Mousavi, Ahmad and Mostafavi, Ali},\n  year = {2026},\n  eprint = {2609.17763},\n  archivePrefix = {arXiv},\n  primaryClass = {cs.LG},\n  doi = {10.48550/arXiv.2609.17763},\n  url = {https://arxiv.org/abs/2609.17763}\n}","keywords":"Preprint Wildfire and environmental AI Modular deep learning augmentations for next-day wildfire spread prediction: wind- and slope-conditioned attention, retrieval-augmented correction, and dual-stream gating.","doi":"10.48550/arXiv.2609.17763","arxiv":"2609.17763"},"iiswc-2026-workload":{"title":"Characterizing an On-Device Depth-Aware Multimodal Workload in Assistive Navigation for Blind and Low-Vision Users","authors":["Aydin Ayanzadeh","Tim Oates"],"venue":"IEEE International Symposium on Workload Characterization (IISWC)","venueShort":"IISWC 2026","year":"2026","type":"inproceedings","url":"","status":"Accepted","bibtex":"@inproceedings{ayanzadeh2026characterizing,\n  title = {Characterizing an On-Device Depth-Aware Multimodal Workload in Assistive Navigation for Blind and Low-Vision Users},\n  author = {Ayanzadeh, Aydin and Oates, Tim},\n  booktitle = {Proceedings of the IEEE International Symposium on Workload Characterization (IISWC)},\n  year = {2026},\n  address = {Boulder, CO, USA}\n}","keywords":"Conference paper Accessible navigation An end-to-end characterization of an on-device, depth-aware multimodal workload for assistive indoor navigation for blind and low-vision users."},"cvpr-2026-floorplan-agentic":{"title":"LLM-Guided Agentic Floor Plan Parsing for Accessible Indoor Navigation of Blind and Low-Vision People","authors":["Aydin Ayanzadeh","Tim Oates"],"venue":"IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) Workshops","venueShort":"CVPR 2026 Workshop (GRAIL-V)","year":"2026","type":"inproceedings","url":"https://openaccess.thecvf.com/content/CVPR2026W/GRAIL-V/papers/Ayanzadeh_LLM-Guided_Agentic_Floor_Plan_Parsing_for_Accessible_Indoor_Navigation_of_CVPRW_2026_paper.pdf","status":"","bibtex":"@inproceedings{ayanzadeh2026llm,\n  title = {LLM-Guided Agentic Floor Plan Parsing for Accessible Indoor Navigation of Blind and Low-Vision People},\n  author = {Ayanzadeh, Aydin and Oates, Tim},\n  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) Workshops},\n  year = {2026},\n  eprint = {2604.23970},\n  archivePrefix = {arXiv},\n  primaryClass = {cs.AI},\n  doi = {10.48550/arXiv.2604.23970},\n  url = {https://arxiv.org/abs/2604.23970}\n}","keywords":"Conference paper Accessible navigation An agentic framework that converts a single floor plan image into a structured, retrievable knowledge base for safe, accessible indoor navigation.","doi":"10.48550/arXiv.2604.23970","arxiv":"2604.23970"},"wildfirevlm":{"title":"WildfireVLM: AI-Powered Analysis for Early Wildfire Detection Using Satellite Imagery","authors":["Aydin Ayanzadeh","Prakhar Dixit","Sadia Kamal","Milton Halem"],"venue":"IEEE International Geoscience and Remote Sensing Symposium (IGARSS)","venueShort":"IGARSS 2026","year":"2026","type":"inproceedings","url":"https://arxiv.org/abs/2602.13305","status":"Accepted","bibtex":"@inproceedings{ayanzadeh2026wildfirevlm,\n  title = {{WildfireVLM}: AI-Powered Analysis for Early Wildfire Detection Using Satellite Imagery},\n  author = {Ayanzadeh, Aydin and Dixit, Prakhar and Kamal, Sadia and Halem, Milton},\n  booktitle = {IEEE International Geoscience and Remote Sensing Symposium (IGARSS)},\n  year = {2026},\n  eprint = {2602.13305},\n  archivePrefix = {arXiv},\n  url = {https://arxiv.org/abs/2602.13305},\n  note = {Accepted}\n}","keywords":"Conference paper Wildfire and environmental AI A vision-language model for early wildfire detection and risk assessment from satellite imagery.","arxiv":"2602.13305"},"IEEEBigData2025":{"title":"Floorplan2Guide: LLM-Guided Floorplan Parsing for BLV Indoor Navigation","authors":["Aydin Ayanzadeh","Tim Oates"],"venue":"2025 IEEE International Conference on Big Data (BigData)","venueShort":"IEEE BigData 2025","year":"2025","type":"inproceedings","url":"https://doi.org/10.1109/BigData66926.2025.11401868","status":"","bibtex":"@inproceedings{ayanzadeh2025floorplan2guide,\n  title     = {Floorplan2Guide: LLM-Guided Floorplan Parsing for BLV Indoor Navigation},\n  author    = {Ayanzadeh, Aydin and Oates, Tim},\n  booktitle = {2025 IEEE International Conference on Big Data (BigData)},\n  pages     = {7477--7485},\n  year      = {2025},\n  doi       = {10.1109/BigData66926.2025.11401868}\n}","keywords":"Conference paper Accessible navigation Floorplan2Guide transforms floorplans into spatial knowledge graphs and language-guided indoor navigation for blind and low-vision users.","pages":"7477-7485","publisher":"IEEE","doi":"10.1109/BigData66926.2025.11401868","arxiv":"2512.12177"},"pursuhint":{"title":"PURSUhInT: In Search of Informative Hint Points Based on Layer Clustering for Knowledge Distillation","authors":["Reyhan Kevser Keser","Aydin Ayanzadeh","Omid Abdollahi Aghdam","Çağlar Kılcıoğlu","Behçet Uğur Töreyin","Nazım Kemal Üre"],"venue":"Expert Systems with Applications","venueShort":"Expert Systems with Applications","year":"2023","type":"article","url":"https://doi.org/10.1016/j.eswa.2022.119040","status":"","bibtex":"@article{keser2023pursuhint,\n  title = {{PURSUhInT}: In Search of Informative Hint Points Based on Layer Clustering for Knowledge Distillation},\n  author = {Keser, Reyhan Kevser and Ayanzadeh, Aydin and Aghdam, Omid Abdollahi and Kilcioglu, Caglar and Toreyin, Behcet Ugur and Ure, Nazim Kemal},\n  journal = {Expert Systems with Applications},\n  volume = {213},\n  pages = {119040},\n  year = {2023},\n  doi = {10.1016/j.eswa.2022.119040},\n  url = {https://doi.org/10.1016/j.eswa.2022.119040},\n  eprint = {2103.00053},\n  archivePrefix = {arXiv},\n  primaryClass = {cs.LG}\n}","keywords":"Journal article Efficient and representation learning A clustering-based hint selection method for knowledge distillation: teacher layers are clustered and the cluster centers become the hint points.","volume":"213","pages":"119040","doi":"10.1016/j.eswa.2022.119040","arxiv":"2103.00053"}}</script>
+    <script type="application/json" id="pub-data">{"nextday-wildfire":{"title":"Modular Deep Learning Mechanisms for Auditable Next-Day Wildfire Spread Prediction","authors":["Miguel Esparza","Aydin Ayanzadeh","Ahmad Mousavi","Ali Mostafavi"],"venue":"arXiv preprint","venueShort":"arXiv 2026","year":"2026","type":"preprint","url":"https://arxiv.org/pdf/2609.17763","status":"Under review","bibtex":"@misc{esparza2026modular,\n  title = {Modular Deep Learning Mechanisms for Auditable Next-Day Wildfire Spread Prediction},\n  author = {Esparza, Miguel and Ayanzadeh, Aydin and Mousavi, Ahmad and Mostafavi, Ali},\n  year = {2026},\n  eprint = {2609.17763},\n  archivePrefix = {arXiv},\n  primaryClass = {cs.LG},\n  doi = {10.48550/arXiv.2609.17763},\n  url = {https://arxiv.org/abs/2609.17763}\n}","keywords":"Preprint Wildfire and environmental AI Modular deep learning augmentations for next-day wildfire spread prediction: wind- and slope-conditioned attention, retrieval-augmented correction, and dual-stream gating.","doi":"10.48550/arXiv.2609.17763","arxiv":"2609.17763"},"iiswc-2026-workload":{"title":"Characterizing an On-Device Depth-Aware Multimodal Workload in Assistive Navigation for Blind and Low-Vision Users","authors":["Aydin Ayanzadeh","Tim Oates"],"venue":"IEEE International Symposium on Workload Characterization (IISWC)","venueShort":"IISWC 2026","year":"2026","type":"inproceedings","url":"","status":"Accepted","bibtex":"@inproceedings{ayanzadeh2026characterizing,\n  title = {Characterizing an On-Device Depth-Aware Multimodal Workload in Assistive Navigation for Blind and Low-Vision Users},\n  author = {Ayanzadeh, Aydin and Oates, Tim},\n  booktitle = {Proceedings of the IEEE International Symposium on Workload Characterization (IISWC)},\n  year = {2026},\n  address = {Boulder, CO, USA}\n}","keywords":"Conference paper Accessible navigation An end-to-end characterization of an on-device, depth-aware multimodal workload for assistive indoor navigation for blind and low-vision users."},"cvpr-2026-floorplan-agentic":{"title":"LLM-Guided Agentic Floor Plan Parsing for Accessible Indoor Navigation of Blind and Low-Vision People","authors":["Aydin Ayanzadeh","Tim Oates"],"venue":"IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) Workshops","venueShort":"CVPR 2026 Workshop (GRAIL-V)","year":"2026","type":"inproceedings","url":"https://openaccess.thecvf.com/content/CVPR2026W/GRAIL-V/papers/Ayanzadeh_LLM-Guided_Agentic_Floor_Plan_Parsing_for_Accessible_Indoor_Navigation_of_CVPRW_2026_paper.pdf","status":"","bibtex":"@inproceedings{ayanzadeh2026llm,\n  title = {LLM-Guided Agentic Floor Plan Parsing for Accessible Indoor Navigation of Blind and Low-Vision People},\n  author = {Ayanzadeh, Aydin and Oates, Tim},\n  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) Workshops},\n  year = {2026},\n  eprint = {2604.23970},\n  archivePrefix = {arXiv},\n  primaryClass = {cs.AI},\n  doi = {10.48550/arXiv.2604.23970},\n  url = {https://arxiv.org/abs/2604.23970}\n}","keywords":"Conference paper Accessible navigation An agentic framework that converts a single floor plan image into a structured, retrievable knowledge base for safe, accessible indoor navigation.","doi":"10.48550/arXiv.2604.23970","arxiv":"2604.23970"},"wildfirevlm":{"title":"WildfireVLM: AI-Powered Analysis for Early Wildfire Detection Using Satellite Imagery","authors":["Aydin Ayanzadeh","Prakhar Dixit","Sadia Kamal","Milton Halem"],"venue":"IEEE International Geoscience and Remote Sensing Symposium (IGARSS)","venueShort":"IGARSS 2026","year":"2026","type":"inproceedings","url":"https://arxiv.org/pdf/2602.13305","status":"Accepted","bibtex":"@inproceedings{ayanzadeh2026wildfirevlm,\n  title = {{WildfireVLM}: AI-Powered Analysis for Early Wildfire Detection Using Satellite Imagery},\n  author = {Ayanzadeh, Aydin and Dixit, Prakhar and Kamal, Sadia and Halem, Milton},\n  booktitle = {IEEE International Geoscience and Remote Sensing Symposium (IGARSS)},\n  year = {2026},\n  eprint = {2602.13305},\n  archivePrefix = {arXiv},\n  url = {https://arxiv.org/abs/2602.13305},\n  note = {Accepted}\n}","keywords":"Conference paper Wildfire and environmental AI A vision-language model for early wildfire detection and risk assessment from satellite imagery.","arxiv":"2602.13305"},"IEEEBigData2025":{"title":"Floorplan2Guide: LLM-Guided Floorplan Parsing for BLV Indoor Navigation","authors":["Aydin Ayanzadeh","Tim Oates"],"venue":"2025 IEEE International Conference on Big Data (BigData)","venueShort":"IEEE BigData 2025","year":"2025","type":"inproceedings","url":"https://arxiv.org/pdf/2512.12177","status":"","bibtex":"@inproceedings{ayanzadeh2025floorplan2guide,\n  title     = {Floorplan2Guide: LLM-Guided Floorplan Parsing for BLV Indoor Navigation},\n  author    = {Ayanzadeh, Aydin and Oates, Tim},\n  booktitle = {2025 IEEE International Conference on Big Data (BigData)},\n  pages     = {7477--7485},\n  year      = {2025},\n  doi       = {10.1109/BigData66926.2025.11401868}\n}","keywords":"Conference paper Accessible navigation Floorplan2Guide transforms floorplans into spatial knowledge graphs and language-guided indoor navigation for blind and low-vision users.","pages":"7477-7485","publisher":"IEEE","doi":"10.1109/BigData66926.2025.11401868","arxiv":"2512.12177"},"pursuhint":{"title":"PURSUhInT: In Search of Informative Hint Points Based on Layer Clustering for Knowledge Distillation","authors":["Reyhan Kevser Keser","Aydin Ayanzadeh","Omid Abdollahi Aghdam","Çağlar Kılcıoğlu","Behçet Uğur Töreyin","Nazım Kemal Üre"],"venue":"Expert Systems with Applications","venueShort":"Expert Systems with Applications","year":"2023","type":"article","url":"https://arxiv.org/pdf/2103.00053","status":"","bibtex":"@article{keser2023pursuhint,\n  title = {{PURSUhInT}: In Search of Informative Hint Points Based on Layer Clustering for Knowledge Distillation},\n  author = {Keser, Reyhan Kevser and Ayanzadeh, Aydin and Aghdam, Omid Abdollahi and Kilcioglu, Caglar and Toreyin, Behcet Ugur and Ure, Nazim Kemal},\n  journal = {Expert Systems with Applications},\n  volume = {213},\n  pages = {119040},\n  year = {2023},\n  doi = {10.1016/j.eswa.2022.119040},\n  url = {https://doi.org/10.1016/j.eswa.2022.119040},\n  eprint = {2103.00053},\n  archivePrefix = {arXiv},\n  primaryClass = {cs.LG}\n}","keywords":"Journal article Efficient and representation learning A clustering-based hint selection method for knowledge distillation: teacher layers are clustered and the cluster centers become the hint points.","volume":"213","pages":"119040","doi":"10.1016/j.eswa.2022.119040","arxiv":"2103.00053"}}</script>
     <!-- /build:pub-data -->
 
     <!-- Legacy live regions and scripts, kept for the Projects sections -->

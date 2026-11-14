@@ -4,31 +4,47 @@
   "summary": "Ph.D. student in Computer Science working on computer vision, multimodal learning and medical image analysis. Current research integrates vision-language models with computer vision for assistive technology, in particular indoor navigation for people who are blind or have low vision.",
   "education": [
     {
-      "when": "May 2025 – Present", "start": "2025-05", "current": true,
+      "when": "May 2025 – Present",
+      "start": "2025-05",
+      "current": true,
       "degree": "Ph.D. in Computer Science",
       "org": "University of Maryland, Baltimore County",
       "gpa": "3.78/4.00",
-      "details": ["Advisor: Dr. Tim Oates", "Research focus: multimodal AI systems for assistive technologies", "Expected May 2027"],
+      "details": [
+        "Advisor: Dr. Tim Oates",
+        "Research focus: multimodal AI systems for assistive technologies",
+        "Expected May 2028"
+      ],
       "logo": "umbc"
     },
     {
-      "when": "Feb 2022 – May 2025", "start": "2022-02", "end": "2025-05",
+      "when": "Feb 2022 – May 2025",
+      "start": "2022-02",
+      "end": "2025-05",
       "degree": "M.S. in Computer Science",
       "org": "University of Maryland, Baltimore County",
       "gpa": "3.78/4.00",
-      "details": ["Coursework: Advanced Algorithms, Knowledge Graphs, Machine Learning, Computer Vision, Data Privacy"],
+      "details": [
+        "Coursework: Advanced Algorithms, Knowledge Graphs, Machine Learning, Computer Vision, Data Privacy"
+      ],
       "logo": "umbc"
     },
     {
-      "when": "Sept 2018 – Sept 2020", "start": "2018-09", "end": "2020-09",
+      "when": "Sept 2018 – Sept 2020",
+      "start": "2018-09",
+      "end": "2020-09",
       "degree": "M.Sc. in Applied Informatics",
       "org": "Istanbul Technical University, Turkey",
       "gpa": "3.75/4.00",
-      "details": ["Coursework: Image Processing, Applied Informatics in Structural Biology, Fuzzy Logic"],
+      "details": [
+        "Coursework: Image Processing, Applied Informatics in Structural Biology, Fuzzy Logic"
+      ],
       "logo": "itu"
     },
     {
-      "when": "Sept 2011 – Apr 2016", "start": "2011-09", "end": "2016-04",
+      "when": "Sept 2011 – Apr 2016",
+      "start": "2011-09",
+      "end": "2016-04",
       "degree": "B.Sc. in Computer Science",
       "org": "University of Tabriz, Iran",
       "gpa": "3.11/4.00"
@@ -36,52 +52,113 @@
   ],
   "experience": [
     {
-      "when": "Dec 2022 – Present", "start": "2022-12", "current": true,
-      "org": "CORAL Lab, UMBC", "role": "Researcher · Advisor: Tim Oates", "location": "Baltimore, MD",
-      "blocks": [{"notes": [
-        "Developing a multi-task network for segmenting and classifying medical images on imbalanced datasets",
-        "Leading InVLM accessible indoor navigation research with Prof. Tim Oates (<a href=\"/projects/indoor-navigation.html\">project notes</a>)",
-        "Principal Investigator, UMBC IRB Protocol #1743 (Expedited, approved May 2025)"
-      ]}]
-    },
-    {
-      "when": "Oct 2020 – Jan 2022", "start": "2020-10", "end": "2022-01",
-      "org": "Tubitak 1001 (Grant #119E578)", "role": "Research Assistant · Supervisor: Devrim Unay", "location": "Izmir, Turkey",
-      "blocks": [{"project": "Image processing and machine learning tools for phase-contrast optical microscopy time series", "notes": [
-        "Analyzed cell morphology and movement in phase-contrast optical microscopy time series",
-        "Designed an auto-encoder that sped up training, improved tracking robustness, and reduced overfitting on segmentation and tracking"
-      ]}]
-    },
-    {
-      "when": "Dec 2019 – Dec 2020", "start": "2019-12", "end": "2020-12",
-      "org": "Arcelik Global Co.", "role": "Researcher · Supervisor: Nazim Kemal Ure", "location": "Istanbul, Turkey",
+      "when": "Dec 2022 – Present",
+      "start": "2022-12",
+      "current": true,
+      "org": "CORAL Lab, UMBC",
+      "role": "Researcher · Advisor: Tim Oates",
+      "location": "Baltimore, MD",
       "blocks": [
-        {"project": "Optimization of Multi-Task Network on Surveillance Cameras", "notes": ["Quantized a multi-task model for edge devices, raising inference from 2 fps to 18 fps"]},
-        {"project": "Model Compression for Efficient Video Processing on Edge Devices", "notes": [
-          "Built a multi-task people-monitoring network for surveillance cameras on edge devices",
-          "Compressed the models with quantization, using Intel OpenVINO"
-        ]}
+        {
+          "notes": [
+            "Developing a multi-task network for segmenting and classifying medical images on imbalanced datasets",
+            "Leading InVLM accessible indoor navigation research with Prof. Tim Oates (<a href=\"/projects/indoor-navigation.html\">project notes</a>)",
+            "Principal Investigator, UMBC IRB Protocol #1743 (Expedited, approved May 2025)"
+          ]
+        }
       ]
     },
     {
-      "when": "May 2019 – Jan 2022", "start": "2019-05", "end": "2022-01",
-      "org": "Vodafone FutureLab", "role": "Research Fellowship · Supervisor: Mehmet Basaran", "location": "Istanbul, Turkey",
-      "blocks": [{"notes": [
-        "Introduced Res-VGAE, a variational graph auto-encoder with residual connections",
-        "Proposed dynamic Word2Vec to examine social structure of Vodafone customers"
-      ]}]
-    },
-    {
-      "when": "Sept 2018 – Dec 2021", "start": "2018-09", "end": "2021-12",
-      "org": "SP4CING Lab", "role": "Research Assistant · Co-Advisors: Behcet Ugur Toreyin and Devrim Unay", "location": "Istanbul, Turkey",
-      "blocks": [{"notes": ["Introduced an auto-encoder with a modified ResNet-18 encoder"]}]
-    },
-    {
-      "when": "Apr 2017 – June 2018", "start": "2017-04", "end": "2018-06",
-      "org": "SiMiT Lab", "role": "Researcher (Unpaid) · Supervisor: Hazim Kemal Ekenel", "location": "Istanbul, Turkey",
+      "when": "Oct 2020 – Jan 2022",
+      "start": "2020-10",
+      "end": "2022-01",
+      "org": "Tubitak 1001 (Grant #119E578)",
+      "role": "Research Assistant · Supervisor: Devrim Unay",
+      "location": "Izmir, Turkey",
       "blocks": [
-        {"project": "Kaggle Dog Breeds Identification with transfer learning", "notes": ["Fine-tuned ImageNet-pretrained models for the Kaggle dog-breed identification dataset"]},
-        {"project": "Google Cloud YouTube-8M Video Understanding Challenge", "notes": ["Examined deep neural networks with skip connections for the Kaggle video understanding challenge"]}
+        {
+          "project": "Image processing and machine learning tools for phase-contrast optical microscopy time series",
+          "notes": [
+            "Analyzed cell morphology and movement in phase-contrast optical microscopy time series",
+            "Designed an auto-encoder that sped up training, improved tracking robustness, and reduced overfitting on segmentation and tracking"
+          ]
+        }
+      ]
+    },
+    {
+      "when": "Dec 2019 – Dec 2020",
+      "start": "2019-12",
+      "end": "2020-12",
+      "org": "Arcelik Global Co.",
+      "role": "Researcher · Supervisor: Nazim Kemal Ure",
+      "location": "Istanbul, Turkey",
+      "blocks": [
+        {
+          "project": "Optimization of Multi-Task Network on Surveillance Cameras",
+          "notes": [
+            "Quantized a multi-task model for edge devices, raising inference from 2 fps to 18 fps"
+          ]
+        },
+        {
+          "project": "Model Compression for Efficient Video Processing on Edge Devices",
+          "notes": [
+            "Built a multi-task people-monitoring network for surveillance cameras on edge devices",
+            "Compressed the models with quantization, using Intel OpenVINO"
+          ]
+        }
+      ]
+    },
+    {
+      "when": "May 2019 – Jan 2022",
+      "start": "2019-05",
+      "end": "2022-01",
+      "org": "Vodafone FutureLab",
+      "role": "Research Fellowship · Supervisor: Mehmet Basaran",
+      "location": "Istanbul, Turkey",
+      "blocks": [
+        {
+          "notes": [
+            "Introduced Res-VGAE, a variational graph auto-encoder with residual connections",
+            "Proposed dynamic Word2Vec to examine social structure of Vodafone customers"
+          ]
+        }
+      ]
+    },
+    {
+      "when": "Sept 2018 – Dec 2021",
+      "start": "2018-09",
+      "end": "2021-12",
+      "org": "SP4CING Lab",
+      "role": "Research Assistant · Co-Advisors: Behcet Ugur Toreyin and Devrim Unay",
+      "location": "Istanbul, Turkey",
+      "blocks": [
+        {
+          "notes": [
+            "Introduced an auto-encoder with a modified ResNet-18 encoder"
+          ]
+        }
+      ]
+    },
+    {
+      "when": "Apr 2017 – June 2018",
+      "start": "2017-04",
+      "end": "2018-06",
+      "org": "SiMiT Lab",
+      "role": "Researcher (Unpaid) · Supervisor: Hazim Kemal Ekenel",
+      "location": "Istanbul, Turkey",
+      "blocks": [
+        {
+          "project": "Kaggle Dog Breeds Identification with transfer learning",
+          "notes": [
+            "Fine-tuned ImageNet-pretrained models for the Kaggle dog-breed identification dataset"
+          ]
+        },
+        {
+          "project": "Google Cloud YouTube-8M Video Understanding Challenge",
+          "notes": [
+            "Examined deep neural networks with skip connections for the Kaggle video understanding challenge"
+          ]
+        }
       ]
     }
   ],
@@ -90,13 +167,41 @@
     "org": "University of Maryland, Baltimore County",
     "when": "Spring 2022 – Present",
     "courses": [
-      {"code": "CMSC 313", "name": "Computer Organization and Assembly Language Programming", "terms": "Spring 2025, Fall 2024, Spring 2024, Spring 2022"},
-      {"code": "CMSC 104", "name": "Problem Solving & Programming", "terms": "Summer 2024"},
-      {"code": "CMSC 433", "name": "Scripting Languages", "terms": "Summer 2024"},
-      {"code": "CMSC 671", "name": "Principles of Artificial Intelligence", "terms": "Fall 2023"},
-      {"code": "CMSC 304", "name": "Social & Ethical Issues in IT", "terms": "Summer 2023"},
-      {"code": "CMSC 691", "name": "Introduction to Data Science", "terms": "Spring 2023, Fall 2022"},
-      {"code": "CMSC 341", "name": "Data Structures", "terms": "Summer 2022"}
+      {
+        "code": "CMSC 313",
+        "name": "Computer Organization and Assembly Language Programming",
+        "terms": "Spring 2025, Fall 2024, Spring 2024, Spring 2022"
+      },
+      {
+        "code": "CMSC 104",
+        "name": "Problem Solving & Programming",
+        "terms": "Summer 2024"
+      },
+      {
+        "code": "CMSC 433",
+        "name": "Scripting Languages",
+        "terms": "Summer 2024"
+      },
+      {
+        "code": "CMSC 671",
+        "name": "Principles of Artificial Intelligence",
+        "terms": "Fall 2023"
+      },
+      {
+        "code": "CMSC 304",
+        "name": "Social & Ethical Issues in IT",
+        "terms": "Summer 2023"
+      },
+      {
+        "code": "CMSC 691",
+        "name": "Introduction to Data Science",
+        "terms": "Spring 2023, Fall 2022"
+      },
+      {
+        "code": "CMSC 341",
+        "name": "Data Structures",
+        "terms": "Summer 2022"
+      }
     ],
     "notes": [
       "Supported undergraduate and graduate sections across systems, AI, data science, scripting, ethics, and intro programming",
@@ -104,26 +209,77 @@
     ]
   },
   "reviewing": [
-    {"journal": "Expert Systems with Applications", "publisher": "Elsevier", "when": "Jan 2024"},
-    {"journal": "Neurocomputing", "publisher": "Elsevier", "when": "Nov 2024"},
-    {"journal": "Scientific Reports", "publisher": "Nature", "when": "May 2024"},
-    {"journal": "Multimedia Systems", "publisher": "Springer Nature", "when": "May 2024"},
-    {"journal": "International Journal of Machine Learning & Cybernetics", "publisher": "Springer Nature", "when": "June 2024"},
-    {"journal": "Signal Processing: Image Communication", "publisher": "Elsevier", "when": "June 2024"}
+    {
+      "journal": "Expert Systems with Applications",
+      "publisher": "Elsevier",
+      "when": "Jan 2024"
+    },
+    {
+      "journal": "Neurocomputing",
+      "publisher": "Elsevier",
+      "when": "Nov 2024"
+    },
+    {
+      "journal": "Scientific Reports",
+      "publisher": "Nature",
+      "when": "May 2024"
+    },
+    {
+      "journal": "Multimedia Systems",
+      "publisher": "Springer Nature",
+      "when": "May 2024"
+    },
+    {
+      "journal": "International Journal of Machine Learning & Cybernetics",
+      "publisher": "Springer Nature",
+      "when": "June 2024"
+    },
+    {
+      "journal": "Signal Processing: Image Communication",
+      "publisher": "Elsevier",
+      "when": "June 2024"
+    }
   ],
   "mentoring": [
-    {"lead": "Undergraduate research", "text": "in computer vision and machine learning"},
-    {"lead": "Technical guidance", "text": "on programming projects and assignments"},
-    {"lead": "Career advising", "text": "for research paths and graduate school"},
-    {"lead": "Project supervision", "text": "for capstones and independent study in AI and vision"}
+    {
+      "lead": "Undergraduate research",
+      "text": "in computer vision and machine learning"
+    },
+    {
+      "lead": "Technical guidance",
+      "text": "on programming projects and assignments"
+    },
+    {
+      "lead": "Career advising",
+      "text": "for research paths and graduate school"
+    },
+    {
+      "lead": "Project supervision",
+      "text": "for capstones and independent study in AI and vision"
+    }
   ],
   "awards": [
-    {"when": "May 2025", "date": "2025-05", "title": "International Alumni Endowed Scholarship", "org": "University of Maryland, Baltimore County (UMBC), USA",
-     "desc": "Prestigious scholarship recognizing outstanding academic achievement and international student contributions to the UMBC community."},
-    {"when": "May 2019", "date": "2019-05", "title": "Research Fellowship", "org": "Vodafone FutureLab, Turkey",
-     "desc": "Competitive fellowship for advanced research in telecommunications and technology innovation."},
-    {"when": "Sept 2011", "date": "2011-09", "title": "Top 1% Ranking", "org": "Nationwide Universities Entrance Exam, Iran",
-     "desc": "Achieved top 1% ranking among 500,000+ students in the highly competitive national university entrance examination."}
+    {
+      "when": "May 2025",
+      "date": "2025-05",
+      "title": "International Alumni Endowed Scholarship",
+      "org": "University of Maryland, Baltimore County (UMBC), USA",
+      "desc": "Prestigious scholarship recognizing outstanding academic achievement and international student contributions to the UMBC community."
+    },
+    {
+      "when": "May 2019",
+      "date": "2019-05",
+      "title": "Research Fellowship",
+      "org": "Vodafone FutureLab, Turkey",
+      "desc": "Competitive fellowship for advanced research in telecommunications and technology innovation."
+    },
+    {
+      "when": "Sept 2011",
+      "date": "2011-09",
+      "title": "Top 1% Ranking",
+      "org": "Nationwide Universities Entrance Exam, Iran",
+      "desc": "Achieved top 1% ranking among 500,000+ students in the highly competitive national university entrance examination."
+    }
   ],
   "certificates": [
     "AI for Medicine (3-course specialization), deeplearning.ai on Coursera",
@@ -135,8 +291,19 @@
     "Digital Image and Video Processing, Northwestern University"
   ],
   "presentations": [
-    {"authors": "Aydin Ayanzadeh, Tim Oates", "title": "LLM-Based Indoor Navigation System for Individuals with Blindness or Low Vision",
-     "where": "Poster. STARS Celebration Conference 2024; CMD-IT/ACM Richard Tapia Conference 2025"}
+    {
+      "authors": "Aydin Ayanzadeh, Prakhar Dixit, Sadia Kamal, Milton Halem",
+      "title": "WildfireVLM: AI-Powered Analysis for Early Wildfire Detection Using Satellite Imagery",
+      "where": "IEEE International Geoscience and Remote Sensing Symposium (IGARSS) 2026",
+      "kind": "Slides",
+      "url": "/assets/slides/wildfire-vlm-igarss-2026.pdf"
+    },
+    {
+      "authors": "Aydin Ayanzadeh, Tim Oates",
+      "title": "LLM-Based Indoor Navigation System for Individuals with Blindness or Low Vision",
+      "where": "STARS Celebration Conference 2024; CMD-IT/ACM Richard Tapia Conference 2025",
+      "kind": "Poster"
+    }
   ],
   "memberships": [
     "IEEE Graduate Student Member (since 2022)",
@@ -148,5 +315,10 @@
     "Secretary of the Scientific Association, Computer Science Department, University of Tabriz (2014–2015)",
     "Executive Secretary, International Symposium on Computer Science and Software Engineering, University of Tabriz (2015)"
   ],
-  "languages": ["English (fluent)", "Turkish (fluent)", "Persian (native)", "Azerbaijani (native)"]
+  "languages": [
+    "English (fluent)",
+    "Turkish (fluent)",
+    "Persian (native)",
+    "Azerbaijani (native)"
+  ]
 }

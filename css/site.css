@@ -637,6 +637,60 @@
 .intro__role { margin-top: var(--s-4); font-size: var(--t-md); color: var(--c-ink-2); }
 .intro__role a { color: inherit; font-weight: 700; text-decoration-color: var(--c-accent); }
 .intro__role a:hover { color: var(--c-brand); }
+.intro__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: var(--s-3);
+  padding: 0.3rem 0.85rem 0.3rem 0.7rem;
+  border: 1px solid color-mix(in srgb, var(--c-brand) 30%, var(--c-line));
+  border-radius: var(--r-pill);
+  background: var(--c-brand-tint);
+  color: var(--c-brand-strong);
+  font-size: var(--t-sm);
+  font-weight: 700;
+}
+.status-dot {
+  position: relative;
+  width: 0.55rem;
+  height: 0.55rem;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #1f9d6e;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .status-dot::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid #1f9d6e;
+    animation: dot-pulse 2.6s ease-out infinite;
+  }
+}
+.page-hero .intro__status { margin-top: var(--s-4); }
+
+.talks-wrap { margin-top: var(--s-6); }
+.talks__title { font: 700 var(--t-xs)/1.4 var(--f-body); letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-ink-3); margin-bottom: var(--s-3); }
+.talk {
+  display: grid;
+  grid-template-columns: 6.5rem minmax(0, 1fr) auto;
+  gap: 0.15rem var(--s-4);
+  align-items: baseline;
+  padding-block: 0.8rem;
+  border-top: 1px solid var(--c-line);
+}
+.talk:last-child { border-bottom: 1px solid var(--c-line); }
+.talk .pill { justify-self: start; }
+.talk__title { grid-column: 2; font-family: var(--f-display); font-size: 1.05rem; font-weight: 600; line-height: 1.35; color: var(--c-ink); }
+.talk__where { grid-column: 2; font-size: var(--t-sm); color: var(--c-ink-3); }
+.talk .pub__link { grid-column: 3; grid-row: 1 / span 2; align-self: center; }
+@media (max-width: 560px) {
+  .talk { grid-template-columns: minmax(0, 1fr); }
+  .talk__title, .talk__where, .talk .pub__link { grid-column: 1; grid-row: auto; }
+  .talk .pub__link { justify-self: start; margin-top: 0.35rem; }
+}
+
 .intro__lead {
   max-width: 40rem;
   margin-top: var(--s-5);
@@ -1711,6 +1765,8 @@ html:not(.js) .marquee__track[aria-hidden='true'] { display: none; }
 
 .article { max-width: var(--w-read); font-size: 1.125rem; line-height: 1.75; color: var(--c-ink-2); }
 .article > * + *, .article > section > * + * { margin-top: 1.15em; }
+.article > h2:first-child { margin-top: 0; }
+.wrap--read.sec { padding-top: var(--s-6); }
 .article > section + section { margin-top: 2.6em; }
 .article h2 { margin-top: 2.2em; font-family: var(--f-display); font-size: 1.7rem; color: var(--c-ink); letter-spacing: -0.01em; }
 .article h3 { margin-top: 1.8em; font-family: var(--f-display); font-size: 1.3rem; color: var(--c-ink); }

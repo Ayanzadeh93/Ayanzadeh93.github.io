@@ -14,7 +14,9 @@
     "cv": "/Aydin_Ayanzadeh_CV__final.pdf",
     "twitter": "@aydin_ayanzadeh",
     "blurb": "Ph.D. student in Computer Science at UMBC working on computer vision, multimodal learning and medical image analysis, with a focus on AI that is useful in clinics, in the field and in assistive technology.",
-    "cvPage": "/cv.html"
+    "cvPage": "/cv.html",
+    "availability": "Ph.D. expected May 2028 · open to research internships and collaborations",
+    "graduation": "2028-05"
   },
   "nav": [
     {
@@ -46,11 +48,6 @@
       "id": "news",
       "label": "News",
       "href": "/#news"
-    },
-    {
-      "id": "blog",
-      "label": "Blog",
-      "href": "/blog.html"
     },
     {
       "id": "contact",
@@ -124,14 +121,19 @@
       "priority": "0.6"
     },
     {
-      "loc": "/blog-post.html",
+      "loc": "/contact.html",
+      "changefreq": "yearly",
+      "priority": "0.5"
+    },
+    {
+      "loc": "/blog/multi-task-learning/",
       "changefreq": "yearly",
       "priority": "0.4"
     },
     {
-      "loc": "/contact.html",
+      "loc": "/accessibility.html",
       "changefreq": "yearly",
-      "priority": "0.5"
+      "priority": "0.3"
     }
   ],
   "toolkit": [
@@ -233,6 +235,20 @@
           "icon": "jupyter"
         }
       ]
+    }
+  ],
+  "footerExtra": [
+    {
+      "label": "Blog",
+      "href": "/blog.html"
+    },
+    {
+      "label": "Accessibility",
+      "href": "/accessibility.html"
+    },
+    {
+      "label": "News feed (RSS)",
+      "href": "/feed.xml"
     }
   ]
 }

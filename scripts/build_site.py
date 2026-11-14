@@ -15,7 +15,8 @@ Outputs (do not edit by hand — rerun this script):
     assets/publications.bib  every curated BibTeX entry
     sitemap.xml              in-scope URLs (Projects entries are kept verbatim)
     regions marked <!-- build:NAME --> … <!-- /build:NAME --> inside
-    index.html, contact.html, blog.html, blog-post.html, 404.html and llms.txt
+    index.html, contact.html, blog.html, blog/multi-task-learning/index.html, 404.html and llms.txt
+    feed.xml, accessibility.html
 
 Usage:
     python scripts/build_site.py           write outputs
@@ -140,6 +141,7 @@ def head_assets() -> str:
         '<link rel="preload" href="/fonts/newsreader-var-latin.woff2" as="font" type="font/woff2" crossorigin>',
         '<link rel="preload" href="/fonts/atkinson-hyperlegible-400-latin.woff2" as="font" type="font/woff2" crossorigin>',
         '<link rel="apple-touch-icon" href="/apple-touch-icon.png">',
+        '<link rel="alternate" type="application/rss+xml" title="Aydin Ayanzadeh: publications and news" href="/feed.xml">',
         '<link rel="stylesheet" href="/css/site.css">',
         '<script src="/js/theme-init.js"></script>',
     ])
@@ -188,7 +190,8 @@ def render_header(site: dict, current: str | None = None, home: bool = False) ->
 def render_footer(site: dict, pubs: list[dict]) -> str:
     person = site["person"]
     nav = "\n".join(
-        f'          <li><a href="{esc(item["href"])}">{esc(item["label"])}</a></li>' for item in site["nav"]
+        f'          <li><a href="{esc(item["href"])}">{esc(item["label"])}</a></li>'
+        for item in site["nav"] + site.get("footerExtra", [])
     )
     profiles = "\n".join(
         f'          <li><a href="{esc(p["url"])}" rel="me noopener">{esc(p["label"])}</a></li>' for p in site["profiles"]
@@ -314,6 +317,8 @@ def paper_links(pub: dict) -> list[tuple[str, str]]:
     out: list[tuple[str, str]] = []
     if links.get("pdf"):
         out.append(("PDF", links["pdf"]))
+    elif pub.get("arxiv"):
+        out.append(("PDF", f'https://arxiv.org/pdf/{pub["arxiv"]}'))
     doi = pub.get("doi", "")
     if doi and not is_arxiv_doi(doi):
         out.append(("Publisher", f"https://doi.org/{doi}"))
@@ -524,8 +529,9 @@ def scholar_meta(pub: dict, site: dict) -> str:
         tags.append(("citation_doi", pub["doi"]))
     if pub.get("arxiv"):
         tags.append(("citation_arxiv_id", pub["arxiv"]))
-    if pub.get("links", {}).get("pdf"):
-        tags.append(("citation_pdf_url", pub["links"]["pdf"]))
+    pdf = pub.get("links", {}).get("pdf") or (f'https://arxiv.org/pdf/{pub["arxiv"]}' if pub.get("arxiv") else "")
+    if pdf:
+        tags.append(("citation_pdf_url", pdf))
     tags.append(("citation_abstract_html_url", f'{site["url"]}/{pub["id"]}/'))
     return "\n".join(f'<meta name="{name}" content="{esc(value)}">' for name, value in tags)
 
@@ -1010,16 +1016,39 @@ def render_toolkit(site: dict) -> str:
 </div>"""
 
 
-def render_home_ld(pubs: list[dict], site: dict) -> str:
-    """Selected publications as an ItemList, so the homepage points at the papers."""
+def render_home_ld(pubs: list[dict], site: dict, profile: dict) -> str:
+    """Selected publications as an ItemList, plus person facts from profile.json.
+
+    The Person node reuses the @id of the hand-written graph in index.html, so
+    search engines merge the two descriptions into one entity.
+    """
     base = site["url"]
+    schools = []
+    for degree in profile["education"]:
+        name = degree["org"].split(",")[0]
+        if name not in [s["name"] for s in schools]:
+            schools.append({"@type": "CollegeOrUniversity", "name": name})
+    person = {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "@id": f"{base}/#person",
+        "alumniOf": schools,
+        "memberOf": [{"@type": "Organization", "name": m.split(" (")[0].replace(" Graduate Student Member", "").replace(" Member", "")}
+                     for m in profile.get("memberships", [])],
+        "award": [f'{a["title"]}, {a["org"]} ({a["when"]})' for a in profile["awards"]],
+        "knowsLanguage": [lang.split(" (")[0] for lang in profile.get("languages", [])],
+        "hasOccupation": {"@type": "Occupation", "name": "Graduate research assistant",
+                          "occupationalCategory": "Computer and information research scientists"},
+        "seeks": site["person"].get("availability", ""),
+    }
+    person = {k: v for k, v in person.items() if v}
     selected = [p for p in pubs if p.get("selected")]
     items = [
         {"@type": "ListItem", "position": index, "name": p["title"],
          "url": f'{base}/{p["id"]}/' if p.get("page") else p.get("external_page", "")}
         for index, p in enumerate(selected, 1)
     ]
-    return json_ld({
+    return json_ld(person) + "\n" + json_ld({
         "@context": "https://schema.org",
         "@type": "ItemList",
         "@id": f"{base}/#selected-publications",
@@ -1082,6 +1111,12 @@ def render_news(pubs: list[dict], news: dict, visible: int = 6) -> str:
         more = (f'\n<p class="news__more"><button class="button button--sm" type="button" data-news-more hidden>'
                 f'<span data-label>Show earlier updates</span></button></p>')
     return f'<ol class="news" data-news>\n{chr(10).join(rows)}\n</ol>{more}'
+
+
+def render_availability(site: dict) -> str:
+    """One line under the role: when the Ph.D. ends and what is welcome."""
+    text = site["person"].get("availability")
+    return f'<p class="intro__status"><span class="status-dot" aria-hidden="true"></span>{esc(text)}</p>' if text else ""
 
 
 def render_facts(pubs: list[dict], profile: dict) -> str:
@@ -1274,6 +1309,25 @@ def render_teaching(profile: dict) -> str:
 </div>"""
 
 
+def talk_item(talk: dict) -> str:
+    link = f' <a href="{esc(talk["url"])}">{esc(talk["kind"])} (PDF)</a>' if talk.get("url") else f' {esc(talk["kind"])}.'
+    return (f'<li><span class="cvpub__authors">{esc(talk["authors"])}.</span> <span class="cvpub__title">{esc(talk["title"])}.</span> '
+            f'<span class="cvpub__venue">{esc(talk["where"])}.</span>{link}</li>')
+
+
+def render_talks(profile: dict) -> str:
+    """Homepage: talks and posters, under the news list."""
+    rows = "\n".join(
+        f'  <li class="talk"><span class="pill">{esc(t["kind"])}</span>'
+        f'<span class="talk__title">{esc(t["title"])}</span>'
+        f'<span class="talk__where">{esc(t["where"])}</span>'
+        + (f'<a class="pub__link" href="{esc(t["url"])}">{icon("slides")}{esc(t["kind"])}</a>' if t.get("url") else "")
+        + "</li>"
+        for t in profile["presentations"]
+    )
+    return f'<h3 class="talks__title">Talks and posters</h3>\n<ul class="talks">\n{rows}\n</ul>'
+
+
 def render_awards(profile: dict, heading: str = "h3") -> str:
     cards = "\n".join(
         f"""  <li class="honor" data-reveal>
@@ -1317,11 +1371,7 @@ def render_cv(profile: dict, pubs: list[dict], topics: dict, site: dict) -> str:
         + "\n".join("          " + cv_publication(p, me) for p in items) + "\n        </ol>"
         for label, items in groups if items
     )
-    presentations = "\n".join(
-        f'          <li><span class="cvpub__authors">{esc(t["authors"])}.</span> <span class="cvpub__title">{esc(t["title"])}.</span> '
-        f'<span class="cvpub__venue">{esc(t["where"])}.</span></li>'
-        for t in profile["presentations"]
-    )
+    presentations = "\n".join("          " + talk_item(t) for t in profile["presentations"])
     teaching = profile["teaching"]
     teaching_notes = "".join(f"<li>{esc(n)}</li>" for n in teaching["notes"])
     awards = "\n".join(
@@ -1340,7 +1390,7 @@ def render_cv(profile: dict, pubs: list[dict], topics: dict, site: dict) -> str:
         for p in site["profiles"] if p.get("primary")
     )
     sections = [("summary", "Summary"), ("education", "Education"), ("experience", "Research experience"),
-                ("publications", "Publications"), ("presentations", "Posters"), ("teaching", "Teaching"),
+                ("publications", "Publications"), ("presentations", "Talks and posters"), ("teaching", "Teaching"),
                 ("awards", "Honors and awards"), ("service", "Service and memberships"),
                 ("skills", "Technical skills"), ("languages", "Languages")]
     toc = "\n".join(f'        <li><a href="#{anchor}">{esc(label)}</a></li>' for anchor, label in sections)
@@ -1354,6 +1404,7 @@ def render_cv(profile: dict, pubs: list[dict], topics: dict, site: dict) -> str:
       <p class="eyebrow">Curriculum vitae</p>
       <h1 class="page-hero__title">{esc(me)}</h1>
       <p class="page-hero__lede">{esc(person["role"])}, {esc(person["affiliation"])} · {esc(person["lab"])}</p>
+      {render_availability(site)}
       <p class="cv-contact"><a href="mailto:{esc(person["emailUniversity"])}">{esc(person["emailUniversity"])}</a> · <a href="mailto:{esc(person["email"])}">{esc(person["email"])}</a> · {esc(person["location"])}</p>
       <p class="cv-contact">{links}</p>
       <p class="paper-actions">
@@ -1388,7 +1439,7 @@ def render_cv(profile: dict, pubs: list[dict], topics: dict, site: dict) -> str:
         <p class="muted mt-4">Abstracts, figures and BibTeX are in the <a href="/publications.html">publication library</a>.</p>
       </section>
       <section id="presentations" aria-labelledby="presentations-h">
-        <h2 id="presentations-h">Posters</h2>
+        <h2 id="presentations-h">Talks and posters</h2>
         <ol class="cvpubs">
 {presentations}
         </ol>
@@ -1510,6 +1561,113 @@ def render_sitemap(pubs: list[dict], site: dict, existing: str) -> str:
             + "\n".join(blocks) + "\n</urlset>\n")
 
 
+def rfc822(date: str) -> str:
+    """RSS date for a full YYYY-MM-DD, else empty (a guessed day is not a date)."""
+    import datetime
+    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", date):
+        return ""
+    return datetime.datetime.strptime(date, "%Y-%m-%d").strftime("%a, %d %b %Y 00:00:00 +0000")
+
+
+def render_feed(pubs: list[dict], news: dict, site: dict) -> str:
+    """RSS 2.0: every publication, then the hand-written news items."""
+    base = site["url"]
+    me = site["person"]["name"]
+    items = []
+    for pub in pubs:
+        link = f'{base}/{pub["id"]}/' if pub.get("page") else pub.get("external_page", "")
+        items.append(
+            "  <item>\n"
+            f"    <title>{esc(pub['title'])}</title>\n"
+            f"    <link>{esc(link)}</link>\n"
+            f"    <guid isPermaLink=\"true\">{esc(link)}</guid>\n"
+            f"    <category>{esc(TYPE_LABEL[pub['type']])}</category>\n"
+            f"    <description>{esc(pub['venue_short'])}, {pub['year']}. {esc(pub['summary'])}</description>\n"
+            "  </item>"
+        )
+    for item in news["items"]:
+        link = base + item["url"] if item.get("url", "").startswith("/") else f"{base}/#news"
+        date = rfc822(item["date"])
+        items.append(
+            "  <item>\n"
+            f"    <title>{esc(item['text'])}</title>\n"
+            f"    <link>{esc(link)}</link>\n"
+            f"    <guid isPermaLink=\"false\">news-{esc(item['date'])}-{esc(re.sub(r'[^a-z0-9]+', '-', item['text'].lower()).strip('-'))}</guid>\n"
+            f"    <category>{esc(item['kind'])}</category>\n"
+            + (f"    <pubDate>{date}</pubDate>\n" if date else "")
+            + "  </item>"
+        )
+    return ('<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">\n<channel>\n'
+            f"  <title>{esc(me)}: publications and news</title>\n"
+            f"  <link>{base}/</link>\n"
+            f'  <atom:link href="{base}/feed.xml" rel="self" type="application/rss+xml"/>\n'
+            f"  <description>New papers and research updates from {esc(me)}, {esc(site['person']['affiliationShort'])}.</description>\n"
+            "  <language>en</language>\n"
+            f"  <lastBuildDate>{rfc822(site['updated'])}</lastBuildDate>\n"
+            + "\n".join(items) + "\n</channel>\n</rss>\n")
+
+
+def render_accessibility(site: dict, pubs: list[dict]) -> str:
+    person = site["person"]
+    base = site["url"]
+    body = f"""<main id="main">
+  <header class="page-hero">
+    <div class="wrap">
+      <nav aria-label="Breadcrumb">
+        <ol class="crumbs"><li><a href="/">Home</a></li><li aria-current="page">Accessibility</li></ol>
+      </nav>
+      <h1 class="page-hero__title">Accessibility</h1>
+      <p class="page-hero__lede">My research is about access for blind and low-vision people, so this site tries to hold itself to the same standard. This page says what it does, how it was checked, and where it still falls short.</p>
+    </div>
+  </header>
+  <div class="wrap wrap--read sec">
+    <div class="article">
+      <h2>Target</h2>
+      <p>The pages aim to meet the Web Content Accessibility Guidelines (WCAG) 2.2 at level AA.</p>
+      <h2>What the site does</h2>
+      <ul>
+        <li>Body text is set in Atkinson Hyperlegible, a typeface designed by the Braille Institute for low-vision readers.</li>
+        <li>Text keeps a contrast ratio of at least 4.5:1, and form controls at least 3:1, in both the light and the dark theme.</li>
+        <li>Every page can be used with a keyboard alone. A skip link leads to the main content, focus is always visible, and dialogs trap and return focus.</li>
+        <li>Each page has one main heading, labelled landmarks, and alternative text or a text description for figures and charts.</li>
+        <li>Animation stops when the operating system asks for reduced motion, and the moving toolkit row has a pause button.</li>
+        <li>Everything is readable without JavaScript; interactive extras appear only when they work.</li>
+        <li>The colour theme follows the system setting until you choose one with the button in the header.</li>
+      </ul>
+      <h2>How it was checked</h2>
+      <ul>
+        <li>Automated checks with axe-core on representative pages, in both themes, at desktop and phone widths, with no violations.</li>
+        <li>A browser test that loads every page at two widths and exercises the menu, theme switch, search, citation dialog, figure zoom and forms with the keyboard.</li>
+        <li>Contrast computed directly from the colour tokens of the design system.</li>
+      </ul>
+      <h2>Known limitations</h2>
+      <ul>
+        <li>Some paper figures are hosted on arXiv. When they cannot load, a short note takes their place, and the full figure is in the paper.</li>
+        <li>Redrawn diagrams have a short description rather than a full text equivalent of every element.</li>
+        <li>The site has not yet been tested end to end with a screen reader by a blind user.</li>
+      </ul>
+      <h2>Tell me about a problem</h2>
+      <p>If something on this site is hard to use, please email <a href="mailto:{esc(person["email"])}">{esc(person["email"])}</a>. I read every message and will fix what I can.</p>
+      <p class="muted">Last reviewed {esc(human_date(site["updated"]))}.</p>
+    </div>
+  </div>
+</main>"""
+    crumbs = breadcrumb_ld([("Home", f"{base}/"), ("Accessibility", f"{base}/accessibility.html")])
+    return page_shell(
+        title=f"Accessibility | {person['name']}",
+        description="How this site supports keyboard, screen-reader and low-vision use, how it was checked, and how to report a problem.",
+        canonical=f"{base}/accessibility.html",
+        og_type="website",
+        og_image=f"{base}/assets/og/home.png",
+        head_extra=json_ld(crumbs),
+        body=body,
+        site=site,
+        pubs=pubs,
+        current=None,
+    )
+
+
 def render_bib(pubs: list[dict], site: dict) -> str:
     header = (f"% Publications of {site['person']['name']}\n"
               f"% Generated from data/publications.json — {site['url']}/publications.html\n\n")
@@ -1535,6 +1693,8 @@ def build() -> dict[str, str]:
     outputs["publications.html"] = render_library(pubs, topic_list, topics, site)
     outputs["cv.html"] = render_cv(profile, pubs, topics, site)
     outputs["assets/publications.bib"] = render_bib(pubs, site)
+    outputs["feed.xml"] = render_feed(pubs, news, site)
+    outputs["accessibility.html"] = render_accessibility(site, pubs)
     outputs["sitemap.xml"] = render_sitemap(pubs, site, (ROOT / "sitemap.xml").read_text(encoding="utf-8"))
 
     selected = [p for p in pubs if p.get("selected")]
@@ -1545,6 +1705,8 @@ def build() -> dict[str, str]:
                            facts=render_facts(pubs, profile),
                            threads=render_threads(pubs, topic_list),
                            toolkit=render_toolkit(site),
+                           availability=render_availability(site),
+                           talks=render_talks(profile),
                            experience=render_experience(profile),
                            education=render_education(profile),
                            teaching=render_teaching(profile),
@@ -1553,11 +1715,11 @@ def build() -> dict[str, str]:
                            **{"selected-publications": render_selected(pubs, site),
                               "news": render_news(pubs, news),
                               "pub-data": data_island(selected, topics),
-                              "structured-data": render_home_ld(pubs, site)}),
+                              "structured-data": render_home_ld(pubs, site, profile)}),
         "contact.html": dict(shared, header=render_header(site, current="contact"),
                              contact=render_contact(site, heading="h2")),
         "blog.html": dict(shared, header=render_header(site, current="blog")),
-        "blog-post.html": dict(shared, header=render_header(site, current="blog")),
+        "blog/multi-task-learning/index.html": dict(shared, header=render_header(site, current="blog")),
         "404.html": dict(shared, header=render_header(site)),
         "llms.txt": {"publications": render_llms(pubs, site)},
     }
