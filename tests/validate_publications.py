@@ -142,11 +142,13 @@ def validate_publications(data: dict, check_files: bool = True) -> list[str]:
             if fig.get("svg"):
                 if check_files and not (ROOT / fig["svg"]).is_file():
                     errors.append(f"{pid}: figure {index} file missing: {fig['svg']}")
-            elif is_url(fig.get("src", "")):
+            elif fig.get("src"):
                 if not fig.get("alt", "").strip():
                     errors.append(f"{pid}: figure {index} is an image and needs alt text")
+                if not is_url(fig["src"]) and check_files and not (ROOT / fig["src"].lstrip("/")).is_file():
+                    errors.append(f"{pid}: figure {index} file missing: {fig['src']}")
             else:
-                errors.append(f"{pid}: figure {index} needs an svg file or an https src")
+                errors.append(f"{pid}: figure {index} needs an svg file, a local image or an https src")
         for item in page.get("highlights") or []:
             if not (str(item.get("value", "")).strip() and str(item.get("label", "")).strip()):
                 errors.append(f"{pid}: every highlight needs a value and a label")

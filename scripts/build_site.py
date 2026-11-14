@@ -549,6 +549,10 @@ def render_figure(fig: dict, index: int) -> str:
     if fig.get("svg"):
         media = (ROOT / fig["svg"]).read_text(encoding="utf-8").strip()
         missing = ""
+    elif not fig["src"].startswith("http"):
+        # A copy saved in the repository (scripts/fetch_figures.py).
+        media = f'<img src="/{esc(fig["src"].lstrip("/"))}" alt="{esc(fig.get("alt", ""))}" loading="lazy" decoding="async">'
+        missing = ""
     else:
         media = (f'<img src="{esc(fig["src"])}" alt="{esc(fig.get("alt", ""))}" loading="lazy" '
                  f'decoding="async" referrerpolicy="no-referrer">')
@@ -710,6 +714,7 @@ def render_paper(pub: dict, pubs: list[dict], topics: dict, site: dict) -> str:
       <p class="paper-hero__venue"><span class="eyebrow">{esc(eyebrow)}</span>{tag}</p>
       <h1 class="paper-hero__title">{title_html}</h1>
       <ul class="paper-byline" aria-label="Authors">{authors}</ul>{affil}
+      <p class="paper-hero__brief"><span class="paper-hero__brief-k">In brief</span>{esc(pub["summary"])}</p>
       <p class="paper-actions">{"".join(actions)}</p>
     </div>
   </header>

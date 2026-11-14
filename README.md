@@ -36,6 +36,8 @@ repeat the same bibliography by hand.
 ├── fonts/                      Self-hosted Newsreader and Atkinson Hyperlegible
 ├── scripts/
 │   ├── build_site.py           The generator (no dependencies)
+│   ├── fetch_figures.py        Saves hot-linked paper figures into assets/figures/
+│   ├── check_profiles.py       Compares the publication list with DBLP and ORCID
 │   └── make_social_cards.js    Optional: renders assets/og/*.png with Playwright
 ├── tests/
 │   ├── validate_publications.py  Data schema + internal link check (CI)
@@ -97,6 +99,11 @@ paper page with its Google Scholar tags and `ScholarlyArticle` JSON-LD, `assets/
 `sitemap.xml` all follow from that one edit. A paper from the last two calendar years also appears under
 *News* automatically.
 
+### Housekeeping scripts
+
+- `python scripts/fetch_figures.py` saves the paper figures still loaded from arxiv.org into `assets/figures/` and points the data at the copies. Check each paper's licence before committing them.
+- `python scripts/check_profiles.py` lists papers that DBLP or ORCID know about and the site does not, and the reverse.
+
 ### Other content
 
 - **News**: add an item to `data/news.json`, rebuild.
@@ -135,9 +142,10 @@ Principles the code holds to:
 | `python tests/validate_publications.py --self-test` | Proves each validation rule can fail |
 | `python scripts/build_site.py --check` | Generated files match the data |
 | `python tests/validate_content.py` | Projects data and route contracts |
+| `python tests/check_budgets.py` | Byte budgets for pages, styles, scripts, fonts and images |
 | `node tests/smoke.js` | Optional, needs Playwright: loads all in-scope pages at two widths, fails on console errors or overflow, and drives the interactive features |
 
-The first four run in GitHub Actions on every pull request and push to `main`.
+The first five run in GitHub Actions on every pull request and push to `main`.
 
 ## Deployment
 
