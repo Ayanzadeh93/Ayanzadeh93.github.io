@@ -1342,6 +1342,22 @@ html:not(.js) .marquee__track[aria-hidden='true'] { display: none; }
 .paper-byline .me { color: var(--c-ink); font-weight: 700; }
 .paper-byline sup { margin-left: 0.1rem; font-size: 0.65em; color: var(--c-accent-strong); }
 .paper-affil { margin-top: var(--s-2); font-size: var(--t-sm); color: var(--c-ink-3); }
+.paper-hero__brief {
+  max-width: 46rem;
+  margin-top: var(--s-4);
+  font-family: var(--f-display);
+  font-size: var(--t-md);
+  line-height: 1.5;
+  color: var(--c-ink);
+}
+.paper-hero__brief-k {
+  margin-right: 0.6rem;
+  font: 700 var(--t-xs)/1 var(--f-body);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--c-accent-strong);
+  vertical-align: 0.15em;
+}
 .paper-actions { display: flex; flex-wrap: wrap; gap: var(--s-3); margin-top: var(--s-5); }
 
 .paper-layout {

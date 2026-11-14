@@ -1,6 +1,8 @@
 .DS_Store
 ._*
-Thumbs.db
 .env
 .env.*
+Thumbs.db
+__pycache__/
 node_modules/
+scripts/__pycache__/

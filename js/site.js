@@ -478,7 +478,8 @@
                         item.hidden = !match;
                         if (match) shown += 1;
                     });
-                    if (status) status.textContent = shown + (shown === 1 ? ' post' : ' posts');
+                    var noun = group.getAttribute('data-filter-noun') || 'post';
+                    if (status) status.textContent = shown + ' ' + noun + (shown === 1 ? '' : 's');
                 });
             });
         });
