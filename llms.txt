@@ -16,6 +16,7 @@
 - [Projects](https://www.ayanzadeh.com/projects/): FloorPlan2Guide, WildfireVLM, medical segmentation, and more
 - [Contact](https://www.ayanzadeh.com/contact.html): collaboration contact details
 - [Blog](https://www.ayanzadeh.com/blog.html): research notes
+- [Curriculum vitae](https://www.ayanzadeh.com/cv.html): education, research experience, publications, teaching, honors and service
 - [CV (PDF)](https://www.ayanzadeh.com/Aydin_Ayanzadeh_CV__final.pdf)
 
 ## Publications

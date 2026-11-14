@@ -64,7 +64,7 @@ changes are data edits and must never require touching rendering code**:
 
 | Data file | Rendered by | Covers |
 |-----------|-------------|--------|
-| `data/publications.json`, `data/news.json`, `data/site.json` | `scripts/build_site.py` (build time) | Publication library, paper pages, homepage selected publications / research threads / news / headline counts, header, footer, contact block, `assets/publications.bib`, `sitemap.xml` |
+| `data/publications.json`, `data/news.json`, `data/site.json`, `data/profile.json` | `scripts/build_site.py` (build time) | Publication library, paper pages, `cv.html`, homepage selected publications / research threads / toolkit / news / experience / education / teaching / awards / headline counts, header, footer, contact block, `assets/publications.bib`, `sitemap.xml`, the publication list in `llms.txt` |
 | `data/projects.json` | `js/projects-index.js`, `js/project-detail.js` | The projects index and detail routes |
 | GitHub CLI catalog (standalone) | [`Ayanzadeh93/claude-code-encyclopedia`](https://github.com/Ayanzadeh93/claude-code-encyclopedia) | GitHub CLI entries live with the encyclopedia app. `apps/claude-code-*.html` in this repo are redirects. |
 
@@ -79,7 +79,7 @@ python tests/validate_publications.py     # publication schema + every internal 
 python tests/validate_content.py          # Projects data + route contracts
 ```
 
-**Never hand-edit generated output**: `publications.html`, any
+**Never hand-edit generated output**: `publications.html`, `cv.html`, any
 `<paper-id>/index.html`, or the inside of a `<!-- build:NAME -->` region. The
 next build overwrites it and the `--check` step fails.
 

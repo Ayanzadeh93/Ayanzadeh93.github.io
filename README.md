@@ -12,11 +12,13 @@ repeat the same bibliography by hand.
 ```
 ├── index.html                  Homepage (hand-written, with generated regions)
 ├── publications.html           Publication library            ← generated
+├── cv.html                     Web curriculum vitae           ← generated
 ├── <paper-id>/index.html       One page per publication       ← generated
 ├── contact.html, blog.html, blog-post.html, 404.html          hand-written, generated header/footer
 ├── data/
 │   ├── publications.json       Every publication — the single source of truth
 │   ├── news.json               Hand-written news items
+│   ├── profile.json            Education, experience, teaching, service, honours
 │   ├── site.json               Name, links, navigation, "last updated" date
 │   └── projects.json           Projects hub data (separate system, see below)
 ├── assets/
@@ -97,12 +99,14 @@ paper page with its Google Scholar tags and `ScholarlyArticle` JSON-LD, `assets/
 ### Other content
 
 - **News**: add an item to `data/news.json`, rebuild.
-- **Profile links, navigation, contact details**: `data/site.json`, rebuild. Bump `updated` when content changes; it drives the footer date and the sitemap.
-- **Homepage text** (research statement, experience, education, teaching, awards): edit `index.html` directly, outside the `<!-- build:… -->` regions.
-- **CV**: replace `Aydin_Ayanzadeh_CV__final.pdf`.
+- **Education, experience, teaching, reviewing, awards, memberships**: `data/profile.json`, rebuild. The homepage sections and `cv.html` both follow.
+- **Profile links, navigation, contact details, toolkit**: `data/site.json`, rebuild. Bump `updated` when content changes; it drives the footer date and the sitemap.
+- **Homepage text** (research statement, interests, the floor-plan illustration): edit `index.html` directly, outside the `<!-- build:… -->` regions.
+- **Toolkit logos**: `assets/icons/tech.svg` (Simple Icons, CC0); add a symbol and reference its id from `data/site.json`.
+- **CV**: the web CV is generated; replace `Aydin_Ayanzadeh_CV__final.pdf` for the PDF.
 
-Never edit inside a `<!-- build:NAME -->` … `<!-- /build:NAME -->` region, a paper page, or
-`publications.html` by hand: the next build overwrites it, and CI fails when generated files are stale
+Never edit inside a `<!-- build:NAME -->` … `<!-- /build:NAME -->` region, a paper page,
+`publications.html` or `cv.html` by hand: the next build overwrites it, and CI fails when generated files are stale
 (`python scripts/build_site.py --check`).
 
 ## Design system
