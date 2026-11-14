@@ -62,7 +62,7 @@ Projects pages (legacy; copy as-is unless adding origins):
 ```
 - [ ] Listing entry in blog.html (date, category, title, excerpt, topics)
 - [ ] Link the title only if the post page exists; otherwise keep the "Summary only" pill
-- [ ] Post page copied from blog-post.html (.article), registered in build() in scripts/build_site.py
+- [ ] Post page copied from blog/multi-task-learning/index.html (.article), registered in build() in scripts/build_site.py
 - [ ] BlogPosting JSON-LD, title and description match the post
 - [ ] Added to "sitemap" in data/site.json; python scripts/build_site.py
 ```

@@ -19,6 +19,10 @@ on:
       - '*/index.html'
       - 'sitemap.xml'
       - 'llms.txt'
+      - 'css/**'
+      - 'fonts/**'
+      - 'assets/**'
+      - 'blog/**'
       - '.github/workflows/content-validation.yml'
   push:
     branches: [main]
@@ -57,3 +61,5 @@ jobs:
         run: |
           python tests/validate_publications.py --self-test
           python tests/validate_publications.py
+      - name: Size budgets
+        run: python tests/check_budgets.py

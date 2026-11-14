@@ -14,7 +14,8 @@ repeat the same bibliography by hand.
 ├── publications.html           Publication library            ← generated
 ├── cv.html                     Web curriculum vitae           ← generated
 ├── <paper-id>/index.html       One page per publication       ← generated
-├── contact.html, blog.html, blog-post.html, 404.html          hand-written, generated header/footer
+├── contact.html, blog.html, blog/<slug>/, 404.html         hand-written, generated header/footer
+├── accessibility.html, feed.xml                              ← generated
 ├── data/
 │   ├── publications.json       Every publication — the single source of truth
 │   ├── news.json               Hand-written news items

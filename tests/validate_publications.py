@@ -39,7 +39,7 @@ DATE = re.compile(r"^\d{4}(-\d{2}(-\d{2})?)?$")
 BIB_HEAD = re.compile(r"^@(\w+)\{([^,\s]+),")
 
 # Pages this validator owns. Projects pages are deliberately not listed.
-STATIC_PAGES = ["index.html", "publications.html", "cv.html", "contact.html", "blog.html", "blog-post.html", "404.html"]
+STATIC_PAGES = ["index.html", "publications.html", "cv.html", "contact.html", "blog.html", "blog/multi-task-learning/index.html", "accessibility.html", "404.html"]
 
 
 def read_json(relative: str):
