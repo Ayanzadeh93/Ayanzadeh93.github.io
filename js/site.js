@@ -419,6 +419,15 @@
         });
     }
 
+    /* ── Print button (the CV page) ───────────────────────────────────────── */
+    function initPrint() {
+        document.querySelectorAll('[data-print]').forEach(function (button) {
+            if (typeof window.print !== 'function') return;
+            button.hidden = false;
+            button.addEventListener('click', function () { window.print(); });
+        });
+    }
+
     /* ── Toolkit marquee: a visible way to stop anything that moves ───────── */
     function initMarquee() {
         var marquee = document.querySelector('[data-marquee]');
@@ -585,6 +594,7 @@
         run('figures', initFigures);
         run('threads', initThreads);
         run('marquee', initMarquee);
+        run('print', initPrint);
         run('news', initNews);
         run('filters', initFilters);
         run('contact form', initContactForm);

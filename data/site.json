@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "url": "https://www.ayanzadeh.com",
-  "updated": "2026-11-13",
+  "updated": "2026-11-14",
   "person": {
     "name": "Aydin Ayanzadeh",
     "role": "Ph.D. student in Computer Science",
@@ -13,7 +13,8 @@
     "location": "Baltimore, Maryland, USA",
     "cv": "/Aydin_Ayanzadeh_CV__final.pdf",
     "twitter": "@aydin_ayanzadeh",
-    "blurb": "Ph.D. student in Computer Science at UMBC working on computer vision, multimodal learning and medical image analysis, with a focus on AI that is useful in clinics, in the field and in assistive technology."
+    "blurb": "Ph.D. student in Computer Science at UMBC working on computer vision, multimodal learning and medical image analysis, with a focus on AI that is useful in clinics, in the field and in assistive technology.",
+    "cvPage": "/cv.html"
   },
   "nav": [
     {
@@ -113,6 +114,11 @@
       "priority": "0.9"
     },
     {
+      "loc": "/cv.html",
+      "changefreq": "monthly",
+      "priority": "0.8"
+    },
+    {
       "loc": "/blog.html",
       "changefreq": "monthly",
       "priority": "0.6"
@@ -141,8 +147,8 @@
           "icon": "matlab"
         },
         {
-          "name": "C",
-          "icon": "c"
+          "name": "C/C++",
+          "icon": "cplusplus"
         },
         {
           "name": "SQL",
@@ -180,6 +186,18 @@
         {
           "name": "NumPy",
           "icon": "numpy"
+        },
+        {
+          "name": "Hugging Face Transformers",
+          "icon": "huggingface"
+        },
+        {
+          "name": "PyTorch Lightning",
+          "icon": "lightning"
+        },
+        {
+          "name": "ONNX",
+          "icon": "onnx"
         }
       ]
     },
@@ -205,6 +223,14 @@
         {
           "name": "ImageJ/Fiji",
           "icon": "imagej"
+        },
+        {
+          "name": "Docker",
+          "icon": "docker"
+        },
+        {
+          "name": "Jupyter",
+          "icon": "jupyter"
         }
       ]
     }

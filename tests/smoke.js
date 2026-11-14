@@ -19,7 +19,7 @@ const path = require('node:path');
 const BASE = process.env.BASE_URL || 'http://127.0.0.1:8765';
 const data = JSON.parse(readFileSync(path.join(__dirname, '..', 'data', 'publications.json'), 'utf8'));
 const papers = data.publications.filter((p) => p.page).map((p) => `/${p.id}/`);
-const pages = ['/', '/publications.html', '/contact.html', '/blog.html', '/blog-post.html', '/404.html', ...papers];
+const pages = ['/', '/publications.html', '/cv.html', '/contact.html', '/blog.html', '/blog-post.html', '/404.html', ...papers];
 
 let failures = 0;
 const fail = (message) => { failures += 1; console.log(`  FAIL ${message}`); };
