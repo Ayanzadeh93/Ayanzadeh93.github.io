@@ -55,6 +55,12 @@
         <priority>0.8</priority>
     </url>
     <url>
+        <loc>https://www.ayanzadeh.com/grip-bigdata-2026/</loc>
+        <lastmod>2026-11-14</lastmod>
+        <changefreq>yearly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
         <loc>https://www.ayanzadeh.com/cvpr-2026-floorplan-agentic/</loc>
         <lastmod>2026-11-14</lastmod>
         <changefreq>yearly</changefreq>
