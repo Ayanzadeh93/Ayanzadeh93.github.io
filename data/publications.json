@@ -22,7 +22,7 @@
     {
       "id": "efficient",
       "name": "Efficient and representation learning",
-      "summary": "Knowledge distillation with clustered hint points, and residual variational graph autoencoders for link prediction.",
+      "summary": "Knowledge distillation with clustered hint points, residual variational graph autoencoders for link prediction, and graph-guided revision of scientific ideas.",
       "icon": "layers"
     },
     {
@@ -188,6 +188,69 @@
       },
       "links": {
         "code": "https://github.com/Ayanzadeh93/IISWIC-2026-paper_"
+      }
+    },
+    {
+      "id": "grip-bigdata-2026",
+      "title": "GRIP: Graph-Guided Review-Informed Preserve-and-Repair for Scientific Idea Revision",
+      "title_lead": "GRIP:",
+      "authors": [
+        "Aydin Ayanzadeh",
+        "Ahmad Mousavi"
+      ],
+      "affiliations": "University of Maryland, Baltimore County · American University",
+      "type": "inproceedings",
+      "year": 2026,
+      "venue": "2026 IEEE International Conference on Big Data (BigData) Workshops",
+      "venue_short": "IEEE BigData 2026 Workshop",
+      "venue_line": "IEEE BigData 2026 Workshop · Building Trustworthy AI Pipelines for Big Data: Verification, Provenance, and Reproducibility",
+      "status": "accepted",
+      "publisher": "IEEE",
+      "topic": "efficient",
+      "selected": true,
+      "summary": "A variational framework that revises scientific ideas by preserving acceptance-worthy content and repairing rejection-worthy content on an idea graph, using peer-review feedback as weak supervision.",
+      "bibtex": "@inproceedings{ayanzadeh2026grip,\n  title = {{GRIP}: Graph-Guided Review-Informed Preserve-and-Repair for Scientific Idea Revision},\n  author = {Ayanzadeh, Aydin and Mousavi, Ahmad},\n  booktitle = {2026 IEEE International Conference on Big Data (BigData) Workshops},\n  year = {2026},\n  note = {Workshop on Building Trustworthy AI Pipelines for Big Data: Verification, Provenance, and Reproducibility. Accepted},\n  address = {Phoenix, AZ, USA}\n}",
+      "page": {
+        "description": "GRIP revises scientific ideas by separating preservation from repair on an idea graph, using peer-review feedback as weak supervision. Accepted at the IEEE BigData 2026 workshop on Building Trustworthy AI Pipelines for Big Data.",
+        "abstract_heading": "Abstract",
+        "abstract": [
+          "Large language models can generate plausible research ideas, but they lack a principled mechanism for deciding which parts of an idea should be preserved and which should be revised. We introduce GRIP (Graph-guided Review-Informed Preserve-and-repair), a variational framework that treats peer-review feedback as weak supervision over complementary latent factors: acceptance-worthy content to preserve and rejection-worthy content to repair. At the document level these factors are separate preserve and repair latents; at the idea-graph level each facet or claim node carries its own preserve-and-repair latents, enabling localised revision instead of undifferentiated rewriting. Positive reviewer feedback supervises preservation latents; negative feedback supervises repair latents; a graph-aware decoder rewrites only high-repair nodes while keeping the graph structure intact. An evidence lower bound aligns review-informed posteriors with idea-only priors, enabling revision without explicit feedback at inference time. A three-tier data representation—abstract-level corpus indexing, compact retrieval for generation, and review-grounded revision—keeps LLM cost bounded as the paper collection grows. We specify an experimental protocol with datasets, baselines, and preserve–repair metrics; empirical results are left to future instantiation of the released pipeline. Compared with checklist-grounded RL, graph-based edit selection, and facet-level interactive refinement, GRIP is the first formulation to cast scientific idea revision as dual-latent variational inference with explicit preserve–repair semantics on an idea graph."
+        ],
+        "notes": [
+          "Abstract from the authors’ manuscript. The paper was accepted at the IEEE BigData 2026 workshop Building Trustworthy AI Pipelines for Big Data: Verification, Provenance, and Reproducibility (Phoenix, AZ); the proceedings record is not public yet, so no DOI or page numbers are listed here."
+        ],
+        "method_heading": "Framework",
+        "method_layout": "grid",
+        "method": [
+          {
+            "title": "Dual-latent preserve and repair",
+            "text": "Document- and node-level latents separate acceptance-worthy content to keep from rejection-worthy content to fix."
+          },
+          {
+            "title": "Idea-graph decoder",
+            "text": "A graph-aware decoder rewrites high-repair facet nodes while copying high-preservation nodes, instead of regenerating the full proposal."
+          },
+          {
+            "title": "Feedback-free inference",
+            "text": "Training distils review supervision into idea-only priors so the model can revise without explicit reviewer input at test time."
+          },
+          {
+            "title": "Tiered corpus representation",
+            "text": "Abstract-level indexing, compact retrieval, and review-grounded revision keep LLM cost bounded as the paper collection grows."
+          }
+        ],
+        "resources": [
+          {
+            "label": "Conference",
+            "text": "IEEE BigData 2026",
+            "url": "https://bigdataieee.org/BigData2026/"
+          },
+          {
+            "label": "Workshop",
+            "text": "Building Trustworthy AI Pipelines for Big Data: Verification, Provenance, and Reproducibility",
+            "url": "https://bigdataieee.org/BigData2026/"
+          }
+        ]
       }
     },
     {

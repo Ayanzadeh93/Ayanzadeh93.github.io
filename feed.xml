@@ -22,6 +22,13 @@
     <description>IISWC 2026, 2026. An end-to-end characterization of an on-device, depth-aware multimodal workload for assistive indoor navigation for blind and low-vision users.</description>
   </item>
   <item>
+    <title>GRIP: Graph-Guided Review-Informed Preserve-and-Repair for Scientific Idea Revision</title>
+    <link>https://www.ayanzadeh.com/grip-bigdata-2026/</link>
+    <guid isPermaLink="true">https://www.ayanzadeh.com/grip-bigdata-2026/</guid>
+    <category>Conference paper</category>
+    <description>IEEE BigData 2026 Workshop, 2026. A variational framework that revises scientific ideas by preserving acceptance-worthy content and repairing rejection-worthy content on an idea graph, using peer-review feedback as weak supervision.</description>
+  </item>
+  <item>
     <title>LLM-Guided Agentic Floor Plan Parsing for Accessible Indoor Navigation of Blind and Low-Vision People</title>
     <link>https://www.ayanzadeh.com/cvpr-2026-floorplan-agentic/</link>
     <guid isPermaLink="true">https://www.ayanzadeh.com/cvpr-2026-floorplan-agentic/</guid>
